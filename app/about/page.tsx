@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { org, contact } from "@/lib/org";
 import { agencyLeadership, programDirectors } from "@/lib/staff";
-
+ 
 export const metadata: Metadata = {
   title: "About CADC | Community Action Development Corporation",
   description:
