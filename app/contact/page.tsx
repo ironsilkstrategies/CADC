@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { org, contact } from "@/lib/org";
 import { transitOffices, headStartCenters } from "@/lib/locations";
-
+ 
 export const metadata: Metadata = {
   title: "Contact CADC | Community Action Development Corporation",
   description:
