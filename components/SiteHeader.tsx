@@ -2,24 +2,25 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { programs } from "@/lib/programs";
+import { programs, programHref } from "@/lib/programs";
+import { contact } from "@/lib/org";
 
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-[var(--cadc-border)] shadow-sm">
-      {/* Top utility bar — one-click priority actions */}
+      {/* Top utility bar */}
       <div className="bg-[var(--cadc-blue)] text-white text-sm">
         <div className="mx-auto max-w-7xl px-4 flex items-center justify-between h-9">
           <span className="hidden sm:inline">
             Serving 16–17 counties across Southwest Oklahoma
           </span>
           <a
-            href="tel:18005245552"
+            href={contact.transitPhoneHref}
             className="flex items-center gap-1.5 font-semibold hover:underline"
           >
-            📞 Ride the River: 1-800-524-5552
+            📞 Ride the River: {contact.transitPhone}
           </a>
         </div>
       </div>
@@ -46,11 +47,11 @@ export default function SiteHeader() {
             </div>
           </Link>
 
-          {/* Desktop nav — priority action first */}
+          {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
             <Link
               href="/programs/head-start"
-              className="px-4 py-2 rounded-md bg-[var(--cadc-red)] text-white text-sm font-bold hover:bg-[var(--cadc-red-dark)] transition-colors"
+              className="px-4 py-2 rounded-md bg-[var(--cadc-maroon)] text-white text-sm font-bold hover:bg-[var(--cadc-maroon-dark)] transition-colors"
             >
               Enroll in Head Start
             </Link>
@@ -66,7 +67,7 @@ export default function SiteHeader() {
                   {programs.map((p) => (
                     <Link
                       key={p.slug}
-                      href={p.href}
+                      href={programHref(p.slug)}
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--cadc-blue-light)] text-sm"
                     >
                       <span aria-hidden="true">{p.icon}</span>
@@ -112,7 +113,7 @@ export default function SiteHeader() {
           <div className="px-4 py-3 flex flex-col gap-1">
             <Link
               href="/programs/head-start"
-              className="px-3 py-3 rounded-md bg-[var(--cadc-red)] text-white text-sm font-bold text-center mb-2"
+              className="px-3 py-3 rounded-md bg-[var(--cadc-maroon)] text-white text-sm font-bold text-center mb-2"
               onClick={() => setMenuOpen(false)}
             >
               Enroll in Head Start
@@ -120,7 +121,7 @@ export default function SiteHeader() {
             {programs.map((p) => (
               <Link
                 key={p.slug}
-                href={p.href}
+                href={programHref(p.slug)}
                 className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[var(--cadc-blue-light)] text-sm"
                 onClick={() => setMenuOpen(false)}
               >
