@@ -9,13 +9,39 @@ export const metadata: Metadata = {
     "CADC serves 16-17 counties across Southwest Oklahoma with Head Start, transit, weatherization, senior meals, and more. Find your program and get help today.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+const VERSION = "v1.06";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <div
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            top: "14px",
+            right: "16px",
+            zIndex: 9999,
+            fontSize: "0.6rem",
+            fontWeight: 600,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: "var(--cadc-blue)",
+            opacity: 0.32,
+            userSelect: "none",
+            pointerEvents: "none",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {VERSION}
+        </div>
       </body>
     </html>
   );
