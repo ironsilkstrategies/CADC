@@ -26,7 +26,7 @@ export default function RootLayout({
           aria-hidden="true"
           style={{
             position: "fixed",
-            top: "14px",
+            bottom: "14px",
             right: "16px",
             zIndex: 9999,
             fontSize: "0.6rem",
