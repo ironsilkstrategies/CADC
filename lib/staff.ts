@@ -1,35 +1,169 @@
 /**
  * CADC staff roster.
  *
- * ⚠️ TWO ISSUES TO RESOLVE WITH CADC BEFORE THIS SHIPS:
+ * ⚠️ PRIVACY NOTE: Professional background only — no personal detail
+ * (family, hobbies, personal life) unless a staff member specifically
+ * requests it. The legacy site published spouses' names and children's
+ * ages on a public page. We don't carry that forward by default.
  *
- * 1. TITLE CONFLICT. The legacy site lists BOTH Leslea Hixson and Robin Harris
- *    as "Director of Head Start & Early Head Start," and repeats Karen Segler's
- *    photo and bio twice. The signed proposal addresses Leslea as Executive
- *    Director and Robin as Director of Head Start & Early Head Start. The
- *    proposal version is encoded below. CONFIRM DIRECTLY — do not publish a
- *    guess about someone's job title.
+ * ⚠️ TITLE CONFLICT RESOLVED: The About page confirms Leslea Hixson as
+ * Executive Director (since January 2024). Robin Harris is Director of
+ * Head Start & Early Head Start. Verify once more before launch.
  *
- * 2. PRIVACY REVIEW. The legacy bios publish staff members' spouses, children's
- *    names, and in at least one case the first names and ages of minor children.
- *    That is a real exposure on a public site, and it is not something to carry
- *    forward by default. The `bio` field below holds PROFESSIONAL background
- *    only. Ask each staff member whether they want personal detail included
- *    before adding any back. Defaulting to less is the right call here.
+ * All entries marked verified: false until CADC signs off.
  */
 
 export interface StaffMember {
   id: string;
   name: string;
   title: string;
-  program: "head-start" | "agency";
-  /** Professional background only — see privacy note above. */
+  program: "head-start" | "agency" | "transit" | "weatherization" | "community-services" | "nutrition" | "community-market";
   bio?: string;
   tenure?: string;
   photo?: string;
-  /** True once CADC has confirmed name, title, and bio copy. */
   verified: boolean;
 }
+
+// ─── Agency leadership & administration ──────────────────────────────────────
+
+export const agencyLeadership: StaffMember[] = [
+  {
+    id: "leslea-hixson",
+    name: "Leslea Hixson",
+    title: "Executive Director",
+    program: "agency",
+    tenure: "Since January 2024",
+    bio:
+      "Leslea holds a bachelor's degree in elementary education and a master's in education " +
+      "administration, with 17 years in public education as a teacher and administrator. " +
+      "She joined CADC as Head Start / Early Head Start Director before becoming Executive Director.",
+    verified: false,
+  },
+  {
+    id: "terry-collom",
+    name: "Terry Collom",
+    title: "Chief Financial Officer",
+    program: "agency",
+    tenure: "16 years with CADC",
+    bio:
+      "Terry holds a bachelor's degree in accounting from Cameron University and brings " +
+      "27 years of accounting experience, including 10 years in private manufacturing.",
+    verified: false,
+  },
+  {
+    id: "marty-martin",
+    name: "Marty Martin",
+    title: "Purchasing Officer",
+    program: "agency",
+    tenure: "3 years with CADC",
+    bio:
+      "Marty holds a bachelor's degree in Christian Counseling from Calvary Theological " +
+      "Seminary and an Associate in Computer Science from Cameron University, with 30 years " +
+      "of accounting experience in the banking industry.",
+    verified: false,
+  },
+  {
+    id: "tiffany-camero",
+    name: "Tiffany Camero",
+    title: "Executive Secretary",
+    program: "agency",
+    tenure: "6 years with CADC",
+    bio:
+      "Tiffany is a U.S. Navy veteran who served 4 years on active duty and continues " +
+      "to serve in the Navy Reserves. She attended Converse University and WOSC.",
+    verified: false,
+  },
+  {
+    id: "suzi-fletcher",
+    name: "Suzi Fletcher",
+    title: "Human Resources Director / Payroll Manager",
+    program: "agency",
+    tenure: "Since August 2023",
+    bio:
+      "Suzi holds a bachelor's and master's degree in accounting from Oklahoma State " +
+      "University, with 28 years of experience across payroll, audit, cost, and financial " +
+      "accounting in public and private sectors.",
+    verified: false,
+  },
+  {
+    id: "sarah-perez",
+    name: "Sarah Perez",
+    title: "Bookkeeper",
+    program: "agency",
+    tenure: "Since January 2023",
+    bio:
+      "Sarah holds an Associate's Degree in Business Administration and is working toward " +
+      "a Bachelor's Degree in Accounting at NWOSU.",
+    verified: false,
+  },
+];
+
+// ─── Program directors ────────────────────────────────────────────────────────
+
+export const programDirectors: StaffMember[] = [
+  {
+    id: "gilbert-nuncio",
+    name: "Gilbert Nuncio",
+    title: "Transit Director",
+    program: "transit",
+    tenure: "13 years with CADC",
+    bio:
+      "Gilbert joined Red River Transportation as a driver in 2014, was promoted to " +
+      "Maintenance Supervisor in 2016, Route Supervisor in 2018, and has served as " +
+      "Transit Director since 2021. He brings 8 years of public transportation experience.",
+    verified: false,
+  },
+  {
+    id: "robert-meador",
+    name: "Robert Meador",
+    title: "Weatherization & Housing Director",
+    program: "weatherization",
+    tenure: "Since September 1991",
+    bio:
+      "Robert began with CADC in 1991, became Housing Director in 1993, and was named " +
+      "Weatherization Director in 1996. Over 35 years he has overseen the weatherization " +
+      "of more than a thousand homes. He holds a bachelor's degree in Business Administration " +
+      "plus associate degrees in Accounting and Economics, along with multiple state and " +
+      "national licenses in Community and Economic Development, Environmental Compliance, " +
+      "and Home Energy Performance.",
+    verified: false,
+  },
+  {
+    id: "kristie-jackson",
+    name: "Kristie Jackson",
+    title: "CSBG & Advantage Director",
+    program: "community-services",
+    tenure: "Since January 2023",
+    bio:
+      "Kristie joined CADC as a Head Start teacher in September 2022 before moving into " +
+      "her current role. She holds a bachelor's degree in business administration with a " +
+      "specialty in Human Resource Management and previously served on the CADC Board of Directors.",
+    verified: false,
+  },
+  {
+    id: "laura-vardell",
+    name: "Laura Vardell",
+    title: "Senior Nutrition Director",
+    program: "nutrition",
+    tenure: "4 years with CADC",
+    bio: "Laura oversees the Senior Congregate Meals and nutrition programs across the region.",
+    verified: false,
+  },
+  {
+    id: "scott-fraley",
+    name: "Scott Fraley",
+    title: "Community Market Director",
+    program: "community-market",
+    tenure: "Current",
+    bio:
+      "Scott brings more than 30 years of leadership across retail, merchandising, " +
+      "materials management, and business ownership. Born and raised in Frederick, he " +
+      "is deeply rooted in the community CADC serves.",
+    verified: false,
+  },
+];
+
+// ─── Head Start staff ─────────────────────────────────────────────────────────
 
 export const headStartStaff: StaffMember[] = [
   {
@@ -122,20 +256,13 @@ export const headStartStaff: StaffMember[] = [
   },
 ];
 
-// ─── Agency leadership ───────────────────────────────────────────────────────
-// Per the signed proposal. See title conflict note above.
+// ─── Aggregates ───────────────────────────────────────────────────────────────
 
-export const agencyLeadership: StaffMember[] = [
-  {
-    id: "leslea-hixson",
-    name: "Leslea Hixson",
-    title: "Executive Director",
-    program: "agency",
-    bio:
-      "Leslea holds a bachelor's degree in elementary education and a master's in education " +
-      "administration, with 17 years in public education as a teacher and administrator.",
-    verified: false,
-  },
+export const allStaff = [
+  ...agencyLeadership,
+  ...programDirectors,
+  ...headStartStaff,
 ];
 
-export const allStaff = [...agencyLeadership, ...headStartStaff];
+export const staffByProgram = (program: StaffMember["program"]) =>
+  allStaff.filter((s) => s.program === program);
