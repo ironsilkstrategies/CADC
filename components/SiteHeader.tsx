@@ -49,12 +49,6 @@ export default function SiteHeader() {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
-            <Link
-              href="/programs/head-start"
-              className="px-4 py-2 rounded-md bg-[var(--cadc-maroon)] text-white text-sm font-bold hover:bg-[var(--cadc-maroon-dark)] transition-colors"
-            >
-              Enroll in Head Start
-            </Link>
             <div className="relative group">
               <button className="px-3 py-2 text-sm font-semibold text-[var(--cadc-ink)] hover:text-[var(--cadc-blue)] flex items-center gap-1">
                 Programs
@@ -111,13 +105,6 @@ export default function SiteHeader() {
       {menuOpen && (
         <div className="lg:hidden border-t border-[var(--cadc-border)] bg-white">
           <div className="px-4 py-3 flex flex-col gap-1">
-            <Link
-              href="/programs/head-start"
-              className="px-3 py-3 rounded-md bg-[var(--cadc-maroon)] text-white text-sm font-bold text-center mb-2"
-              onClick={() => setMenuOpen(false)}
-            >
-              Enroll in Head Start
-            </Link>
             {programs.map((p) => (
               <Link
                 key={p.slug}
