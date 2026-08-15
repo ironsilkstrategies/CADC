@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "CADC serves 16-17 counties across Southwest Oklahoma with Head Start, transit, weatherization, senior meals, and more. Find your program and get help today.",
 };
 
-const VERSION = "v1.11";
+const VERSION = "v1.12";
 
 export default function RootLayout({
   children,
