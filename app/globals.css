@@ -1,18 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* ── CADC BRAND TOKENS ────────────────────────────────────────── */
-  --cadc-blue: #003087;
-  --cadc-blue-dark: #001a4d;
-  --cadc-blue-light: #e8edf5;
-  --cadc-red: #cc0000;
-  --cadc-red-dark: #8b0000;
+  /* ── CADC BRAND TOKENS ─────────────────────────────────────────────────────
+     Colors sampled directly from the official logo artwork.
+     Blue  = #0101FF (wordmark)
+     Maroon = #7E0001 (heart / hands mark)
+     Do not substitute navy or bright red — they don't match the logo.
+  ─────────────────────────────────────────────────────────────────────────── */
+  --cadc-blue: #0101FF;
+  --cadc-blue-dark: #0000B8;
+  --cadc-blue-light: #E4E4FF;
+  --cadc-maroon: #7E0001;
+  --cadc-maroon-dark: #5C0001;
   --cadc-white: #ffffff;
-  --cadc-ink: #1a1a1a;
-  --cadc-ink-soft: #444444;
+  --cadc-ink: #1a1a2e;
+  --cadc-ink-soft: #4a4a6a;
   --cadc-gray: #777777;
   --cadc-gray-light: #f7f9fc;
   --cadc-border: #e0e0e0;
+  --cadc-grid: rgba(1, 1, 255, 0.06);
 
   --background: var(--cadc-white);
   --foreground: var(--cadc-ink);
@@ -24,8 +30,8 @@
   --color-cadc-blue: var(--cadc-blue);
   --color-cadc-blue-dark: var(--cadc-blue-dark);
   --color-cadc-blue-light: var(--cadc-blue-light);
-  --color-cadc-red: var(--cadc-red);
-  --color-cadc-red-dark: var(--cadc-red-dark);
+  --color-cadc-maroon: var(--cadc-maroon);
+  --color-cadc-maroon-dark: var(--cadc-maroon-dark);
   --color-cadc-ink: var(--cadc-ink);
   --color-cadc-ink-soft: var(--cadc-ink-soft);
   --color-cadc-gray: var(--cadc-gray);
@@ -38,14 +44,19 @@ body {
   font-family: "Calibri", "Segoe UI", system-ui, sans-serif;
 }
 
+/* ── Blueprint grid background ─────────────────────────────────────────────── */
+
 .cadc-grid-bg {
   position: relative;
   background-image:
-    linear-gradient(rgba(0, 48, 135, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 48, 135, 0.06) 1px, transparent 1px);
+    linear-gradient(var(--cadc-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cadc-grid) 1px, transparent 1px);
   background-size: 38px 38px;
 }
 
+/* Radial fade overlay — apply to the same element via .cadc-grid-bg.cadc-grid-fade
+   OR to a wrapper that uses both classes. Kept as a separate class so pages
+   that want a raw grid without the fade can opt out. */
 .cadc-grid-fade::after {
   content: "";
   position: absolute;
@@ -59,10 +70,20 @@ body {
   pointer-events: none;
 }
 
+/* ── Accessibility ─────────────────────────────────────────────────────────── */
+
 :focus-visible {
-  outline: 3px solid var(--cadc-red);
+  outline: 3px solid var(--cadc-maroon);
   outline-offset: 2px;
 }
+
+/* Minimum touch target — seniors and low-vision users */
+:where(a, button)[data-touch] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
