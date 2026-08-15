@@ -1,14 +1,13 @@
 import OrbitHero from "@/components/OrbitHero";
 import ProgramGrid from "@/components/ProgramGrid";
 import Link from "next/link";
-import { orgInfo } from "@/lib/programs";
 
 export default function Home() {
   return (
     <>
       <OrbitHero />
 
-      {/* Stats bar — the "9 sites in one" proof, quantified */}
+      {/* Stats bar */}
       <section className="bg-[var(--cadc-blue)] text-white">
         <div className="mx-auto max-w-7xl px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
@@ -29,11 +28,11 @@ export default function Home() {
 
       <ProgramGrid />
 
-      {/* Head Start priority CTA — highest-traffic program */}
+      {/* Head Start CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-20">
         <div className="bg-[var(--cadc-blue-light)] rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 justify-between">
           <div>
-            <p className="text-xs font-bold text-[var(--cadc-red)] uppercase tracking-wide mb-1">
+            <p className="text-xs font-bold text-[var(--cadc-maroon)] uppercase tracking-wide mb-1">
               Most requested
             </p>
             <h2 className="text-xl md:text-2xl font-bold text-[var(--cadc-blue)]">
@@ -46,7 +45,7 @@ export default function Home() {
           </div>
           <Link
             href="/programs/head-start"
-            className="shrink-0 px-6 py-3 rounded-lg bg-[var(--cadc-red)] text-white font-bold hover:bg-[var(--cadc-red-dark)] transition-colors"
+            className="shrink-0 px-6 py-3 rounded-lg bg-[var(--cadc-maroon)] text-white font-bold hover:bg-[var(--cadc-maroon-dark)] transition-colors"
           >
             Start Enrollment →
           </Link>
