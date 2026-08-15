@@ -1,80 +1,84 @@
 import Link from "next/link";
-import { programs, orgInfo } from "@/lib/programs";
+import { programs } from "@/lib/programs";
+import { org, contact } from "@/lib/org";
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-[var(--cadc-blue-dark)] text-white mt-24">
-      <div className="mx-auto max-w-7xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
-        <div>
-          <div
-            className="text-xl font-bold mb-2"
-            style={{ fontFamily: "Georgia, serif" }}
-          >
-            CADC
+    <footer
+      className="cadc-grid-bg border-t border-[var(--cadc-border)] bg-[var(--cadc-blue)] text-white"
+    >
+      <div className="mx-auto max-w-5xl px-5 py-10 md:py-14">
+        {/* Top row */}
+        <div className="flex flex-col gap-8 md:flex-row md:justify-between">
+          {/* Identity */}
+          <div className="flex flex-col gap-2">
+            <p className="font-serif text-xl font-bold tracking-wide">
+              {org.shortName}
+            </p>
+            <p className="text-[0.78rem] uppercase tracking-widest opacity-70">
+              {org.legalName}
+            </p>
+            <p className="mt-1 text-sm italic opacity-80">{org.tagline}</p>
           </div>
-          <p className="text-sm text-white/70 leading-relaxed">
-            {orgInfo.name}
-            <br />
-            {orgInfo.address}
-          </p>
-          <p className="text-sm text-white/70 mt-3">{orgInfo.serviceArea}</p>
+
+          {/* Programs */}
+          <nav aria-label="Programs">
+            <p className="mb-3 text-[0.65rem] font-bold uppercase tracking-widest opacity-60">
+              Programs
+            </p>
+            <ul className="grid grid-cols-2 gap-x-8 gap-y-1.5">
+              {programs.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/programs/${p.slug}`}
+                    className="text-sm opacity-80 transition-opacity hover:opacity-100"
+                  >
+                    {p.shortName}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Contact */}
+          <div className="flex flex-col gap-2">
+            <p className="mb-1 text-[0.65rem] font-bold uppercase tracking-widest opacity-60">
+              Contact
+            </p>
+            <a
+              href={contact.mainPhoneHref}
+              className="text-sm opacity-80 transition-opacity hover:opacity-100"
+            >
+              {contact.mainPhone}
+            </a>
+            <p className="text-sm opacity-80">
+              {contact.address.street}<br />
+              {contact.address.city}, {contact.address.state} {contact.address.zip}
+            </p>
+            <div className="mt-2 flex gap-4">
+              <a
+                href={contact.social.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm opacity-70 transition-opacity hover:opacity-100"
+              >
+                Facebook
+              </a>
+              <a
+                href={contact.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm opacity-70 transition-opacity hover:opacity-100"
+              >
+                Instagram
+              </a>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-wide text-white/60 mb-3">
-            Programs
-          </h3>
-          <ul className="space-y-2 text-sm">
-            {programs.slice(0, 5).map((p) => (
-              <li key={p.slug}>
-                <Link href={p.href} className="text-white/80 hover:text-white">
-                  {p.shortName}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-wide text-white/60 mb-3">
-            More
-          </h3>
-          <ul className="space-y-2 text-sm">
-            {programs.slice(5).map((p) => (
-              <li key={p.slug}>
-                <Link href={p.href} className="text-white/80 hover:text-white">
-                  {p.shortName}
-                </Link>
-              </li>
-            ))}
-            <li>
-              <Link href="/locations" className="text-white/80 hover:text-white">
-                Locations
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-wide text-white/60 mb-3">
-            Ride the River
-          </h3>
-          <a
-            href={`tel:${orgInfo.transitPhone.replace(/-/g, "")}`}
-            className="text-lg font-bold text-white hover:underline"
-          >
-            {orgInfo.transitPhone}
-          </a>
-          <p className="text-sm text-white/70 mt-2">
-            Transit service across 16 counties
-          </p>
-        </div>
-      </div>
-
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-white/50 flex flex-col sm:flex-row justify-between gap-2">
-          <span>© {new Date().getFullYear()} {orgInfo.name}</span>
-          <span>An equal opportunity provider and employer</span>
+        {/* Bottom bar */}
+        <div className="mt-10 border-t border-white/20 pt-6 text-center text-[0.7rem] opacity-50">
+          © {new Date().getFullYear()} {org.legalName} · {org.domain}
         </div>
       </div>
     </footer>
