@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { org, contact } from "@/lib/org";
 import { transitOffices, headStartCenters } from "@/lib/locations";
- 
+
 export const metadata: Metadata = {
   title: "Contact CADC | Community Action Development Corporation",
   description:
@@ -61,7 +61,7 @@ export default function ContactPage() {
                 {contact.address.city}, {contact.address.state} {contact.address.zip}
               </p>
               <a
-                href={`https://maps.google.com/?q=${encodeURIComponent(`${contact.address.street}, ${contact.address.city}, ${contact.address.state} ${contact.address.zip}`)}`}
+                href={`https://maps.apple.com/?q=${encodeURIComponent(`${contact.address.street}, ${contact.address.city}, ${contact.address.state} ${contact.address.zip}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-semibold underline underline-offset-2 hover:opacity-70 mt-1"
