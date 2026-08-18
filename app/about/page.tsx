@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { org, contact } from "@/lib/org";
 import { agencyLeadership, programDirectors } from "@/lib/staff";
- 
+
 export const metadata: Metadata = {
   title: "About CADC | Community Action Development Corporation",
   description:
@@ -92,7 +92,6 @@ export default function AboutPage() {
               { name: "Red River Transportation", href: "/programs/transit", detail: "Rural public transit across 16 counties — 110 vehicles, ADA equipped." },
               { name: "Weatherization & Housing", href: "/programs/weatherization", detail: "Free home energy improvements for income-eligible households." },
               { name: "Senior Congregate Meals", href: "/programs/senior-meals", detail: "Hot meals and community connection at 14 sites plus home delivery." },
-              { name: "Community Services", href: "/programs/community-services", detail: "Emergency assistance and referrals for households in crisis." },
               { name: "VITA Tax Assistance", href: "/programs/tax-help", detail: "Free IRS-certified tax preparation — keep every dollar of your refund." },
               { name: "Community Market", href: "/programs/community-market", detail: "Expanding food access across Southwest Oklahoma." },
               { name: "Employment & Workforce", href: "/programs/employment", detail: "Open positions and workforce support across the region." },
