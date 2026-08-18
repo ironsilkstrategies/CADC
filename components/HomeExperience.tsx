@@ -1,31 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import { programs, programHref, type ProgramSlug } from "@/lib/programs";
-import { org, contact } from "@/lib/org";
+import { org } from "@/lib/org";
 import { useRouter } from "next/navigation";
-
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 type Stage = "logo" | "map" | "orbit";
 type CadcCounty = "Beckham"|"Canadian"|"Comanche"|"Cotton"|"Jefferson"|"Kiowa"|"Roger Mills"|"Tillman"|"Washita";
 
-// ─── County programs ──────────────────────────────────────────────────────────
-
 const COUNTY_PROGRAMS: Record<CadcCounty, ProgramSlug[]> = {
-  "Beckham": ["head-start","transit","weatherization","tax-help","community-market","employment"],
-  "Canadian": ["head-start","transit","weatherization","tax-help","community-market","employment"],
-  "Comanche": ["head-start","transit","weatherization","senior-meals","tax-help","community-market","employment"],
-  "Cotton": ["head-start","transit","weatherization","tax-help","community-market","employment"],
-  "Jefferson": ["head-start","transit","weatherization","senior-meals","tax-help","community-market","employment"],
-  "Kiowa": ["head-start","transit","weatherization","tax-help","community-market","employment"],
+  "Beckham":     ["head-start","transit","weatherization","tax-help","community-market","employment"],
+  "Canadian":    ["head-start","transit","weatherization","tax-help","community-market","employment"],
+  "Comanche":    ["head-start","transit","weatherization","senior-meals","tax-help","community-market","employment"],
+  "Cotton":      ["head-start","transit","weatherization","tax-help","community-market","employment"],
+  "Jefferson":   ["head-start","transit","weatherization","senior-meals","tax-help","community-market","employment"],
+  "Kiowa":       ["head-start","transit","weatherization","tax-help","community-market","employment"],
   "Roger Mills": ["head-start","transit","weatherization","tax-help","community-market","employment"],
-  "Tillman": ["head-start","transit","weatherization","senior-meals","tax-help","community-market","employment"],
-  "Washita": ["head-start","transit","weatherization","tax-help","community-market","employment"]
+  "Tillman":     ["head-start","transit","weatherization","senior-meals","tax-help","community-market","employment"],
+  "Washita":     ["head-start","transit","weatherization","tax-help","community-market","employment"],
 };
-
-// ─── County geo data (SW Oklahoma crop, real geographic paths) ────────────────
 
 const OK_COUNTIES: {name:string;cx:number;cy:number;cadc:boolean;path:string}[] = [
   {name:"Beaver",cx:242.4,cy:41.4,cadc:false,path:"M198.3 12.4L283.6 12.0L283.5 67.8L197.5 67.8L198.3 12.4Z"},
@@ -76,8 +69,6 @@ const OK_COUNTIES: {name:string;cx:number;cy:number;cadc:boolean;path:string}[] 
 
 const VIEWBOX = "220 85 340 310";
 
-// ─── Orbit geometry ───────────────────────────────────────────────────────────
-
 const RADIUS_PCT = 38;
 const START_DEG = -90;
 
@@ -86,8 +77,6 @@ function nodePos(i: number, total: number) {
   const rad = (angle * Math.PI) / 180;
   return { x: 50 + RADIUS_PCT * Math.cos(rad), y: 50 + RADIUS_PCT * Math.sin(rad) };
 }
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function HomeExperience() {
   const router = useRouter();
@@ -99,13 +88,10 @@ export default function HomeExperience() {
   const [glowTarget, setGlowTarget] = useState<string | null>(null);
   const [logoGlow, setLogoGlow] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const reduceMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
-
-  function glow(id: string, ms = 600) {
+  function glow(id: string) {
     setGlowTarget(id);
-    timers.current.push(setTimeout(() => setGlowTarget(null), ms));
+    timers.current.push(setTimeout(() => setGlowTarget(null), 600));
   }
 
   function selectCounty(name: CadcCounty) {
@@ -117,23 +103,20 @@ export default function HomeExperience() {
     setActiveSlug(null);
     timers.current.push(setTimeout(() => {
       setStage("orbit");
-      if (reduceMotion) {
-        setVisibleCount(progs.length);
-      } else {
-        progs.forEach((_, i) => {
-          timers.current.push(setTimeout(() => setVisibleCount(c => Math.max(c, i + 1)), 80 + i * 90));
-        });
-      }
-    }, reduceMotion ? 0 : 350));
+      progs.forEach((_, i) => {
+        timers.current.push(setTimeout(() => setVisibleCount(c => Math.max(c, i + 1)), 80 + i * 90));
+      });
+    }, 350));
   }
 
   function selectProgram(slug: ProgramSlug) {
+    setActiveSlug(slug);
     glow(slug);
-    timers.current.push(setTimeout(() => router.push(programHref(slug)), 300));
+    timers.current.push(setTimeout(() => router.push(programHref(slug)), 350));
   }
 
   function goBack() {
-    if (stage === "orbit") { setStage("map"); setVisibleCount(0); }
+    if (stage === "orbit") { setStage("map"); setVisibleCount(0); setActiveSlug(null); }
     else if (stage === "map") { setStage("logo"); }
   }
 
@@ -146,23 +129,18 @@ export default function HomeExperience() {
       className="relative w-full cadc-grid-bg"
       style={{ height: "100svh", overflow: "hidden" }}
     >
-      {/* ── LOGO STAGE ── */}
+      {/* LOGO */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-500"
-        style={{
-          opacity: isLogo ? 1 : 0,
-          pointerEvents: isLogo ? "auto" : "none",
-          transform: isLogo ? "scale(1)" : "scale(0.94)",
-        }}
+        style={{ opacity: isLogo ? 1 : 0, pointerEvents: isLogo ? "auto" : "none", transform: isLogo ? "scale(1)" : "scale(0.94)" }}
       >
         <button
           type="button"
-          onClick={() => { setLogoGlow(true); setTimeout(() => { setLogoGlow(false); setStage("map"); }, 300); }}
+          onClick={() => { setLogoGlow(true); setTimeout(() => { setLogoGlow(false); setStage("map"); }, 320); }}
           className="flex flex-col items-center"
           aria-label="Explore CADC service area"
         >
           <div className="relative">
-            {/* Glow ring */}
             <div style={{
               position: "absolute", inset: "-20px", borderRadius: "50%",
               background: "radial-gradient(circle, rgba(1,1,255,0.22) 0%, transparent 70%)",
@@ -173,8 +151,7 @@ export default function HomeExperience() {
             <div
               className="relative flex flex-col items-center justify-center gap-1 bg-white rounded-full border-[3px]"
               style={{
-                width: "clamp(120px, 32vw, 160px)",
-                aspectRatio: "1/1",
+                width: "clamp(120px,32vw,160px)", aspectRatio: "1/1",
                 borderColor: logoGlow ? "var(--cadc-maroon)" : "var(--cadc-blue)",
                 boxShadow: logoGlow
                   ? "0 0 0 16px rgba(1,1,255,0.07), 0 0 50px rgba(1,1,255,0.25)"
@@ -198,16 +175,14 @@ export default function HomeExperience() {
         </p>
       </div>
 
-      {/* ── MAP STAGE ── */}
+      {/* MAP */}
       <div
         className="absolute inset-0 flex flex-col transition-all duration-500"
         style={{
           opacity: isMap ? 1 : 0,
           pointerEvents: isMap ? "auto" : "none",
           transform: isMap ? "translateY(0)" : "translateY(16px)",
-          paddingTop: "12px",
-          paddingLeft: "12px",
-          paddingRight: "12px",
+          padding: "12px",
           overflowY: "auto",
         }}
       >
@@ -215,35 +190,26 @@ export default function HomeExperience() {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           Back
         </button>
-
         <p className="text-center font-bold uppercase tracking-widest mb-1" style={{ fontSize: "0.65rem", color: "var(--cadc-maroon)" }}>Select Your County</p>
         <h2 className="font-serif font-bold text-center mb-3" style={{ fontSize: "clamp(1.3rem,5vw,2rem)", color: "var(--cadc-blue)" }}>Where do you need help?</h2>
 
-        {/* Map — cropped to SW Oklahoma */}
         <div className="rounded-2xl overflow-hidden border" style={{ borderColor: "var(--cadc-border)", background: "#f9f9fc" }}>
-          <svg
-            viewBox={{VIEWBOX}}
-            className="w-full h-auto block"
-            aria-label="Southwest Oklahoma county map"
-            role="img"
-          >
+          <svg viewBox={VIEWBOX} className="w-full h-auto block" aria-label="Southwest Oklahoma county map" role="img">
             {OK_COUNTIES.map((county) => {
               const isGlowing = glowTarget === county.name;
               return (
-                <g key={{county.name}}>
+                <g key={county.name}>
                   {isGlowing && (
-                    <circle cx={{county.cx}} cy={{county.cy}} r={25}
+                    <circle cx={county.cx} cy={county.cy} r={25}
                       fill="rgba(1,1,255,0.25)"
                       style={{ animation: "ping 0.6s ease-out forwards" }}
                     />
                   )}
                   <path
-                    d={{county.path}}
-                    onClick={{() => county.cadc && selectCounty(county.name as CadcCounty)}}
+                    d={county.path}
+                    onClick={() => county.cadc && selectCounty(county.name as CadcCounty)}
                     style={{
-                      fill: county.name === selectedCounty
-                        ? "var(--cadc-blue)"
-                        : county.cadc ? "var(--cadc-blue-light)" : "#ededf4",
+                      fill: county.name === selectedCounty ? "var(--cadc-blue)" : county.cadc ? "var(--cadc-blue-light)" : "#ededf4",
                       stroke: "#ffffff",
                       strokeWidth: county.cadc ? 1.2 : 0.6,
                       cursor: county.cadc ? "pointer" : "default",
@@ -253,7 +219,7 @@ export default function HomeExperience() {
                   {county.cadc && (
                     <>
                       <text
-                        x={{county.cx}} y={{county.cy}}
+                        x={county.cx} y={county.cy}
                         textAnchor="middle" dominantBaseline="middle"
                         style={{
                           fontSize: county.name === "Roger Mills" ? "5.5px" : "6.5px",
@@ -264,11 +230,10 @@ export default function HomeExperience() {
                           letterSpacing: "0.03em",
                         }}
                       >
-                        {county.name === "Roger Mills" ? "Roger Mills" : county.name}
+                        {county.name}
                       </text>
                       {county.name !== selectedCounty && (
-                        <circle
-                          cx={{county.cx}} cy={{county.cy - 11}} r={3.5}
+                        <circle cx={county.cx} cy={county.cy - 11} r={3.5}
                           fill="var(--cadc-maroon)" stroke="#fff" strokeWidth={1.2}
                           style={{ pointerEvents: "none" }}
                         />
@@ -279,7 +244,6 @@ export default function HomeExperience() {
               );
             })}
           </svg>
-
           <div className="flex items-center gap-4 px-3 py-2 border-t" style={{ borderColor: "var(--cadc-border)" }}>
             <span className="flex items-center gap-1.5" style={{ fontSize: "0.65rem" }}>
               <span className="w-3 h-3 rounded-sm inline-block border-[1.5px]" style={{ background: "var(--cadc-blue-light)", borderColor: "var(--cadc-blue)" }}></span>
@@ -291,13 +255,10 @@ export default function HomeExperience() {
             </span>
           </div>
         </div>
-
-        <p className="mt-3 text-center" style={{ fontSize: "0.6rem", color: "#9ca3af" }}>
-          9 base counties · {org.tagline}
-        </p>
+        <p className="mt-3 text-center" style={{ fontSize: "0.6rem", color: "#9ca3af" }}>9 base counties · {org.tagline}</p>
       </div>
 
-      {/* ── ORBIT STAGE ── */}
+      {/* ORBIT */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-500"
         style={{
@@ -306,7 +267,6 @@ export default function HomeExperience() {
           transform: isOrbit ? "translateY(0)" : "translateY(16px)",
         }}
       >
-        {/* Back + county label */}
         <div className="absolute top-3 left-0 right-0 flex items-center justify-between px-4">
           <button onClick={goBack} className="flex items-center gap-1.5" style={{ fontSize: "0.65rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--cadc-blue)", opacity: 0.65 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -319,25 +279,17 @@ export default function HomeExperience() {
           )}
         </div>
 
-        {/* Orbit */}
         <div className="relative" style={{ width: "min(84vw, 84svh, 480px)", aspectRatio: "1/1" }}>
-          {/* Ring */}
           <div className="absolute rounded-full border-dashed transition-all duration-700"
-            style={{
-              inset: "11%",
-              border: "1.5px dashed rgba(1,1,255,0.16)",
-              opacity: visibleCount > 0 ? 1 : 0,
-            }}
+            style={{ inset: "11%", border: "1.5px dashed rgba(1,1,255,0.16)", opacity: visibleCount > 0 ? 1 : 0 }}
           />
-
-          {/* Connectors */}
           <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             {countyPrograms.map((slug, i) => {
               const { x, y } = nodePos(i, countyPrograms.length);
               return (
-                <line key={{slug}} x1={50} y1={50} x2={{x}} y2={{y}}
-                  stroke={{slug === activeSlug ? "var(--cadc-maroon)" : "rgba(126,0,1,0.22)"}}
-                  strokeWidth={{slug === activeSlug ? 1.8 : 1}}
+                <line key={slug} x1={50} y1={50} x2={x} y2={y}
+                  stroke={slug === activeSlug ? "var(--cadc-maroon)" : "rgba(126,0,1,0.22)"}
+                  strokeWidth={slug === activeSlug ? 1.8 : 1}
                   strokeDasharray="4 4"
                   style={{ opacity: i < visibleCount ? 1 : 0, transition: "opacity 0.4s ease, stroke 0.25s ease" }}
                 />
@@ -345,7 +297,6 @@ export default function HomeExperience() {
             })}
           </svg>
 
-          {/* Center logo */}
           <button
             type="button"
             onClick={() => { setStage("map"); setVisibleCount(0); setActiveSlug(null); }}
@@ -354,12 +305,10 @@ export default function HomeExperience() {
           >
             <div className="bg-white rounded-full border-[3px] flex flex-col items-center justify-center gap-0.5"
               style={{
-                width: "clamp(76px, 21vw, 110px)",
-                aspectRatio: "1/1",
+                width: "clamp(76px,21vw,110px)", aspectRatio: "1/1",
                 borderColor: "var(--cadc-blue)",
                 boxShadow: "0 0 0 5px rgba(1,1,255,0.07), 0 6px 22px rgba(1,1,255,0.14)",
-              }}
-            >
+              }}>
               <span className="font-serif font-bold leading-none" style={{ fontSize: "clamp(1rem,3.5vw,1.6rem)", color: "var(--cadc-blue)", letterSpacing: "0.04em" }}>CADC</span>
               <span className="block" style={{ width: "30px", height: "1.5px", background: "var(--cadc-maroon)", margin: "2px 0" }} />
               <span className="text-center font-semibold uppercase leading-tight" style={{ fontSize: "0.36rem", letterSpacing: "0.05em", color: "#4a4a6a" }}>
@@ -368,32 +317,29 @@ export default function HomeExperience() {
             </div>
           </button>
 
-          {/* Program nodes */}
           {countyPrograms.map((slug, i) => {
             const prog = programs.find(p => p.slug === slug)!;
             const { x, y } = nodePos(i, countyPrograms.length);
             const isOn = i < visibleCount;
             const isActive = slug === activeSlug;
             const isGlowing = glowTarget === slug;
-
             return (
               <button
-                key={{slug}}
+                key={slug}
                 type="button"
-                tabIndex={{isOn ? 0 : -1}}
-                onClick={{() => { setActiveSlug(slug); selectProgram(slug); }}}
-                aria-label={{prog.name}}
+                tabIndex={isOn ? 0 : -1}
+                onClick={() => selectProgram(slug)}
+                aria-label={prog.name}
                 className="absolute flex flex-col items-center gap-1"
                 style={{
-                  left: `${{x}}%`, top: `${{y}}%`,
+                  left: `${x}%`, top: `${y}%`,
                   width: "clamp(56px,15vw,76px)",
-                  transform: `translate(-50%, -50%) scale(${{isOn ? 1 : 0.3}})`,
+                  transform: `translate(-50%, -50%) scale(${isOn ? 1 : 0.3})`,
                   opacity: isOn ? 1 : 0,
                   pointerEvents: isOn ? "auto" : "none",
                   transition: "opacity 0.4s ease, transform 0.45s ease",
                 }}
               >
-                {/* Glow */}
                 {isGlowing && (
                   <div className="absolute rounded-full" style={{
                     inset: "-10px",
@@ -402,11 +348,9 @@ export default function HomeExperience() {
                   }} />
                 )}
                 <div style={{
-                  width: "clamp(40px,10vw,56px)",
-                  aspectRatio: "1/1",
-                  borderRadius: "50%",
-                  background: "white",
-                  border: `2.5px solid ${{isActive ? "var(--cadc-maroon)" : "var(--cadc-blue)"}}`,
+                  width: "clamp(40px,10vw,56px)", aspectRatio: "1/1",
+                  borderRadius: "50%", background: "white",
+                  border: `2.5px solid ${isActive ? "var(--cadc-maroon)" : "var(--cadc-blue)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "clamp(0.9rem,2.5vw,1.25rem)",
                   boxShadow: isActive
@@ -416,32 +360,28 @@ export default function HomeExperience() {
                     : "0 3px 10px rgba(1,1,255,0.12)",
                   transition: "border-color 0.25s, box-shadow 0.3s",
                 }} aria-hidden="true">
-                  {{prog.icon}}
+                  {prog.icon}
                 </div>
                 <span style={{
                   fontSize: "clamp(0.42rem,1.3vw,0.55rem)",
                   fontWeight: 700,
                   color: isActive ? "var(--cadc-maroon)" : "var(--cadc-blue)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  textAlign: "center",
-                  lineHeight: 1.2,
+                  textTransform: "uppercase", letterSpacing: "0.06em",
+                  textAlign: "center", lineHeight: 1.2,
                   width: "clamp(56px,15vw,76px)",
                   overflowWrap: "break-word",
                 }}>
-                  {{prog.shortName}}
+                  {prog.shortName}
                 </span>
               </button>
             );
           })}
         </div>
-
         <p className="mt-2 font-medium uppercase tracking-widest" style={{ fontSize: "0.58rem", color: "#4a4a6a", opacity: 0.45 }}>
           Tap a program to go there
         </p>
       </div>
 
-      {/* Ping animation */}
       <style>{`
         @keyframes ping {
           0% { transform: scale(1); opacity: 0.8; }
