@@ -17,7 +17,7 @@ export interface StaffMember {
   id: string;
   name: string;
   title: string;
-  program: "head-start" | "agency" | "transit" | "weatherization" | "community-services" | "nutrition" | "community-market";
+  program: "head-start" | "agency" | "transit" | "weatherization" | "nutrition" | "community-market";
   bio?: string;
   tenure?: string;
   photo?: string;
@@ -132,7 +132,7 @@ export const programDirectors: StaffMember[] = [
     id: "kristie-jackson",
     name: "Kristie Jackson",
     title: "CSBG & Advantage Director",
-    program: "community-services",
+    program: "agency",
     tenure: "Since January 2023",
     bio:
       "Kristie joined CADC as a Head Start teacher in September 2022 before moving into " +

@@ -22,7 +22,7 @@ export const org = {
   legalName: "Community Action Development Corporation",
   shortName: "CADC",
   tagline: "Helping People. Changing Lives.",
-  serviceAreaLabel: "Serving 16+ counties across Southwest Oklahoma",
+  serviceAreaLabel: "Serving 9 counties across Southwest Oklahoma",
   domain: "cadcok.org",
 } as const;
 
@@ -147,7 +147,7 @@ export const redirects: Record<string, string> = {
   "/public-transportation": "/programs/transit",
   "/weatherization": "/programs/weatherization",
   "/senior-congregate-meals": "/programs/senior-meals",
-  "/community-services": "/programs/community-services",
+  "/community-services": "/",
   "/taxes": "/programs/tax-help",
   "/copy-of-taxes": "/programs/community-market",
   "/employment-1": "/programs/employment",

@@ -1,9 +1,12 @@
 /**
- * The 9 CADC programs — single source of truth.
+ * The CADC programs — single source of truth.
  * Drives: orbit intro, program grid, header nav, footer, sitemap, routing.
  *
- * Add a program here and it appears everywhere. Never hardcode a program
- * name or link anywhere else in the app.
+ * CONFIRMED BY LESLEA HIXSON (Aug 18 2026):
+ * - Base service area is 9 counties
+ * - Community Services (CSBG) funding is gone — program removed
+ * - Senior Meals: 5 sites (Frederick, Ryan, Ringling, Temple, Cache, Waters)
+ * - County-specific coverage varies per program
  */
 
 export type ProgramSlug =
@@ -11,7 +14,6 @@ export type ProgramSlug =
   | "transit"
   | "weatherization"
   | "senior-meals"
-  | "community-services"
   | "tax-help"
   | "community-market"
   | "employment"
@@ -19,17 +21,11 @@ export type ProgramSlug =
 
 export interface Program {
   slug: ProgramSlug;
-  /** Full name, used in page titles and headings. */
   name: string;
-  /** Short label for tight spaces — orbit nodes, nav. */
   shortName: string;
-  /** One or two sentences. Plain language, written for the person who needs it. */
   blurb: string;
-  /** Emoji placeholder — replace with an SVG icon set before launch. */
   icon: string;
-  /** Primary action for this program, if it has one. */
   cta?: { label: string; href: string; external?: boolean };
-  /** Show in the orbit intro? All 9 do — equal weight, no hero program. */
   inOrbit: boolean;
 }
 
@@ -50,7 +46,7 @@ export const programs: Program[] = [
     name: "Red River Transportation",
     shortName: "Red River Transit",
     blurb:
-      "Rural public transit across 16 counties with a fleet of 110 vehicles. " +
+      "Rural public transit with a fleet of 110 vehicles. " +
       "Rides to medical appointments, dialysis, work, and shopping. Every vehicle is lift or ramp equipped.",
     icon: "🚌",
     cta: { label: "Call 1-800-524-5552", href: "tel:+18005245552" },
@@ -61,7 +57,7 @@ export const programs: Program[] = [
     name: "Weatherization & Housing",
     shortName: "Weatherization",
     blurb:
-      "Free home energy improvements for income-eligible households across 17 counties. " +
+      "Free home energy improvements for income-eligible households. " +
       "Funded through the Department of Energy and Oklahoma DHS.",
     icon: "🏠",
     cta: { label: "Apply online", href: "https://ok.mywaplink.org", external: true },
@@ -72,19 +68,10 @@ export const programs: Program[] = [
     name: "Senior Congregate Meals",
     shortName: "Senior Meals",
     blurb:
-      "Hot meals and community at 14 sites, plus Advantage home delivery for " +
-      "older adults who can't travel.",
+      "Hot meals and community at 5 sites across Southwest Oklahoma, " +
+      "plus Advantage home delivery for older adults who can't travel.",
     icon: "🍽️",
-    cta: { label: "Find a meal site", href: "/locations?program=senior-meals" },
-    inOrbit: true,
-  },
-  {
-    slug: "community-services",
-    name: "Community Services",
-    shortName: "Community Svcs",
-    blurb:
-      "CSBG-funded emergency assistance and referrals for households facing a crisis.",
-    icon: "🤝",
+    cta: { label: "Call 580-335-5588", href: "tel:+15803355588" },
     inOrbit: true,
   },
   {
@@ -131,7 +118,7 @@ export const programs: Program[] = [
   },
 ];
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export const programHref = (slug: ProgramSlug) => `/programs/${slug}`;
 
@@ -140,5 +127,4 @@ export const getProgram = (slug: ProgramSlug): Program | undefined =>
 
 export const orbitPrograms = () => programs.filter((p) => p.inOrbit);
 
-/** For generateStaticParams() on the [slug] route. */
 export const allProgramSlugs = () => programs.map((p) => ({ slug: p.slug }));
