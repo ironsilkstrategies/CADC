@@ -5,7 +5,7 @@ import { contact } from "@/lib/org";
 export const metadata: Metadata = {
   title: "Senior Congregate Meals | CADC Southwest Oklahoma",
   description:
-    "Hot meals and community at sites across Southwest Oklahoma, plus Advantage home delivery for older adults who can't travel. Free to eligible seniors.",
+    "Hot meals and community at 5 sites across Southwest Oklahoma — Frederick, Ryan, Ringling, Temple, Cache, and Waters — plus Advantage home delivery.",
 };
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -65,7 +65,7 @@ export default function SeniorMealsPage() {
             Senior Congregate Meals
           </h1>
           <p className="text-base md:text-lg leading-relaxed max-w-2xl" style={{ color: "var(--cadc-blue-light)" }}>
-            Hot meals and community connection at sites across Southwest Oklahoma.
+            Hot meals and community at 5 sites across Southwest Oklahoma.
             Home delivery available for older adults who can't travel.
           </p>
         </div>
@@ -148,10 +148,10 @@ export default function SeniorMealsPage() {
         >
           <SectionLabel>Locations</SectionLabel>
           <h2 id="sites-heading" className="font-serif text-2xl font-bold mb-3" style={{ color: "var(--cadc-blue)" }}>
-            14 Meal Sites Across the Region
+            5 Meal Sites Across the Region
           </h2>
           <p className="text-sm leading-relaxed mb-6" style={{ color: "#374151" }}>
-            We operate 14 congregate meal sites across Southwest Oklahoma.
+            We operate 5 congregate meal sites across Southwest Oklahoma.
             A full site directory with addresses and serving times is being added now.
             In the meantime, call us and we'll find your nearest location immediately.
           </p>
