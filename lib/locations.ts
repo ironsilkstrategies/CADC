@@ -32,7 +32,8 @@ export interface Location {
 
 const tel = (p: string) => `tel:+1${p.replace(/\D/g, "")}`;
 
-// ─── Head Start & Early Head Start — 13 centers ──────────────────────────────
+// ─── Head Start & Early Head Start — 11 centers ──────────────────────────────
+// Waurika and Mt. Park closed and consolidated (confirmed Robin Harris, Aug 2026)
 
 export const headStartCenters: Location[] = [
   { id: "hs-burns-flat", name: "Burns Flat – Dill City", program: "head-start",
@@ -75,17 +76,13 @@ export const headStartCenters: Location[] = [
     street: "114 S. 3rd St.", mailing: "P.O. Box 598", city: "Sentinel", state: "OK", zip: "73664",
     phone: "580-393-4303", phoneHref: tel("580-393-4303"), verified: false },
 
-  { id: "hs-snyder", name: "Snyder / Mt. Park", program: "head-start",
-    street: "621 C Street", city: "Snyder", state: "OK", zip: "73566",
-    phone: "580-569-4335", phoneHref: tel("580-569-4335"), verified: false },
+  // Mt. Park center CLOSED — consolidated with surrounding centers (confirmed Robin Harris Aug 2026)
 
   { id: "hs-temple", name: "Temple", program: "head-start",
     street: "102 W. Texas", mailing: "P.O. Box 247", city: "Temple", state: "OK", zip: "73568",
     phone: "580-342-5022", phoneHref: tel("580-342-5022"), verified: false },
 
-  { id: "hs-waurika", name: "Waurika", program: "head-start",
-    street: "803 Phillips", mailing: "P.O. Box C6", city: "Waurika", state: "OK", zip: "73573",
-    phone: "580-228-2810", phoneHref: tel("580-228-2810"), verified: false },
+  // Waurika center CLOSED — consolidated with surrounding centers (confirmed Robin Harris Aug 2026)
 ];
 
 // ─── Red River Transportation offices ────────────────────────────────────────
