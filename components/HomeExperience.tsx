@@ -184,6 +184,8 @@ export default function HomeExperience() {
           transform: isMap ? "translateY(0)" : "translateY(16px)",
           padding: "12px",
           overflowY: "auto",
+          maxWidth: "680px",
+          margin: "0 auto",
         }}
       >
         <button onClick={goBack} className="flex items-center gap-1.5 mb-3 self-start" style={{ fontSize: "0.68rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--cadc-blue)", opacity: 0.65 }}>
@@ -193,7 +195,7 @@ export default function HomeExperience() {
         <p className="text-center font-bold uppercase tracking-widest mb-1" style={{ fontSize: "0.65rem", color: "var(--cadc-maroon)" }}>Select Your County</p>
         <h2 className="font-serif font-bold text-center mb-3" style={{ fontSize: "clamp(1.3rem,5vw,2rem)", color: "var(--cadc-blue)" }}>Where do you need help?</h2>
 
-        <div className="rounded-2xl overflow-hidden border" style={{ borderColor: "var(--cadc-border)", background: "#f9f9fc" }}>
+        <div className="rounded-2xl overflow-hidden border" style={{ borderColor: "var(--cadc-border)", background: "#f9f9fc", maxHeight: "min(70vh, 520px)" }}>
           <svg viewBox={VIEWBOX} className="w-full h-auto block" aria-label="Southwest Oklahoma county map" role="img">
             {OK_COUNTIES.map((county) => {
               const isGlowing = glowTarget === county.name;
