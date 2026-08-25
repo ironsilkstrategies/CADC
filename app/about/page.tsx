@@ -1,12 +1,7 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-import { org, contact, addressOneLine, complianceDocs } from "@/lib/org";
+"use client";
 
-export const metadata: Metadata = {
-  title: "About CADC | Community Action Development Corporation",
-  description:
-    "CADC has served Southwest Oklahoma families since 1966 — early childhood education, transportation, weatherization, nutrition, and more across 9 counties.",
-};
+import Link from "next/link";
+import { contact, complianceDocs } from "@/lib/org";
 
 const STATS = [
   { value: "1966", label: "Year founded" },
