@@ -322,7 +322,7 @@ const PROGRAMS: ProgramData[] = [
           <div className="cadc-content">
             <p>Head Start serves children ages 3–5 with full-day, full-year preschool at no cost to income-eligible families. Every child receives education, health, nutrition, and family support.</p>
             <div className="cadc-grid-2">
-              {["Full-day preschool at no cost","Health & dental screenings","Nutritious meals daily","Family engagement","School readiness curriculum","Individualized learning goals"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+              {["Full-day preschool at no cost","Health screenings","Nutritious meals daily","Family engagement","School readiness curriculum","Individualized learning goals"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
             </div>
           </div>
         ),
@@ -382,7 +382,8 @@ const PROGRAMS: ProgramData[] = [
               {[
                 {t:"Medical Protocols",d:"Children with conditions such as asthma must have an inhaler on-site. All medical needs are documented and staff trained."},
                 {t:"Allergy Management",d:"Food allergies require a doctor's note specifying the allergy and approved substitutes."},
-                {t:"Vision, Dental & Hearing",d:"Screenings completed within program timelines. Referrals made when follow-up care is needed."},
+                {t:"Vision & Hearing Screenings",d:"CADC provides vision, hearing, and mental health screenings. Other screenings are the parent's responsibility — we provide guidance and referrals to help families get them completed."},
+                {t:"Dental Hygiene",d:"Teeth brushing occurs daily in the classroom. Teachers demonstrate and brush alongside children to build healthy habits. Dental exams are the parent's responsibility — we will help direct families to the right resources."},
                 {t:"Mental Health Support",d:"Integrated into the classroom and available to families. We partner with mental health professionals."},
                 {t:"Disabilities Services",d:"Up to 10% of enrollment reserved for children with disabilities. We coordinate with school districts and specialists."},
               ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
@@ -416,7 +417,7 @@ const PROGRAMS: ProgramData[] = [
                 {["Assist with handwashing and daily routines","Sit and eat with the children","Help with cleaning tables and play areas","Participate during large and small group time","Join outdoor activities and field trips","Cut out and prepare classroom materials","Help decorate bulletin boards","Share a hobby, talent, or cultural tradition","Be a mystery reader — surprise your child's class","Complete monthly Learning at Home activities","Assist staff with repairs, painting, or yard work"].map(i=><li key={i}>{i}</li>)}
               </ul>
             </div>
-            <p className="cadc-note">Contact your nearest center to learn how to schedule a visit or volunteer.</p>
+            <p className="cadc-note">Parents and community members are welcome to show up at any center — no call or appointment needed.</p>
             <div className="cadc-card">
               <p className="cadc-label">Donations — Coming Soon</p>
               <p>CADC is setting up online donation options including Amazon Smile, Walmart Community, and Shop Raise. Check back soon or call us to express interest in supporting a classroom directly.</p>
@@ -450,9 +451,9 @@ const PROGRAMS: ProgramData[] = [
                 {q:"What do I need to bring to apply?",a:"Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable."},
                 {q:"Are children with disabilities or special needs accepted?",a:"Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP."},
                 {q:"Can parents apply to work at CADC Head Start?",a:"Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588."},
-                {q:"How can parents volunteer in the classroom?",a:"Contact your child's center to schedule a visit. Parents can help with handwashing, meals, group time, outdoor activities, bulletin boards, reading, sharing talents, cultural celebrations, and more. Every hour you volunteer counts as an in-kind contribution to the program."},
-                {q:"What should I expect during a home visit?",a:"Home visits are regular for Early Head Start families and available as needed for Head Start families. Your Family Service Worker will work with you on goals, connect you to resources, and discuss your child's development."},
-                {q:"How does Head Start support my child's health?",a:"Every child receives vision, hearing, and dental screenings. Health needs are documented and monitored by our Health Coordinator. Mental health support is available to children and families. Children with conditions such as asthma must have an inhaler on-site."},
+                {q:"How can parents volunteer in the classroom?",a:"Just show up — no call or appointment needed. Parents can help with handwashing, meals, group time, outdoor activities, bulletin boards, reading, sharing talents, cultural celebrations, and more. Every hour you volunteer counts as an in-kind contribution to the program."},
+                {q:"What should I expect during a home visit?",a:"CADC attempts two home visits per year per family. Your Family Service Worker will work with you on goals, connect you to resources, and discuss your child's development. If a home visit isn't possible due to safety concerns or family preference, an alternative location can be arranged to maintain confidentiality."},
+                {q:"How does Head Start support my child's health?",a:"CADC provides vision, hearing, and mental health screenings. Other screenings — including dental exams — are the parent's responsibility, though we will help direct you to the right resources. Health needs are documented and monitored by our Health Coordinator. Children with conditions such as asthma must have an inhaler on-site."},
                 {q:"What if my child has allergies or special dietary needs?",a:"A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program."},
                 {q:"I need a new parent handbook or school calendar. What do I do?",a:"Contact your child's center directly. Each center can provide current handbooks and calendars. You can also find updates through your classroom's private Facebook page."},
               ].map(item => (
