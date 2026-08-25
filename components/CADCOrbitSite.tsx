@@ -374,60 +374,96 @@ const PROGRAMS: ProgramData[] = [
     shortName: "Senior Meals",
     icon: "🍽️",
     color: T.blue,
-    tagline: "Hot meals, community connection, and home delivery",
+    tagline: "More than a meal — nutrition, connection, and dignity",
     subAreas: [
+      {
+        id: "sn-about", label: "About the Program", shortLabel: "About", icon: "ℹ️",
+        content: (
+          <div className="cadc-content">
+            <p>CADC's Senior Nutrition Program serves adults 60 and older with nutritious meals, meaningful community connection, and caring support. Our sites are more than places to eat — they are places where seniors gather, build friendships, and stay connected.</p>
+            <p>For those who are unable to attend a congregate site, our Home-Delivered Meal Program brings a hot meal and a friendly visit directly to their door.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Program eligibility</p>
+              <p>Available to individuals age 60 and older. Spouses and caregivers may also be eligible — contact us for details.</p>
+            </div>
+            <div className="cadc-grid-2">
+              {["6 congregate sites","Home delivery available","Nutritious daily meals","Social activities","Community connection","Compassionate staff"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+            </div>
+            <p className="cadc-note">We are committed to serving our seniors with compassion, dignity, respect, and kindness.</p>
+          </div>
+        ),
+      },
       {
         id: "congregate", label: "Congregate Meals", shortLabel: "Congregate", icon: "🍽️",
         content: (
           <div className="cadc-content">
-            <p>Hot, nutritious meals served at community sites across Southwest Oklahoma. More than just food — a daily gathering point for seniors.</p>
+            <p>Hot, nutritious meals served in a welcoming environment at 6 community sites across Southwest Oklahoma. Seniors enjoy a meal with others, participate in activities, socialize, and build friendships.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Meal contributions</p>
+              <div className="cadc-stack">
+                <div className="cadc-card-sm">
+                  <p className="cadc-card-title">With completed assessment</p>
+                  <p>$3.00 per meal</p>
+                </div>
+                <div className="cadc-card-sm">
+                  <p className="cadc-card-title">Without assessment</p>
+                  <p>$7.00 per meal</p>
+                </div>
+              </div>
+            </div>
+            <p className="cadc-label" style={{marginTop:14}}>Our 6 congregate sites</p>
             <div className="cadc-stack">
               {[
-                {name:"Frederick",addr:"Frederick, OK"},
-                {name:"Ryan",addr:"Ryan, OK"},
-                {name:"Ringling",addr:"Ringling, OK"},
-                {name:"Temple",addr:"Temple, OK"},
-                {name:"Cache",addr:"Cache, OK"},
-              ].map(s=><div key={s.name} className="cadc-card-sm"><p className="cadc-card-title">{s.name}</p><p>{s.addr}</p></div>)}
+                {name:"Frederick",addr:"100 E Grand, Frederick, OK 73542",phone:"580-335-7026",href:"tel:+15803357026"},
+                {name:"Ringling",addr:"200 D St., Ringling, OK 73456",phone:"580-662-2362",href:"tel:+15806622362"},
+                {name:"Cache",addr:"416 West C Ave., Cache, OK 73527",phone:"580-429-3427",href:"tel:+15804293427"},
+                {name:"Temple",addr:"201 S Commercial, Temple, OK 73568",phone:"580-342-6944",href:"tel:+15803426944"},
+                {name:"Walters",addr:"500 E California, Walters, OK 73572",phone:"580-875-9044",href:"tel:+15808759044"},
+                {name:"Ryan",addr:"400 Taylor St. Apt #8, Ryan, OK 73565",phone:"580-757-2412",href:"tel:+15807572412"},
+              ].map(s=>(
+                <div key={s.name} className="cadc-card-sm">
+                  <p className="cadc-card-title">{s.name}</p>
+                  <p>{s.addr}</p>
+                  <a href={s.href} className="cadc-link">{s.phone}</a>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "sn-menu", label: "Monthly Menu", shortLabel: "Menu", icon: "📋",
+        content: (
+          <div className="cadc-content">
+            <p>Our meals are planned to meet senior nutritional needs and rotate on a 4-week cycle. An 8 oz serving of milk is included daily at all congregate sites.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">August 2026 menu</p>
+              <p>Download the current monthly menu to see what's being served at your nearest site.</p>
+              <a href="/docs/august-menu-2026.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">📄 Download August Menu →</a>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">More information</p>
+              <p className="cadc-label">Questions about the menu?</p>
               <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
             </div>
           </div>
         ),
       },
       {
-        id: "advantage", label: "Home Delivered Meals", shortLabel: "Home Delivery", icon: "🚗",
+        id: "sn-homedelivered", label: "Home Delivered", shortLabel: "Home Delivery", icon: "🚗",
         content: (
           <div className="cadc-content">
-            <p>CADC Advantage provides home-delivered meals to older adults and individuals with disabilities through the Advantage, Living Choice, and Medically Fragile waiver programs.</p>
+            <p>Our Home-Delivered Meal Program helps seniors who are unable to attend a congregate meal site. Nutritious meals are delivered directly to their homes — along with a friendly visit and an important connection to the community.</p>
             <div className="cadc-card">
-              <p className="cadc-label">Eligibility</p>
-              <ul className="cadc-list">
-                {["SoonerCare (Medicaid) qualified","Meet medical Level of Care (LOC) criteria","Age 65+ or age 19–64 with intellectual, physical, or developmental disabilities, or cognitive impairment"].map(i=><li key={i}>{i}</li>)}
-              </ul>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">How it works</p>
-              <ul className="cadc-list">
-                {["Meals delivered every two weeks","14 meals or 28 meals per delivery depending on your plan","Each shelf-stable box contains 7 meals","Fresh milk and/or juice included with each delivery","Frozen and shelf-stable options available"].map(i=><li key={i}>{i}</li>)}
-              </ul>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Apply or get help</p>
-              <a href="tel:+18009877767" className="cadc-btn">📞 1-800-987-7767</a>
-              <p className="cadc-note">Or call 405-522-5050</p>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Office locations</p>
-              <div className="cadc-stack">
-                {[
-                  {n:"Sentinel — Emily Correll",p:"580-393-2216",addr:"122 S. 3rd Butler Building, Sentinel, OK 73664"},
-                  {n:"Temple — Danya Brinson",p:"580-342-6967",addr:"102 West Texas, Temple, OK 73568"},
-                  {n:"Lawton — Kristie Jackson",p:"580-699-8880",addr:"802 SW A Ave, Suite B, Lawton, OK 73501"},
-                ].map(o=><div key={o.n} className="cadc-card-sm"><p className="cadc-card-title">{o.n}</p><p>{o.addr}</p><a href={`tel:+1${o.p.replace(/\D/g,"")}`} className="cadc-link">{o.p}</a></div>)}
+              <p className="cadc-label">Meal contribution</p>
+              <div className="cadc-card-sm">
+                <p className="cadc-card-title">With completed assessment (required)</p>
+                <p>$3.00 per meal</p>
               </div>
+              <p className="cadc-note">An assessment is required before receiving home-delivered meals.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">More information</p>
+              <a href="tel:+15803355588" className="cadc-btn">📞 580-335-5588</a>
             </div>
           </div>
         ),
