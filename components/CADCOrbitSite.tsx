@@ -306,11 +306,12 @@ const PROGRAMS: ProgramData[] = [
         id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
         content: (
           <div className="cadc-content">
-            <p>Early Head Start serves pregnant women, expectant families, and children from birth to age 3. Home visits, center-based care, and family support starting before birth.</p>
+            <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
+            <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
             <div className="cadc-card">
               <p className="cadc-label">Provided at no cost while children are in care</p>
               <ul className="cadc-list">
-                {["Formula for infants","Diapers","Wipes","Nutritious meals and snacks","Developmental support and screenings"].map(i=><li key={i}>{i}</li>)}
+                {["Formula for infants","Diapers","Wipes","Nutritious meals and snacks","Developmental screenings and individualized support"].map(i=><li key={i}>{i}</li>)}
               </ul>
             </div>
           </div>
@@ -320,9 +321,9 @@ const PROGRAMS: ProgramData[] = [
         id: "hs", label: "Head Start Preschool", shortLabel: "Preschool", icon: "📖",
         content: (
           <div className="cadc-content">
-            <p>Head Start serves children ages 3–5 with full-day, full-year preschool at no cost to income-eligible families. Every child receives education, health, nutrition, and family support.</p>
+            <p>Head Start serves children ages 3–5 with full-day, full-year preschool at no cost to income-eligible families. Every child receives education, health, nutrition, and family support — all in one place.</p>
             <div className="cadc-grid-2">
-              {["Full-day preschool at no cost","Health screenings","Nutritious meals daily","Family engagement","School readiness curriculum","Individualized learning goals"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+              {["Full-day preschool at no cost","Health screenings","Nutritious meals daily","Family engagement","School readiness goals","Individualized learning plans"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
             </div>
           </div>
         ),
@@ -358,16 +359,36 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "education", label: "Education", shortLabel: "Education", icon: "📚",
+        id: "ehs-education", label: "EHS Education", shortLabel: "EHS Ed", icon: "🧸",
         content: (
           <div className="cadc-content">
-            <p>Our education program uses <strong>Frog Street</strong>, a credential-based curriculum designed specifically for early childhood. Every classroom follows structured lesson plans aligned to each child's individual developmental goals.</p>
+            <p>Our Early Head Start education approach supports infants and toddlers across all developmental domains using evidence-based tools and individualized instruction.</p>
             <div className="cadc-stack">
               {[
-                {t:"45-Day Developmental Screenings",d:"Every child is screened within the first 45 days — identifying strengths and areas for support early."},
-                {t:"Individualized Goals",d:"Lesson plans are set for each child based on where they are developmentally."},
-                {t:"Frog Street Curriculum",d:"Nationally recognized, credential-based curriculum focused on language, literacy, math, and social-emotional development."},
-                {t:"Classroom Facebook Pages",d:"Each classroom has a private Facebook page where families can see photos, events, and updates."},
+                {t:"Brigance Developmental Screening",d:"Every child is screened within the first 45 days using the Brigance Early Childhood Screener — a standardized tool identifying strengths and areas for support across all developmental domains. Aligned with 45 CFR §1302.33."},
+                {t:"Individualized Goals",d:"Lesson plans and learning goals are created for each child based on Brigance results, DRDP assessment data, daily observations, and family input. No two children receive the same plan. Standards §1302.33 and §1302.32."},
+                {t:"Frog Street Infant/Toddler Curriculum",d:"A nationally recognized, credential-based curriculum supporting language & early literacy, cognitive development, social-emotional skills, approaches to learning, and physical development. Standards §1302.33 and §1302.32."},
+                {t:"DRDP Assessment",d:"A strength-based assessment tool measuring what children can do — not comparing against age norms. Completed three times per year (Fall, Winter, Spring). Staff document approximately 15% of each child's measures weekly through observations. Standards §1302.33 and §1302.32."},
+                {t:"Conscious Discipline — Baby Doll Circle Time",d:"A Conscious Discipline strategy using baby dolls to model nurturing interactions, build attachment, and teach self-regulation. Children develop empathy, connection, and emotional awareness through consistent rituals and predictable routines. Standard 45 CFR §1302.32 and §1302.33."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "hs-education", label: "HS Education", shortLabel: "HS Ed", icon: "📚",
+        content: (
+          <div className="cadc-content">
+            <p>Our Head Start Preschool education program supports 3 and 4-year-old children across all developmental domains through evidence-based curriculum, individualized instruction, and rigorous assessment.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Brigance Developmental Screening",d:"Every child is screened within the first 45 days using the Brigance Early Childhood Screener — identifying strengths and areas for support early. Aligned with 45 CFR §1302.33."},
+                {t:"Individualized Goals",d:"Lesson plans are built from Brigance results, DRDP data, daily observations, and family input — ensuring instruction is never one-size-fits-all. Standards §1302.33 and §1302.32."},
+                {t:"Frog Street Curriculum",d:"A nationally recognized, credential-based curriculum aligned to Oklahoma Early Learning Guidelines, Head Start ELOF, and DRDP developmental domains. Covers language, literacy, math, social-emotional development, and approaches to learning. Standards §1302.33 and §1302.32."},
+                {t:"DRDP Assessment",d:"Strength-based assessment completed three times per year — Fall, Winter, and Spring. Staff document approximately 15% of each child's measures weekly using observations from routines, play, and group activities. Standards §1302.33 and §1302.32."},
+                {t:"School Readiness Goals",d:"Goals aligned with ELOF, DRDP, and Frog Street — covering social-emotional skills, early literacy and language, early math and science, cognitive flexibility, physical development, and approaches to learning. Required under 45 CFR §1302.102."},
+                {t:"Conscious Discipline",d:"A nationally recognized, evidence-based social-emotional learning framework. Builds safety, connection, and problem-solving skills in the classroom. Reduces challenging behaviors, strengthens teacher confidence, and supports long-term school readiness. Standards §1302.32, §1302.33, §1302.102."},
+                {t:"CLASS — Classroom Assessment Scoring System",d:"A nationally recognized observation tool measuring the quality of teacher-child interactions across three domains: Emotional Support, Classroom Organization, and Instructional Support. CLASS data guides professional development and aligns practices with Head Start ELOF. Standard §1302.33."},
               ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
             </div>
           </div>
@@ -403,21 +424,24 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "getinvolved", label: "Get Involved", shortLabel: "Volunteer", icon: "🤝",
+        id: "parent-engagement", label: "Parent Engagement", shortLabel: "Parents", icon: "👨‍👩‍👧",
         content: (
           <div className="cadc-content">
-            <p>Head Start strongly believes that parents and the whole community must be involved for children's experiences to have a lasting impact. Studies show children are most successful when parents are involved.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">What is In-Kind?</p>
-              <p>Each year, Head Start must match a portion of the federal grant through donations of time, services, and goods. This is how we operate at no cost to families. Your time has real monetary value to our program.</p>
+            <p>Parent and community involvement is not optional at Head Start — it is foundational. Families are partners in the program, and the community is part of the team.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Policy Council",d:"The Head Start Policy Council includes parents of currently enrolled children and community representatives. Members have a real voice in how the program operates — approving budgets, reviewing policies, participating in hiring decisions, and advocating for families."},
+                {t:"Parent Education & Trainings",d:"CADC offers parent education opportunities throughout the year covering child development, health, family wellness, and school readiness. Training schedules are available through your child's center."},
+                {t:"Sub Committees",d:"Parents can join sub-committees to take a deeper role in specific areas of program governance and planning. Contact your center to learn about current sub-committee opportunities."},
+                {t:"Get Involved — Community Welcome",d:"Head Start's impact depends on community involvement. Parents, grandparents, neighbors, and local volunteers are all welcome. Show up at any center — no appointment needed. Volunteer hours count as in-kind contributions that help CADC match its federal grant and keep the program free for families."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Ways to help</p>
+              <p className="cadc-label">Ways to contribute</p>
               <ul className="cadc-list">
                 {["Assist with handwashing and daily routines","Sit and eat with the children","Help with cleaning tables and play areas","Participate during large and small group time","Join outdoor activities and field trips","Cut out and prepare classroom materials","Help decorate bulletin boards","Share a hobby, talent, or cultural tradition","Be a mystery reader — surprise your child's class","Complete monthly Learning at Home activities","Assist staff with repairs, painting, or yard work"].map(i=><li key={i}>{i}</li>)}
               </ul>
             </div>
-            <p className="cadc-note">Parents and community members are welcome to show up at any center — no call or appointment needed.</p>
             <div className="cadc-card">
               <p className="cadc-label">Donations — Coming Soon</p>
               <p>CADC is setting up online donation options including Amazon Smile, Walmart Community, and Shop Raise. Check back soon or call us to express interest in supporting a classroom directly.</p>
@@ -451,7 +475,7 @@ const PROGRAMS: ProgramData[] = [
                 {q:"What do I need to bring to apply?",a:"Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable."},
                 {q:"Are children with disabilities or special needs accepted?",a:"Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP."},
                 {q:"Can parents apply to work at CADC Head Start?",a:"Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588."},
-                {q:"How can parents volunteer in the classroom?",a:"Just show up — no call or appointment needed. Parents can help with handwashing, meals, group time, outdoor activities, bulletin boards, reading, sharing talents, cultural celebrations, and more. Every hour you volunteer counts as an in-kind contribution to the program."},
+                {q:"How can parents or community members get involved?",a:"Just show up at any center — no call or appointment needed. Parents, grandparents, neighbors, and local volunteers are all welcome. Every hour you contribute counts as an in-kind donation that helps keep the program free for families."},
                 {q:"What should I expect during a home visit?",a:"CADC attempts two home visits per year per family. Your Family Service Worker will work with you on goals, connect you to resources, and discuss your child's development. If a home visit isn't possible due to safety concerns or family preference, an alternative location can be arranged to maintain confidentiality."},
                 {q:"How does Head Start support my child's health?",a:"CADC provides vision, hearing, and mental health screenings. Other screenings — including dental exams — are the parent's responsibility, though we will help direct you to the right resources. Health needs are documented and monitored by our Health Coordinator. Children with conditions such as asthma must have an inhaler on-site."},
                 {q:"What if my child has allergies or special dietary needs?",a:"A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program."},
