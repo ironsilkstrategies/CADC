@@ -285,6 +285,10 @@ function MealCalendarPanel() {
       </p>
       <MealCalendar dark={isDesktop} />
       <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(126,0,1,0.9)" : "#7E0001", margin: "0 0 6px" }}>About our menus</p>
+        <p style={{ fontSize: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers. Each menu cycle covers three months.</p>
+      </div>
+      <div style={{ marginTop: 10, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
         <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(126,0,1,0.9)" : "#7E0001", margin: "0 0 6px" }}>Questions about the menu?</p>
         <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-335-5588</a>
       </div>
@@ -348,13 +352,16 @@ const PROGRAMS: ProgramData[] = [
         id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
         content: (
           <div className="cadc-content">
-            <p>Head Start and Early Head Start serve pregnant mothers and children from birth to 5 years old. Priority is given to families with the greatest need.</p>
+            <p>EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5.</p>
             <div className="cadc-card">
-              <p className="cadc-label">Qualifying circumstances include</p>
-              <ul className="cadc-list">
-                {["Children in foster care","Families receiving SNAP, SSI, or TANF","Families with income below the federal poverty guidelines","Families who are unhoused or sharing housing","Children on a safety plan","Children with disabilities (IEP or IFSP)","Families where housing and utility bills exceed 30% of income","Families receiving Public Assistance"].map(i=><li key={i}>{i}</li>)}
-              </ul>
+              <p className="cadc-label">Automatically eligible</p>
+              <p>Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF).</p>
             </div>
+            <div className="cadc-card">
+              <p className="cadc-label">All families are encouraged to apply</p>
+              <p>Enrollment is based on a points system that considers many circumstances beyond the automatic eligibility categories above. We serve all children — don't count yourself out before you apply.</p>
+            </div>
+            <a href="https://childplus.com" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
           </div>
         ),
       },
@@ -471,7 +478,7 @@ const PROGRAMS: ProgramData[] = [
             <p>Answers to the questions families ask us every day.</p>
             <div className="cadc-stack">
               {[
-                {q:"Who qualifies for Early Head Start and Head Start?",a:"EHS serves pregnant mothers and children birth to 3. Head Start serves children ages 3–5. Priority is given to families receiving SNAP, SSI, TANF, or Public Assistance; children in foster care; children on safety plans; children with disabilities; unhoused families; and families whose housing costs exceed 30% of income."},
+                {q:"Who qualifies for Early Head Start and Head Start?",a:"EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5. Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF). Enrollment is based on a points system that considers many circumstances — all families are encouraged to apply."},
                 {q:"What do I need to bring to apply?",a:"Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable."},
                 {q:"Are children with disabilities or special needs accepted?",a:"Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP."},
                 {q:"Can parents apply to work at CADC Head Start?",a:"Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588."},
