@@ -8,7 +8,7 @@ const STATS = [
   { value: "9", label: "Counties served" },
   { value: "11", label: "Head Start centers" },
   { value: "110", label: "Transit vehicles" },
-  { value: "5", label: "Senior meal sites" },
+  { value: "6", label: "Senior meal sites" },
 ];
 
 const COUNTIES = [
