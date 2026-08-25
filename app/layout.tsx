@@ -4,7 +4,7 @@ import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-space-grotesk",
   display: "swap",
 });
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-const VERSION = "v2.03";
+const VERSION = "v2.04";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
