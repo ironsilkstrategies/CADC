@@ -1,176 +1,196 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { org, contact } from "@/lib/org";
-import { agencyLeadership, programDirectors } from "@/lib/staff";
+import { org, contact, addressOneLine, complianceDocs } from "@/lib/org";
 
 export const metadata: Metadata = {
   title: "About CADC | Community Action Development Corporation",
   description:
-    "Community Action Development Corporation has served Southwest Oklahoma for decades — 9 programs, 16–17 counties, and a team committed to improving lives across the region.",
+    "CADC has served Southwest Oklahoma families since 1966 — early childhood education, transportation, weatherization, nutrition, and more across 9 counties.",
 };
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--cadc-maroon)" }}>
-      {children}
-    </p>
-  );
-}
+const STATS = [
+  { value: "1966", label: "Year founded" },
+  { value: "9", label: "Counties served" },
+  { value: "11", label: "Head Start centers" },
+  { value: "110", label: "Transit vehicles" },
+  { value: "5", label: "Senior meal sites" },
+];
+
+const PROGRAMS = [
+  { name: "Head Start & Early Head Start", slug: "head-start", icon: "🏫" },
+  { name: "Red River Transportation", slug: "transit", icon: "🚌" },
+  { name: "Weatherization & Housing", slug: "weatherization", icon: "🏠" },
+  { name: "Senior Nutrition", slug: "senior-meals", icon: "🍽️" },
+  { name: "Advantage Home Delivered Meals", slug: "advantage", icon: "🚗" },
+  { name: "VITA Free Tax Help", slug: "tax-help", icon: "📋" },
+  { name: "Community Market", slug: "community-market", icon: "🛒" },
+  { name: "Employment & Workforce", slug: "employment", icon: "💼" },
+];
+
+const LEADERSHIP = [
+  { name: "Leslea Hixson", title: "Executive Director" },
+  { name: "Robin Harris", title: "Director, Head Start & Early Head Start" },
+  { name: "Kristie Jackson", title: "Advantage Director" },
+];
+
+const COUNTIES = [
+  "Beckham","Canadian","Comanche","Cotton",
+  "Jefferson","Kiowa","Roger Mills","Tillman","Washita",
+];
 
 export default function AboutPage() {
+  const annualReport = complianceDocs.find(d => d.label === "2024 Annual Report");
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ background: "#F8F8FF", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
 
       {/* Hero */}
-      <section className="cadc-grid-bg py-14 md:py-20" style={{ background: "var(--cadc-blue)" }}>
-        <div className="mx-auto max-w-4xl px-5 md:px-8">
-          <h1 className="font-serif text-3xl md:text-5xl font-bold leading-tight mb-4 text-white">
-            About CADC
-          </h1>
-          <p className="text-base md:text-lg leading-relaxed max-w-2xl" style={{ color: "var(--cadc-blue-light)" }}>
-            {org.tagline} For decades, Community Action Development Corporation
-            has worked to reduce poverty and expand opportunity across Southwest Oklahoma.
+      <section style={{ background: "#000014", position: "relative", overflow: "hidden", padding: "80px 0 64px" }}>
+        {/* Subtle grid texture */}
+        <div style={{
+          position: "absolute", inset: 0, opacity: 0.04,
+          backgroundImage: "linear-gradient(rgba(1,1,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(1,1,255,0.8) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }} />
+        <div style={{ position: "relative", maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
+          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.45)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", marginBottom: 28 }}>
+            <span>←</span> Back to Home
+          </Link>
+          <p style={{ color: "#0101FF", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 14 }}>
+            Southwest Oklahoma
           </p>
+          <h1 style={{ color: "white", fontSize: "clamp(2rem,5vw,3.4rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20 }}>
+            Community Action<br />
+            <span style={{ color: "#0101FF" }}>Development</span> Corporation
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 16, lineHeight: 1.75, maxWidth: 600, marginBottom: 32 }}>
+            Since 1966, CADC has worked alongside families across Southwest Oklahoma — connecting people to the resources, programs, and support they need to build stable, healthy lives.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <a href={`tel:+1${contact.mainPhone.replace(/\D/g,"")}`} style={{ background: "#7E0001", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.04em" }}>
+              📞 {contact.mainPhone}
+            </a>
+            {annualReport && (
+              <a href={annualReport.href} target="_blank" rel="noopener noreferrer" style={{ border: "1px solid rgba(1,1,255,0.4)", color: "rgba(255,255,255,0.7)", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
+                2024 Annual Report ↗
+              </a>
+            )}
+          </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-4xl px-5 md:px-8 py-10 md:py-14 flex flex-col gap-14">
+      {/* Stats bar */}
+      <div style={{ background: "#0101FF" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px", display: "flex", flexWrap: "wrap" }}>
+          {STATS.map(s => (
+            <div key={s.label} style={{ flex: "1 1 120px", padding: "20px 16px", textAlign: "center", borderRight: "1px solid rgba(255,255,255,0.12)" }}>
+              <div style={{ color: "white", fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 800, lineHeight: 1 }}>{s.value}</div>
+              <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: "56px 24px 80px", display: "flex", flexDirection: "column", gap: 56 }}>
 
         {/* Mission */}
-        <section aria-labelledby="mission-heading">
-          <SectionLabel>Mission</SectionLabel>
-          <h2 id="mission-heading" className="font-serif text-2xl font-bold mb-5" style={{ color: "var(--cadc-blue)" }}>
-            Why We Exist
+        <section>
+          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Mission</p>
+          <h2 style={{ color: "#0101FF", fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>
+            Helping People. Changing Lives.
           </h2>
-          <p className="text-base leading-relaxed mb-4" style={{ color: "#374151" }}>
-            Community Action Development Corporation is a Community Action Agency serving
-            Southwest and Central Oklahoma. Our mission is to reduce poverty, revitalize
-            low-income communities, and empower residents to achieve economic stability
-            and self-sufficiency.
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 640 }}>
+            CADC is a private, non-profit Community Action Agency and Community Action Partnership member. We work to reduce poverty, revitalize communities, and empower people across Southwest Oklahoma through direct services, advocacy, and partnerships.
           </p>
-          <p className="text-base leading-relaxed" style={{ color: "#374151" }}>
-            We do this through nine programs — from early childhood education to rural
-            transit to home weatherization — delivered by a team with deep roots in the
-            communities we serve.
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 640, marginTop: 14 }}>
+            Every program we operate is built around one belief: that people, given the right support at the right time, can and do change their circumstances. We show up for that moment — every day, across 9 counties.
           </p>
         </section>
 
-        {/* By the numbers */}
-        <section aria-labelledby="numbers-heading">
-          <SectionLabel>By the Numbers</SectionLabel>
-          <h2 id="numbers-heading" className="font-serif text-2xl font-bold mb-6" style={{ color: "var(--cadc-blue)" }}>
-            The Scale of What We Do
+        {/* Service area */}
+        <section>
+          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Where We Serve</p>
+          <h2 style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>
+            9 Counties Across Southwest Oklahoma
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { stat: "9", label: "Programs" },
-              { stat: "13", label: "Head Start Centers" },
-              { stat: "110", label: "Transit Vehicles" },
-              { stat: "16–17", label: "Counties Served" },
-            ].map(({ stat, label }) => (
-              <div
-                key={label}
-                className="rounded-xl p-5 text-center"
-                style={{ background: "var(--cadc-blue-light)" }}
-              >
-                <p className="font-serif text-3xl font-bold" style={{ color: "var(--cadc-blue)" }}>{stat}</p>
-                <p className="text-xs font-semibold uppercase tracking-wide mt-1" style={{ color: "var(--cadc-ink-soft)" }}>{label}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {COUNTIES.map(c => (
+              <div key={c} style={{ background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.2)", borderRadius: 6, padding: "7px 14px", fontSize: 13, color: "#0101FF", fontWeight: 700 }}>
+                {c}
               </div>
             ))}
           </div>
+          <p style={{ color: "#6b7280", fontSize: 13, marginTop: 12 }}>
+            Some programs — including Red River Transportation and Advantage Home Delivered Meals — serve additional counties beyond the base 9. Visit individual program pages for coverage details.
+          </p>
         </section>
 
-        {/* What we do */}
-        <section aria-labelledby="programs-heading">
-          <SectionLabel>Our Work</SectionLabel>
-          <h2 id="programs-heading" className="font-serif text-2xl font-bold mb-6" style={{ color: "var(--cadc-blue)" }}>
-            Nine Programs, One Commitment
+        {/* Programs */}
+        <section>
+          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>What We Do</p>
+          <h2 style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20 }}>
+            Our Programs
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { name: "Head Start & Early Head Start", href: "/programs/head-start", detail: "Free early childhood education at 13 centers across the region." },
-              { name: "Red River Transportation", href: "/programs/transit", detail: "Rural public transit across 16 counties — 110 vehicles, ADA equipped." },
-              { name: "Weatherization & Housing", href: "/programs/weatherization", detail: "Free home energy improvements for income-eligible households." },
-              { name: "Senior Congregate Meals", href: "/programs/senior-meals", detail: "Hot meals and community connection at 14 sites plus home delivery." },
-              { name: "VITA Tax Assistance", href: "/programs/tax-help", detail: "Free IRS-certified tax preparation — keep every dollar of your refund." },
-              { name: "Community Market", href: "/programs/community-market", detail: "Expanding food access across Southwest Oklahoma." },
-              { name: "Employment & Workforce", href: "/programs/employment", detail: "Open positions and workforce support across the region." },
-              { name: "Board & Leadership", href: "/programs/board", detail: "Governance, agendas, and Policy Council information." },
-            ].map((p) => (
-              <Link
-                key={p.name}
-                href={p.href}
-                className="flex flex-col gap-1 rounded-xl border p-5 transition-shadow hover:shadow-md"
-                style={{ borderColor: "#e5e7eb" }}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+            {PROGRAMS.map(p => (
+              <Link key={p.slug} href={`/#${p.slug}`} style={{
+                background: "white", border: "1px solid #e5e7eb", borderRadius: 12,
+                padding: "16px 20px", textDecoration: "none",
+                display: "flex", alignItems: "center", gap: 12,
+                transition: "border-color 0.2s, box-shadow 0.2s",
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#0101FF"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 4px 16px rgba(1,1,255,0.1)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#e5e7eb"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none"; }}
               >
-                <p className="font-semibold text-sm" style={{ color: "var(--cadc-blue)" }}>{p.name}</p>
-                <p className="text-xs leading-relaxed" style={{ color: "#6b7280" }}>{p.detail}</p>
+                <span style={{ fontSize: 22 }}>{p.icon}</span>
+                <span style={{ color: "#111827", fontSize: 13, fontWeight: 700, lineHeight: 1.3 }}>{p.name}</span>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* Executive team */}
-        <section aria-labelledby="team-heading">
-          <SectionLabel>Our Team</SectionLabel>
-          <h2 id="team-heading" className="font-serif text-2xl font-bold mb-6" style={{ color: "var(--cadc-blue)" }}>
-            Executive Leadership
+        {/* Leadership */}
+        <section>
+          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Agency Leadership</p>
+          <h2 style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20 }}>
+            Our Team
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {agencyLeadership.map((s) => (
-              <div key={s.id} className="rounded-xl border p-5 flex flex-col gap-1.5" style={{ borderColor: "#e5e7eb" }}>
-                <p className="font-bold text-sm" style={{ color: "var(--cadc-blue)" }}>{s.name}</p>
-                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--cadc-maroon)" }}>{s.title}</p>
-                {s.tenure && <p className="text-xs" style={{ color: "#9ca3af" }}>{s.tenure}</p>}
-                {s.bio && <p className="text-xs leading-relaxed mt-1" style={{ color: "#374151" }}>{s.bio}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+            {LEADERSHIP.map(l => (
+              <div key={l.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "20px" }}>
+                <p style={{ color: "#111827", fontWeight: 800, fontSize: 15, margin: "0 0 4px" }}>{l.name}</p>
+                <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>{l.title}</p>
               </div>
             ))}
           </div>
-        </section>
-
-        {/* Program directors */}
-        <section aria-labelledby="directors-heading">
-          <SectionLabel>Program Leadership</SectionLabel>
-          <h2 id="directors-heading" className="font-serif text-2xl font-bold mb-6" style={{ color: "var(--cadc-blue)" }}>
-            Department Directors
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {programDirectors.map((s) => (
-              <div key={s.id} className="rounded-xl border p-5 flex flex-col gap-1.5" style={{ borderColor: "#e5e7eb" }}>
-                <p className="font-bold text-sm" style={{ color: "var(--cadc-blue)" }}>{s.name}</p>
-                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--cadc-maroon)" }}>{s.title}</p>
-                {s.tenure && <p className="text-xs" style={{ color: "#9ca3af" }}>{s.tenure}</p>}
-                {s.bio && <p className="text-xs leading-relaxed mt-1" style={{ color: "#374151" }}>{s.bio}</p>}
-              </div>
-            ))}
-          </div>
+          <p style={{ color: "#6b7280", fontSize: 13, marginTop: 14 }}>
+            Each program has a dedicated director reporting to the Executive Director. Board of Directors information available upon request.
+          </p>
         </section>
 
         {/* Contact CTA */}
-        <div className="cadc-grid-bg rounded-2xl overflow-hidden" style={{ background: "var(--cadc-blue)" }}>
-          <div className="px-6 py-8 md:px-10 md:py-10 flex flex-col gap-4">
-            <h2 className="font-serif text-2xl font-bold text-white">Get in Touch</h2>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--cadc-blue-light)" }}>
-              {contact.address.street}, {contact.address.city}, {contact.address.state} {contact.address.zip}
+        <section style={{ background: "#000014", borderRadius: 20, padding: "40px 36px", position: "relative", overflow: "hidden" }}>
+          <div style={{
+            position: "absolute", inset: 0, opacity: 0.04,
+            backgroundImage: "linear-gradient(rgba(1,1,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(1,1,255,0.8) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }} />
+          <div style={{ position: "relative" }}>
+            <p style={{ color: "#0101FF", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Get in touch</p>
+            <h3 style={{ color: "white", fontSize: "clamp(1.2rem,2.5vw,1.8rem)", fontWeight: 800, marginBottom: 8 }}>We're here to help.</h3>
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, lineHeight: 1.7, marginBottom: 24, maxWidth: 480 }}>
+              {contact.address.street} · {contact.address.city}, {contact.address.state} {contact.address.zip}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href={contact.mainPhoneHref}
-                className="inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
-                style={{ background: "var(--cadc-maroon)" }}
-              >
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <a href={contact.mainPhoneHref} style={{ background: "#7E0001", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
                 📞 {contact.mainPhone}
               </a>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-                style={{ borderColor: "rgba(255,255,255,0.35)" }}
-              >
-                Contact Page →
+              <Link href="/contact" style={{ border: "1px solid rgba(1,1,255,0.4)", color: "rgba(255,255,255,0.7)", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
+                Contact page →
               </Link>
             </div>
           </div>
-        </div>
+        </section>
 
       </div>
     </div>
