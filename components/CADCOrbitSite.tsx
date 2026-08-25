@@ -1141,7 +1141,11 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, assembled
             <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>
           )}
         </div>
-        <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>📞 Call</a>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
+          <a href="/contact" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Contact</a>
+          <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>📞 Call</a>
+        </div>
       </div>
 
       {/* Orbit */}
