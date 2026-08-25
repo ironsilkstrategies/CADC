@@ -1,43 +1,51 @@
 import type { Metadata } from "next";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Community Action Development Corporation | Southwest Oklahoma",
+  title: "CADC — Community Action Development Corporation",
   description:
-    "CADC serves 16-17 counties across Southwest Oklahoma with Head Start, transit, weatherization, senior meals, and more. Find your program and get help today.",
+    "Southwest Oklahoma's community action agency. Serving 9 counties with Head Start, Red River Transportation, Weatherization, Senior Nutrition, Tax Help, and more. Helping People. Changing Lives.",
+  metadataBase: new URL("https://cadcok.org"),
+  openGraph: {
+    title: "CADC — Community Action Development Corporation",
+    description: "Helping People. Changing Lives. Southwest Oklahoma's community action agency.",
+    url: "https://cadcok.org",
+    siteName: "CADC",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
-const VERSION = "v2.02";
+const VERSION = "v2.03";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+      <body style={{ margin: 0, padding: 0 }}>
+        {children}
+        {/* Build watermark — hidden from users */}
         <div
           aria-hidden="true"
           style={{
-            position: "fixed",
-            bottom: "14px",
-            right: "16px",
-            zIndex: 9999,
-            fontSize: "0.6rem",
-            fontWeight: 600,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            color: "var(--cadc-blue)",
-            opacity: 0.32,
-            userSelect: "none",
-            pointerEvents: "none",
-            fontVariantNumeric: "tabular-nums",
+            position: "fixed", bottom: 8, right: 10, zIndex: 9999,
+            fontSize: "9px", fontFamily: "monospace", fontVariantNumeric: "tabular-nums",
+            color: "rgba(128,128,128,0.35)", pointerEvents: "none", userSelect: "none",
+            letterSpacing: "0.05em",
           }}
         >
           {VERSION}
