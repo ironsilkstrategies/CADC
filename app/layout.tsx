@@ -19,19 +19,24 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "CADC — Community Action Development Corporation",
   description:
-    "Southwest Oklahoma's community action agency. Serving 9 counties with Head Start, Red River Transportation, Weatherization, Senior Nutrition, Tax Help, and more. Helping People. Changing Lives.",
+    "A Community Action Development Corporation serving 9 counties across Southwest Oklahoma — Head Start, Red River Transportation, Weatherization, Senior Nutrition, Tax Help, and more. Helping People. Changing Lives.",
   metadataBase: new URL("https://cadcok.org"),
   openGraph: {
     title: "CADC — Community Action Development Corporation",
-    description: "Helping People. Changing Lives. Southwest Oklahoma's community action agency.",
+    description: "Helping People. Changing Lives. A Community Action Development Corporation serving Southwest Oklahoma.",
     url: "https://cadcok.org",
     siteName: "CADC",
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary",
+    title: "CADC — Community Action Development Corporation",
+    description: "Helping People. Changing Lives. A Community Action Development Corporation serving Southwest Oklahoma.",
+  },
 };
 
-const VERSION = "v2.09";
+const VERSION = "v2.10";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
