@@ -180,6 +180,10 @@ const PROGRAMS: ProgramData[] = [
               </ul>
             </div>
             <p className="cadc-note">Contact your nearest center to learn how to schedule a visit or volunteer.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Donations — Coming Soon</p>
+              <p>CADC is setting up online donation options including Amazon Smile, Walmart Community, and Shop Raise. Check back soon or call us to express interest in supporting a classroom directly.</p>
+            </div>
           </div>
         ),
       },
@@ -194,6 +198,32 @@ const PROGRAMS: ProgramData[] = [
                 {t:"Safe Environments",d:"Centers undergo Environmental Health and Safety checks every other month. Daily safety checks are conducted in classrooms, playgrounds, and pick-up/drop-off areas. Indoor and outdoor environments meet CPSC/ASTM standards."},
                 {t:"Emergency Procedures",d:"Each center maintains a current all-hazards emergency preparedness plan covering fire, severe weather, lockdowns, medical emergencies, and utility outages. Monthly drills are conducted with staff and children."},
               ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "faq", label: "FAQs", shortLabel: "FAQ", icon: "❓",
+        content: (
+          <div className="cadc-content">
+            <p>Answers to the questions families ask us every day.</p>
+            <div className="cadc-stack">
+              {[
+                {q:"Who qualifies for Early Head Start and Head Start?",a:"EHS serves pregnant mothers and children birth to 3. Head Start serves children ages 3–5. Priority is given to families receiving SNAP, SSI, TANF, or Public Assistance; children in foster care; children on safety plans; children with disabilities; unhoused families; and families whose housing costs exceed 30% of income."},
+                {q:"What do I need to bring to apply?",a:"Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable."},
+                {q:"Are children with disabilities or special needs accepted?",a:"Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP."},
+                {q:"Can parents apply to work at CADC Head Start?",a:"Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588."},
+                {q:"How can parents volunteer in the classroom?",a:"Contact your child's center to schedule a visit. Parents can help with handwashing, meals, group time, outdoor activities, bulletin boards, reading, sharing talents, cultural celebrations, and more. Every hour you volunteer counts as an in-kind contribution to the program."},
+                {q:"What should I expect during a home visit?",a:"Home visits are regular for Early Head Start families and available as needed for Head Start families. Your Family Service Worker will work with you on goals, connect you to resources, and discuss your child's development."},
+                {q:"How does Head Start support my child's health?",a:"Every child receives vision, hearing, and dental screenings. Health needs are documented and monitored by our Health Coordinator. Mental health support is available to children and families. Children with conditions such as asthma must have an inhaler on-site."},
+                {q:"What if my child has allergies or special dietary needs?",a:"A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program."},
+                {q:"I need a new parent handbook or school calendar. What do I do?",a:"Contact your child's center directly. Each center can provide current handbooks and calendars. You can also find updates through your classroom's private Facebook page."},
+              ].map(item => (
+                <div key={item.q} className="cadc-card-sm">
+                  <p className="cadc-card-title">{item.q}</p>
+                  <p>{item.a}</p>
+                </div>
+              ))}
             </div>
           </div>
         ),
@@ -587,7 +617,104 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
     ],
+  },,
+// ── 9. ADVANTAGE HOME DELIVERED MEALS ─────────────────────────────────────
+  {
+    slug: "advantage",
+    name: "Advantage Home Delivered Meals",
+    shortName: "Advantage",
+    icon: "🚗",
+    color: T.blue,
+    tagline: "Home-delivered meals for seniors & adults with disabilities",
+    subAreas: [
+      {
+        id: "adv-about", label: "About the Program", shortLabel: "About", icon: "ℹ️",
+        content: (
+          <div className="cadc-content">
+            <p>CADC Advantage provides home-delivered meals to older adults and individuals with disabilities through Oklahoma Medicaid waiver programs — Advantage, Living Choice, and Medically Fragile.</p>
+            <p>Meals are delivered every two weeks. Members may receive 14 or 28 meals per delivery, plus fresh milk and juice. Both frozen and shelf-stable meal options are available.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">17 counties served</p>
+              <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Grady · Greer · Harmon · Jackson · Jefferson · Kiowa · McClain · Roger Mills · Stephens · Tillman · Washita</p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-eligibility", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
+        content: (
+          <div className="cadc-content">
+            <p>To receive Advantage Home Delivered Meals, applicants must meet all of the following criteria:</p>
+            <div className="cadc-card">
+              <ul className="cadc-list">
+                {["Be financially qualified for SoonerCare (Medicaid)","Meet medical Level of Care (LOC) criteria","Be at least age 65, OR be age 19–64 with an intellectual or developmental disability, physical or other disability, or cognitive impairment related to a developmental disability"].map(i=><li key={i}>{i}</li>)}
+              </ul>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">To apply or get help</p>
+              <a href="tel:+18009877767" className="cadc-btn">📞 1-800-987-7767</a>
+              <p className="cadc-note">Or call 405-522-5050</p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-meals", label: "Meal Options", shortLabel: "Meals", icon: "🍱",
+        content: (
+          <div className="cadc-content">
+            <p>Members choose from a rotating selection of frozen and shelf-stable meals designed to meet nutritional needs. Fresh milk and juice are included with every delivery.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Delivery schedule</p>
+              <ul className="cadc-list">
+                {["Meals delivered every two weeks","14-meal plan: 2 half-gallons of milk or juice per delivery","28-meal plan: 4 half-gallons of milk or juice per delivery","Shelf-stable boxes contain 7 meals each","Members can mix frozen and shelf-stable meals"].map(i=><li key={i}>{i}</li>)}
+              </ul>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Milk & juice options</p>
+              <p>Whole milk, 2% milk, chocolate milk, buttermilk, almond milk (sweet, unsweetened, vanilla), orange juice, apple juice. Purchased through Braum's where available; local grocery partners used in other areas.</p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
+        content: (
+          <div className="cadc-content">
+            <div className="cadc-stack">
+              {[
+                {n:"Sentinel — Emily Correll",addr:"122 S. 3rd Butler Building, Sentinel, OK 73664",p:"580-393-2216",href:"tel:+15803932216"},
+                {n:"Temple — Danya Brinson",addr:"102 West Texas, Temple, OK 73568",p:"580-342-6967",href:"tel:+15803426967"},
+                {n:"Lawton — Kristie Jackson",addr:"802 SW A Ave, Suite B, Lawton, OK 73501",p:"580-699-8880",href:"tel:+15806998880"},
+              ].map(o=>(
+                <div key={o.n} className="cadc-card-sm">
+                  <p className="cadc-card-title">{o.n}</p>
+                  <p>{o.addr}</p>
+                  <a href={o.href} className="cadc-link">{o.p}</a>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-donate", label: "Support & Donate", shortLabel: "Donate", icon: "❤️",
+        content: (
+          <div className="cadc-content">
+            <p>CADC is exploring ways for community members and businesses to support our nutrition programs directly. Details coming soon — check back or contact us to express interest.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Coming soon</p>
+              <p>Online donation options, Amazon Smile, Walmart Community, and Shop Raise are being set up. We'll update this page once logistics are confirmed.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Questions? Contact us</p>
+              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+            </div>
+          </div>
+        ),
+      },
+    ],
   },
+
 ];
 
 // ─── Geometry helpers ─────────────────────────────────────────────────────────
