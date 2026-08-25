@@ -1,15 +1,18 @@
-// app/about/layout.tsx
-// Server component wrapper — exports metadata for the about page.
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About CADC | Community Action Development Corporation",
   description:
-    "Since 1966, CADC has served Southwest Oklahoma families — Head Start, transportation, weatherization, nutrition, and more across 9 counties.",
+    "Since 1966, CADC has served Southwest Oklahoma families — a Community Action Development Corporation delivering Head Start, transportation, weatherization, nutrition, and more across 9 counties.",
   openGraph: {
     title: "About CADC | Community Action Development Corporation",
-    description: "Helping People. Changing Lives. Southwest Oklahoma's community action agency since 1966.",
+    description: "Helping People. Changing Lives. A Community Action Development Corporation serving Southwest Oklahoma since 1966.",
     url: "https://cadcok.org/about",
+  },
+  twitter: {
+    card: "summary",
+    title: "About CADC | Community Action Development Corporation",
+    description: "Helping People. Changing Lives. A Community Action Development Corporation serving Southwest Oklahoma since 1966.",
   },
 };
 
