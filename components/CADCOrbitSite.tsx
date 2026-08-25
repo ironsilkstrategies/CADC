@@ -617,7 +617,7 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
     ],
-  },,
+  },
 // ── 9. ADVANTAGE HOME DELIVERED MEALS ─────────────────────────────────────
   {
     slug: "advantage",
