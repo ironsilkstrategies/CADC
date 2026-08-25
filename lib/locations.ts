@@ -86,25 +86,24 @@ export const headStartCenters: Location[] = [
 ];
 
 // ─── Red River Transportation offices ────────────────────────────────────────
-// Legacy site listed Cordell twice, identically. Deduplicated here.
-// Packet references 4 offices; 4 unique are listed below. Confirm completeness.
+// Confirmed by Gilbert (Red River Transportation dept) Aug 2026
+// Cordell REMOVED per Gilbert. 3 confirmed offices: Frederick, Sayre, Ryan.
+// Fare effective date: 10-1-22. Greer County: hold off pending confirmation.
 
 export const transitOffices: Location[] = [
-  { id: "tr-cordell", name: "Cordell Office", program: "transit",
-    street: "111 E. Main", city: "Cordell", state: "OK", zip: "73632",
-    phone: "580-832-5458", phoneHref: tel("580-832-5458"), verified: false },
+  // Cordell transit office REMOVED — per Gilbert, Red River Transportation dept (Aug 2026)
 
   { id: "tr-frederick", name: "Frederick Office", program: "transit",
     street: "105 S. Main", city: "Frederick", state: "OK", zip: "73542",
-    phone: "580-335-5588", phoneHref: tel("580-335-5588"), verified: false },
+    phone: "580-335-5588", phoneHref: tel("580-335-5588"), verified: true },
 
   { id: "tr-sayre", name: "Sayre Office", program: "transit",
     street: "304 W. Main", city: "Sayre", state: "OK", zip: "73662",
-    phone: "580-928-2199", phoneHref: tel("580-928-2199"), verified: false },
+    phone: "580-928-2199", phoneHref: tel("580-928-2199"), verified: true },
 
   { id: "tr-ryan", name: "Ryan Office", program: "transit",
     street: "400 Taylor & Main", city: "Ryan", state: "OK", zip: "73565",
-    phone: "580-757-2235", phoneHref: tel("580-757-2235"), verified: false },
+    phone: "580-757-2235", phoneHref: tel("580-757-2235"), verified: true },
 ];
 
 // ─── Senior Congregate Meals — 14 sites ──────────────────────────────────────
