@@ -785,61 +785,88 @@ function ParticleField() {
 // ─── Main Orbit component ─────────────────────────────────────────────────────
 
 type Stage = "main" | "program" | "content";
+type TransitionState = "idle" | "out" | "in";
 
 export default function CADCOrbitSite() {
   const [stage, setStage] = useState<Stage>("main");
   const [activeProgram, setActiveProgram] = useState<ProgramData | null>(null);
   const [activeSubArea, setActiveSubArea] = useState<SubArea | null>(null);
   const [glowNode, setGlowNode] = useState<string | null>(null);
+  const [popNode, setPopNode] = useState<string | null>(null);
+  const [beamNode, setBeamNode] = useState<string | null>(null);
+  const [orbitTx, setOrbitTx] = useState<TransitionState>("idle");
   const [assembled, setAssembled] = useState(false);
   const isDesktop = useIsDesktop();
 
-  // Logo assembly animation
   useEffect(() => {
     const t = setTimeout(() => setAssembled(true), 300);
     return () => clearTimeout(t);
   }, []);
 
   function tapProgram(prog: ProgramData) {
+    // 1. Pop + beam
+    setPopNode(prog.slug);
+    setBeamNode(prog.slug);
     setGlowNode(prog.slug);
-    setTimeout(() => setGlowNode(null), 600);
+    // 2. Start orbit exit
+    setTimeout(() => {
+      setOrbitTx("out");
+    }, 120);
+    // 3. Swap data mid-transition
     setTimeout(() => {
       setActiveProgram(prog);
       setActiveSubArea(null);
       setStage("program");
-    }, 200);
+      setOrbitTx("in");
+      setGlowNode(null);
+      setBeamNode(null);
+    }, 480);
+    // 4. Settle
+    setTimeout(() => {
+      setOrbitTx("idle");
+      setPopNode(null);
+    }, 900);
   }
 
   function tapSubArea(area: SubArea) {
+    setPopNode(area.id);
     setGlowNode(area.id);
-    setTimeout(() => setGlowNode(null), 600);
     setTimeout(() => {
       setActiveSubArea(area);
       setStage("content");
-    }, 200);
+      setGlowNode(null);
+      setPopNode(null);
+    }, 300);
   }
 
   function goBack() {
-    if (stage === "content") {
-      setActiveSubArea(null);
-      setStage("program");
-    } else if (stage === "program") {
-      setActiveProgram(null);
-      setStage("main");
-    }
+    setOrbitTx("out");
+    setTimeout(() => {
+      if (stage === "content") {
+        setActiveSubArea(null);
+        setStage("program");
+      } else if (stage === "program") {
+        setActiveProgram(null);
+        setStage("main");
+      }
+      setOrbitTx("in");
+    }, 300);
+    setTimeout(() => setOrbitTx("idle"), 700);
   }
 
   if (isDesktop) {
     return <DesktopLayout
       stage={stage} activeProgram={activeProgram} activeSubArea={activeSubArea}
-      glowNode={glowNode} assembled={assembled}
+      glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
+      assembled={assembled}
       tapProgram={tapProgram} tapSubArea={tapSubArea} goBack={goBack}
     />;
   }
 
   return <MobileLayout
     stage={stage} activeProgram={activeProgram} activeSubArea={activeSubArea}
-    glowNode={glowNode} assembled={assembled}
+    glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
+    assembled={assembled}
     tapProgram={tapProgram} tapSubArea={tapSubArea} goBack={goBack}
   />;
 }
@@ -865,6 +892,9 @@ interface LayoutProps {
   activeProgram: ProgramData | null;
   activeSubArea: SubArea | null;
   glowNode: string | null;
+  popNode: string | null;
+  beamNode: string | null;
+  orbitTx: TransitionState;
   assembled: boolean;
   tapProgram: (p: ProgramData) => void;
   tapSubArea: (a: SubArea) => void;
@@ -873,7 +903,7 @@ interface LayoutProps {
 
 // ─── DESKTOP LAYOUT ───────────────────────────────────────────────────────────
 
-function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, assembled, tapProgram, tapSubArea, goBack }: LayoutProps) {
+function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea, goBack }: LayoutProps) {
   return (
     <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
       <ParticleField />
@@ -920,7 +950,8 @@ function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, assemble
 
           <DesktopOrbit
             stage={stage} activeProgram={activeProgram}
-            glowNode={glowNode} assembled={assembled}
+            glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
+            assembled={assembled}
             tapProgram={tapProgram} tapSubArea={tapSubArea}
           />
         </div>
@@ -936,8 +967,9 @@ function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, assemble
   );
 }
 
-function DesktopOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, tapSubArea }: {
+function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea }: {
   stage: Stage; activeProgram: ProgramData | null; glowNode: string | null;
+  popNode: string | null; beamNode: string | null; orbitTx: TransitionState;
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   const programs = PROGRAMS;
@@ -980,21 +1012,30 @@ function DesktopOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, t
         width: "clamp(72px,16%,88px)", aspectRatio: "1/1",
         borderRadius: "50%", background: T.void,
         border: `2px solid ${T.blue}`,
-        boxShadow: `0 0 0 8px rgba(1,1,255,0.06), 0 0 40px rgba(1,1,255,0.3)`,
+        boxShadow: orbitTx === "out"
+          ? `0 0 0 16px rgba(1,1,255,0.12), 0 0 60px rgba(1,1,255,0.5)`
+          : `0 0 0 8px rgba(1,1,255,0.06), 0 0 40px rgba(1,1,255,0.3)`,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         gap: 2,
+        transition: "box-shadow 0.3s ease",
+        animation: orbitTx === "out" ? "hubPulse 0.4s ease-out" : "none",
       }}>
-        {stage === "main" ? (
-          <>
-            <span style={{ fontSize: "clamp(1rem,2.5vw,1.4rem)" }}>🏛️</span>
-            <span style={{ color: T.blue, fontSize: "clamp(0.35rem,0.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" }}>CADC</span>
-          </>
-        ) : (
-          <>
-            <span style={{ fontSize: "clamp(1rem,2.5vw,1.4rem)" }}>{activeProgram?.icon}</span>
-            <span style={{ color: T.blue, fontSize: "clamp(0.32rem,0.7vw,0.42rem)", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", padding: "0 4px", lineHeight: 1.2 }}>{activeProgram?.shortName}</span>
-          </>
-        )}
+        <span style={{
+          fontSize: "clamp(1rem,2.5vw,1.4rem)",
+          animation: orbitTx !== "idle" ? "hubSpin 0.45s ease-in-out" : "none",
+        }}>
+          {stage === "main" ? "🏛️" : activeProgram?.icon}
+        </span>
+        <span style={{
+          color: T.blue,
+          fontSize: stage === "main" ? "clamp(0.35rem,0.8vw,0.5rem)" : "clamp(0.32rem,0.7vw,0.42rem)",
+          fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
+          textAlign: "center", padding: "0 4px", lineHeight: 1.2,
+          transition: "opacity 0.2s ease",
+          opacity: orbitTx === "out" ? 0 : 1,
+        }}>
+          {stage === "main" ? "CADC" : activeProgram?.shortName}
+        </span>
       </div>
 
       {/* Nodes */}
@@ -1006,7 +1047,16 @@ function DesktopOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, t
         const label = stage === "main" ? prog.shortName : sub.shortLabel;
         const icon = stage === "main" ? prog.icon : sub.icon;
         const isGlowing = id === glowNode;
-        const delay = assembled ? 0 : i * 80;
+        const isPopped = id === popNode;
+        const isBeaming = id === beamNode;
+
+        // Orbit transition: nodes fly out toward edges (out) or bloom in from center (in)
+        const exitX = orbitTx === "out" ? (x - 50) * 0.4 : 0;
+        const exitY = orbitTx === "out" ? (y - 50) * 0.4 : 0;
+        const entryScale = orbitTx === "in" ? 1 : orbitTx === "out" ? 0.6 : 1;
+        const txOpacity = orbitTx === "out" ? 0 : 1;
+        const initDelay = assembled ? 0 : i * 80;
+        const bloomDelay = orbitTx === "in" ? i * 45 : 0;
 
         return (
           <button
@@ -1017,38 +1067,62 @@ function DesktopOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, t
               position: "absolute",
               left: `${x}%`, top: `${y}%`,
               width: "clamp(52px,11%,68px)",
-              transform: "translate(-50%,-50%)",
+              transform: `translate(calc(-50% + ${exitX}px), calc(-50% + ${exitY}px)) scale(${isPopped ? 1.28 : entryScale})`,
               display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
               background: "none", border: "none", cursor: "pointer", padding: 0,
-              opacity: assembled ? 1 : 0,
-              transition: `opacity 0.5s ease ${delay}ms, transform 0.3s ease`,
+              opacity: !assembled ? 0 : txOpacity,
+              transition: orbitTx === "idle"
+                ? `opacity 0.5s ease ${initDelay}ms, transform 0.25s cubic-bezier(0.34,1.56,0.64,1)`
+                : `opacity 0.35s ease ${bloomDelay}ms, transform 0.38s cubic-bezier(0.34,1.56,0.64,1) ${bloomDelay}ms`,
+              zIndex: isPopped ? 10 : 1,
             }}
-            onMouseEnter={e => { (e.currentTarget.querySelector(".node-disc") as HTMLElement).style.transform = "scale(1.15)"; }}
-            onMouseLeave={e => { (e.currentTarget.querySelector(".node-disc") as HTMLElement).style.transform = "scale(1)"; }}
+            onMouseEnter={e => {
+              if (!isPopped) (e.currentTarget.querySelector(".node-disc") as HTMLElement).style.transform = "scale(1.18)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget.querySelector(".node-disc") as HTMLElement).style.transform = "scale(1)";
+            }}
           >
+            {/* Ripple on glow */}
             {isGlowing && (
               <div style={{
-                position: "absolute", inset: -12, borderRadius: "50%",
-                background: `radial-gradient(circle, rgba(1,1,255,0.4) 0%, transparent 70%)`,
-                animation: "desktopPing 0.6s ease-out forwards",
+                position: "absolute", inset: -14, borderRadius: "50%",
+                background: `radial-gradient(circle, rgba(1,1,255,0.5) 0%, transparent 65%)`,
+                animation: "desktopPing 0.7s ease-out forwards",
+                pointerEvents: "none",
+              }} />
+            )}
+            {/* Beam pulse traveling to center */}
+            {isBeaming && (
+              <div style={{
+                position: "absolute", inset: -6, borderRadius: "50%",
+                border: "2px solid rgba(1,1,255,0.9)",
+                animation: "beamPulse 0.45s ease-out forwards",
                 pointerEvents: "none",
               }} />
             )}
             <div className="node-disc" style={{
               width: "clamp(40px,8.5%,54px)", aspectRatio: "1/1",
-              borderRadius: "50%", background: T.void,
-              border: `2px solid ${T.blue}`,
+              borderRadius: "50%",
+              background: isPopped
+                ? `radial-gradient(circle at 35% 35%, rgba(1,1,255,0.4), ${T.void})`
+                : T.void,
+              border: `${isPopped ? 3 : 2}px solid ${isPopped ? "rgba(1,1,255,1)" : T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.9rem,2vw,1.2rem)",
-              boxShadow: `0 0 16px rgba(1,1,255,0.25), inset 0 0 12px rgba(1,1,255,0.08)`,
-              transition: "transform 0.25s ease, box-shadow 0.25s ease",
+              boxShadow: isPopped
+                ? `0 0 32px rgba(1,1,255,0.7), 0 0 8px rgba(1,1,255,0.9), inset 0 0 16px rgba(1,1,255,0.2)`
+                : `0 0 16px rgba(1,1,255,0.25), inset 0 0 12px rgba(1,1,255,0.08)`,
+              transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-width 0.15s ease",
             }}>
               {icon}
             </div>
             <span style={{
-              color: "rgba(255,255,255,0.75)", fontSize: "clamp(0.38rem,0.85vw,0.52rem)",
+              color: isPopped ? "white" : "rgba(255,255,255,0.75)",
+              fontSize: "clamp(0.38rem,0.85vw,0.52rem)",
               fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em",
               textAlign: "center", lineHeight: 1.2, whiteSpace: "nowrap",
+              transition: "color 0.2s ease",
             }}>
               {label}
             </span>
@@ -1107,7 +1181,7 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: "white" }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
@@ -1123,7 +1197,7 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
 
 // ─── MOBILE LAYOUT ────────────────────────────────────────────────────────────
 
-function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, assembled, tapProgram, tapSubArea, goBack }: LayoutProps) {
+function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea, goBack }: LayoutProps) {
   return (
     <div style={{ background: T.ghost, minHeight: "100svh", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
 
@@ -1152,14 +1226,15 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, assembled
       <div style={{ padding: "20px 0 0" }}>
         <MobileOrbit
           stage={stage} activeProgram={activeProgram}
-          glowNode={glowNode} assembled={assembled}
+          glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
+          assembled={assembled}
           tapProgram={tapProgram} tapSubArea={tapSubArea}
         />
       </div>
 
       {/* Content below orbit */}
       {stage === "content" && activeSubArea && (
-        <div style={{ padding: "0 20px 80px", animation: "fadeSlideUp 0.35s ease" }}>
+        <div style={{ padding: "0 20px 80px", animation: "mobileContentIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards" }}>
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
             <div style={{ background: T.blue, padding: "14px 20px" }}>
               <h3 style={{ color: "white", fontWeight: 800, fontSize: 16, margin: 0 }}>
@@ -1203,8 +1278,9 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, assembled
   );
 }
 
-function MobileOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, tapSubArea }: {
+function MobileOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea }: {
   stage: Stage; activeProgram: ProgramData | null; glowNode: string | null;
+  popNode: string | null; beamNode: string | null; orbitTx: TransitionState;
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   const programs = PROGRAMS;
@@ -1258,7 +1334,14 @@ function MobileOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, ta
         const label = stage === "main" ? prog.shortName : sub.shortLabel;
         const icon = stage === "main" ? prog.icon : sub.icon;
         const isGlowing = id === glowNode;
-        const delay = assembled ? 0 : i * 60;
+        const isPopped = id === popNode;
+        const initDelay = assembled ? 0 : i * 60;
+        const bloomDelay = orbitTx === "in" ? i * 40 : 0;
+
+        const exitX = orbitTx === "out" ? (x - 50) * 0.35 : 0;
+        const exitY = orbitTx === "out" ? (y - 50) * 0.35 : 0;
+        const txOpacity = orbitTx === "out" ? 0 : 1;
+        const txScale = orbitTx === "in" ? 1 : orbitTx === "out" ? 0.5 : 1;
 
         return (
           <button
@@ -1269,33 +1352,49 @@ function MobileOrbit({ stage, activeProgram, glowNode, assembled, tapProgram, ta
               position: "absolute",
               left: `${x}%`, top: `${y}%`,
               width: "clamp(48px,13vw,64px)",
-              transform: "translate(-50%,-50%)",
+              transform: `translate(calc(-50% + ${exitX}px), calc(-50% + ${exitY}px)) scale(${isPopped ? 1.25 : txScale})`,
               display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
               background: "none", border: "none", cursor: "pointer", padding: 0,
-              opacity: assembled ? 1 : 0,
-              transition: `opacity 0.45s ease ${delay}ms`,
+              opacity: !assembled ? 0 : txOpacity,
+              transition: orbitTx === "idle"
+                ? `opacity 0.45s ease ${initDelay}ms, transform 0.22s cubic-bezier(0.34,1.56,0.64,1)`
+                : `opacity 0.3s ease ${bloomDelay}ms, transform 0.36s cubic-bezier(0.34,1.56,0.64,1) ${bloomDelay}ms`,
+              zIndex: isPopped ? 10 : 1,
             }}
           >
             {isGlowing && (
               <div style={{
                 position: "absolute", inset: -8, borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(1,1,255,0.35) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(1,1,255,0.4) 0%, transparent 70%)",
                 animation: "mobilePing 0.6s ease-out forwards", pointerEvents: "none",
+              }} />
+            )}
+            {isPopped && (
+              <div style={{
+                position: "absolute", inset: -5, borderRadius: "50%",
+                border: `2px solid ${T.blue}`,
+                animation: "mobilePing 0.5s ease-out forwards", pointerEvents: "none",
               }} />
             )}
             <div style={{
               width: "clamp(34px,10vw,48px)", aspectRatio: "1/1",
-              borderRadius: "50%", background: "white",
-              border: `2px solid ${T.blue}`,
+              borderRadius: "50%",
+              background: isPopped ? "#E4E4FF" : "white",
+              border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.85rem,4vw,1.1rem)",
-              boxShadow: "0 2px 10px rgba(1,1,255,0.14)",
+              boxShadow: isPopped
+                ? `0 0 18px rgba(1,1,255,0.4), 0 4px 14px rgba(1,1,255,0.2)`
+                : "0 2px 10px rgba(1,1,255,0.14)",
+              transition: "box-shadow 0.2s ease, background 0.15s ease",
             }}>
               {icon}
             </div>
             <span style={{
-              color: T.blue, fontSize: "clamp(0.36rem,1.6vw,0.48rem)",
-              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em",
+              color: isPopped ? T.blue : T.blue,
+              fontSize: "clamp(0.36rem,1.6vw,0.48rem)",
+              fontWeight: isPopped ? 800 : 700,
+              textTransform: "uppercase", letterSpacing: "0.05em",
               textAlign: "center", lineHeight: 1.2,
               width: "clamp(48px,13vw,64px)", overflowWrap: "break-word",
             }}>
@@ -1316,8 +1415,29 @@ function DesktopStyles() {
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
 
       @keyframes desktopPing {
-        0% { transform: scale(1); opacity: 0.8; }
-        100% { transform: scale(2.8); opacity: 0; }
+        0% { transform: scale(1); opacity: 0.9; }
+        60% { opacity: 0.4; }
+        100% { transform: scale(3.2); opacity: 0; }
+      }
+      @keyframes beamPulse {
+        0% { transform: scale(1); opacity: 1; border-color: rgba(1,1,255,1); }
+        50% { transform: scale(1.8); opacity: 0.6; }
+        100% { transform: scale(0.2); opacity: 0; border-color: rgba(1,1,255,0.2); }
+      }
+      @keyframes hubPulse {
+        0%  { transform: translate(-50%,-50%) scale(1); }
+        40% { transform: translate(-50%,-50%) scale(1.18); }
+        100%{ transform: translate(-50%,-50%) scale(1); }
+      }
+      @keyframes hubSpin {
+        0%  { transform: scale(1) rotate(0deg); opacity: 1; }
+        40% { transform: scale(0.6) rotate(90deg); opacity: 0; }
+        60% { transform: scale(0.6) rotate(-90deg); opacity: 0; }
+        100%{ transform: scale(1) rotate(0deg); opacity: 1; }
+      }
+      @keyframes clipReveal {
+        from { clip-path: inset(0 100% 0 0); opacity: 0.6; transform: translateX(12px); }
+        to   { clip-path: inset(0 0% 0 0); opacity: 1; transform: translateX(0); }
       }
       @keyframes fadeSlideIn {
         from { opacity: 0; transform: translateX(24px); }
@@ -1355,12 +1475,17 @@ function MobileStyles() {
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
       @keyframes mobilePing {
-        0% { transform: scale(1); opacity: 0.8; }
-        100% { transform: scale(2.5); opacity: 0; }
+        0% { transform: scale(1); opacity: 0.9; }
+        60% { opacity: 0.4; }
+        100% { transform: scale(2.8); opacity: 0; }
       }
       @keyframes fadeSlideUp {
-        from { opacity: 0; transform: translateY(16px); }
+        from { opacity: 0; transform: translateY(20px); }
         to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes mobileContentIn {
+        from { opacity: 0; transform: translateY(28px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
       }
 
       .cadc-light-content p { color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 12px; }
