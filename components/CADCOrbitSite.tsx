@@ -55,6 +55,243 @@ interface ProgramData {
   subAreas: SubArea[];
 }
 
+// ─── useIsDesktop hook (hoisted — used by MealCalendarPanel and main component) ─
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
+// ─── Senior Nutrition Menu Data ───────────────────────────────────────────────
+// To update: change month, year, and meals object only. Keys are YYYY-MM-DD.
+// headline = short label shown on calendar cell
+// full = complete meal list shown in popup
+
+const MENU_DATA = {
+  month: "August",
+  year: 2026,
+  note: "8 oz milk served daily at all congregate sites",
+  meals: {
+    "2026-08-03": { headline: "Pork Chop", full: ["Pork Chop", "Potato Casserole", "Baked Beans", "Sliced Bread", "Mandarin Oranges"] },
+    "2026-08-04": { headline: "Chicken Teriyaki", full: ["Chicken Teriyaki", "Broccoli", "Carrots", "Rice Pilaf", "Pineapple", "Upside-Down Cake"] },
+    "2026-08-05": { headline: "Pimento Cheese", full: ["Pimento Cheese", "Vegetable Soup", "Crackers", "Cake w/ Frosting"] },
+    "2026-08-06": { headline: "Sliced Turkey", full: ["Sliced Turkey on Bun", "Tomato Soup", "Diced Peaches", "Peanut Butter Bar"] },
+    "2026-08-07": { headline: "Salisbury Steak", full: ["Salisbury Steak", "Mashed Potatoes w/ Gravy", "Green Beans", "Dinner Roll", "Butterscotch Fluff"] },
+    "2026-08-10": { headline: "Chicken Parmesan", full: ["Chicken Parmesan", "Carrots", "Broccoli", "Garlic Bread", "Chocolate Pan Pie"] },
+    "2026-08-11": { headline: "Tuna Salad", full: ["Tuna Salad", "Pickled Beets", "Macaroni Salad", "Diced Peaches", "Cookie Bar"] },
+    "2026-08-12": { headline: "Sausage Gravy", full: ["Sausage Gravy over Biscuits", "Hash Browns", "Tomatoes", "Fruit Salad"] },
+    "2026-08-13": { headline: "Fish Sandwich", full: ["Fish Sandwich on Bun", "Potato Wedges", "Pea Salad", "Poke Cake"] },
+    "2026-08-14": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Green Beans", "Pear Crisp", "Dinner Roll"] },
+    "2026-08-17": { headline: "Pulled Pork", full: ["Pulled Pork", "Baked Potato", "Mixed Vegetables", "Sliced Bread", "Cookies"] },
+    "2026-08-18": { headline: "Chicken Salad", full: ["Chicken Salad", "Cottage Cheese", "Pickled Beets", "Fruit Salad", "Simply Super Cake"] },
+    "2026-08-19": { headline: "Chicken & Dumplings", full: ["Chicken & Dumplings", "Carrots", "Peas", "Applesauce"] },
+    "2026-08-20": { headline: "Brown Beans", full: ["Brown Beans w/ Ham", "Zucchini/Tomatoes", "Spinach", "Cornbread", "Chocolate Pie"] },
+    "2026-08-21": { headline: "Chili Cheeseburger", full: ["Chili Cheeseburger on Bun", "Baked Beans", "Potato Salad", "Pudding"] },
+    "2026-08-24": { headline: "Chicken Tenders", full: ["Chicken Tenders", "Mashed Potatoes w/ Gravy", "Corn", "Bread", "Pears"] },
+    "2026-08-25": { headline: "Roasted Ham", full: ["Roasted Ham", "Sweet Potatoes", "Brussels Sprouts", "Fruit Crisp"] },
+    "2026-08-26": { headline: "Meatball Sub", full: ["Meatball Sub on Hoagie", "Broccoli Salad", "Fruit", "Cookie Bar"] },
+    "2026-08-27": { headline: "BBQ Chicken", full: ["BBQ Chicken", "Potato Casserole", "Green Beans", "Roll", "Cake"] },
+    "2026-08-28": { headline: "Sweet & Sour Pork", full: ["Sweet & Sour Pork on Rice", "Cali Mix", "Pineapple Tidbits", "Jell-O"] },
+    "2026-08-31": { headline: "Mexican Casserole", full: ["Mexican Casserole", "Tex Mex Rice", "Ranch Beans", "Chips", "Brownie"] },
+  } as Record<string, { headline: string; full: string[] }>,
+};
+
+// ─── Meal Calendar Component ──────────────────────────────────────────────────
+
+function MealCalendar({ dark }: { dark: boolean }) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const { month, year, note, meals } = MENU_DATA;
+
+  // Build calendar grid — full weeks containing the month
+  const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
+  const lastDay = new Date(year, firstDay.getMonth() + 1, 0);
+  const startOffset = firstDay.getDay(); // 0=Sun
+  const totalDays = lastDay.getDate();
+
+  const cells: (number | null)[] = [
+    ...Array(startOffset).fill(null),
+    ...Array.from({ length: totalDays }, (_, i) => i + 1),
+  ];
+  // Pad to complete last row
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+  const monthNum = String(firstDay.getMonth() + 1).padStart(2, "0");
+
+  function dateKey(day: number) {
+    return `${year}-${monthNum}-${String(day).padStart(2, "0")}`;
+  }
+
+  const isWeekend = (dayOfWeek: number) => dayOfWeek === 0 || dayOfWeek === 6;
+
+  // Styles derived from dark/light context
+  const c = {
+    bg: dark ? "rgba(1,1,255,0.08)" : "#f4f4ff",
+    border: dark ? "rgba(1,1,255,0.2)" : "#d4d4f0",
+    headerBg: dark ? "rgba(1,1,255,0.25)" : "#0101FF",
+    headerText: "white",
+    dayLabel: dark ? "rgba(255,255,255,0.4)" : "#6b7280",
+    cellBg: dark ? "rgba(255,255,255,0.04)" : "#ffffff",
+    cellBorder: dark ? "rgba(1,1,255,0.12)" : "#e5e7eb",
+    cellHasMeal: dark ? "rgba(1,1,255,0.18)" : "#eeeeff",
+    cellHasMealBorder: dark ? "rgba(1,1,255,0.4)" : "#0101FF",
+    dayNum: dark ? "rgba(255,255,255,0.5)" : "#9ca3af",
+    dayNumMeal: dark ? "white" : "#111827",
+    headline: dark ? "rgba(255,255,255,0.85)" : "#111827",
+    weekend: dark ? "rgba(255,255,255,0.02)" : "#fafafa",
+    weekendText: dark ? "rgba(255,255,255,0.15)" : "#d1d5db",
+    modalBg: dark ? "#0a0a2e" : "#ffffff",
+    modalBorder: dark ? "rgba(1,1,255,0.4)" : "#0101FF",
+    modalTitle: dark ? "white" : "#111827",
+    modalItem: dark ? "rgba(255,255,255,0.7)" : "#374151",
+    overlay: "rgba(0,0,10,0.72)",
+    note: dark ? "rgba(255,255,255,0.35)" : "#9ca3af",
+  };
+
+  const selectedMeal = selectedDate ? meals[selectedDate] : null;
+  const selectedDayNum = selectedDate ? parseInt(selectedDate.split("-")[2]) : null;
+
+  return (
+    <div style={{ position: "relative" }}>
+      {/* Calendar header */}
+      <div style={{ background: c.headerBg, borderRadius: "10px 10px 0 0", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ color: c.headerText, fontWeight: 800, fontSize: 13, letterSpacing: "0.05em" }}>
+          {month} {year}
+        </span>
+        <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 600 }}>Mon–Fri service</span>
+      </div>
+
+      {/* Day labels */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", background: c.bg, borderLeft: `1px solid ${c.border}`, borderRight: `1px solid ${c.border}` }}>
+        {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
+          <div key={d} style={{ textAlign: "center", padding: "6px 2px", fontSize: 9, fontWeight: 700, color: c.dayLabel, textTransform: "uppercase", letterSpacing: "0.08em" }}>{d}</div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div style={{ border: `1px solid ${c.border}`, borderTop: "none", borderRadius: "0 0 10px 10px", overflow: "hidden" }}>
+        {weeks.map((week, wi) => (
+          <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderTop: wi === 0 ? "none" : `1px solid ${c.cellBorder}` }}>
+            {week.map((day, di) => {
+              const weekend = isWeekend(di);
+              const key = day ? dateKey(day) : null;
+              const hasMeal = key ? !!meals[key] : false;
+              const meal = key ? meals[key] : null;
+
+              return (
+                <div
+                  key={di}
+                  onClick={() => hasMeal && key && setSelectedDate(key)}
+                  style={{
+                    minHeight: 52,
+                    background: !day ? "transparent" : weekend ? c.weekend : hasMeal ? c.cellHasMeal : c.cellBg,
+                    borderLeft: di > 0 ? `1px solid ${c.cellBorder}` : "none",
+                    borderTop: hasMeal ? `2px solid ${c.cellHasMealBorder}` : "2px solid transparent",
+                    cursor: hasMeal ? "pointer" : "default",
+                    padding: "5px 5px 4px",
+                    display: "flex", flexDirection: "column", gap: 2,
+                    transition: "background 0.15s ease",
+                  }}
+                >
+                  {day && (
+                    <>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: hasMeal ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
+                      {meal && (
+                        <span style={{ fontSize: 8, fontWeight: 600, color: c.headline, lineHeight: 1.3, wordBreak: "break-word" }}>{meal.headline}</span>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* Note */}
+      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>{note}</p>
+
+      {/* Day detail modal */}
+      {selectedDate && selectedMeal && selectedDayNum && (
+        <div
+          onClick={() => setSelectedDate(null)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 200,
+            background: c.overlay,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: c.modalBg,
+              border: `2px solid ${c.modalBorder}`,
+              borderRadius: 16,
+              padding: 24,
+              maxWidth: 320,
+              width: "100%",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div>
+                <p style={{ color: dark ? "rgba(1,1,255,0.9)" : "#0101FF", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
+                  {month} {selectedDayNum}, {year}
+                </p>
+                <h4 style={{ color: c.modalTitle, fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {selectedMeal.headline}
+                </h4>
+              </div>
+              <button
+                onClick={() => setSelectedDate(null)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: c.note, fontSize: 20, lineHeight: 1, padding: 4 }}
+                aria-label="Close"
+              >×</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {selectedMeal.full.map((item, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: dark ? "rgba(1,1,255,0.12)" : "#f0f0ff", borderRadius: 8 }}>
+                  <span style={{ fontSize: 11 }}>{i === 0 ? "🍽️" : "·"}</span>
+                  <span style={{ color: c.modalItem, fontSize: 13, fontWeight: i === 0 ? 700 : 400 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ color: c.note, fontSize: 10, fontStyle: "italic", margin: "12px 0 0", textAlign: "center" }}>Tap outside to close</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// MealCalendarPanel detects desktop (dark) vs mobile (light) context
+function MealCalendarPanel() {
+  const isDesktop = useIsDesktop();
+  return (
+    <div className="cadc-content">
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
+        Tap any day to see the full meal. Menu rotates monthly — check back for updates.
+      </p>
+      <MealCalendar dark={isDesktop} />
+      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(126,0,1,0.9)" : "#7E0001", margin: "0 0 6px" }}>Questions about the menu?</p>
+        <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-335-5588</a>
+      </div>
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
   {
@@ -433,20 +670,7 @@ const PROGRAMS: ProgramData[] = [
       },
       {
         id: "sn-menu", label: "Monthly Menu", shortLabel: "Menu", icon: "📋",
-        content: (
-          <div className="cadc-content">
-            <p>Our meals are planned to meet senior nutritional needs and rotate on a 4-week cycle. An 8 oz serving of milk is included daily at all congregate sites.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">August 2026 menu</p>
-              <p>Download the current monthly menu to see what's being served at your nearest site.</p>
-              <a href="/docs/august-menu-2026.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">📄 Download August Menu →</a>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Questions about the menu?</p>
-              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
-            </div>
-          </div>
-        ),
+        content: <MealCalendarPanel />,
       },
       {
         id: "sn-homedelivered", label: "Home Delivered", shortLabel: "Home Delivery", icon: "🚗",
@@ -905,20 +1129,6 @@ export default function CADCOrbitSite() {
     assembled={assembled}
     tapProgram={tapProgram} tapSubArea={tapSubArea} goBack={goBack}
   />;
-}
-
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return isDesktop;
 }
 
 // ─── Shared props ─────────────────────────────────────────────────────────────
