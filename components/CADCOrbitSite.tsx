@@ -1415,7 +1415,7 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
           Corporation
         </h1>
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 16, lineHeight: 1.7, marginBottom: 32 }}>
-          Southwest Oklahoma's community action agency — serving 9 counties with early childhood education, transportation, weatherization, nutrition, and more. Select any program from the orbit to explore.
+          A Community Action Development Corporation serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, nutrition programs, and more. Select any program from the orbit to explore.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a href="tel:+15803355588" style={{ background: T.blue, color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.05em" }}>
