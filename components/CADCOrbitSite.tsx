@@ -655,8 +655,30 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-label">Program eligibility</p>
               <p>Available to individuals age 60 and older. Spouses and caregivers may also be eligible — contact us for details.</p>
             </div>
-            <div className="cadc-grid-2">
-              {["6 congregate sites","Home delivery available","Nutritious daily meals","Social activities","Community connection","Compassionate staff"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+            <div className="cadc-card">
+              <p className="cadc-label">Staff training & safety</p>
+              <div className="cadc-stack">
+                {[
+                  {t:"CPR / First Aid / Heimlich",d:"All nutrition staff are certified in CPR, First Aid, and Heimlich Maneuver. Training completed June 2026 — recertified every two years."},
+                  {t:"Health Department Inspections",d:"Every center is inspected by the Health Department twice per year."},
+                  {t:"Vent Hood Suppression Systems",d:"Kitchen suppression systems inspected twice per year at all centers."},
+                  {t:"Fire Inspections",d:"Annual fire inspections conducted at all six centers."},
+                  {t:"Registered Dietitian Oversight",d:"Our registered dietitian conducts site inspections every two months in addition to planning all menus quarterly."},
+                ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+              </div>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">6 centers across 4 counties</p>
+              <div className="cadc-grid-2">
+                {[
+                  "Frederick — Tillman County",
+                  "Cache — Comanche County",
+                  "Temple — Cotton County",
+                  "Walters — Cotton County",
+                  "Ringling — Jefferson County",
+                  "Ryan — Jefferson County",
+                ].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+              </div>
             </div>
             <p className="cadc-note">We are committed to serving our seniors with compassion, dignity, respect, and kindness.</p>
           </div>
@@ -683,15 +705,16 @@ const PROGRAMS: ProgramData[] = [
             <p className="cadc-label" style={{marginTop:14}}>Our 6 congregate sites</p>
             <div className="cadc-stack">
               {[
-                {name:"Frederick",addr:"100 E Grand, Frederick, OK 73542",phone:"580-335-7026",href:"tel:+15803357026"},
-                {name:"Ringling",addr:"200 D St., Ringling, OK 73456",phone:"580-662-2362",href:"tel:+15806622362"},
-                {name:"Cache",addr:"416 West C Ave., Cache, OK 73527",phone:"580-429-3427",href:"tel:+15804293427"},
-                {name:"Temple",addr:"201 S Commercial, Temple, OK 73568",phone:"580-342-6944",href:"tel:+15803426944"},
-                {name:"Walters",addr:"500 E California, Walters, OK 73572",phone:"580-875-9044",href:"tel:+15808759044"},
-                {name:"Ryan",addr:"400 Taylor St. Apt #8, Ryan, OK 73565",phone:"580-757-2412",href:"tel:+15807572412"},
+                {name:"Frederick",county:"Tillman County",addr:"100 E Grand, Frederick, OK 73542",phone:"580-335-7026",href:"tel:+15803357026"},
+                {name:"Ringling",county:"Jefferson County",addr:"200 D St., Ringling, OK 73456",phone:"580-662-2362",href:"tel:+15806622362"},
+                {name:"Cache",county:"Comanche County",addr:"416 West C Ave., Cache, OK 73527",phone:"580-429-3427",href:"tel:+15804293427"},
+                {name:"Temple",county:"Cotton County",addr:"201 S Commercial, Temple, OK 73568",phone:"580-342-6944",href:"tel:+15803426944"},
+                {name:"Walters",county:"Cotton County",addr:"500 E California, Walters, OK 73572",phone:"580-875-9044",href:"tel:+15808759044"},
+                {name:"Ryan",county:"Jefferson County",addr:"400 Taylor St. Apt #8, Ryan, OK 73565",phone:"580-757-2412",href:"tel:+15807572412"},
               ].map(s=>(
                 <div key={s.name} className="cadc-card-sm">
                   <p className="cadc-card-title">{s.name}</p>
+                  <p style={{fontSize:10,opacity:0.6,margin:"2px 0 4px"}}>{s.county}</p>
                   <p>{s.addr}</p>
                   <a href={s.href} className="cadc-link">{s.phone}</a>
                 </div>
