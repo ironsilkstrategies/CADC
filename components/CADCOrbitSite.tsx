@@ -659,6 +659,7 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-label">Staff training & safety</p>
               <div className="cadc-stack">
                 {[
+                  {t:"Food Handlers Certification",d:"All nutrition staff are required to complete a Food Handlers class prior to working in our kitchens."},
                   {t:"CPR / First Aid / Heimlich",d:"All nutrition staff are certified in CPR, First Aid, and Heimlich Maneuver. Training completed June 2026 — recertified every two years."},
                   {t:"Health Department Inspections",d:"Every center is inspected by the Health Department twice per year."},
                   {t:"Vent Hood Suppression Systems",d:"Kitchen suppression systems inspected twice per year at all centers."},
