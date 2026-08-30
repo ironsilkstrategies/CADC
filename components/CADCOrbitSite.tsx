@@ -71,37 +71,234 @@ function useIsDesktop() {
 
 // ─── Senior Nutrition Menu Data ───────────────────────────────────────────────
 // To update: change month, year, and meals object only. Keys are YYYY-MM-DD.
-// headline = short label shown on calendar cell
-// full = complete meal list shown in popup
 
 const MENU_DATA = {
-  month: "August",
+  month: "September",
   year: 2026,
   note: "8 oz milk served daily at all congregate sites",
   meals: {
-    "2026-08-03": { headline: "Pork Chop", full: ["Pork Chop", "Potato Casserole", "Baked Beans", "Sliced Bread", "Mandarin Oranges"] },
-    "2026-08-04": { headline: "Chicken Teriyaki", full: ["Chicken Teriyaki", "Broccoli", "Carrots", "Rice Pilaf", "Pineapple", "Upside-Down Cake"] },
-    "2026-08-05": { headline: "Pimento Cheese", full: ["Pimento Cheese", "Vegetable Soup", "Crackers", "Cake w/ Frosting"] },
-    "2026-08-06": { headline: "Sliced Turkey", full: ["Sliced Turkey on Bun", "Tomato Soup", "Diced Peaches", "Peanut Butter Bar"] },
-    "2026-08-07": { headline: "Salisbury Steak", full: ["Salisbury Steak", "Mashed Potatoes w/ Gravy", "Green Beans", "Dinner Roll", "Butterscotch Fluff"] },
-    "2026-08-10": { headline: "Chicken Parmesan", full: ["Chicken Parmesan", "Carrots", "Broccoli", "Garlic Bread", "Chocolate Pan Pie"] },
-    "2026-08-11": { headline: "Tuna Salad", full: ["Tuna Salad", "Pickled Beets", "Macaroni Salad", "Diced Peaches", "Cookie Bar"] },
-    "2026-08-12": { headline: "Sausage Gravy", full: ["Sausage Gravy over Biscuits", "Hash Browns", "Tomatoes", "Fruit Salad"] },
-    "2026-08-13": { headline: "Fish Sandwich", full: ["Fish Sandwich on Bun", "Potato Wedges", "Pea Salad", "Poke Cake"] },
-    "2026-08-14": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Green Beans", "Pear Crisp", "Dinner Roll"] },
-    "2026-08-17": { headline: "Pulled Pork", full: ["Pulled Pork", "Baked Potato", "Mixed Vegetables", "Sliced Bread", "Cookies"] },
-    "2026-08-18": { headline: "Chicken Salad", full: ["Chicken Salad", "Cottage Cheese", "Pickled Beets", "Fruit Salad", "Simply Super Cake"] },
-    "2026-08-19": { headline: "Chicken & Dumplings", full: ["Chicken & Dumplings", "Carrots", "Peas", "Applesauce"] },
-    "2026-08-20": { headline: "Brown Beans", full: ["Brown Beans w/ Ham", "Zucchini/Tomatoes", "Spinach", "Cornbread", "Chocolate Pie"] },
-    "2026-08-21": { headline: "Chili Cheeseburger", full: ["Chili Cheeseburger on Bun", "Baked Beans", "Potato Salad", "Pudding"] },
-    "2026-08-24": { headline: "Chicken Tenders", full: ["Chicken Tenders", "Mashed Potatoes w/ Gravy", "Corn", "Bread", "Pears"] },
-    "2026-08-25": { headline: "Roasted Ham", full: ["Roasted Ham", "Sweet Potatoes", "Brussels Sprouts", "Fruit Crisp"] },
-    "2026-08-26": { headline: "Meatball Sub", full: ["Meatball Sub on Hoagie", "Broccoli Salad", "Fruit", "Cookie Bar"] },
-    "2026-08-27": { headline: "BBQ Chicken", full: ["BBQ Chicken", "Potato Casserole", "Green Beans", "Roll", "Cake"] },
-    "2026-08-28": { headline: "Sweet & Sour Pork", full: ["Sweet & Sour Pork on Rice", "Cali Mix", "Pineapple Tidbits", "Jell-O"] },
-    "2026-08-31": { headline: "Mexican Casserole", full: ["Mexican Casserole", "Tex Mex Rice", "Ranch Beans", "Chips", "Brownie"] },
+    "2026-09-01": { headline: "Mexican Casserole", full: ["Mexican Casserole", "Tex Mex Rice", "Ranch Beans", "Chips", "Brownie"] },
+    "2026-09-02": { headline: "Baked Rigatoni", full: ["Baked Rigatoni", "Corn", "Green Beans", "Garlic Bread", "Applesauce"] },
+    "2026-09-03": { headline: "Chicken Pasta", full: ["Chicken Pasta", "Pickled Beets", "Mandarin Oranges", "Crackers", "Cake w/ Icing"] },
+    "2026-09-04": { headline: "Chicken Fried Steak", full: ["Chicken Fried Steak", "Mashed Potatoes w/ Gravy", "Peas & Carrots", "Sliced Bread", "Fruit"] },
+    "2026-09-07": { headline: "Breakfast Casserole", full: ["Breakfast Casserole", "Hash Brown Patty", "Biscuit w/ Gravy", "Sliced Pears", "Cottage Cheese"] },
+    "2026-09-08": { headline: "Taco Spud", full: ["Taco Spud", "Baked Potato", "Mixed Veggies", "Dinner Roll", "Pudding Pan Pie"] },
+    "2026-09-09": { headline: "BBQ Pork", full: ["BBQ Pork on Bun", "Baked Beans", "Potato Salad", "No Bake Cookie"] },
+    "2026-09-10": { headline: "Brown Beans w/ Ham", full: ["Brown Beans w/ Ham", "Oven Fried Potatoes", "Zucchini/Tomatoes", "Cornbread", "Cobbler"] },
+    "2026-09-11": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Cali Mix", "Fruit", "Dinner Roll"] },
+    "2026-09-14": { headline: "Cajun Pork Chop", full: ["Cajun Pork Chop", "Potato Casserole", "Baked Beans", "Sliced Bread", "Mandarin Orange Salad"] },
+    "2026-09-15": { headline: "Chicken Teriyaki", full: ["Chicken Teriyaki", "Broccoli", "Carrots", "Rice Pilaf", "Pineapple", "Upside-Down Cake"] },
+    "2026-09-16": { headline: "Pimento Cheese", full: ["Pimento Cheese", "Vegetable Soup", "Crackers", "Pears w/ Cottage Cheese", "Cake w/ Frosting"] },
+    "2026-09-17": { headline: "Sliced Turkey", full: ["Sliced Turkey on Bun", "Tomato Soup", "Diced Peaches", "Peanut Butter Bar"] },
+    "2026-09-18": { headline: "Salisbury Steak", full: ["Salisbury Steak", "Mashed Potatoes w/ Gravy", "Green Beans", "Dinner Roll", "Butterscotch Fluff"] },
+    "2026-09-21": { headline: "Chicken Parmesan", full: ["Chicken Parmesan", "Spaghetti Noodles", "Carrots", "Broccoli", "Garlic Bread", "Pan Pie"] },
+    "2026-09-22": { headline: "Tuna Salad", full: ["Tuna Salad on Croissant", "Pickled Beets", "Diced Peaches", "Macaroni Salad", "Cookie Bar"] },
+    "2026-09-23": { headline: "Sausage Gravy", full: ["Sausage Gravy w/ Biscuit", "Zucchini/Tomatoes", "Fruit Salad"] },
+    "2026-09-24": { headline: "Fried Fish", full: ["Fried Fish", "Potato Wedges", "Cole Slaw", "Hush Puppies", "Poke Cake"] },
+    "2026-09-25": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Green Beans", "Dinner Roll", "Pear Crisp"] },
+    "2026-09-28": { headline: "Pulled Pork", full: ["Pulled Pork", "Baked Potato", "Mixed Vegetables", "Sliced Bread", "Cookies"] },
+    "2026-09-29": { headline: "Chicken Salad", full: ["Chicken Salad", "Cottage Cheese", "Pickled Beets", "Crackers", "Fruit Salad", "Simply Super Cake"] },
+    "2026-09-30": { headline: "Chicken & Noodles", full: ["Chicken & Noodles", "Carrots", "Peas", "Applesauce"] },
   } as Record<string, { headline: string; full: string[] }>,
 };
+
+// ─── Community Market Schedule Data ──────────────────────────────────────────
+// To update: change month, year, and stops object only. Keys are YYYY-MM-DD.
+// Each day can have multiple stops.
+
+const MARKET_SCHEDULE_DATA = {
+  month: "September",
+  year: 2026,
+  note: "Temporarily starting earlier due to extreme heat. Regular hours return in October.",
+  transportation: "Need a ride? Call or text 580-374-5518",
+  stops: {
+    "2026-09-01": [{ time: "9:30–11:30", location: "Mt. View" }, { time: "1:30–3:30", location: "Corn" }],
+    "2026-09-02": [{ time: "9:30–11:30", location: "Burns Flat" }, { time: "1:00–3:30", location: "Sentinel" }],
+    "2026-09-03": [{ time: "9:00–12:00", location: "Grandfield" }, { time: "2:00–4:30", location: "Tipton" }],
+    "2026-09-04": [{ time: "10:30–12:00", location: "Ringling" }, { time: "2:00–3:30", location: "Ryan" }],
+    "2026-09-08": [{ time: "9:00–12:00", location: "Geronimo" }, { time: "1:30–4:00", location: "Chattanooga" }],
+    "2026-09-09": [{ time: "9:30–11:30", location: "Lawton — 509 Woodridge Dr." }, { time: "1:30–3:30", location: "Cache" }],
+    "2026-09-10": [{ time: "10:30–12:00", location: "Erick" }, { time: "2:00–3:30", location: "Lone Wolf" }],
+    "2026-09-11": [{ time: "10:30–12:00", location: "Hammon" }, { time: "1:30–3:00", location: "Canute" }],
+    "2026-09-14": [{ time: "9:00–11:00", location: "Randlett" }, { time: "1:00–3:30", location: "Temple" }],
+    "2026-09-15": [{ time: "9:30–11:30", location: "Mt. View" }, { time: "1:30–3:30", location: "Corn" }],
+    "2026-09-16": [{ time: "9:30–11:30", location: "Burns Flat" }, { time: "1:00–3:30", location: "Sentinel" }],
+    "2026-09-17": [{ time: "9:00–12:00", location: "Grandfield" }, { time: "2:00–4:30", location: "Tipton" }],
+    "2026-09-18": [{ time: "10:30–12:00", location: "Ringling" }, { time: "2:00–3:30", location: "Ryan" }],
+    "2026-09-21": [{ time: "9:30–11:30", location: "Sterling" }, { time: "1:00–3:00", location: "Fletcher" }],
+    "2026-09-22": [{ time: "9:00–12:00", location: "Geronimo" }, { time: "1:30–4:00", location: "Chattanooga" }],
+    "2026-09-23": [{ time: "9:30–11:30", location: "Lawton — Benjamin Davis HR" }, { time: "1:30–3:30", location: "Cache" }],
+    "2026-09-24": [{ time: "10:30–12:00", location: "Erick" }, { time: "2:00–3:30", location: "Lone Wolf" }],
+    "2026-09-25": [{ time: "10:30–12:00", location: "Hammon" }, { time: "1:30–3:00", location: "Canute" }],
+    "2026-09-28": [{ time: "9:30–11:00", location: "Valley Community S.C. — Lawton" }, { time: "1:00–3:30", location: "Temple" }],
+    "2026-09-29": [{ time: "9:30–11:30", location: "Mt. View" }, { time: "1:30–3:30", location: "Corn" }],
+    "2026-09-30": [{ time: "9:30–11:30", location: "Burns Flat" }, { time: "1:00–3:30", location: "Sentinel" }],
+  } as Record<string, { time: string; location: string }[]>,
+};
+
+// ─── Market Schedule Component ────────────────────────────────────────────────
+
+function MarketSchedule({ dark }: { dark: boolean }) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const { month, year, note, transportation, stops } = MARKET_SCHEDULE_DATA;
+
+  const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
+  const lastDay = new Date(year, firstDay.getMonth() + 1, 0);
+  const startOffset = firstDay.getDay();
+  const totalDays = lastDay.getDate();
+
+  const cells: (number | null)[] = [
+    ...Array(startOffset).fill(null),
+    ...Array.from({ length: totalDays }, (_, i) => i + 1),
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+  const monthNum = String(firstDay.getMonth() + 1).padStart(2, "0");
+  function dateKey(day: number) {
+    return `${year}-${monthNum}-${String(day).padStart(2, "0")}`;
+  }
+
+  const isWeekend = (dow: number) => dow === 0 || dow === 6;
+
+  const c = {
+    headerBg: dark ? "rgba(0,100,0,0.5)" : "#166534",
+    cellHasMeal: dark ? "rgba(0,120,0,0.2)" : "#f0fdf4",
+    cellHasMealBorder: dark ? "rgba(0,200,0,0.4)" : "#16a34a",
+    dayNumMeal: dark ? "white" : "#111827",
+    headline: dark ? "rgba(255,255,255,0.85)" : "#111827",
+    weekend: dark ? "rgba(255,255,255,0.02)" : "#fafafa",
+    weekendText: dark ? "rgba(255,255,255,0.15)" : "#d1d5db",
+    cellBg: dark ? "rgba(255,255,255,0.04)" : "#ffffff",
+    cellBorder: dark ? "rgba(255,255,255,0.08)" : "#e5e7eb",
+    border: dark ? "rgba(0,180,0,0.2)" : "#d1fae5",
+    bg: dark ? "rgba(0,80,0,0.15)" : "#f0fdf4",
+    dayLabel: dark ? "rgba(255,255,255,0.4)" : "#6b7280",
+    dayNum: dark ? "rgba(255,255,255,0.5)" : "#9ca3af",
+    note: dark ? "rgba(255,255,255,0.35)" : "#9ca3af",
+    modalBg: dark ? "#0a1a0a" : "#ffffff",
+    modalBorder: dark ? "rgba(0,180,0,0.5)" : "#16a34a",
+    modalTitle: dark ? "white" : "#111827",
+    modalItem: dark ? "rgba(255,255,255,0.75)" : "#374151",
+    overlay: "rgba(0,0,0,0.72)",
+  };
+
+  const selectedStops = selectedDate ? stops[selectedDate] : null;
+  const selectedDayNum = selectedDate ? parseInt(selectedDate.split("-")[2]) : null;
+
+  return (
+    <div style={{ position: "relative" }}>
+      <div style={{ background: c.headerBg, borderRadius: "10px 10px 0 0", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ color: "white", fontWeight: 800, fontSize: 13, letterSpacing: "0.05em" }}>{month} {year}</span>
+        <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 600 }}>Tap a day to see stops</span>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", background: c.bg, borderLeft: `1px solid ${c.border}`, borderRight: `1px solid ${c.border}` }}>
+        {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
+          <div key={d} style={{ textAlign: "center", padding: "6px 2px", fontSize: 9, fontWeight: 700, color: c.dayLabel, textTransform: "uppercase", letterSpacing: "0.08em" }}>{d}</div>
+        ))}
+      </div>
+
+      <div style={{ border: `1px solid ${c.border}`, borderTop: "none", borderRadius: "0 0 10px 10px", overflow: "hidden" }}>
+        {weeks.map((week, wi) => (
+          <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderTop: wi === 0 ? "none" : `1px solid ${c.cellBorder}` }}>
+            {week.map((day, di) => {
+              const weekend = isWeekend(di);
+              const key = day ? dateKey(day) : null;
+              const hasStop = key ? !!stops[key] : false;
+              const dayStops = key ? stops[key] : null;
+
+              return (
+                <div
+                  key={di}
+                  onClick={() => hasStop && key && setSelectedDate(key)}
+                  style={{
+                    minHeight: 52,
+                    background: !day ? "transparent" : weekend ? c.weekend : hasStop ? c.cellHasMeal : c.cellBg,
+                    borderLeft: di > 0 ? `1px solid ${c.cellBorder}` : "none",
+                    borderTop: hasStop ? `2px solid ${c.cellHasMealBorder}` : "2px solid transparent",
+                    cursor: hasStop ? "pointer" : "default",
+                    padding: "5px 5px 4px",
+                    display: "flex", flexDirection: "column", gap: 2,
+                  }}
+                >
+                  {day && (
+                    <>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: hasStop ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
+                      {dayStops && (
+                        <span style={{ fontSize: 7, fontWeight: 600, color: c.headline, lineHeight: 1.3 }}>
+                          {dayStops.map(s => s.location.split("—")[0].trim()).join(", ")}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>{note}</p>
+
+      {selectedDate && selectedStops && selectedDayNum && (
+        <div
+          onClick={() => setSelectedDate(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 200, background: c.overlay, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: c.modalBg, border: `2px solid ${c.modalBorder}`, borderRadius: 16, padding: 24, maxWidth: 320, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div>
+                <p style={{ color: "#16a34a", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
+                  {month} {selectedDayNum}, {year}
+                </p>
+                <h4 style={{ color: c.modalTitle, fontWeight: 800, fontSize: 16, margin: 0 }}>Market Stops Today</h4>
+              </div>
+              <button onClick={() => setSelectedDate(null)} style={{ background: "none", border: "none", cursor: "pointer", color: c.note, fontSize: 20, lineHeight: 1, padding: 4 }} aria-label="Close">×</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {selectedStops.map((stop, i) => (
+                <div key={i} style={{ padding: "10px 14px", background: dark ? "rgba(0,180,0,0.1)" : "#f0fdf4", borderRadius: 10, borderLeft: "3px solid #16a34a" }}>
+                  <p style={{ color: "#16a34a", fontSize: 10, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stop.time}</p>
+                  <p style={{ color: c.modalTitle, fontWeight: 700, fontSize: 14, margin: 0 }}>{stop.location}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 14, padding: "10px 14px", background: dark ? "rgba(255,255,255,0.05)" : "#f9fafb", borderRadius: 10 }}>
+              <p style={{ color: c.note, fontSize: 10, margin: "0 0 4px" }}>Need a ride?</p>
+              <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-374-5518</a>
+            </div>
+            <p style={{ color: c.note, fontSize: 10, fontStyle: "italic", margin: "10px 0 0", textAlign: "center" }}>Tap outside to close</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MarketSchedulePanel() {
+  const isDesktop = useIsDesktop();
+  return (
+    <div className="cadc-content">
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
+        Tap any market day to see stop locations and times. Schedule updates monthly.
+      </p>
+      <MarketSchedule dark={isDesktop} />
+      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(0,100,0,0.2)" : "#f0fdf4", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#16a34a", margin: "0 0 6px" }}>Need a ride to the market?</p>
+        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Call or text 580-374-5518</a>
+      </div>
+    </div>
+  );
+}
+
+
 
 // ─── Meal Calendar Component ──────────────────────────────────────────────────
 
@@ -798,28 +995,136 @@ const PROGRAMS: ProgramData[] = [
     shortName: "Market",
     icon: "🛒",
     color: T.blue,
-    tagline: "Building food access across Southwest Oklahoma",
+    tagline: "Fresh, affordable groceries brought directly to your community",
     subAreas: [
       {
         id: "market-about", label: "About the Market", shortLabel: "About", icon: "ℹ️",
         content: (
           <div className="cadc-content">
-            <p>CADC's Community Market is an emerging program expanding food access across the region. We're building this program based directly on what our communities tell us they need.</p>
+            <p>The CADC Community Market is a mobile grocery store housed in a 42-foot customized trailer — bringing fresh, affordable, and nutritious food directly to communities across Southwest Oklahoma that have lost access to full-service grocery stores.</p>
+            <p>The market is open to the general public regardless of ZIP code. No membership or eligibility required.</p>
             <div className="cadc-card">
-              <p className="cadc-label">Focus areas</p>
+              <p className="cadc-label">Mission</p>
+              <p>To bring fresh, affordable, and nutritious food directly to every community we serve — breaking down barriers to access and fostering healthier, happier lives, one stop at a time.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">By the numbers</p>
               <div className="cadc-grid-2">
-                {["Fresh produce access","Food pantry networks","Nutrition education","Community garden support"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+                {["8 counties served","22 communities","42-foot mobile trailer","400+ SKUs on board","EBT/SNAP accepted","5-star customer rating"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
               </div>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Payment accepted</p>
+              <p>EBT/SNAP benefits, cash, credit cards, and debit cards. Every form of payment accepted so food is accessible to every family.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Economic impact</p>
+              <p>Tax dollars generated through Community Market purchases are returned to the communities it serves — keeping economic resources local and supporting the continued vitality of rural Oklahoma.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Contact Scott Fraley — Community Market Director</p>
+              <a href="tel:+15803051964" className="cadc-link">580-305-1964</a>
+              <a href="mailto:SFraley@cadcok.org" className="cadc-link" style={{display:"block",marginTop:4}}>SFraley@cadcok.org</a>
             </div>
           </div>
         ),
       },
       {
-        id: "market-survey", label: "Community Survey", shortLabel: "Survey", icon: "📊",
+        id: "market-products", label: "What We Carry", shortLabel: "Products", icon: "🥦",
         content: (
           <div className="cadc-content">
-            <p>This program is built around your input. Take the Community Needs Survey and tell us what your community is missing.</p>
-            <a href="https://www.surveymonkey.com/r/26cadcneeds" target="_blank" rel="noopener noreferrer" className="cadc-btn">Take the Survey →</a>
+            <p>The Community Market carries 400+ SKUs — from fresh produce to frozen meals to household essentials. We stock the brands and products you know and trust.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Top sellers by category</p>
+              <div className="cadc-stack">
+                {[
+                  {cat:"Fresh Produce",pct:"33%",d:"Seasonal fruits and vegetables priced competitively"},
+                  {cat:"Frozen Items",pct:"29%",d:"Frozen meals, vegetables, meats, and ice cream"},
+                  {cat:"Groceries",pct:"22%",d:"Pantry staples, cereals, snacks, and canned goods"},
+                  {cat:"Meat & Dairy",pct:"14%",d:"Fresh and refrigerated proteins and dairy products"},
+                  {cat:"HBA / Household",pct:"2%",d:"Personal care and household cleaning products"},
+                ].map(i=>(
+                  <div key={i.cat} className="cadc-card-sm">
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
+                      <p className="cadc-card-title" style={{margin:0}}>{i.cat}</p>
+                      <span style={{fontWeight:800,fontSize:13,color:"#0101FF"}}>{i.pct}</span>
+                    </div>
+                    <p style={{margin:"4px 0 0"}}>{i.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Featured brands</p>
+              <p>Braum's milk, locally sourced USDA grass-fed beef, Blue Bell Ice Cream, Sara Lee bread, and many other name-brand favorites. Whether you're stocking up for the family, planning a cookout, or simply looking for quality products you can count on — we've got something for everyone.</p>
+            </div>
+            <p className="cadc-note">Fresh produce and frozen items together account for 62% of total sales — the community is telling us what they need most.</p>
+          </div>
+        ),
+      },
+      {
+        id: "market-schedule", label: "September Schedule", shortLabel: "Schedule", icon: "📅",
+        content: <MarketSchedulePanel />,
+      },
+      {
+        id: "market-recipes", label: "Budget Recipes", shortLabel: "Recipes", icon: "🍳",
+        content: (
+          <div className="cadc-content">
+            <p>The Community Market provides easy, budget-friendly meal ideas for our shoppers. All ingredients available on the market.</p>
+            <div className="cadc-stack">
+              {[
+                {
+                  name:"Spaghetti & Meat Sauce",
+                  desc:"A classic family favorite that comes together quickly with just a few basic ingredients.",
+                  serves:"4–6", prep:"5 min", cook:"20 min",
+                  ingredients:["1 lb. spaghetti","1 lb. ground beef","1 jar pasta sauce (about 24 oz.)","1 tbsp cooking oil, if needed","Salt, to taste","Optional: grated Parmesan or shredded mozzarella"],
+                  tip:"Stretch the sauce by adding a can of diced tomatoes or a small amount of cooked vegetables.",
+                },
+                {
+                  name:"Easy Tacos",
+                  desc:"Let everyone add their favorite toppings for a meal the whole family can enjoy.",
+                  serves:"4–6", prep:"5 min", cook:"10 min",
+                  ingredients:["1 lb. ground beef","1 packet taco seasoning","Water (per seasoning directions)","8–12 tortillas or taco shells","1 cup shredded cheese","Optional: lettuce, diced tomatoes, onion, salsa, sour cream, refried beans"],
+                  tip:"Add refried beans or cooked rice to the tacos to make the meat go further.",
+                },
+                {
+                  name:"Easy Chili",
+                  desc:"Hearty chili using inexpensive pantry staples — perfect for a cold evening or reheated the next day.",
+                  serves:"4–6", prep:"5 min", cook:"25 min",
+                  ingredients:["1 lb. ground beef","1 can beans, drained and rinsed","1 can diced tomatoes","1 can tomato sauce","1 packet chili seasoning","½ cup water, or as needed","Optional: diced onion, shredded cheese, sour cream, crackers, corn chips"],
+                  tip:"Serve chili over rice, baked potatoes, or pasta to make a small batch stretch into more meals.",
+                },
+                {
+                  name:"Chicken & Rice",
+                  desc:"Simple comfort food requiring only a handful of ingredients — a filling dinner with minimal preparation.",
+                  serves:"4–6", prep:"5 min", cook:"20–25 min",
+                  ingredients:["2 cups cooked rice","1 can chicken, drained","1 can cream of chicken soup","½ cup milk","Salt and pepper, to taste","Optional: frozen mixed vegetables, canned peas, shredded cheese, garlic powder, onion powder"],
+                  tip:"Leftover cooked rice works especially well and helps reduce food waste.",
+                },
+                {
+                  name:"Bean & Cheese Burritos",
+                  desc:"Simple, inexpensive, and filling — great for a quick lunch or dinner.",
+                  serves:"4", prep:"5 min", cook:"5–10 min",
+                  ingredients:["1 can refried beans","4–8 flour tortillas","1 cup shredded cheese","Salsa, optional","Optional: cooked rice, diced tomatoes, chopped onion, corn, taco seasoning, sour cream"],
+                  tip:"Add cooked rice to the filling to make the burrito more filling without adding much cost.",
+                },
+              ].map(r=>(
+                <div key={r.name} className="cadc-card-sm">
+                  <p className="cadc-card-title">{r.name}</p>
+                  <p style={{fontSize:11,marginBottom:6}}>{r.desc}</p>
+                  <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:8}}>
+                    {[`Serves ${r.serves}`,`Prep ${r.prep}`,`Cook ${r.cook}`].map(s=>(
+                      <span key={s} style={{fontSize:9,fontWeight:700,padding:"2px 7px",background:"rgba(1,1,255,0.08)",borderRadius:20,color:"#0101FF"}}>{s}</span>
+                    ))}
+                  </div>
+                  <p style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 4px",opacity:0.6}}>Ingredients</p>
+                  <ul style={{margin:"0 0 8px",paddingLeft:16,fontSize:11}}>
+                    {r.ingredients.map(i=><li key={i}>{i}</li>)}
+                  </ul>
+                  <p style={{fontSize:10,fontStyle:"italic",margin:0,opacity:0.7}}>💡 {r.tip}</p>
+                </div>
+              ))}
+            </div>
           </div>
         ),
       },
