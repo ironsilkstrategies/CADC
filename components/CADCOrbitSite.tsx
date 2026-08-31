@@ -1418,13 +1418,144 @@ function ParticleField() {
   );
 }
 
+// ─── County service data for county-first flow ───────────────────────────────
+
+const CADC_BASE_COUNTIES = [
+  "beckham","canadian","comanche","cotton","jefferson","kiowa","roger-mills","tillman","washita"
+];
+
+// Which programs are available per county
+const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
+  beckham:      ["head-start","transit","weatherization","advantage"],
+  canadian:     ["head-start","transit","weatherization","advantage"],
+  comanche:     ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
+  cotton:       ["head-start","transit","weatherization","senior-meals","advantage"],
+  jefferson:    ["head-start","transit","weatherization","senior-meals","advantage"],
+  kiowa:        ["head-start","transit","weatherization","advantage","community-market"],
+  "roger-mills":["head-start","transit","weatherization","advantage"],
+  tillman:      ["head-start","transit","weatherization","senior-meals","advantage"],
+  washita:      ["head-start","transit","weatherization","advantage"],
+  // Transit extended
+  blaine:       ["transit"], caddo: ["transit","advantage"], custer: ["transit","advantage"],
+  dewey:        ["transit"], ellis: ["transit"], grady: ["transit","advantage"],
+  harmon:       ["transit","advantage"], jackson: ["transit","advantage"],
+  mcclain:      ["transit","advantage"], stephens: ["transit","advantage"],
+  greer:        ["transit","advantage"],
+};
+
+// Geographic county shapes — approximate SW Oklahoma positions
+// Each: id, label, cx%, cy% (center as % of SVG 100×70 viewBox)
+interface CountyDot { id: string; name: string; cx: number; cy: number; }
+
+const SW_OK_COUNTIES: CountyDot[] = [
+  { id:"roger-mills", name:"Roger Mills", cx:14, cy:20 },
+  { id:"beckham",     name:"Beckham",     cx:8,  cy:35 },
+  { id:"washita",     name:"Washita",     cx:26, cy:35 },
+  { id:"canadian",    name:"Canadian",    cx:52, cy:28 },
+  { id:"kiowa",       name:"Kiowa",       cx:26, cy:50 },
+  { id:"comanche",    name:"Comanche",    cx:42, cy:58 },
+  { id:"tillman",     name:"Tillman",     cx:30, cy:68 },
+  { id:"cotton",      name:"Cotton",      cx:46, cy:70 },
+  { id:"jefferson",   name:"Jefferson",   cx:58, cy:72 },
+];
+
+// ─── Oklahoma 9-county SVG map ────────────────────────────────────────────────
+
+function OklahomaCountyMap({
+  selectedCounty,
+  onSelectCounty,
+  dark,
+}: {
+  selectedCounty: string | null;
+  onSelectCounty: (id: string) => void;
+  dark: boolean;
+}) {
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  const bg = dark ? "rgba(0,0,20,0.5)" : "rgba(232,236,255,0.6)";
+  const countyFill = dark ? "rgba(1,1,255,0.12)" : "rgba(1,1,255,0.08)";
+  const countyFillHover = dark ? "rgba(1,1,255,0.35)" : "rgba(1,1,255,0.22)";
+  const countyFillSelected = "#0101FF";
+  const countyStroke = dark ? "rgba(1,1,255,0.35)" : "rgba(1,1,255,0.3)";
+  const labelColor = dark ? "rgba(255,255,255,0.8)" : "#1a1a4e";
+  const labelSelected = "white";
+
+  return (
+    <svg
+      viewBox="0 0 100 85"
+      style={{ width: "100%", display: "block" }}
+      aria-label="CADC 9-county service area map"
+    >
+      {/* Background territory suggestion */}
+      <rect x={0} y={0} width={100} height={85} fill={bg} rx={8} />
+
+      {/* County shapes as rounded rects approximate to geography */}
+      {SW_OK_COUNTIES.map(county => {
+        const isSelected = selectedCounty === county.id;
+        const isHovered = hovered === county.id;
+        const r = 9; // radius of county blob
+        return (
+          <g key={county.id}>
+            {/* County blob */}
+            <ellipse
+              cx={county.cx}
+              cy={county.cy}
+              rx={r * 1.3}
+              ry={r}
+              fill={isSelected ? countyFillSelected : isHovered ? countyFillHover : countyFill}
+              stroke={countyStroke}
+              strokeWidth={isSelected ? 0.8 : 0.5}
+              style={{ cursor: "pointer", transition: "fill 0.2s ease" }}
+              onMouseEnter={() => setHovered(county.id)}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => onSelectCounty(county.id)}
+            />
+            {/* County label */}
+            <text
+              x={county.cx}
+              y={county.cy + 0.8}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={2.6}
+              fontWeight={isSelected ? "800" : "600"}
+              fill={isSelected ? labelSelected : labelColor}
+              style={{ pointerEvents: "none", userSelect: "none" }}
+            >
+              {county.name}
+            </text>
+            {/* Dot marker */}
+            {!isSelected && (
+              <circle
+                cx={county.cx}
+                cy={county.cy - 5}
+                r={0.9}
+                fill={isHovered ? "#0101FF" : "#CC0000"}
+                style={{ pointerEvents: "none", transition: "fill 0.2s" }}
+              />
+            )}
+          </g>
+        );
+      })}
+
+      {/* Legend */}
+      <g transform="translate(2, 77)">
+        <rect x={0} y={0} width={2.5} height={2.5} rx={0.3} fill={countyFill} stroke={countyStroke} strokeWidth={0.3} />
+        <text x={3.5} y={2} fontSize={2} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>CADC County</text>
+        <circle cx={22} cy={1.2} r={0.8} fill="#CC0000" />
+        <text x={23.5} y={2} fontSize={2} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>Tap to see services</text>
+      </g>
+    </svg>
+  );
+}
+
 // ─── Main Orbit component ─────────────────────────────────────────────────────
 
-type Stage = "main" | "program" | "content";
+type Stage = "entry" | "map" | "county" | "program" | "content";
 type TransitionState = "idle" | "out" | "in";
 
 export default function CADCOrbitSite() {
-  const [stage, setStage] = useState<Stage>("main");
+  const [stage, setStage] = useState<Stage>("entry");
+  const [activeCounty, setActiveCounty] = useState<string | null>(null);
   const [activeProgram, setActiveProgram] = useState<ProgramData | null>(null);
   const [activeSubArea, setActiveSubArea] = useState<SubArea | null>(null);
   const [glowNode, setGlowNode] = useState<string | null>(null);
@@ -1435,20 +1566,34 @@ export default function CADCOrbitSite() {
   const isDesktop = useIsDesktop();
 
   useEffect(() => {
-    const t = setTimeout(() => setAssembled(true), 300);
+    const t = setTimeout(() => setAssembled(true), 400);
     return () => clearTimeout(t);
   }, []);
 
+  // Programs available for active county (or all if no county selected)
+  const availablePrograms = activeCounty
+    ? PROGRAMS.filter(p => (COUNTY_PROGRAM_MAP[activeCounty] ?? []).includes(p.slug))
+    : PROGRAMS;
+
+  function tapLogo() {
+    setStage("map");
+  }
+
+  function tapCounty(countyId: string) {
+    setActiveCounty(countyId);
+    setOrbitTx("out");
+    setTimeout(() => {
+      setStage("county");
+      setOrbitTx("in");
+    }, 350);
+    setTimeout(() => setOrbitTx("idle"), 750);
+  }
+
   function tapProgram(prog: ProgramData) {
-    // 1. Pop + beam
     setPopNode(prog.slug);
     setBeamNode(prog.slug);
     setGlowNode(prog.slug);
-    // 2. Start orbit exit
-    setTimeout(() => {
-      setOrbitTx("out");
-    }, 120);
-    // 3. Swap data mid-transition
+    setTimeout(() => setOrbitTx("out"), 120);
     setTimeout(() => {
       setActiveProgram(prog);
       setActiveSubArea(null);
@@ -1457,7 +1602,6 @@ export default function CADCOrbitSite() {
       setGlowNode(null);
       setBeamNode(null);
     }, 480);
-    // 4. Settle
     setTimeout(() => {
       setOrbitTx("idle");
       setPopNode(null);
@@ -1483,27 +1627,44 @@ export default function CADCOrbitSite() {
         setStage("program");
       } else if (stage === "program") {
         setActiveProgram(null);
-        setStage("main");
+        setStage(activeCounty ? "county" : "map");
+      } else if (stage === "county") {
+        setActiveCounty(null);
+        setStage("map");
+      } else if (stage === "map") {
+        setStage("entry");
       }
       setOrbitTx("in");
     }, 300);
     setTimeout(() => setOrbitTx("idle"), 700);
   }
 
+  const activeCountyName = activeCounty
+    ? SW_OK_COUNTIES.find(c => c.id === activeCounty)?.name ?? activeCounty
+    : null;
+
   if (isDesktop) {
     return <DesktopLayout
-      stage={stage} activeProgram={activeProgram} activeSubArea={activeSubArea}
+      stage={stage} activeCounty={activeCounty} activeCountyName={activeCountyName}
+      activeProgram={activeProgram} activeSubArea={activeSubArea}
+      availablePrograms={availablePrograms}
       glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
       assembled={assembled}
-      tapProgram={tapProgram} tapSubArea={tapSubArea} goBack={goBack}
+      tapLogo={tapLogo} tapCounty={tapCounty} tapProgram={tapProgram}
+      tapSubArea={tapSubArea} goBack={goBack}
+      isDesktop={isDesktop}
     />;
   }
 
   return <MobileLayout
-    stage={stage} activeProgram={activeProgram} activeSubArea={activeSubArea}
+    stage={stage} activeCounty={activeCounty} activeCountyName={activeCountyName}
+    activeProgram={activeProgram} activeSubArea={activeSubArea}
+    availablePrograms={availablePrograms}
     glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
     assembled={assembled}
-    tapProgram={tapProgram} tapSubArea={tapSubArea} goBack={goBack}
+    tapLogo={tapLogo} tapCounty={tapCounty} tapProgram={tapProgram}
+    tapSubArea={tapSubArea} goBack={goBack}
+    isDesktop={isDesktop}
   />;
 }
 
@@ -1511,13 +1672,19 @@ export default function CADCOrbitSite() {
 
 interface LayoutProps {
   stage: Stage;
+  activeCounty: string | null;
+  activeCountyName: string | null;
   activeProgram: ProgramData | null;
   activeSubArea: SubArea | null;
+  availablePrograms: ProgramData[];
   glowNode: string | null;
   popNode: string | null;
   beamNode: string | null;
   orbitTx: TransitionState;
   assembled: boolean;
+  isDesktop: boolean;
+  tapLogo: () => void;
+  tapCounty: (id: string) => void;
   tapProgram: (p: ProgramData) => void;
   tapSubArea: (a: SubArea) => void;
   goBack: () => void;
@@ -1525,7 +1692,7 @@ interface LayoutProps {
 
 // ─── DESKTOP LAYOUT ───────────────────────────────────────────────────────────
 
-function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea, goBack }: LayoutProps) {
+function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
     <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
       <ParticleField />
@@ -1553,11 +1720,11 @@ function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, popNode,
       {/* Main split layout */}
       <div style={{ display: "flex", height: "100vh", paddingTop: 64 }}>
 
-        {/* LEFT — Orbit panel */}
-        <div style={{ width: "42%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+        {/* LEFT — Orbit / Map panel */}
+        <div style={{ width: "42%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
 
           {/* Back button */}
-          {stage !== "main" && (
+          {stage !== "entry" && (
             <button onClick={goBack} style={{
               position: "absolute", top: 24, left: 48, zIndex: 10,
               background: "rgba(1,1,255,0.15)", border: "1px solid rgba(1,1,255,0.3)",
@@ -1570,17 +1737,60 @@ function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, popNode,
             >← Back</button>
           )}
 
-          <DesktopOrbit
-            stage={stage} activeProgram={activeProgram}
-            glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
-            assembled={assembled}
-            tapProgram={tapProgram} tapSubArea={tapSubArea}
-          />
+          {/* County label breadcrumb */}
+          {activeCountyName && (stage === "county" || stage === "program" || stage === "content") && (
+            <div style={{ position: "absolute", top: 24, right: 24, color: T.maroon, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              {activeCountyName} County
+            </div>
+          )}
+
+          {/* Entry state — large tappable logo */}
+          {stage === "entry" && (
+            <button
+              onClick={tapLogo}
+              style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}
+            >
+              <div style={{
+                width: 200, height: 200, borderRadius: "50%", background: "white",
+                border: `4px solid ${T.blue}`,
+                boxShadow: `0 0 0 12px rgba(1,1,255,0.08), 0 0 60px rgba(1,1,255,0.2)`,
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+                animation: "logoFloat 3s ease-in-out infinite",
+              }}>
+                <span style={{ color: T.blue, fontWeight: 900, fontSize: 42, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
+                <div style={{ width: 48, height: 3, background: T.maroon, borderRadius: 2 }} />
+                <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", lineHeight: 1.3 }}>Community Action<br />Development Corp.</span>
+              </div>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+            </button>
+          )}
+
+          {/* Map state */}
+          {stage === "map" && (
+            <div style={{ width: "min(90%,420px)", animation: "fadeSlideIn 0.4s ease" }}>
+              <OklahomaCountyMap
+                selectedCounty={null}
+                onSelectCounty={tapCounty}
+                dark={true}
+              />
+            </div>
+          )}
+
+          {/* County / Program / Content state — show orbit */}
+          {(stage === "county" || stage === "program" || stage === "content") && (
+            <DesktopOrbit
+              stage={stage} activeProgram={activeProgram}
+              availablePrograms={availablePrograms}
+              glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
+              assembled={assembled}
+              tapProgram={tapProgram} tapSubArea={tapSubArea}
+            />
+          )}
         </div>
 
         {/* RIGHT — Content panel */}
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: "1px solid rgba(1,1,255,0.1)" }}>
-          <DesktopContentPanel stage={stage} activeProgram={activeProgram} activeSubArea={activeSubArea} />
+          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} />
         </div>
       </div>
 
@@ -1589,14 +1799,13 @@ function DesktopLayout({ stage, activeProgram, activeSubArea, glowNode, popNode,
   );
 }
 
-function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea }: {
-  stage: Stage; activeProgram: ProgramData | null; glowNode: string | null;
+function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea }: {
+  stage: Stage; activeProgram: ProgramData | null; availablePrograms: ProgramData[]; glowNode: string | null;
   popNode: string | null; beamNode: string | null; orbitTx: TransitionState;
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
-  const programs = PROGRAMS;
   const subAreas = activeProgram?.subAreas ?? [];
-  const items = stage === "main" ? programs : subAreas;
+  const items = (stage === "county") ? availablePrograms : (stage === "program" || stage === "content") ? subAreas : availablePrograms;
   const RADIUS = 38;
   const SIZE = "min(80vw,420px)";
 
@@ -1613,9 +1822,9 @@ function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbit
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }} viewBox="0 0 100 100" aria-hidden="true">
         {items.map((item, i) => {
           const { x, y } = orbitPos(i, items.length, RADIUS);
-          const isActive = stage === "main"
-            ? (item as ProgramData).slug === glowNode
-            : (item as SubArea).id === glowNode;
+          const isActive = (stage === "program" || stage === "content")
+            ? (item as SubArea).id === glowNode
+            : (item as ProgramData).slug === glowNode;
           return (
             <line key={i} x1={50} y1={50} x2={x} y2={y}
               stroke={isActive ? "rgba(1,1,255,0.8)" : "rgba(1,1,255,0.15)"}
@@ -1646,17 +1855,17 @@ function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbit
           fontSize: "clamp(1rem,2.5vw,1.4rem)",
           animation: orbitTx !== "idle" ? "hubSpin 0.45s ease-in-out" : "none",
         }}>
-          {stage === "main" ? "🏛️" : activeProgram?.icon}
+          {(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}
         </span>
         <span style={{
           color: T.blue,
-          fontSize: stage === "main" ? "clamp(0.35rem,0.8vw,0.5rem)" : "clamp(0.32rem,0.7vw,0.42rem)",
+          fontSize: (stage === "program" || stage === "content") ? "clamp(0.32rem,0.7vw,0.42rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
           fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
           textAlign: "center", padding: "0 4px", lineHeight: 1.2,
           transition: "opacity 0.2s ease",
           opacity: orbitTx === "out" ? 0 : 1,
         }}>
-          {stage === "main" ? "CADC" : activeProgram?.shortName}
+          {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
         </span>
       </div>
 
@@ -1665,9 +1874,10 @@ function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbit
         const { x, y } = orbitPos(i, items.length, RADIUS);
         const prog = item as ProgramData;
         const sub = item as SubArea;
-        const id = stage === "main" ? prog.slug : sub.id;
-        const label = stage === "main" ? prog.shortName : sub.shortLabel;
-        const icon = stage === "main" ? prog.icon : sub.icon;
+        const isProgLevel = stage === "county";
+        const id = isProgLevel ? prog.slug : (stage === "program" || stage === "content") ? sub.id : prog.slug;
+        const label = isProgLevel ? prog.shortName : (stage === "program" || stage === "content") ? sub.shortLabel : prog.shortName;
+        const icon = isProgLevel ? prog.icon : (stage === "program" || stage === "content") ? sub.icon : prog.icon;
         const isGlowing = id === glowNode;
         const isPopped = id === popNode;
         const isBeaming = id === beamNode;
@@ -1683,8 +1893,8 @@ function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbit
         return (
           <button
             key={id}
-            onClick={() => stage === "main" ? tapProgram(prog) : tapSubArea(sub)}
-            aria-label={stage === "main" ? prog.name : sub.label}
+            onClick={() => (stage === "program" || stage === "content") ? tapSubArea(sub) : tapProgram(prog)}
+            aria-label={(stage === "program" || stage === "content") ? sub.label : prog.name}
             style={{
               position: "absolute",
               left: `${x}%`, top: `${y}%`,
@@ -1755,8 +1965,12 @@ function DesktopOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbit
   );
 }
 
-function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: Stage; activeProgram: ProgramData | null; activeSubArea: SubArea | null }) {
-  if (stage === "main") {
+function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty }: {
+  stage: Stage; activeCountyName: string | null; activeProgram: ProgramData | null;
+  activeSubArea: SubArea | null; availablePrograms: ProgramData[];
+  tapCounty: (id: string) => void;
+}) {
+  if (stage === "entry") {
     return (
       <div style={{ maxWidth: 520, color: "white" }}>
         <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
@@ -1765,23 +1979,78 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
           <span style={{ color: T.blue }}>Development</span><br />
           Corporation
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 16, lineHeight: 1.7, marginBottom: 32 }}>
-          A Community Action Development Corporation serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, nutrition programs, and more. Select any program from the orbit to explore.
+        <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+          Serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, senior nutrition, and more. Tap the CADC logo to find services in your county.
         </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <a href="tel:+15803355588" style={{ background: T.blue, color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.05em" }}>
-            📞 580-335-5588
-          </a>
-          <a href="/about" style={{ border: `1px solid rgba(1,1,255,0.4)`, color: "rgba(255,255,255,0.75)", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
-            About CADC
-          </a>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
+          <a href="tel:+15803355588" style={{ background: T.blue, color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.05em" }}>📞 580-335-5588</a>
+          <a href="/about" style={{ border: `1px solid rgba(1,1,255,0.4)`, color: "rgba(255,255,255,0.75)", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+          {[["9","Programs"],["11","Head Start Centers"],["110","Transit Vehicles"],["6","Senior Meal Sites"],["17","Advantage Counties"],["1966","Est."]].map(([n,l])=>(
+            <div key={l} style={{ background: "rgba(1,1,255,0.1)", border: "1px solid rgba(1,1,255,0.2)", borderRadius: 10, padding: "14px 10px", textAlign: "center" }}>
+              <div style={{ color: "white", fontWeight: 900, fontSize: 22 }}>{n}</div>
+              <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
+  if (stage === "map") {
+    return (
+      <div style={{ maxWidth: 520, color: "white", animation: "fadeSlideIn 0.4s ease" }}>
+        <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Select Your County</p>
+        <h2 style={{ fontSize: "clamp(1.6rem,2.8vw,2.4rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif" }}>
+          Where do you need help?
+        </h2>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>
+          Tap a county on the map to see which CADC programs are available in your area.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {SW_OK_COUNTIES.map(c => (
+            <button key={c.id} onClick={() => tapCounty(c.id)} style={{
+              background: "rgba(1,1,255,0.12)", border: "1px solid rgba(1,1,255,0.3)",
+              color: "rgba(255,255,255,0.8)", padding: "8px 16px", borderRadius: 20,
+              fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(1,1,255,0.3)"; e.currentTarget.style.color = "white"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(1,1,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; }}
+            >{c.name}</button>
+          ))}
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 20 }}>9 base counties · Helping People. Changing Lives.</p>
+      </div>
+    );
+  }
+
+  if (stage === "county" && activeCountyName) {
+    const firstProg = availablePrograms[0];
+    return (
+      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
+        <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 8px" }}>{activeCountyName} County</p>
+        <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif" }}>
+          Programs available in your area
+        </h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+          {availablePrograms.map(p => (
+            <div key={p.slug} style={{ background: "rgba(1,1,255,0.12)", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 600 }}>
+              {p.icon} {p.shortName}
+            </div>
+          ))}
+        </div>
+        {firstProg && (
+          <div className="cadc-dark-content">
+            {firstProg.subAreas[0]?.content}
+          </div>
+        )}
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 16, fontStyle: "italic" }}>Tap a program node in the orbit for more detail.</p>
+      </div>
+    );
+  }
+
   if (stage === "program" && activeProgram) {
-    // Show first sub-area content immediately — no dead prompt
     const firstSub = activeProgram.subAreas[0];
     return (
       <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
@@ -1796,9 +2065,7 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
             {firstSub.content}
           </div>
         )}
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>
-          Select any node in the orbit for more detail.
-        </p>
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Select any node in the orbit for more detail.</p>
       </div>
     );
   }
@@ -1821,23 +2088,31 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
 
 // ─── MOBILE LAYOUT ────────────────────────────────────────────────────────────
 
-function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea, goBack }: LayoutProps) {
+function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
     <div style={{ background: T.ghost, minHeight: "100svh", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
 
+      {/* RESTORED: Blue utility bar */}
+      <div style={{ background: T.blue, padding: "9px 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <a href="tel:+18005245552" style={{ color: "white", fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.03em" }}>
+          📞 Ride the River: 1-800-524-5552
+        </a>
+      </div>
+
       {/* Mobile header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 40, background: "white", borderBottom: `1px solid ${T.border}`, padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 40, background: "white", borderBottom: `1px solid ${T.border}`, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {stage !== "main" && (
+          {stage !== "entry" && (
             <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Back">←</button>
           )}
-          <span style={{ fontWeight: 800, fontSize: 15, color: T.blue, letterSpacing: "0.05em" }}>CADC</span>
-          {stage === "program" && activeProgram && (
-            <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>
-          )}
-          {stage === "content" && activeSubArea && (
-            <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>
-          )}
+          {/* CADC logo circle */}
+          <div style={{ width: 38, height: 38, borderRadius: "50%", border: `2px solid ${T.blue}`, display: "flex", alignItems: "center", justifyContent: "center", background: "white" }}>
+            <span style={{ color: T.blue, fontWeight: 900, fontSize: 10, letterSpacing: "0.05em" }}>CADC</span>
+          </div>
+          {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
+          {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
+          {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
+          {stage === "content" && activeSubArea && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
@@ -1846,17 +2121,94 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, 
         </div>
       </div>
 
-      {/* Orbit */}
-      <div style={{ padding: "20px 0 0" }}>
-        <MobileOrbit
-          stage={stage} activeProgram={activeProgram}
-          glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
-          assembled={assembled}
-          tapProgram={tapProgram} tapSubArea={tapSubArea}
-        />
-      </div>
+      {/* ENTRY — Large tappable logo, centered */}
+      {stage === "entry" && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px 40px", minHeight: "70svh" }}>
+          <button
+            onClick={tapLogo}
+            style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}
+          >
+            <div style={{
+              width: 200, height: 200, borderRadius: "50%", background: "white",
+              border: `4px solid ${T.blue}`,
+              boxShadow: `0 0 0 10px rgba(1,1,255,0.06), 0 8px 40px rgba(1,1,255,0.15)`,
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+            }}>
+              <span style={{ color: T.blue, fontWeight: 900, fontSize: 40, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
+              <div style={{ width: 44, height: 3, background: T.maroon, borderRadius: 2 }} />
+              <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", lineHeight: 1.4 }}>Community Action<br />Development Corp.</span>
+            </div>
+            <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+          </button>
+        </div>
+      )}
 
-      {/* Content below orbit */}
+      {/* MAP — Geographic county selector */}
+      {stage === "map" && (
+        <div style={{ padding: "20px 20px 40px" }}>
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <p style={{ color: T.maroon, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 6px" }}>Select Your County</p>
+            <h2 style={{ color: T.blue, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>Where do you need help?</h2>
+          </div>
+          <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, overflow: "hidden", padding: 12 }}>
+            <OklahomaCountyMap selectedCounty={null} onSelectCounty={tapCounty} dark={false} />
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16, justifyContent: "center" }}>
+            {SW_OK_COUNTIES.map(c => (
+              <button key={c.id} onClick={() => tapCounty(c.id)} style={{
+                background: "white", border: `1.5px solid ${T.blue}`, color: T.blue,
+                padding: "8px 16px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}>{c.name}</button>
+            ))}
+          </div>
+          <p style={{ textAlign: "center", color: T.textMuted, fontSize: 11, marginTop: 12 }}>9 base counties · Helping People. Changing Lives.</p>
+        </div>
+      )}
+
+      {/* COUNTY — Orbit + program list */}
+      {(stage === "county" || stage === "program" || stage === "content") && (
+        <>
+          <div style={{ padding: "12px 20px 0", textAlign: "center" }}>
+            {activeCountyName && (
+              <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 2px" }}>
+                {activeCountyName} County — {availablePrograms.length} programs available
+              </p>
+            )}
+            <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>Tap a program node to explore</p>
+          </div>
+          <div style={{ padding: "12px 0 0" }}>
+            <MobileOrbit
+              stage={stage} activeProgram={activeProgram}
+              availablePrograms={availablePrograms}
+              glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
+              assembled={assembled}
+              tapProgram={tapProgram} tapSubArea={tapSubArea}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Content below orbit — program landing */}
+      {stage === "program" && activeProgram && !activeSubArea && (
+        <div style={{ padding: "0 20px 80px", animation: "mobileContentIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+          <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
+            <div style={{ background: T.blue, padding: "14px 20px" }}>
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
+              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+                {activeProgram.icon} {activeProgram.name}
+              </h2>
+            </div>
+            <div style={{ padding: 20 }} className="cadc-light-content">
+              {activeProgram.subAreas[0]?.content}
+            </div>
+            <div style={{ padding: "0 20px 16px" }}>
+              <p style={{ color: T.textMuted, fontSize: 11, fontStyle: "italic", margin: 0 }}>Tap any node above to explore more.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content below orbit — sub-area detail */}
       {stage === "content" && activeSubArea && (
         <div style={{ padding: "0 20px 80px", animation: "mobileContentIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards" }}>
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
@@ -1872,36 +2224,18 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, 
         </div>
       )}
 
-      {stage === "main" && (
+      {/* County landing — show available programs summary */}
+      {stage === "county" && !activeProgram && (
         <div style={{ padding: "16px 20px 80px" }}>
-          <div style={{ background: T.blue, borderRadius: 16, padding: 24 }}>
-            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 8, margin: 0 }}>Southwest Oklahoma</p>
-            <h1 style={{ color: "white", fontWeight: 800, fontSize: 22, lineHeight: 1.2, margin: "8px 0 12px", fontFamily: "'Space Grotesk', sans-serif" }}>
-              Community Action Development Corporation
-            </h1>
-            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.6, margin: "0 0 16px" }}>
-              Serving 9 counties — early childhood education, transportation, weatherization, nutrition programs, and more.
-            </p>
-            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: 0 }}>Tap any program node above to explore</p>
-          </div>
-        </div>
-      )}
-
-      {stage === "program" && activeProgram && !activeSubArea && (
-        <div style={{ padding: "16px 20px 80px", animation: "mobileContentIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards" }}>
-          <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
-            <div style={{ background: T.blue, padding: "14px 20px" }}>
-              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
-              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
-                {activeProgram.icon} {activeProgram.name}
-              </h2>
-            </div>
-            <div style={{ padding: 20 }} className="cadc-light-content">
-              {activeProgram.subAreas[0]?.content}
-            </div>
-            <div style={{ padding: "0 20px 16px" }}>
-              <p style={{ color: T.textMuted, fontSize: 11, fontStyle: "italic", margin: 0 }}>Tap any node in the orbit above to explore more.</p>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {availablePrograms.map(p => (
+              <button key={p.slug} onClick={() => tapProgram(p)}
+                style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 12, padding: 16, textAlign: "left", cursor: "pointer" }}>
+                <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>
+                <span style={{ color: T.blue, fontWeight: 700, fontSize: 12, display: "block" }}>{p.shortName}</span>
+                <span style={{ color: T.textMuted, fontSize: 10 }}>{p.tagline}</span>
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -1911,15 +2245,14 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, 
   );
 }
 
-function MobileOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea }: {
-  stage: Stage; activeProgram: ProgramData | null; glowNode: string | null;
+function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea }: {
+  stage: Stage; activeProgram: ProgramData | null; availablePrograms: ProgramData[]; glowNode: string | null;
   popNode: string | null; beamNode: string | null; orbitTx: TransitionState;
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
-  const programs = PROGRAMS;
   const subAreas = activeProgram?.subAreas ?? [];
-  const items = stage === "main" ? programs : subAreas;
-  const RADIUS = stage === "main" ? 38 : 36;
+  const items = (stage === "program" || stage === "content") ? subAreas : availablePrograms;
+  const RADIUS = 38;
 
   return (
     <div style={{ position: "relative", margin: "0 auto", width: "min(92vw, 400px)", aspectRatio: "1/1" }}>
@@ -1952,9 +2285,9 @@ function MobileOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitT
         boxShadow: `0 0 0 5px rgba(1,1,255,0.08), 0 4px 20px rgba(1,1,255,0.18)`,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
       }}>
-        <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{stage === "main" ? "🏛️" : activeProgram?.icon}</span>
+        <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}</span>
         <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>
-          {stage === "main" ? "CADC" : activeProgram?.shortName}
+          {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
         </span>
       </div>
 
@@ -1963,9 +2296,10 @@ function MobileOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitT
         const { x, y } = orbitPos(i, items.length, RADIUS);
         const prog = item as ProgramData;
         const sub = item as SubArea;
-        const id = stage === "main" ? prog.slug : sub.id;
-        const label = stage === "main" ? prog.shortName : sub.shortLabel;
-        const icon = stage === "main" ? prog.icon : sub.icon;
+        const isSubLevel = stage === "program" || stage === "content";
+        const id = isSubLevel ? sub.id : prog.slug;
+        const label = isSubLevel ? sub.shortLabel : prog.shortName;
+        const icon = isSubLevel ? sub.icon : prog.icon;
         const isGlowing = id === glowNode;
         const isPopped = id === popNode;
         const initDelay = assembled ? 0 : i * 60;
@@ -1979,7 +2313,7 @@ function MobileOrbit({ stage, activeProgram, glowNode, popNode, beamNode, orbitT
         return (
           <button
             key={id}
-            onClick={() => stage === "main" ? tapProgram(prog) : tapSubArea(sub)}
+            onClick={() => isSubLevel ? tapSubArea(sub) : tapProgram(prog)}
             aria-label={label}
             style={{
               position: "absolute",
@@ -2057,7 +2391,10 @@ function DesktopStyles() {
         50% { transform: scale(1.8); opacity: 0.6; }
         100% { transform: scale(0.2); opacity: 0; border-color: rgba(1,1,255,0.2); }
       }
-      @keyframes hubPulse {
+      @keyframes logoFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
         0%  { transform: translate(-50%,-50%) scale(1); }
         40% { transform: translate(-50%,-50%) scale(1.18); }
         100%{ transform: translate(-50%,-50%) scale(1); }
