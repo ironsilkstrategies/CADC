@@ -1034,6 +1034,187 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
 }
 
 
+// ─── Photo Registry ───────────────────────────────────────────────────────────
+// UPLOAD INSTRUCTIONS:
+// 1. Create folder: public/images/ in your GitHub repo
+// 2. Upload each photo file, rename to match the path below
+// 3. Photos go live automatically on next deploy
+//
+// Naming convention: /images/[program]-[description].jpg
+// All paths are relative to /public/
+
+const PHOTOS = {
+  // ── Senior Nutrition ──────────────────────────────────────────────────────
+  seniorNutrition: {
+    // Kitchen staff in green uniforms, hairnets, serving line — action shot
+    kitchenStaff:     "/images/senior-kitchen-staff.jpg",
+    // Elegant ornate dining room (Frederick site) — full house, blue walls
+    frederickDining:  "/images/senior-dining-frederick.jpg",
+    // Full house wide shot same ornate room — community feeling
+    frederickWide:    "/images/senior-dining-frederick-wide.jpg",
+    // Wood paneling dining room, red chairs — Ryan/Ringling site
+    communityDining:  "/images/senior-dining-community.jpg",
+    // Blue accent walls, group at table — Cache/Temple site
+    groupDining:      "/images/senior-dining-group.jpg",
+    // Seniors doing puzzle at table — social engagement
+    puzzle:           "/images/senior-social-puzzle.jpg",
+    // Patriotic holiday setup — community events angle
+    patrioticSetup:   "/images/senior-patriotic-event.jpg",
+  },
+
+  // ── Community Market ──────────────────────────────────────────────────────
+  communityMarket: {
+    // 42-foot trailer exterior with truck, church backdrop — hero
+    trailerHero:      "/images/market-trailer-exterior.jpg",
+    // Fresh produce shelving — watermelons, apples, sweet potatoes
+    freshProduce:     "/images/market-fresh-produce.jpg",
+    // Refrigerated produce case — grapes, squash, peppers, tomatoes
+    refrigeratedProduce: "/images/market-refrigerated-produce.jpg",
+    // Frozen foods case — peaches, broccoli, ice cream bars
+    frozen:           "/images/market-frozen-foods.jpg",
+    // Frozen meals case — burritos, fish sticks, chicken
+    frozenMeals:      "/images/market-frozen-meals.jpg",
+    // Dairy/refrigerated — eggs, butter, milk, yogurt
+    dairy:            "/images/market-dairy.jpg",
+    // Dry goods shelving — cereals, snacks, pantry
+    dryGoods:         "/images/market-dry-goods.jpg",
+    // HBA/household — toothbrushes, cleaning, toilet paper
+    household:        "/images/market-household.jpg",
+  },
+
+  // ── Head Start (placeholder — photos coming from Robin/Tarra) ─────────────
+  headStart: {
+    classroomActivity: "/images/headstart-classroom.jpg",
+    outdoorPlay:       "/images/headstart-outdoor.jpg",
+    familyEngagement:  "/images/headstart-family.jpg",
+  },
+} as const;
+
+// ─── Program Hero Banner ──────────────────────────────────────────────────────
+// Displays at top of program content panel (Option B of photo strategy)
+// Photo strips with parallax-style overlay and program identity
+
+function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
+  // Map program slug to hero photo + caption
+  const heroMap: Record<string, { src: string; caption: string; credit?: string }> = {
+    "senior-meals": {
+      src: PHOTOS.seniorNutrition.frederickDining,
+      caption: "Congregate dining at our Frederick center",
+    },
+    "community-market": {
+      src: PHOTOS.communityMarket.trailerHero,
+      caption: "The CADC Community Market — bringing fresh food to 22 communities",
+    },
+    "head-start": {
+      src: PHOTOS.headStart.classroomActivity,
+      caption: "Early childhood education across 11 CADC centers",
+    },
+  };
+
+  const hero = heroMap[slug];
+  if (!hero) return null;
+
+  return (
+    <div style={{
+      position: "relative", width: "100%", height: 180,
+      borderRadius: 14, overflow: "hidden", marginBottom: 20,
+      background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
+      animation: "fadeSlideIn 0.5s ease",
+    }}>
+      <img
+        src={hero.src}
+        alt={hero.caption}
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        style={{
+          width: "100%", height: "100%", objectFit: "cover",
+          objectPosition: "center",
+          display: "block",
+        }}
+      />
+      {/* Gradient overlay */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: dark
+          ? "linear-gradient(to top, rgba(0,0,20,0.85) 0%, rgba(0,0,20,0.2) 60%, transparent 100%)"
+          : "linear-gradient(to top, rgba(0,0,60,0.75) 0%, rgba(0,0,60,0.1) 60%, transparent 100%)",
+      }}/>
+      {/* Caption */}
+      <p style={{
+        position: "absolute", bottom: 10, left: 14, right: 14,
+        color: "rgba(255,255,255,0.85)", fontSize: 10, fontWeight: 600,
+        fontStyle: "italic", margin: 0, letterSpacing: "0.03em",
+        textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+      }}>{hero.caption}</p>
+    </div>
+  );
+}
+
+// ─── Inline Photo Strip ───────────────────────────────────────────────────────
+// Used inside sub-area content — horizontal scrollable photo row
+// Place anywhere inside a cadc-content div
+
+function PhotoStrip({ photos, dark }: {
+  photos: { src: string; alt: string }[];
+  dark: boolean;
+}) {
+  return (
+    <div style={{
+      display: "flex", gap: 8, overflowX: "auto", margin: "14px 0",
+      paddingBottom: 6,
+      scrollbarWidth: "none",
+    }}>
+      {photos.map((photo, i) => (
+        <div key={i} style={{
+          flex: "0 0 auto", width: 140, height: 100,
+          borderRadius: 10, overflow: "hidden",
+          background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
+          border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
+        }}>
+          <img
+            src={photo.src}
+            alt={photo.alt}
+            onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Photo Grid ───────────────────────────────────────────────────────────────
+// 2-column grid for program sub-areas with more space
+
+function PhotoGrid({ photos, dark }: {
+  photos: { src: string; alt: string }[];
+  dark: boolean;
+}) {
+  return (
+    <div style={{
+      display: "grid", gridTemplateColumns: "1fr 1fr",
+      gap: 8, margin: "14px 0",
+    }}>
+      {photos.slice(0, 4).map((photo, i) => (
+        <div key={i} style={{
+          borderRadius: 10, overflow: "hidden", aspectRatio: "4/3",
+          background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
+          border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
+          gridColumn: i === 0 && photos.length >= 3 ? "1 / span 2" : "auto",
+        }}>
+          <img
+            src={photo.src}
+            alt={photo.alt}
+            onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -1390,6 +1571,12 @@ const PROGRAMS: ProgramData[] = [
           <div className="cadc-content">
             <p>CADC's Senior Nutrition Program serves adults 60 and older with nutritious meals, meaningful community connection, and caring support. Our sites are more than places to eat — they are places where seniors gather, build friendships, and stay connected.</p>
             <p>For those who are unable to attend a congregate site, our Home-Delivered Meal Program brings a hot meal and a friendly visit directly to their door.</p>
+            <PhotoGrid dark={false} photos={[
+              { src: PHOTOS.seniorNutrition.kitchenStaff, alt: "CADC Senior Nutrition kitchen staff preparing meals" },
+              { src: PHOTOS.seniorNutrition.puzzle, alt: "Seniors socializing over a puzzle at a CADC meal site" },
+              { src: PHOTOS.seniorNutrition.patrioticSetup, alt: "Patriotic holiday celebration at a CADC senior meal site" },
+              { src: PHOTOS.seniorNutrition.groupDining, alt: "Seniors dining together at a CADC congregate site" },
+            ]} />
             <div className="cadc-card">
               <p className="cadc-label">Program eligibility</p>
               <p>Available to individuals age 60 and older. Spouses and caregivers may also be eligible — contact us for details.</p>
@@ -1429,6 +1616,11 @@ const PROGRAMS: ProgramData[] = [
         content: (
           <div className="cadc-content">
             <p>Hot, nutritious meals served in a welcoming environment at 6 community sites across Southwest Oklahoma. Seniors enjoy a meal with others, participate in activities, socialize, and build friendships.</p>
+            <PhotoStrip dark={false} photos={[
+              { src: PHOTOS.seniorNutrition.frederickDining, alt: "Frederick senior nutrition congregate dining room" },
+              { src: PHOTOS.seniorNutrition.frederickWide, alt: "Seniors dining at the Frederick center" },
+              { src: PHOTOS.seniorNutrition.communityDining, alt: "Community dining room at a CADC senior nutrition site" },
+            ]} />
             <div className="cadc-card">
               <p className="cadc-label">Meal contributions</p>
               <div className="cadc-stack">
@@ -1545,6 +1737,11 @@ const PROGRAMS: ProgramData[] = [
           <div className="cadc-content">
             <p>The CADC Community Market is a mobile grocery store housed in a 42-foot customized trailer — bringing fresh, affordable, and nutritious food directly to communities across Southwest Oklahoma that have lost access to full-service grocery stores.</p>
             <p>The market is open to the general public regardless of ZIP code. No membership or eligibility required.</p>
+            <PhotoStrip dark={false} photos={[
+              { src: PHOTOS.communityMarket.trailerHero, alt: "CADC Community Market 42-foot mobile grocery trailer" },
+              { src: PHOTOS.communityMarket.freshProduce, alt: "Fresh produce available at the CADC Community Market" },
+              { src: PHOTOS.communityMarket.refrigeratedProduce, alt: "Refrigerated produce section of the Community Market" },
+            ]} />
             <div className="cadc-card">
               <p className="cadc-label">Mission</p>
               <p>To bring fresh, affordable, and nutritious food directly to every community we serve — breaking down barriers to access and fostering healthier, happier lives, one stop at a time.</p>
@@ -1576,6 +1773,12 @@ const PROGRAMS: ProgramData[] = [
         content: (
           <div className="cadc-content">
             <p>The Community Market carries 400+ SKUs — from fresh produce to frozen meals to household essentials. We stock the brands and products you know and trust.</p>
+            <PhotoGrid dark={false} photos={[
+              { src: PHOTOS.communityMarket.freshProduce, alt: "Fresh produce — watermelons, apples, sweet potatoes, onions" },
+              { src: PHOTOS.communityMarket.refrigeratedProduce, alt: "Refrigerated produce — grapes, peppers, tomatoes, carrots" },
+              { src: PHOTOS.communityMarket.frozen, alt: "Frozen foods — peaches, broccoli, ice cream bars" },
+              { src: PHOTOS.communityMarket.dairy, alt: "Dairy and refrigerated — eggs, butter, milk, yogurt" },
+            ]} />
             <div className="cadc-card">
               <p className="cadc-label">Top sellers by category</p>
               <div className="cadc-stack">
@@ -2622,6 +2825,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
     const firstSub = activeProgram.subAreas[0];
     return (
       <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
+        <ProgramHeroBanner slug={activeProgram.slug} dark={true} />
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
           <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -2760,6 +2964,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
       {/* Content below orbit — program landing */}
       {stage === "program" && activeProgram && !activeSubArea && (
         <div style={{ padding: "0 20px 80px", animation: "mobileContentIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+          <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
             <div style={{ background: T.blue, padding: "14px 20px" }}>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
