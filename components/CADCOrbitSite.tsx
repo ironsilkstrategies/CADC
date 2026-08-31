@@ -1461,117 +1461,129 @@ const SW_OK_COUNTIES: CountyDot[] = [
 
 // ─── Oklahoma 9-county SVG map ────────────────────────────────────────────────
 
-// ─── Oklahoma 9-county SVG map with real boundary polygons ───────────────────
-// Paths traced from actual SW Oklahoma county boundaries, scaled to 200×200 viewBox
-// County positions are geographically accurate relative to each other
+// ─── SW Oklahoma county map — all counties visible, CADC highlighted ──────────
+// 37 counties from US Census Bureau GeoJSON, projected to 500×380 SVG viewBox
+// Grey = context only. Blue highlighted = CADC service county (clickable).
 
-interface CountyPoly {
-  id: string;
-  name: string;
-  path: string;
-  lx: number;
-  ly: number;
-}
-
-// Real SVG paths derived from US Census Bureau GeoJSON county boundaries
-// Projected to 400×300 viewBox, geographically accurate
-const COUNTY_POLYS: CountyPoly[] = [
-  { id: "beckham", name: "Beckham", path: "M 16.0,163.7 L 16.0,142.1 L 80.0,142.1 L 80.1,134.3 L 112.0,134.3 L 112.0,138.2 L 112.6,169.6 L 105.2,169.7 L 105.2,169.8 L 48.8,169.6 L 48.8,177.5 L 32.9,177.4 L 16.0,177.4 L 16.0,163.7 Z", lx: 64.3, ly: 155.9 },
-  { id: "comanche", name: "Comanche", path: "M 296.3,224.7 L 280.9,224.7 L 273.1,229.9 L 241.6,229.9 L 241.6,232.5 L 217.9,233.8 L 217.9,224.6 L 193.1,224.6 L 193.1,216.8 L 193.1,193.2 L 224.3,193.3 L 303.8,193.3 L 304.2,193.3 L 304.3,209.0 L 296.4,208.9 L 296.3,224.7 Z", lx: 248.7, ly: 213.5 },
-  { id: "washita", name: "Washita", path: "M 75.6,36.5 L 122.4,36.3 L 122.4,16.0 L 145.8,19.3 L 172.9,35.9 L 172.9,44.2 L 173.6,75.4 L 109.3,75.1 L 77.0,75.1 L 75.6,36.5 Z", lx: 124.6, ly: 45.7 },
-  { id: "canadian", name: "Canadian", path: "M 367.3,138.3 L 367.3,146.1 L 367.3,149.7 L 367.3,149.9 L 365.3,150.0 L 363.6,150.6 L 362.1,150.9 L 360.0,150.5 L 359.3,150.8 L 357.4,151.0 L 352.2,149.0 L 351.3,149.8 L 349.7,149.8 L 349.1,150.2 L 348.4,149.6 L 346.8,149.4 L 346.1,150.1 L 342.8,149.9 L 303.3,146.1 L 271.5,146.1 L 270.5,130.4 L 270.5,114.7 L 286.5,114.8 L 366.9,114.7 L 367.3,138.3 Z", lx: 318.9, ly: 132.8 },
-  { id: "kiowa", name: "Kiowa", path: "M 224.1,171.4 L 224.3,193.3 L 193.1,193.2 L 193.1,216.8 L 166.7,216.8 L 166.7,212.9 L 151.3,212.8 L 159.0,207.1 L 144.4,207.0 L 144.7,193.7 L 129.7,196.2 L 120.7,193.0 L 117.5,176.4 L 105.2,169.8 L 105.2,169.7 L 112.6,169.6 L 204.6,169.7 L 224.1,171.4 Z", lx: 164.7, ly: 193.2 },
-  { id: "tillman", name: "Tillman", path: "M 174.1,252.8 L 171.9,252.3 L 157.8,251.9 L 148.9,252.2 L 143.2,251.7 L 138.1,251.0 L 135.0,244.0 L 135.0,242.1 L 135.3,241.1 L 135.0,239.9 L 133.6,225.8 L 151.3,212.8 L 166.7,212.9 L 166.7,216.8 L 193.1,216.8 L 193.1,224.6 L 217.9,224.6 L 217.9,233.8 L 225.8,240.3 L 225.7,255.9 L 221.6,255.8 L 219.3,255.9 L 217.3,256.7 L 212.1,258.1 L 202.3,258.1 L 188.3,256.6 L 179.0,253.9 L 174.1,252.8 Z", lx: 179.7, ly: 235.5 },
-  { id: "jefferson", name: "Jefferson", path: "M 321.1,280.3 L 321.1,280.3 L 324.8,276.1 L 325.9,271.3 L 320.2,270.3 L 314.8,271.0 L 311.5,271.0 L 304.9,270.1 L 304.4,269.9 L 301.7,267.4 L 292.2,260.1 L 296.8,257.6 L 296.7,244.3 L 383.7,244.3 L 383.7,262.9 L 384.0,264.0 L 384.0,279.6 L 380.9,279.4 L 380.0,279.2 L 378.6,278.2 L 378.5,277.8 L 379.8,274.8 L 379.7,274.6 L 376.7,273.3 L 369.6,271.4 L 367.3,271.2 L 364.8,271.6 L 364.0,271.9 L 362.9,272.9 L 357.9,276.2 L 350.1,280.3 L 342.7,283.3 L 338.0,284.0 L 336.2,283.9 L 322.8,281.1 L 321.1,280.3 Z", lx: 338.1, ly: 264.1 },
-  { id: "roger-mills", name: "Roger Mills", path: "M 16.0,124.3 L 16.0,100.7 L 27.4,97.7 L 32.9,91.0 L 44.8,89.9 L 46.0,98.0 L 58.7,102.6 L 82.7,102.0 L 92.1,91.9 L 109.4,88.8 L 110.2,106.9 L 112.0,134.3 L 80.1,134.3 L 80.0,142.1 L 16.0,142.1 L 16.0,124.3 Z", lx: 64.0, ly: 115.5 },
-  { id: "cotton", name: "Cotton", path: "M 292.2,260.1 L 287.6,259.9 L 273.4,258.4 L 272.5,258.3 L 268.7,256.8 L 262.8,256.2 L 259.9,257.1 L 257.6,258.8 L 257.3,259.4 L 252.3,261.7 L 246.1,264.6 L 241.7,263.9 L 234.2,258.4 L 230.7,257.0 L 227.3,255.9 L 225.7,255.9 L 225.8,240.3 L 217.9,233.8 L 241.6,232.5 L 241.6,229.9 L 273.1,229.9 L 280.9,224.7 L 296.3,224.7 L 296.7,224.7 L 296.7,244.3 L 296.8,257.6 L 292.2,260.1 Z", lx: 257.3, ly: 244.6 },
+const SW_OK_ALL_COUNTIES: {fips:string;name:string;slug:string|null;isCADC:boolean;path:string;lx:number;ly:number}[] = [
+  {fips:"40003",name:"Alfalfa",slug:null,isCADC:false,path:"M 396.0,56.3 L 396.0,70.4 L 362.3,70.4 L 361.5,12.3 L 371.2,12.4 L 376.4,12.5 L 377.0,12.5 L 385.5,12.5 L 387.0,12.5 L 387.8,12.5 L 390.2,12.5 L 392.6,12.4 L 395.4,12.4 L 395.6,56.3 L 396.0,56.3 Z",lx:378.7,ly:41.4},
+  {fips:"40007",name:"Beaver",slug:null,isCADC:false,path:"M 204.6,66.5 L 172.6,66.5 L 173.3,12.4 L 176.5,12.4 L 180.3,12.4 L 183.5,12.3 L 187.4,12.3 L 194.4,12.3 L 197.7,12.2 L 201.0,12.2 L 204.1,12.2 L 231.6,12.0 L 238.3,12.0 L 240.4,12.0 L 246.9,12.1 L 247.2,12.2 L 247.1,56.3 L 247.1,66.5 L 233.2,66.5 L 223.0,66.5 L 215.0,66.5 L 206.4,66.5 L 204.6,66.5 Z",lx:209.9,ly:39.3},
+  {fips:"40009",name:"Beckham",slug:"beckham",isCADC:true,path:"M 247.3,209.2 L 247.3,183.2 L 280.6,183.3 L 280.6,173.8 L 297.2,173.8 L 297.2,178.6 L 297.5,216.3 L 293.7,216.4 L 293.7,216.6 L 264.4,216.3 L 264.4,225.7 L 256.1,225.7 L 247.3,225.7 L 247.3,209.2 Z",lx:272.4,ly:199.8},
+  {fips:"40011",name:"Blaine",slug:null,isCADC:false,path:"M 354.2,102.7 L 357.0,102.6 L 387.7,102.7 L 387.9,150.4 L 379.6,150.4 L 379.6,169.2 L 355.3,169.2 L 354.6,169.2 L 354.6,140.9 L 354.2,102.7 Z",lx:371.1,ly:135.9},
+  {fips:"40015",name:"Caddo",slug:null,isCADC:false,path:"M 355.6,244.7 L 355.5,218.4 L 355.3,178.7 L 355.3,169.2 L 379.6,169.2 L 380.2,188.1 L 396.6,188.0 L 396.9,244.7 L 355.6,244.7 Z",lx:376.1,ly:207.0},
+  {fips:"40017",name:"Canadian",slug:"canadian",isCADC:true,path:"M 429.9,178.7 L 429.9,192.6 L 428.9,192.8 L 428.0,193.5 L 427.2,193.8 L 426.1,193.4 L 425.7,193.7 L 424.8,193.9 L 422.1,191.5 L 421.6,192.4 L 420.8,192.5 L 420.5,192.9 L 420.1,192.2 L 419.3,192.0 L 418.9,192.8 L 417.2,192.6 L 396.6,188.0 L 380.2,188.1 L 379.6,169.2 L 379.6,150.4 L 387.9,150.4 L 429.7,150.3 L 429.9,178.7 Z",lx:404.8,ly:172.1},
+  {fips:"40019",name:"Carter",slug:null,isCADC:false,path:"M 487.8,318.7 L 484.9,329.7 L 438.6,329.6 L 438.5,306.0 L 438.5,282.4 L 455.0,282.4 L 455.0,296.6 L 479.7,296.7 L 487.8,301.3 L 487.8,318.7 Z",lx:463.1,ly:306.0},
+  {fips:"40025",name:"Cimarron",slug:null,isCADC:false,path:"M 77.9,66.4 L 12.0,66.4 L 12.0,12.2 L 13.2,12.4 L 22.0,12.3 L 45.8,12.8 L 62.7,12.8 L 74.3,12.9 L 76.1,12.9 L 86.3,13.0 L 88.4,13.0 L 88.1,66.4 L 77.9,66.4 Z",lx:50.2,ly:39.3},
+  {fips:"40027",name:"Cleveland",slug:null,isCADC:false,path:"M 429.9,188.1 L 449.4,188.1 L 461.8,188.1 L 471.4,188.1 L 471.4,236.8 L 455.8,232.9 L 454.8,220.7 L 440.1,205.8 L 438.9,197.7 L 429.9,192.4 L 429.9,188.1 Z",lx:450.7,ly:212.4},
+  {fips:"40031",name:"Comanche",slug:"comanche",isCADC:true,path:"M 393.0,282.4 L 385.0,282.4 L 381.0,288.7 L 364.6,288.6 L 364.6,291.8 L 352.3,293.4 L 352.3,282.4 L 339.4,282.4 L 339.4,244.6 L 355.6,244.7 L 396.9,244.7 L 397.2,263.5 L 393.0,263.5 L 393.0,282.4 Z",lx:368.3,ly:269.0},
+  {fips:"40033",name:"Cotton",slug:"cotton",isCADC:true,path:"M 390.9,325.0 L 388.5,324.7 L 381.1,322.9 L 378.7,321.0 L 375.6,320.3 L 374.1,321.3 L 372.9,323.4 L 372.8,324.2 L 370.2,326.9 L 366.9,330.4 L 364.6,329.5 L 360.8,322.9 L 357.1,319.9 L 356.3,319.9 L 356.4,301.2 L 352.3,293.4 L 364.6,291.8 L 364.6,288.6 L 381.0,288.7 L 385.0,282.4 L 393.0,282.4 L 393.3,282.4 L 393.3,305.9 L 393.3,322.0 L 390.9,325.0 Z",lx:372.8,ly:306.4},
+  {fips:"40039",name:"Custer",slug:null,isCADC:false,path:"M 296.3,141.0 L 354.6,140.9 L 354.6,169.2 L 355.3,169.2 L 355.3,178.7 L 297.2,178.6 L 297.2,173.8 L 296.3,141.0 Z",lx:325.8,ly:159.8},
+  {fips:"40043",name:"Dewey",slug:null,isCADC:false,path:"M 295.9,119.2 L 295.8,102.8 L 329.2,103.1 L 354.2,102.7 L 354.6,140.9 L 296.3,141.0 L 295.9,119.2 Z",lx:325.2,ly:121.9},
+  {fips:"40045",name:"Ellis",slug:null,isCADC:false,path:"M 247.3,114.6 L 247.3,66.5 L 247.1,56.3 L 278.3,56.4 L 279.0,102.8 L 295.8,102.8 L 295.9,119.2 L 286.9,122.9 L 282.0,135.1 L 269.6,135.8 L 262.9,130.3 L 262.3,120.6 L 256.1,121.9 L 253.2,130.0 L 247.3,133.5 L 247.3,114.6 Z",lx:271.5,ly:96.1},
+  {fips:"40047",name:"Garfield",slug:null,isCADC:false,path:"M 446.3,56.3 L 446.4,56.3 L 446.4,102.8 L 429.6,102.8 L 396.0,102.7 L 396.0,56.3 L 446.3,56.3 Z",lx:421.2,ly:79.5},
+  {fips:"40049",name:"Garvin",slug:null,isCADC:false,path:"M 438.5,282.4 L 438.4,263.5 L 430.2,263.5 L 430.2,244.7 L 487.9,244.8 L 487.9,268.3 L 466.9,269.9 L 471.3,282.5 L 455.0,282.4 L 438.5,282.4 Z",lx:459.0,ly:263.6},
+  {fips:"40051",name:"Grady",slug:null,isCADC:false,path:"M 396.6,188.0 L 417.2,192.6 L 418.9,192.8 L 419.3,192.0 L 420.1,192.2 L 420.5,192.9 L 420.8,192.5 L 421.6,192.4 L 422.1,191.5 L 424.8,193.9 L 425.7,193.7 L 426.1,193.4 L 427.2,193.8 L 428.0,193.5 L 428.9,192.8 L 429.9,192.6 L 430.2,244.7 L 430.2,263.5 L 397.3,263.5 L 397.2,263.5 L 397.1,244.7 L 396.9,244.7 L 396.6,188.0 Z",lx:413.4,ly:225.8},
+  {fips:"40053",name:"Grant",slug:null,isCADC:false,path:"M 446.3,56.3 L 396.0,56.3 L 395.4,12.4 L 400.6,12.4 L 419.7,12.4 L 421.1,12.4 L 422.3,12.4 L 427.9,12.4 L 431.6,12.3 L 435.0,12.4 L 438.3,12.4 L 445.5,12.4 L 446.3,12.4 L 446.3,56.3 Z",lx:420.9,ly:34.3},
+  {fips:"40055",name:"Greer",slug:null,isCADC:false,path:"M 293.7,216.6 L 300.1,224.5 L 301.8,244.4 L 306.5,248.3 L 294.0,249.2 L 292.6,258.8 L 273.5,258.8 L 269.3,254.1 L 268.5,235.0 L 256.1,235.1 L 256.1,225.7 L 264.4,225.7 L 264.4,216.3 L 293.7,216.6 Z",lx:281.3,ly:237.6},
+  {fips:"40057",name:"Harmon",slug:null,isCADC:false,path:"M 247.3,256.5 L 247.3,225.7 L 256.1,225.7 L 256.1,235.1 L 268.5,235.0 L 269.3,254.1 L 273.5,258.8 L 273.5,282.4 L 259.4,282.6 L 253.4,275.1 L 247.5,276.5 L 247.3,276.6 L 247.3,256.5 Z",lx:260.4,ly:254.2},
+  {fips:"40059",name:"Harper",slug:null,isCADC:false,path:"M 247.2,12.1 L 264.2,12.1 L 274.2,12.2 L 282.0,12.3 L 286.5,12.3 L 290.0,12.3 L 296.5,25.4 L 302.6,31.8 L 302.6,56.1 L 278.3,56.4 L 247.1,56.3 L 247.2,12.1 Z",lx:274.9,ly:34.2},
+  {fips:"40065",name:"Jackson",slug:null,isCADC:false,path:"M 309.2,300.7 L 305.3,293.6 L 297.8,289.4 L 294.5,296.6 L 291.2,296.8 L 290.2,295.2 L 285.4,292.4 L 280.7,292.0 L 277.4,296.7 L 271.3,296.3 L 265.6,290.7 L 259.4,282.6 L 273.5,282.4 L 273.5,258.8 L 292.6,258.8 L 294.0,249.2 L 306.5,248.3 L 314.2,245.2 L 314.1,261.2 L 321.7,261.3 L 317.7,268.2 L 308.5,283.8 L 309.2,300.7 Z",lx:290.5,ly:273.0},
+  {fips:"40067",name:"Jefferson",slug:"jefferson",isCADC:true,path:"M 405.9,349.3 L 407.8,344.2 L 408.4,338.5 L 405.5,337.2 L 402.6,338.0 L 400.9,338.1 L 397.5,337.0 L 395.8,333.7 L 390.9,325.0 L 393.3,322.0 L 393.3,305.9 L 438.5,306.0 L 438.5,328.4 L 438.6,348.4 L 437.0,348.1 L 435.8,346.7 L 436.4,342.6 L 434.8,340.8 L 431.1,338.5 L 429.9,338.3 L 428.6,338.8 L 427.6,340.4 L 425.0,344.2 L 421.0,349.2 L 417.2,352.8 L 414.7,353.7 L 413.8,353.6 L 406.8,350.1 L 405.9,349.3 Z",lx:414.8,ly:329.8},
+  {fips:"40073",name:"Kingfisher",slug:null,isCADC:false,path:"M 396.0,102.7 L 429.6,102.8 L 429.7,150.3 L 387.9,150.4 L 387.7,102.7 L 396.0,102.7 Z",lx:408.7,ly:126.6},
+  {fips:"40075",name:"Kiowa",slug:"kiowa",isCADC:true,path:"M 355.5,218.4 L 355.6,244.7 L 339.4,244.6 L 339.4,272.9 L 325.7,272.9 L 325.7,268.2 L 317.7,268.2 L 321.7,261.3 L 314.1,261.2 L 314.2,245.2 L 306.5,248.3 L 301.8,244.4 L 300.1,224.5 L 293.7,216.6 L 293.7,216.4 L 297.5,216.3 L 345.3,216.4 L 355.5,218.4 Z",lx:324.6,ly:244.6},
+  {fips:"40083",name:"Logan",slug:null,isCADC:false,path:"M 471.5,126.9 L 471.5,150.5 L 429.7,150.3 L 429.6,102.8 L 446.4,102.8 L 454.8,103.4 L 454.8,122.2 L 457.2,119.4 L 471.5,126.9 Z",lx:450.6,ly:126.6},
+  {fips:"40085",name:"Love",slug:null,isCADC:false,path:"M 484.7,344.3 L 483.7,349.6 L 475.3,366.3 L 471.8,367.8 L 469.8,366.7 L 466.5,359.0 L 466.5,357.0 L 458.2,351.2 L 453.3,356.9 L 449.1,356.9 L 446.3,354.5 L 447.2,351.3 L 447.2,349.1 L 444.6,346.5 L 443.3,346.1 L 441.9,346.7 L 439.8,348.1 L 438.6,348.4 L 438.6,329.6 L 484.9,329.7 L 487.7,342.4 L 484.7,344.3 Z",lx:463.1,ly:348.8},
+  {fips:"40093",name:"Major",slug:null,isCADC:false,path:"M 354.2,102.7 L 329.2,103.1 L 328.9,65.7 L 338.0,65.7 L 340.8,70.7 L 355.1,78.1 L 362.3,77.5 L 362.3,70.4 L 396.0,70.4 L 396.0,102.7 L 354.2,102.7 Z",lx:362.5,ly:84.4},
+  {fips:"40087",name:"McClain",slug:null,isCADC:false,path:"M 429.9,192.6 L 438.9,197.7 L 440.1,205.8 L 454.8,220.7 L 455.8,232.9 L 471.4,236.8 L 488.0,232.8 L 488.0,244.7 L 487.9,244.8 L 430.2,244.7 L 429.9,192.6 Z",lx:459.0,ly:218.6},
+  {fips:"40109",name:"Oklahoma",slug:null,isCADC:false,path:"M 461.8,188.1 L 449.4,188.1 L 429.9,188.1 L 429.9,178.7 L 429.7,150.3 L 471.5,150.5 L 471.5,178.7 L 471.4,188.1 L 461.8,188.1 Z",lx:450.6,ly:169.2},
+  {fips:"40129",name:"Roger Mills",slug:"roger-mills",isCADC:true,path:"M 247.3,161.9 L 247.3,133.5 L 253.2,130.0 L 256.1,121.9 L 262.3,120.6 L 262.9,130.3 L 269.6,135.8 L 282.0,135.1 L 286.9,122.9 L 295.9,119.2 L 296.3,141.0 L 297.2,173.8 L 280.6,173.8 L 280.6,183.3 L 247.3,183.2 L 247.3,161.9 Z",lx:272.3,ly:151.2},
+  {fips:"40137",name:"Stephens",slug:null,isCADC:false,path:"M 393.0,282.4 L 393.0,263.5 L 430.2,263.5 L 438.4,263.5 L 438.5,282.4 L 438.5,306.0 L 393.3,305.9 L 393.3,282.4 L 393.0,282.4 Z",lx:415.7,ly:284.8},
+  {fips:"40139",name:"Texas",slug:null,isCADC:false,path:"M 170.8,66.5 L 88.1,66.4 L 88.4,13.0 L 98.2,12.9 L 121.8,12.8 L 130.9,12.7 L 136.5,12.7 L 140.8,12.6 L 152.3,12.6 L 163.8,12.5 L 164.8,12.5 L 168.0,12.4 L 173.3,12.4 L 172.6,66.5 L 170.8,66.5 Z",lx:130.7,ly:39.5},
+  {fips:"40141",name:"Tillman",slug:"tillman",isCADC:true,path:"M 329.5,316.2 L 321.0,315.2 L 316.4,315.5 L 313.5,314.9 L 310.8,314.0 L 309.2,305.7 L 309.2,300.8 L 308.5,283.8 L 317.7,268.2 L 325.7,268.2 L 325.7,272.9 L 339.4,272.9 L 339.4,282.4 L 352.3,282.4 L 352.3,293.4 L 356.4,301.2 L 356.3,319.9 L 354.2,319.8 L 349.3,322.6 L 344.2,322.6 L 336.9,320.8 L 332.0,317.5 L 329.5,316.2 Z",lx:332.4,ly:295.4},
+  {fips:"40149",name:"Washita",slug:"washita",isCADC:true,path:"M 355.5,218.4 L 345.3,216.4 L 297.5,216.3 L 297.2,178.6 L 355.3,178.7 L 355.5,218.4 Z",lx:326.3,ly:198.5},
+  {fips:"40151",name:"Woods",slug:null,isCADC:false,path:"M 302.6,31.8 L 296.5,25.4 L 290.0,12.3 L 335.1,12.3 L 341.7,12.3 L 347.8,12.3 L 361.5,12.3 L 362.3,70.4 L 362.3,77.5 L 355.1,78.1 L 340.8,70.7 L 338.0,65.7 L 328.9,55.7 L 314.8,35.8 L 302.6,31.8 Z",lx:326.2,ly:45.2},
+  {fips:"40153",name:"Woodward",slug:null,isCADC:false,path:"M 278.3,56.4 L 302.6,56.1 L 302.6,31.8 L 314.8,35.8 L 328.9,55.7 L 328.9,65.7 L 329.2,103.1 L 295.8,102.8 L 279.0,102.8 L 278.3,56.4 Z",lx:303.8,ly:67.4},
 ];
 
-function OklahomaCountyMap({
-  selectedCounty,
-  onSelectCounty,
-  dark,
-}: {
+function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
   selectedCounty: string | null;
   onSelectCounty: (id: string) => void;
   dark: boolean;
 }) {
   const [hovered, setHovered] = useState<string | null>(null);
 
-  const countyFill = dark ? "rgba(1,1,255,0.12)" : "rgba(1,1,255,0.09)";
-  const countyFillHover = dark ? "rgba(1,1,255,0.32)" : "rgba(1,1,255,0.22)";
-  const countyFillSelected = "#0101FF";
-  const countyStroke = dark ? "rgba(1,1,255,0.35)" : "rgba(1,1,255,0.35)";
-  const countyStrokeSelected = "#0101FF";
-  const labelColor = dark ? "rgba(255,255,255,0.85)" : "#1a1a4e";
-  const labelSelected = "white";
-  const bg = dark ? "rgba(0,0,30,0.4)" : "rgba(235,237,255,0.6)";
+  const bg = dark ? "rgba(0,0,20,0.6)" : "#eaecf5";
+  const greyFill = dark ? "rgba(255,255,255,0.04)" : "#dde0ef";
+  const greyStroke = dark ? "rgba(255,255,255,0.1)" : "#b8bcd0";
+  const cadcFill = dark ? "rgba(1,1,255,0.22)" : "rgba(1,1,255,0.13)";
+  const cadcStroke = dark ? "rgba(1,1,255,0.55)" : "rgba(1,1,255,0.45)";
+  const cadcHover = dark ? "rgba(1,1,255,0.4)" : "rgba(1,1,255,0.28)";
+  const greyLabel = dark ? "rgba(255,255,255,0.18)" : "#a0a4b8";
+  const cadcLabel = dark ? "rgba(255,255,255,0.9)" : "#1a1a5e";
+  const selectedFill = "#0101FF";
+  const selectedLabel = "white";
 
   return (
-    <svg
-      viewBox="0 0 400 300"
-      style={{ width: "100%", display: "block" }}
-      aria-label="CADC 9-county service area map — tap a county to see services"
-    >
-      {/* Background */}
-      <rect x={0} y={0} width={400} height={300} fill={bg} rx={6} />
+    <svg viewBox="0 0 500 380" style={{ width: "100%", display: "block" }}
+      aria-label="SW Oklahoma county map — CADC service counties highlighted in blue">
+      <rect x={0} y={0} width={500} height={380} fill={bg} rx={8} />
 
-      {/* County shapes — real GeoJSON boundary paths */}
-      {COUNTY_POLYS.map(county => {
-        const isSelected = selectedCounty === county.id;
-        const isHovered = hovered === county.id;
+      {/* Grey background counties first */}
+      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC).map(c => (
+        <g key={c.fips}>
+          <path d={c.path} fill={greyFill} stroke={greyStroke} strokeWidth={0.6} strokeLinejoin="round" />
+          <text x={c.lx} y={c.ly} textAnchor="middle" dominantBaseline="middle"
+            fontSize={4.5} fill={greyLabel} style={{ pointerEvents:"none", userSelect:"none" }}>
+            {c.name}
+          </text>
+        </g>
+      ))}
 
+      {/* CADC counties on top — interactive */}
+      {SW_OK_ALL_COUNTIES.filter(c => c.isCADC).map(c => {
+        const isSel = selectedCounty === c.slug;
+        const isHov = hovered === c.slug;
         return (
-          <g key={county.id} style={{ cursor: "pointer" }}>
+          <g key={c.fips} style={{ cursor: "pointer" }}>
             <path
-              d={county.path}
-              fill={isSelected ? countyFillSelected : isHovered ? countyFillHover : countyFill}
-              stroke={isSelected ? countyStrokeSelected : countyStroke}
-              strokeWidth={isSelected ? 2 : 1}
+              d={c.path}
+              fill={isSel ? selectedFill : isHov ? cadcHover : cadcFill}
+              stroke={isSel ? selectedFill : cadcStroke}
+              strokeWidth={isSel ? 2 : 1.2}
               strokeLinejoin="round"
               style={{ transition: "fill 0.18s ease" }}
-              onMouseEnter={() => setHovered(county.id)}
+              onMouseEnter={() => setHovered(c.slug)}
               onMouseLeave={() => setHovered(null)}
-              onClick={() => onSelectCounty(county.id)}
+              onClick={() => c.slug && onSelectCounty(c.slug)}
             />
-            {/* Red dot marker */}
-            {!isSelected && (
-              <circle
-                cx={county.lx}
-                cy={county.ly - 10}
-                r={3}
-                fill={isHovered ? "#0101FF" : "#CC0000"}
-                style={{ pointerEvents: "none", transition: "fill 0.15s" }}
-              />
+            {!isSel && (
+              <circle cx={c.lx} cy={c.ly - 9} r={3}
+                fill={isHov ? "#0101FF" : "#CC0000"}
+                style={{ pointerEvents:"none", transition:"fill 0.15s" }} />
             )}
-            {/* County label */}
-            <text
-              x={county.lx}
-              y={county.ly + 4}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize={isSelected ? 9 : 8}
-              fontWeight={isSelected ? "800" : "600"}
-              fill={isSelected ? labelSelected : labelColor}
-              style={{ pointerEvents: "none", userSelect: "none" }}
-            >
-              {county.name}
+            <text x={c.lx} y={c.ly + 4} textAnchor="middle" dominantBaseline="middle"
+              fontSize={isSel ? 7.5 : 6.5} fontWeight={isSel ? "800" : "700"}
+              fill={isSel ? selectedLabel : cadcLabel}
+              style={{ pointerEvents:"none", userSelect:"none" }}>
+              {c.name}
             </text>
           </g>
         );
       })}
 
       {/* Legend */}
-      <g transform="translate(10, 288)">
-        <rect x={0} y={-6} width={12} height={8} rx={1}
-          fill={countyFill} stroke={countyStroke} strokeWidth={0.8} />
-        <text x={15} y={0} fontSize={7} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>CADC County</text>
-        <circle cx={80} cy={-2} r={3} fill="#CC0000" />
-        <text x={86} y={0} fontSize={7} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>Tap to see services</text>
+      <g transform="translate(12,370)">
+        <rect x={0} y={-5} width={10} height={7} rx={1} fill={cadcFill} stroke={cadcStroke} strokeWidth={0.8}/>
+        <text x={13} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>CADC County</text>
+        <rect x={72} y={-5} width={10} height={7} rx={1} fill={greyFill} stroke={greyStroke} strokeWidth={0.8}/>
+        <text x={85} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Other County</text>
+        <circle cx={145} cy={-1.5} r={3} fill="#CC0000"/>
+        <text x={151} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
       </g>
     </svg>
   );
 }
+
 
 // ─── Main Orbit component ─────────────────────────────────────────────────────
 
