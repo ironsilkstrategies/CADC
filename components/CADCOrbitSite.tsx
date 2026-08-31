@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import CADCServiceMap from "./CADCServiceMap";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -25,8 +26,8 @@ const T = {
   blue:        "#0101FF",
   blueDark:    "#0000B8",
   blueLight:   "#E4E4FF",
-  maroon:      "#7E0001",
-  maroonDark:  "#5C0001",
+  maroon:      "#CC0000",
+  maroonDark:  "#8B0000",
   void:        "#000014",
   ghost:       "#F8F8FF",
   surface:     "#ffffff",
@@ -482,13 +483,23 @@ function MealCalendarPanel() {
       </p>
       <MealCalendar dark={isDesktop} />
       <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(126,0,1,0.9)" : "#7E0001", margin: "0 0 6px" }}>About our menus</p>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(204,0,0,0.9)" : "#CC0000", margin: "0 0 6px" }}>About our menus</p>
         <p style={{ fontSize: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers. Each menu cycle covers three months.</p>
       </div>
       <div style={{ marginTop: 10, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(126,0,1,0.9)" : "#7E0001", margin: "0 0 6px" }}>Questions about the menu?</p>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(204,0,0,0.9)" : "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
         <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-335-5588</a>
       </div>
+    </div>
+  );
+}
+
+// ServiceMapPanel — wraps CADCServiceMap with dark/light context detection
+function ServiceMapPanel() {
+  const isDesktop = useIsDesktop();
+  return (
+    <div className="cadc-content">
+      <CADCServiceMap dark={isDesktop} />
     </div>
   );
 }
@@ -1236,6 +1247,10 @@ const PROGRAMS: ProgramData[] = [
             </div>
           </div>
         ),
+      },
+      {
+        id: "service-map", label: "Service Area Map", shortLabel: "Map", icon: "🗺️",
+        content: <ServiceMapPanel />,
       },
     ],
   },
@@ -2067,7 +2082,7 @@ function DesktopStyles() {
       .cadc-dark-content .cadc-card { background: rgba(1,1,255,0.12); border: 1px solid rgba(1,1,255,0.25); border-radius: 12px; padding: 16px; margin: 14px 0; }
       .cadc-dark-content .cadc-card-sm { background: rgba(1,1,255,0.1); border: 1px solid rgba(1,1,255,0.2); border-radius: 10px; padding: 14px; margin: 8px 0; }
       .cadc-dark-content .cadc-card-title { color: rgba(1,1,255,0.9); font-weight: 700; font-size: 12px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-      .cadc-dark-content .cadc-label { color: rgba(126,0,1,0.9); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; }
+      .cadc-dark-content .cadc-label { color: rgba(204,0,0,0.9); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; }
       .cadc-dark-content .cadc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
       .cadc-dark-content .cadc-list li { color: rgba(255,255,255,0.65); font-size: 13px; padding-left: 14px; position: relative; }
       .cadc-dark-content .cadc-list li::before { content: "·"; position: absolute; left: 0; color: ${T.blue}; font-weight: 700; }
