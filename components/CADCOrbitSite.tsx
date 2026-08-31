@@ -1766,22 +1766,24 @@ function DesktopContentPanel({ stage, activeProgram, activeSubArea }: { stage: S
   }
 
   if (stage === "program" && activeProgram) {
+    // Show first sub-area content immediately — no dead prompt
+    const firstSub = activeProgram.subAreas[0];
     return (
-      <div style={{ maxWidth: 520, color: "white", animation: "fadeSlideIn 0.4s ease" }}>
-        <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>{activeProgram.tagline}</p>
-        <h2 style={{ fontSize: "clamp(1.6rem,2.8vw,2.4rem)", fontWeight: 800, lineHeight: 1.15, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif" }}>
-          {activeProgram.icon} {activeProgram.name}
-        </h2>
-        <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
-          Select an area from the orbit to explore this program in detail.
-        </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {activeProgram.subAreas.map(a => (
-            <div key={a.id} style={{ background: "rgba(1,1,255,0.12)", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 6, padding: "6px 12px", fontSize: 12, color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>
-              {a.icon} {a.shortLabel}
-            </div>
-          ))}
+      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
+          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+            {activeProgram.icon} {activeProgram.name}
+          </h2>
         </div>
+        {firstSub && (
+          <div className="cadc-dark-content">
+            {firstSub.content}
+          </div>
+        )}
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>
+          Select any node in the orbit for more detail.
+        </p>
       </div>
     );
   }
@@ -1871,11 +1873,20 @@ function MobileLayout({ stage, activeProgram, activeSubArea, glowNode, popNode, 
       )}
 
       {stage === "program" && activeProgram && !activeSubArea && (
-        <div style={{ padding: "16px 20px 80px" }}>
-          <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, padding: 20 }}>
-            <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 8px" }}>{activeProgram.tagline}</p>
-            <h2 style={{ color: T.blue, fontWeight: 800, fontSize: 20, margin: "0 0 8px", fontFamily: "'Space Grotesk', sans-serif" }}>{activeProgram.icon} {activeProgram.name}</h2>
-            <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, margin: 0 }}>Tap any node in the orbit above to explore this program.</p>
+        <div style={{ padding: "16px 20px 80px", animation: "mobileContentIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+          <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
+            <div style={{ background: T.blue, padding: "14px 20px" }}>
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
+              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+                {activeProgram.icon} {activeProgram.name}
+              </h2>
+            </div>
+            <div style={{ padding: 20 }} className="cadc-light-content">
+              {activeProgram.subAreas[0]?.content}
+            </div>
+            <div style={{ padding: "0 20px 16px" }}>
+              <p style={{ color: T.textMuted, fontSize: 11, fontStyle: "italic", margin: 0 }}>Tap any node in the orbit above to explore more.</p>
+            </div>
           </div>
         </div>
       )}
