@@ -1034,6 +1034,8 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
 }
 
 
+const PROGRAMS: ProgramData[] = [
+
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
   {
     slug: "head-start",
