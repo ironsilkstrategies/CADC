@@ -504,7 +504,536 @@ function ServiceMapPanel() {
   );
 }
 
-const PROGRAMS: ProgramData[] = [
+// ─── Spring Physics Engine ────────────────────────────────────────────────────
+// Real spring simulation: F = -k*x - d*v (Hooke's law + damping)
+// Runs on requestAnimationFrame for silky 60fps motion
+
+interface SpringState { value: number; velocity: number; target: number; }
+
+function createSpring(value = 0): SpringState {
+  return { value, velocity: 0, target: value };
+}
+
+function tickSpring(s: SpringState, stiffness = 200, damping = 26, dt = 0.016): SpringState {
+  const force = -stiffness * (s.value - s.target) - damping * s.velocity;
+  const velocity = s.velocity + force * dt;
+  const value = s.value + velocity * dt;
+  const settled = Math.abs(value - s.target) < 0.001 && Math.abs(velocity) < 0.001;
+  return { value: settled ? s.target : value, velocity: settled ? 0 : velocity, target: s.target };
+}
+
+// Orbit node spring — governs scale, opacity, position offset
+interface NodeSpring {
+  scale: SpringState;
+  opacity: SpringState;
+  offsetX: SpringState;
+  offsetY: SpringState;
+  glow: SpringState;
+}
+
+function createNodeSpring(opacity = 0): NodeSpring {
+  return {
+    scale:   createSpring(0.4),
+    opacity: createSpring(opacity),
+    offsetX: createSpring(0),
+    offsetY: createSpring(0),
+    glow:    createSpring(0),
+  };
+}
+
+// Particle burst on tap
+interface Particle {
+  id: number;
+  x: number; y: number;
+  vx: number; vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  color: string;
+}
+
+function spawnParticles(cx: number, cy: number, count = 18): Particle[] {
+  const colors = ["#0101FF","#4444FF","#8888FF","#CC0000","#ffffff"];
+  return Array.from({length: count}, (_, i) => {
+    const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+    const speed = 120 + Math.random() * 180;
+    return {
+      id: i,
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      maxLife: 0.6 + Math.random() * 0.5,
+      size: 2 + Math.random() * 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    };
+  });
+}
+
+// Shockwave ring on tap
+interface Shockwave {
+  id: number;
+  x: number; y: number;
+  radius: number;
+  maxRadius: number;
+  life: number;
+  color: string;
+}
+
+function spawnShockwaves(cx: number, cy: number): Shockwave[] {
+  return [
+    {id:0, x:cx, y:cy, radius:0, maxRadius:120, life:1, color:"rgba(1,1,255,0.7)"},
+    {id:1, x:cx, y:cy, radius:0, maxRadius:200, life:1, color:"rgba(1,1,255,0.4)"},
+    {id:2, x:cx, y:cy, radius:0, maxRadius:300, life:1, color:"rgba(204,0,0,0.25)"},
+  ];
+}
+
+// ─── Canvas Overlay Component ─────────────────────────────────────────────────
+// Renders particles + shockwaves on a canvas overlay
+
+function CanvasOverlay({ particles, shockwaves, width, height }: {
+  particles: Particle[];
+  shockwaves: Shockwave[];
+  width: number;
+  height: number;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw shockwaves
+    shockwaves.forEach(sw => {
+      if (sw.life <= 0) return;
+      const progress = 1 - sw.life;
+      const r = sw.maxRadius * progress;
+      const alpha = sw.life * 0.8;
+      ctx.beginPath();
+      ctx.arc(sw.x, sw.y, r, 0, Math.PI * 2);
+      ctx.strokeStyle = sw.color.replace(/[\d.]+\)$/, `${alpha})`);
+      ctx.lineWidth = 2 * sw.life;
+      ctx.stroke();
+    });
+
+    // Draw particles
+    particles.forEach(p => {
+      if (p.life <= 0) return;
+      const alpha = p.life;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fillStyle = p.color.replace(")", `,${alpha})`).replace("rgb(","rgba(") || `rgba(1,1,255,${alpha})`;
+      ctx.fill();
+      // Glow
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(1,1,255,${alpha * 0.2})`;
+      ctx.fill();
+    });
+  }, [particles, shockwaves, width, height]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={width}
+      height={height}
+      style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:20 }}
+    />
+  );
+}
+
+// ─── Spring Orbit Component ───────────────────────────────────────────────────
+// Full spring-physics driven orbit with particles, shockwaves, magnetic hover
+
+function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapProgram, tapSubArea, isMobile = false }: {
+  stage: Stage; activeProgram: ProgramData | null; availablePrograms: ProgramData[];
+  glowNode: string | null; popNode: string | null; beamNode: string | null;
+  orbitTx: TransitionState; assembled: boolean;
+  tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
+  isMobile?: boolean;
+}) {
+  const isSubLevel = stage === "program" || stage === "content";
+  const items = isSubLevel ? (activeProgram?.subAreas ?? []) : availablePrograms;
+
+  // Spring states for each node (keyed by id/slug)
+  const nodeSpringMap = useRef<Map<string, NodeSpring>>(new Map());
+  const rafRef = useRef<number>(0);
+  const [, forceUpdate] = useState(0);
+
+  // Particle / shockwave state
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [shockwaves, setShockwaves] = useState<Shockwave[]>([]);
+
+  // Orbit slow rotation angle
+  const idleAngle = useRef(0);
+  const lastTime = useRef(performance.now());
+
+  // Mouse position for magnetic effect
+  const mouseRef = useRef<{x:number;y:number}>({x:-9999,y:-9999});
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Hub spring
+  const hubScale = useRef(createSpring(0));
+  const hubGlow = useRef(createSpring(0));
+  const hubPulse = useRef(0);
+
+  const RADIUS = isMobile ? 36 : 38;
+  const SIZE = isMobile ? "min(92vw,400px)" : "min(80vw,420px)";
+  const NODE_SIZE = isMobile ? 42 : 58;
+
+  // Initialize / sync node springs when items change
+  useEffect(() => {
+    const newMap = new Map<string, NodeSpring>();
+    items.forEach((item, i) => {
+      const id = isSubLevel ? (item as SubArea).id : (item as ProgramData).slug;
+      const existing = nodeSpringMap.current.get(id);
+      if (existing) {
+        newMap.set(id, existing);
+      } else {
+        newMap.set(id, createNodeSpring(0));
+      }
+      // Target: visible
+      const spring = newMap.get(id)!;
+      spring.scale.target = 1;
+      spring.opacity.target = 1;
+    });
+    // Fade out removed nodes
+    nodeSpringMap.current.forEach((spring, id) => {
+      if (!newMap.has(id)) {
+        spring.scale.target = 0;
+        spring.opacity.target = 0;
+        newMap.set(id, spring);
+      }
+    });
+    nodeSpringMap.current = newMap;
+    hubScale.current.target = 1;
+    hubGlow.current.target = 1;
+  }, [items.length, stage]);
+
+  // Handle orbitTx transitions
+  useEffect(() => {
+    if (orbitTx === "out") {
+      nodeSpringMap.current.forEach(spring => {
+        spring.scale.target = 0.2;
+        spring.opacity.target = 0;
+        spring.offsetX.target = (Math.random() - 0.5) * 40;
+        spring.offsetY.target = (Math.random() - 0.5) * 40;
+      });
+      hubScale.current.target = 1.3;
+      hubGlow.current.target = 2;
+    } else if (orbitTx === "in") {
+      setTimeout(() => {
+        nodeSpringMap.current.forEach((spring, _id) => {
+          spring.scale.target = 1;
+          spring.opacity.target = 1;
+          spring.offsetX.target = 0;
+          spring.offsetY.target = 0;
+        });
+        hubScale.current.target = 1;
+        hubGlow.current.target = 1;
+      }, 80);
+    }
+  }, [orbitTx]);
+
+  // Handle popNode — spring burst
+  useEffect(() => {
+    if (!popNode) return;
+    const spring = nodeSpringMap.current.get(popNode);
+    if (spring) {
+      spring.scale.target = 1.5;
+      spring.glow.target = 1;
+      setTimeout(() => {
+        if (spring) { spring.scale.target = 1; spring.glow.target = 0; }
+      }, 400);
+    }
+  }, [popNode]);
+
+  // Main animation loop
+  useEffect(() => {
+    let frameId: number;
+
+    function loop(now: number) {
+      const dt = Math.min((now - lastTime.current) / 1000, 0.05);
+      lastTime.current = now;
+
+      // Idle orbit rotation — slow drift
+      if (orbitTx === "idle" && assembled) {
+        idleAngle.current += dt * 0.06; // ~3.4° per second
+      }
+
+      // Hub pulse
+      hubPulse.current += dt * 2.4;
+
+      // Tick hub springs
+      hubScale.current = tickSpring(hubScale.current, 180, 22, dt);
+      hubGlow.current = tickSpring(hubGlow.current, 120, 18, dt);
+
+      // Get container rect for mouse offset
+      const rect = containerRef.current?.getBoundingClientRect();
+
+      // Tick node springs + magnetic
+      let needsUpdate = false;
+      nodeSpringMap.current.forEach((spring, id) => {
+        const idx = items.findIndex(item =>
+          isSubLevel ? (item as SubArea).id === id : (item as ProgramData).slug === id
+        );
+        if (idx === -1) return;
+
+        const baseAngle = (idx / items.length) * Math.PI * 2;
+        const angle = baseAngle + idleAngle.current;
+        const pct = RADIUS; // percent of orbit
+        const cx = 50 + Math.cos(angle) * pct; // 0-100 space
+        const cy = 50 + Math.sin(angle) * pct;
+
+        // Magnetic hover
+        if (rect && stage !== "entry" && stage !== "map") {
+          const svgW = rect.width;
+          const svgH = rect.height; // orbit is square
+          const nodePixX = (cx / 100) * svgW;
+          const nodePixY = (cy / 100) * svgH;
+          const mx = mouseRef.current.x - rect.left;
+          const my = mouseRef.current.y - rect.top;
+          const dist = Math.hypot(mx - nodePixX, my - nodePixY);
+          const magnetRadius = 60;
+          if (dist < magnetRadius) {
+            const strength = (1 - dist / magnetRadius) * 8;
+            spring.offsetX.target = (mx - nodePixX) * strength / NODE_SIZE;
+            spring.offsetY.target = (my - nodePixY) * strength / NODE_SIZE;
+          } else {
+            spring.offsetX.target = 0;
+            spring.offsetY.target = 0;
+          }
+        }
+
+        const prev = { ...spring };
+        spring.scale   = tickSpring(spring.scale,   220, 24, dt);
+        spring.opacity = tickSpring(spring.opacity,  160, 20, dt);
+        spring.offsetX = tickSpring(spring.offsetX,  300, 32, dt);
+        spring.offsetY = tickSpring(spring.offsetY,  300, 32, dt);
+        spring.glow    = tickSpring(spring.glow,     180, 28, dt);
+
+        if (
+          Math.abs(prev.scale.value - spring.scale.value) > 0.0001 ||
+          Math.abs(prev.opacity.value - spring.opacity.value) > 0.0001
+        ) needsUpdate = true;
+      });
+
+      // Tick particles
+      setParticles(prev => {
+        const next = prev
+          .map(p => ({
+            ...p,
+            x: p.x + p.vx * dt,
+            y: p.y + p.vy * dt,
+            vx: p.vx * 0.92,
+            vy: p.vy * 0.92 + 60 * dt, // gravity
+            life: p.life - dt / p.maxLife,
+          }))
+          .filter(p => p.life > 0);
+        return next.length !== prev.length || next.some((p,i) => Math.abs(p.life - prev[i]?.life) > 0.001)
+          ? next : prev;
+      });
+
+      // Tick shockwaves
+      setShockwaves(prev => {
+        const next = prev
+          .map((sw, i) => ({
+            ...sw,
+            life: sw.life - dt / (0.5 + i * 0.15),
+          }))
+          .filter(sw => sw.life > 0);
+        return next.length !== prev.length ? next : prev;
+      });
+
+      if (needsUpdate) forceUpdate(n => n + 1);
+
+      frameId = requestAnimationFrame(loop);
+    }
+
+    frameId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(frameId);
+  }, [items.length, stage, orbitTx, assembled, isSubLevel]);
+
+  // Mouse tracking
+  useEffect(() => {
+    function onMove(e: MouseEvent) { mouseRef.current = {x: e.clientX, y: e.clientY}; }
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+
+  function handleNodeTap(item: ProgramData | SubArea, e: React.MouseEvent | React.TouchEvent) {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    // Spawn burst
+    setParticles(prev => [...prev, ...spawnParticles(cx, cy)]);
+    setShockwaves(spawnShockwaves(cx, cy));
+    if (isSubLevel) tapSubArea(item as SubArea);
+    else tapProgram(item as ProgramData);
+  }
+
+  const hubS = hubScale.current.value;
+  const hubG = hubGlow.current.value;
+  const pulseAlpha = (Math.sin(hubPulse.current) * 0.5 + 0.5) * 0.4;
+
+  return (
+    <div ref={containerRef} style={{ position:"relative", width: SIZE, aspectRatio:"1/1", margin:"0 auto" }}>
+
+      {/* Particle/shockwave canvas */}
+      <CanvasOverlay
+        particles={particles}
+        shockwaves={shockwaves}
+        width={isMobile ? 400 : 420}
+        height={isMobile ? 400 : 420}
+      />
+
+      {/* Ambient rings */}
+      <div style={{
+        position:"absolute", inset:"6%", borderRadius:"50%",
+        border:"1px solid rgba(1,1,255,0.12)",
+        boxShadow:`0 0 ${40 + hubG*20}px rgba(1,1,255,${0.06 + pulseAlpha*0.1})`,
+        pointerEvents:"none",
+      }}/>
+      <div style={{
+        position:"absolute", inset:"18%", borderRadius:"50%",
+        border:`1px solid rgba(1,1,255,${0.06 + pulseAlpha * 0.15})`,
+        pointerEvents:"none",
+      }}/>
+
+      {/* SVG connector lines */}
+      <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",overflow:"visible"}} viewBox="0 0 100 100" aria-hidden>
+        {items.map((item, i) => {
+          const id = isSubLevel ? (item as SubArea).id : (item as ProgramData).slug;
+          const spring = nodeSpringMap.current.get(id);
+          const baseAngle = (i / items.length) * Math.PI * 2;
+          const angle = baseAngle + idleAngle.current;
+          const x = 50 + Math.cos(angle) * RADIUS;
+          const y = 50 + Math.sin(angle) * RADIUS;
+          const isGlowing = id === glowNode || id === popNode;
+          const opacity = spring?.opacity.value ?? 0;
+          return (
+            <line key={id}
+              x1={50} y1={50} x2={x} y2={y}
+              stroke={isGlowing ? "rgba(1,1,255,0.7)" : `rgba(1,1,255,${0.08 + pulseAlpha * 0.12})`}
+              strokeWidth={isGlowing ? 1.2 : 0.5}
+              strokeDasharray="2 3"
+              opacity={opacity}
+              style={{transition:"stroke 0.3s,stroke-width 0.3s"}}
+            />
+          );
+        })}
+      </svg>
+
+      {/* Hub center */}
+      <div style={{
+        position:"absolute", left:"50%", top:"50%",
+        width: isMobile ? "clamp(60px,18vw,80px)" : "clamp(72px,16%,88px)",
+        aspectRatio:"1/1",
+        transform:`translate(-50%,-50%) scale(${hubS})`,
+        borderRadius:"50%",
+        background: isMobile ? "white" : T.void,
+        border:`2.5px solid ${T.blue}`,
+        boxShadow:`0 0 0 ${8*hubG}px rgba(1,1,255,${0.04+pulseAlpha*0.08}), 0 0 ${40*hubG}px rgba(1,1,255,${0.2+pulseAlpha*0.15}), inset 0 0 20px rgba(1,1,255,${0.05+pulseAlpha*0.05})`,
+        display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
+        transition:"transform 0s", // let spring handle it
+      }}>
+        <span style={{fontSize: isMobile ? "clamp(1rem,5vw,1.4rem)" : "clamp(1rem,2.5vw,1.4rem)"}}>
+          {isSubLevel ? activeProgram?.icon : "🏛️"}
+        </span>
+        <span style={{
+          color:T.blue,
+          fontSize: isMobile ? "clamp(0.35rem,1.8vw,0.5rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
+          fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase",
+          textAlign:"center", padding:"0 4px", lineHeight:1.2,
+          opacity: orbitTx === "out" ? 0 : 1,
+          transition:"opacity 0.2s ease",
+        }}>
+          {isSubLevel ? activeProgram?.shortName : "CADC"}
+        </span>
+      </div>
+
+      {/* Orbit nodes */}
+      {items.map((item, i) => {
+        const id = isSubLevel ? (item as SubArea).id : (item as ProgramData).slug;
+        const label = isSubLevel ? (item as SubArea).shortLabel : (item as ProgramData).shortName;
+        const icon = isSubLevel ? (item as SubArea).icon : (item as ProgramData).icon;
+        const spring = nodeSpringMap.current.get(id) ?? createNodeSpring(0);
+
+        const baseAngle = (i / items.length) * Math.PI * 2;
+        const angle = baseAngle + idleAngle.current;
+        const x = 50 + Math.cos(angle) * RADIUS;
+        const y = 50 + Math.sin(angle) * RADIUS;
+
+        const sc = spring.scale.value;
+        const op = spring.opacity.value;
+        const ox = spring.offsetX.value;
+        const oy = spring.offsetY.value;
+        const glow = spring.glow.value;
+        const isActive = id === popNode || id === glowNode;
+
+        return (
+          <button
+            key={id}
+            onClick={(e) => handleNodeTap(item, e)}
+            aria-label={label}
+            style={{
+              position:"absolute",
+              left:`${x}%`, top:`${y}%`,
+              width: isMobile ? "clamp(48px,13vw,64px)" : "clamp(52px,11%,68px)",
+              transform:`translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(${sc})`,
+              display:"flex",flexDirection:"column",alignItems:"center",gap: isMobile?3:5,
+              background:"none",border:"none",cursor:"pointer",padding:0,
+              opacity: op,
+              zIndex: isActive ? 10 : 1,
+              transition:"none", // springs handle everything
+            }}
+          >
+            {/* Glow ring */}
+            {glow > 0.01 && (
+              <div style={{
+                position:"absolute",inset:`${-12*glow}px`,borderRadius:"50%",
+                background:`radial-gradient(circle, rgba(1,1,255,${0.5*glow}) 0%, transparent 65%)`,
+                pointerEvents:"none",
+              }}/>
+            )}
+            {/* Node disc */}
+            <div className="node-disc" style={{
+              width: isMobile ? "clamp(34px,10vw,48px)" : "clamp(44px,9.5%,60px)",
+              aspectRatio:"1/1", borderRadius:"50%",
+              background: isActive ? "#E4E4FF" : isMobile ? "white" : "rgba(1,5,30,0.9)",
+              border:`${isActive?3:2}px solid ${T.blue}`,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontSize: isMobile ? "clamp(0.85rem,4vw,1.1rem)" : "clamp(1rem,2vw,1.3rem)",
+              boxShadow: isActive
+                ? `0 0 24px rgba(1,1,255,0.7), 0 0 48px rgba(1,1,255,0.3), inset 0 0 12px rgba(1,1,255,0.1)`
+                : `0 0 ${8+glow*20}px rgba(1,1,255,${0.15+glow*0.3}), 0 4px 16px rgba(0,0,0,0.3)`,
+              transition:"box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease",
+            }}>
+              {icon}
+            </div>
+            <span style={{
+              color: T.blue,
+              fontSize: isMobile ? "clamp(0.36rem,1.6vw,0.48rem)" : "clamp(0.38rem,0.85vw,0.52rem)",
+              fontWeight: isActive ? 800 : 700,
+              textTransform:"uppercase", letterSpacing:"0.05em",
+              textAlign:"center", lineHeight:1.2,
+              width: isMobile ? "clamp(48px,13vw,64px)" : "clamp(52px,11%,68px)",
+              overflowWrap:"break-word",
+              textShadow: isMobile ? "none" : isActive ? "0 0 12px rgba(1,1,255,0.8)" : "0 0 8px rgba(1,1,255,0.3)",
+            }}>
+              {label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
   {
     slug: "head-start",
@@ -1792,7 +2321,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
                 border: `4px solid ${T.blue}`,
                 boxShadow: `0 0 0 12px rgba(1,1,255,0.08), 0 0 60px rgba(1,1,255,0.2)`,
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
-                animation: "logoFloat 3s ease-in-out infinite",
+                animation: "logoAssemble 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards, logoFloat 3.5s ease-in-out 0.8s infinite",
               }}>
                 <span style={{ color: T.blue, fontWeight: 900, fontSize: 42, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
                 <div style={{ width: 48, height: 3, background: T.maroon, borderRadius: 2 }} />
@@ -1815,7 +2344,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
           {/* County / Program / Content state — show orbit */}
           {(stage === "county" || stage === "program" || stage === "content") && (
-            <DesktopOrbit
+            <SpringOrbit
               stage={stage} activeProgram={activeProgram}
               availablePrograms={availablePrograms}
               glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
@@ -2214,12 +2743,13 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>Tap a program node to explore</p>
           </div>
           <div style={{ padding: "12px 0 0" }}>
-            <MobileOrbit
+            <SpringOrbit
               stage={stage} activeProgram={activeProgram}
               availablePrograms={availablePrograms}
               glowNode={glowNode} popNode={popNode} beamNode={beamNode} orbitTx={orbitTx}
               assembled={assembled}
               tapProgram={tapProgram} tapSubArea={tapSubArea}
+              isMobile={true}
             />
           </div>
         </>
@@ -2418,39 +2948,82 @@ function DesktopStyles() {
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
 
-      @keyframes desktopPing {
-        0% { transform: scale(1); opacity: 0.9; }
-        60% { opacity: 0.4; }
-        100% { transform: scale(3.2); opacity: 0; }
-      }
-      @keyframes beamPulse {
-        0% { transform: scale(1); opacity: 1; border-color: rgba(1,1,255,1); }
-        50% { transform: scale(1.8); opacity: 0.6; }
-        100% { transform: scale(0.2); opacity: 0; border-color: rgba(1,1,255,0.2); }
-      }
+      /* ── Logo entry — spring-inspired float with glow bloom ── */
       @keyframes logoFloat {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-      }
-        0%  { transform: translate(-50%,-50%) scale(1); }
-        40% { transform: translate(-50%,-50%) scale(1.18); }
-        100%{ transform: translate(-50%,-50%) scale(1); }
-      }
-      @keyframes hubSpin {
-        0%  { transform: scale(1) rotate(0deg); opacity: 1; }
-        40% { transform: scale(0.6) rotate(90deg); opacity: 0; }
-        60% { transform: scale(0.6) rotate(-90deg); opacity: 0; }
-        100%{ transform: scale(1) rotate(0deg); opacity: 1; }
-      }
-      @keyframes clipReveal {
-        from { clip-path: inset(0 100% 0 0); opacity: 0.6; transform: translateX(12px); }
-        to   { clip-path: inset(0 0% 0 0); opacity: 1; transform: translateX(0); }
-      }
-      @keyframes fadeSlideIn {
-        from { opacity: 0; transform: translateX(24px); }
-        to   { opacity: 1; transform: translateX(0); }
+        0%   { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 12px rgba(1,1,255,0.3)); }
+        50%  { transform: translateY(-14px) scale(1.02); filter: drop-shadow(0 0 28px rgba(1,1,255,0.55)); }
+        100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 12px rgba(1,1,255,0.3)); }
       }
 
+      /* ── Logo first-appear assembly ── */
+      @keyframes logoAssemble {
+        0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; filter: blur(12px); }
+        60%  { transform: scale(1.08) rotate(2deg); opacity: 1; filter: blur(0); }
+        80%  { transform: scale(0.96) rotate(-1deg); }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); }
+      }
+
+      /* ── Content panel reveal — cinematic wipe ── */
+      @keyframes clipReveal {
+        0%   { clip-path: inset(0 100% 0 0); opacity: 0; transform: translateX(20px); }
+        15%  { opacity: 0.8; }
+        100% { clip-path: inset(0 0% 0 0); opacity: 1; transform: translateX(0); }
+      }
+
+      /* ── Content panel slide in with overshoot ── */
+      @keyframes fadeSlideIn {
+        0%   { opacity: 0; transform: translateX(32px) scale(0.97); }
+        65%  { transform: translateX(-4px) scale(1.005); }
+        100% { opacity: 1; transform: translateX(0) scale(1); }
+      }
+
+      /* ── Stage transition — portal swirl ── */
+      @keyframes stagePortal {
+        0%   { transform: scale(0) rotate(-180deg); opacity: 0; filter: blur(16px); }
+        50%  { filter: blur(4px); }
+        75%  { transform: scale(1.05) rotate(4deg); opacity: 1; filter: blur(0); }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); }
+      }
+
+      /* ── Hub pulse — living heartbeat ── */
+      @keyframes hubPulse {
+        0%   { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 0 0 rgba(1,1,255,0.4); }
+        50%  { transform: translate(-50%,-50%) scale(1.06); box-shadow: 0 0 0 20px rgba(1,1,255,0); }
+        100% { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 0 0 rgba(1,1,255,0); }
+      }
+
+      /* ── Hub icon morph on stage change ── */
+      @keyframes hubSpin {
+        0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+        30%  { transform: scale(0.3) rotate(135deg); opacity: 0; filter: blur(4px); }
+        70%  { transform: scale(0.3) rotate(-135deg); opacity: 0; filter: blur(4px); }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); }
+      }
+
+      /* ── Map county tap — shockwave ── */
+      @keyframes countyShock {
+        0%   { transform: scale(1); opacity: 1; }
+        40%  { transform: scale(1.15); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      /* ── Mobile content enter ── */
+      @keyframes mobileContentIn {
+        0%   { opacity: 0; transform: translateY(40px) scale(0.95); }
+        60%  { transform: translateY(-6px) scale(1.01); }
+        80%  { transform: translateY(3px) scale(0.998); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      /* ── Node hover glow ── */
+      .node-disc {
+        transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.15s ease;
+      }
+      button:hover .node-disc {
+        filter: brightness(1.15);
+      }
+
+      /* ── Dark content styles ── */
       .cadc-dark-content p { color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.7; margin: 0 0 14px; }
       .cadc-dark-content strong { color: white; }
       .cadc-dark-content .cadc-card { background: rgba(1,1,255,0.12); border: 1px solid rgba(1,1,255,0.25); border-radius: 12px; padding: 16px; margin: 14px 0; }
@@ -2463,7 +3036,8 @@ function DesktopStyles() {
       .cadc-dark-content .cadc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
       .cadc-dark-content .cadc-chip { background: rgba(1,1,255,0.15); border: 1px solid rgba(1,1,255,0.25); border-radius: 6px; padding: 6px 10px; font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 600; }
       .cadc-dark-content .cadc-stack { display: flex; flex-direction: column; gap: 8px; }
-      .cadc-dark-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: ${T.maroon}; color: white; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 8px; }
+      .cadc-dark-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: ${T.maroon}; color: white; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 8px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+      .cadc-dark-content .cadc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(204,0,0,0.4); }
       .cadc-dark-content .cadc-link { color: ${T.blue}; font-weight: 700; font-size: 14px; text-decoration: none; }
       .cadc-dark-content .cadc-note { color: rgba(255,255,255,0.4); font-size: 11px; font-style: italic; margin: 8px 0 0; }
       .cadc-dark-content .cadc-fare-table { border: 1px solid rgba(1,1,255,0.25); border-radius: 10px; overflow: hidden; margin: 14px 0; }
@@ -2481,19 +3055,34 @@ function MobileStyles() {
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
-      @keyframes mobilePing {
-        0% { transform: scale(1); opacity: 0.9; }
-        60% { opacity: 0.4; }
-        100% { transform: scale(2.8); opacity: 0; }
-      }
-      @keyframes fadeSlideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
       @keyframes mobileContentIn {
-        from { opacity: 0; transform: translateY(28px) scale(0.97); }
-        to   { opacity: 1; transform: translateY(0) scale(1); }
+        0%   { opacity: 0; transform: translateY(40px) scale(0.95); }
+        60%  { transform: translateY(-6px) scale(1.01); }
+        80%  { transform: translateY(3px) scale(0.998); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
       }
+      @keyframes logoAssemble {
+        0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; filter: blur(12px); }
+        60%  { transform: scale(1.08) rotate(2deg); opacity: 1; filter: blur(0); }
+        80%  { transform: scale(0.96) rotate(-1deg); }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      }
+      @keyframes logoFloat {
+        0%,100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 8px rgba(1,1,255,0.25)); }
+        50%     { transform: translateY(-12px) scale(1.02); filter: drop-shadow(0 0 20px rgba(1,1,255,0.5)); }
+      }
+      @keyframes fadeSlideIn {
+        0%   { opacity: 0; transform: translateY(20px); }
+        65%  { transform: translateY(-3px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes countyShock {
+        0%   { transform: scale(1); }
+        40%  { transform: scale(1.12); }
+        100% { transform: scale(1); }
+      }
+
+      .node-disc { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
 
       .cadc-light-content p { color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 12px; }
       .cadc-light-content strong { color: #111827; }
