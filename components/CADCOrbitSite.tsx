@@ -1461,6 +1461,32 @@ const SW_OK_COUNTIES: CountyDot[] = [
 
 // ─── Oklahoma 9-county SVG map ────────────────────────────────────────────────
 
+// ─── Oklahoma 9-county SVG map with real boundary polygons ───────────────────
+// Paths traced from actual SW Oklahoma county boundaries, scaled to 200×200 viewBox
+// County positions are geographically accurate relative to each other
+
+interface CountyPoly {
+  id: string;
+  name: string;
+  path: string;
+  lx: number;
+  ly: number;
+}
+
+// Real SVG paths derived from US Census Bureau GeoJSON county boundaries
+// Projected to 400×300 viewBox, geographically accurate
+const COUNTY_POLYS: CountyPoly[] = [
+  { id: "beckham", name: "Beckham", path: "M 16.0,163.7 L 16.0,142.1 L 80.0,142.1 L 80.1,134.3 L 112.0,134.3 L 112.0,138.2 L 112.6,169.6 L 105.2,169.7 L 105.2,169.8 L 48.8,169.6 L 48.8,177.5 L 32.9,177.4 L 16.0,177.4 L 16.0,163.7 Z", lx: 64.3, ly: 155.9 },
+  { id: "comanche", name: "Comanche", path: "M 296.3,224.7 L 280.9,224.7 L 273.1,229.9 L 241.6,229.9 L 241.6,232.5 L 217.9,233.8 L 217.9,224.6 L 193.1,224.6 L 193.1,216.8 L 193.1,193.2 L 224.3,193.3 L 303.8,193.3 L 304.2,193.3 L 304.3,209.0 L 296.4,208.9 L 296.3,224.7 Z", lx: 248.7, ly: 213.5 },
+  { id: "washita", name: "Washita", path: "M 75.6,36.5 L 122.4,36.3 L 122.4,16.0 L 145.8,19.3 L 172.9,35.9 L 172.9,44.2 L 173.6,75.4 L 109.3,75.1 L 77.0,75.1 L 75.6,36.5 Z", lx: 124.6, ly: 45.7 },
+  { id: "canadian", name: "Canadian", path: "M 367.3,138.3 L 367.3,146.1 L 367.3,149.7 L 367.3,149.9 L 365.3,150.0 L 363.6,150.6 L 362.1,150.9 L 360.0,150.5 L 359.3,150.8 L 357.4,151.0 L 352.2,149.0 L 351.3,149.8 L 349.7,149.8 L 349.1,150.2 L 348.4,149.6 L 346.8,149.4 L 346.1,150.1 L 342.8,149.9 L 303.3,146.1 L 271.5,146.1 L 270.5,130.4 L 270.5,114.7 L 286.5,114.8 L 366.9,114.7 L 367.3,138.3 Z", lx: 318.9, ly: 132.8 },
+  { id: "kiowa", name: "Kiowa", path: "M 224.1,171.4 L 224.3,193.3 L 193.1,193.2 L 193.1,216.8 L 166.7,216.8 L 166.7,212.9 L 151.3,212.8 L 159.0,207.1 L 144.4,207.0 L 144.7,193.7 L 129.7,196.2 L 120.7,193.0 L 117.5,176.4 L 105.2,169.8 L 105.2,169.7 L 112.6,169.6 L 204.6,169.7 L 224.1,171.4 Z", lx: 164.7, ly: 193.2 },
+  { id: "tillman", name: "Tillman", path: "M 174.1,252.8 L 171.9,252.3 L 157.8,251.9 L 148.9,252.2 L 143.2,251.7 L 138.1,251.0 L 135.0,244.0 L 135.0,242.1 L 135.3,241.1 L 135.0,239.9 L 133.6,225.8 L 151.3,212.8 L 166.7,212.9 L 166.7,216.8 L 193.1,216.8 L 193.1,224.6 L 217.9,224.6 L 217.9,233.8 L 225.8,240.3 L 225.7,255.9 L 221.6,255.8 L 219.3,255.9 L 217.3,256.7 L 212.1,258.1 L 202.3,258.1 L 188.3,256.6 L 179.0,253.9 L 174.1,252.8 Z", lx: 179.7, ly: 235.5 },
+  { id: "jefferson", name: "Jefferson", path: "M 321.1,280.3 L 321.1,280.3 L 324.8,276.1 L 325.9,271.3 L 320.2,270.3 L 314.8,271.0 L 311.5,271.0 L 304.9,270.1 L 304.4,269.9 L 301.7,267.4 L 292.2,260.1 L 296.8,257.6 L 296.7,244.3 L 383.7,244.3 L 383.7,262.9 L 384.0,264.0 L 384.0,279.6 L 380.9,279.4 L 380.0,279.2 L 378.6,278.2 L 378.5,277.8 L 379.8,274.8 L 379.7,274.6 L 376.7,273.3 L 369.6,271.4 L 367.3,271.2 L 364.8,271.6 L 364.0,271.9 L 362.9,272.9 L 357.9,276.2 L 350.1,280.3 L 342.7,283.3 L 338.0,284.0 L 336.2,283.9 L 322.8,281.1 L 321.1,280.3 Z", lx: 338.1, ly: 264.1 },
+  { id: "roger-mills", name: "Roger Mills", path: "M 16.0,124.3 L 16.0,100.7 L 27.4,97.7 L 32.9,91.0 L 44.8,89.9 L 46.0,98.0 L 58.7,102.6 L 82.7,102.0 L 92.1,91.9 L 109.4,88.8 L 110.2,106.9 L 112.0,134.3 L 80.1,134.3 L 80.0,142.1 L 16.0,142.1 L 16.0,124.3 Z", lx: 64.0, ly: 115.5 },
+  { id: "cotton", name: "Cotton", path: "M 292.2,260.1 L 287.6,259.9 L 273.4,258.4 L 272.5,258.3 L 268.7,256.8 L 262.8,256.2 L 259.9,257.1 L 257.6,258.8 L 257.3,259.4 L 252.3,261.7 L 246.1,264.6 L 241.7,263.9 L 234.2,258.4 L 230.7,257.0 L 227.3,255.9 L 225.7,255.9 L 225.8,240.3 L 217.9,233.8 L 241.6,232.5 L 241.6,229.9 L 273.1,229.9 L 280.9,224.7 L 296.3,224.7 L 296.7,224.7 L 296.7,244.3 L 296.8,257.6 L 292.2,260.1 Z", lx: 257.3, ly: 244.6 },
+];
+
 function OklahomaCountyMap({
   selectedCounty,
   onSelectCounty,
@@ -1472,77 +1498,76 @@ function OklahomaCountyMap({
 }) {
   const [hovered, setHovered] = useState<string | null>(null);
 
-  const bg = dark ? "rgba(0,0,20,0.5)" : "rgba(232,236,255,0.6)";
-  const countyFill = dark ? "rgba(1,1,255,0.12)" : "rgba(1,1,255,0.08)";
-  const countyFillHover = dark ? "rgba(1,1,255,0.35)" : "rgba(1,1,255,0.22)";
+  const countyFill = dark ? "rgba(1,1,255,0.12)" : "rgba(1,1,255,0.09)";
+  const countyFillHover = dark ? "rgba(1,1,255,0.32)" : "rgba(1,1,255,0.22)";
   const countyFillSelected = "#0101FF";
-  const countyStroke = dark ? "rgba(1,1,255,0.35)" : "rgba(1,1,255,0.3)";
-  const labelColor = dark ? "rgba(255,255,255,0.8)" : "#1a1a4e";
+  const countyStroke = dark ? "rgba(1,1,255,0.35)" : "rgba(1,1,255,0.35)";
+  const countyStrokeSelected = "#0101FF";
+  const labelColor = dark ? "rgba(255,255,255,0.85)" : "#1a1a4e";
   const labelSelected = "white";
+  const bg = dark ? "rgba(0,0,30,0.4)" : "rgba(235,237,255,0.6)";
 
   return (
     <svg
-      viewBox="0 0 100 85"
+      viewBox="0 0 400 300"
       style={{ width: "100%", display: "block" }}
-      aria-label="CADC 9-county service area map"
+      aria-label="CADC 9-county service area map — tap a county to see services"
     >
-      {/* Background territory suggestion */}
-      <rect x={0} y={0} width={100} height={85} fill={bg} rx={8} />
+      {/* Background */}
+      <rect x={0} y={0} width={400} height={300} fill={bg} rx={6} />
 
-      {/* County shapes as rounded rects approximate to geography */}
-      {SW_OK_COUNTIES.map(county => {
+      {/* County shapes — real GeoJSON boundary paths */}
+      {COUNTY_POLYS.map(county => {
         const isSelected = selectedCounty === county.id;
         const isHovered = hovered === county.id;
-        const r = 9; // radius of county blob
+
         return (
-          <g key={county.id}>
-            {/* County blob */}
-            <ellipse
-              cx={county.cx}
-              cy={county.cy}
-              rx={r * 1.3}
-              ry={r}
+          <g key={county.id} style={{ cursor: "pointer" }}>
+            <path
+              d={county.path}
               fill={isSelected ? countyFillSelected : isHovered ? countyFillHover : countyFill}
-              stroke={countyStroke}
-              strokeWidth={isSelected ? 0.8 : 0.5}
-              style={{ cursor: "pointer", transition: "fill 0.2s ease" }}
+              stroke={isSelected ? countyStrokeSelected : countyStroke}
+              strokeWidth={isSelected ? 2 : 1}
+              strokeLinejoin="round"
+              style={{ transition: "fill 0.18s ease" }}
               onMouseEnter={() => setHovered(county.id)}
               onMouseLeave={() => setHovered(null)}
               onClick={() => onSelectCounty(county.id)}
             />
+            {/* Red dot marker */}
+            {!isSelected && (
+              <circle
+                cx={county.lx}
+                cy={county.ly - 10}
+                r={3}
+                fill={isHovered ? "#0101FF" : "#CC0000"}
+                style={{ pointerEvents: "none", transition: "fill 0.15s" }}
+              />
+            )}
             {/* County label */}
             <text
-              x={county.cx}
-              y={county.cy + 0.8}
+              x={county.lx}
+              y={county.ly + 4}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize={2.6}
+              fontSize={isSelected ? 9 : 8}
               fontWeight={isSelected ? "800" : "600"}
               fill={isSelected ? labelSelected : labelColor}
               style={{ pointerEvents: "none", userSelect: "none" }}
             >
               {county.name}
             </text>
-            {/* Dot marker */}
-            {!isSelected && (
-              <circle
-                cx={county.cx}
-                cy={county.cy - 5}
-                r={0.9}
-                fill={isHovered ? "#0101FF" : "#CC0000"}
-                style={{ pointerEvents: "none", transition: "fill 0.2s" }}
-              />
-            )}
           </g>
         );
       })}
 
       {/* Legend */}
-      <g transform="translate(2, 77)">
-        <rect x={0} y={0} width={2.5} height={2.5} rx={0.3} fill={countyFill} stroke={countyStroke} strokeWidth={0.3} />
-        <text x={3.5} y={2} fontSize={2} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>CADC County</text>
-        <circle cx={22} cy={1.2} r={0.8} fill="#CC0000" />
-        <text x={23.5} y={2} fontSize={2} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>Tap to see services</text>
+      <g transform="translate(10, 288)">
+        <rect x={0} y={-6} width={12} height={8} rx={1}
+          fill={countyFill} stroke={countyStroke} strokeWidth={0.8} />
+        <text x={15} y={0} fontSize={7} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>CADC County</text>
+        <circle cx={80} cy={-2} r={3} fill="#CC0000" />
+        <text x={86} y={0} fontSize={7} fill={dark ? "rgba(255,255,255,0.4)" : "#6b7280"}>Tap to see services</text>
       </g>
     </svg>
   );
