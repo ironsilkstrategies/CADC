@@ -28,8 +28,8 @@ const T = {
   blueLight:   "#E4E4FF",
   maroon:      "#CC0000",
   maroonDark:  "#8B0000",
-  void:        "#000014",
-  ghost:       "#F8F8FF",
+  void:        "#F8F9FF",
+  ghost:       "#F8F9FF",
   surface:     "#ffffff",
   border:      "#e5e7eb",
   textPrimary: "#111827",
@@ -166,22 +166,22 @@ function MarketSchedule({ dark }: { dark: boolean }) {
   const isWeekend = (dow: number) => dow === 0 || dow === 6;
 
   const c = {
-    headerBg: dark ? "rgba(0,100,0,0.5)" : "#166534",
-    cellHasMeal: dark ? "rgba(0,120,0,0.2)" : "#f0fdf4",
-    cellHasMealBorder: dark ? "rgba(0,200,0,0.4)" : "#16a34a",
+    headerBg: T.blue,
+    cellHasMeal: dark ? "rgba(1,1,255,0.15)" : "#EEF0FF",
+    cellHasMealBorder: T.blue,
     dayNumMeal: dark ? "white" : "#111827",
     headline: dark ? "rgba(255,255,255,0.85)" : "#111827",
     weekend: dark ? "rgba(255,255,255,0.02)" : "#fafafa",
     weekendText: dark ? "rgba(255,255,255,0.15)" : "#d1d5db",
     cellBg: dark ? "rgba(255,255,255,0.04)" : "#ffffff",
     cellBorder: dark ? "rgba(255,255,255,0.08)" : "#e5e7eb",
-    border: dark ? "rgba(0,180,0,0.2)" : "#d1fae5",
-    bg: dark ? "rgba(0,80,0,0.15)" : "#f0fdf4",
+    border: dark ? "rgba(1,1,255,0.2)" : "#C7C7FF",
+    bg: dark ? "rgba(1,1,255,0.08)" : "#F0F0FF",
     dayLabel: dark ? "rgba(255,255,255,0.4)" : "#6b7280",
     dayNum: dark ? "rgba(255,255,255,0.5)" : "#9ca3af",
     note: dark ? "rgba(255,255,255,0.35)" : "#9ca3af",
-    modalBg: dark ? "#0a1a0a" : "#ffffff",
-    modalBorder: dark ? "rgba(0,180,0,0.5)" : "#16a34a",
+    modalBg: dark ? "#00001A" : "#ffffff",
+    modalBorder: T.blue,
     modalTitle: dark ? "white" : "#111827",
     modalItem: dark ? "rgba(255,255,255,0.75)" : "#374151",
     overlay: "rgba(0,0,0,0.72)",
@@ -256,7 +256,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <div>
-                <p style={{ color: "#16a34a", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
+                <p style={{ color: T.blue, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
                   {month} {selectedDayNum}, {year}
                 </p>
                 <h4 style={{ color: c.modalTitle, fontWeight: 800, fontSize: 16, margin: 0 }}>Market Stops Today</h4>
@@ -265,8 +265,8 @@ function MarketSchedule({ dark }: { dark: boolean }) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {selectedStops.map((stop, i) => (
-                <div key={i} style={{ padding: "10px 14px", background: dark ? "rgba(0,180,0,0.1)" : "#f0fdf4", borderRadius: 10, borderLeft: "3px solid #16a34a" }}>
-                  <p style={{ color: "#16a34a", fontSize: 10, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stop.time}</p>
+                <div key={i} style={{ padding: "10px 14px", background: dark ? "rgba(1,1,255,0.12)" : "#EEF0FF", borderRadius: 10, borderLeft: `3px solid ${T.blue}` }}>
+                  <p style={{ color: T.blue, fontSize: 10, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stop.time}</p>
                   <p style={{ color: c.modalTitle, fontWeight: 700, fontSize: 14, margin: 0 }}>{stop.location}</p>
                 </div>
               ))}
@@ -291,8 +291,8 @@ function MarketSchedulePanel() {
         Tap any market day to see stop locations and times. Schedule updates monthly.
       </p>
       <MarketSchedule dark={isDesktop} />
-      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(0,100,0,0.2)" : "#f0fdf4", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#16a34a", margin: "0 0 6px" }}>Need a ride to the market?</p>
+      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#EEF0FF", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: T.blue, margin: "0 0 6px" }}>Need a ride to the market?</p>
         <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Call or text 580-374-5518</a>
       </div>
     </div>
@@ -640,7 +640,7 @@ function CanvasOverlay({ particles, shockwaves, width, height }: {
       ref={canvasRef}
       width={width}
       height={height}
-      style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:20 }}
+      style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:20, opacity: 0.35 }}
     />
   );
 }
@@ -2469,20 +2469,20 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
       <ParticleField />
 
       {/* Utility nav */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: "1px solid rgba(1,1,255,0.15)" }}>
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
           <div>
-            <div style={{ color: "white", fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>CADC</div>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>Community Action</div>
+            <div style={{ color: T.blue, fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>CADC</div>
+            <div style={{ color: T.textMuted, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>Community Action</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 32 }}>
           {["About", "Contact", "580-335-5588"].map((item, i) => (
             <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
-              style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "white")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+              style={{ color: T.textMuted, fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = T.blue)}
+              onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}
             >{item}</a>
           ))}
         </div>
@@ -2498,13 +2498,14 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
           {stage !== "entry" && (
             <button onClick={goBack} style={{
               position: "absolute", top: 24, left: 48, zIndex: 10,
-              background: "rgba(1,1,255,0.15)", border: "1px solid rgba(1,1,255,0.3)",
-              color: "rgba(255,255,255,0.8)", padding: "8px 18px", borderRadius: 8,
+              background: "white", border: `1px solid ${T.border}`,
+              color: T.blue, padding: "8px 18px", borderRadius: 8,
               fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", cursor: "pointer",
               textTransform: "uppercase", transition: "all 0.2s",
+              boxShadow: "0 2px 8px rgba(1,1,255,0.08)",
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(1,1,255,0.3)"; e.currentTarget.style.color = "white"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(1,1,255,0.15)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#E4E4FF"; e.currentTarget.style.borderColor = T.blue; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = T.border; }}
             >← Back</button>
           )}
 
@@ -2532,17 +2533,17 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
                 <div style={{ width: 48, height: 3, background: T.maroon, borderRadius: 2 }} />
                 <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", lineHeight: 1.3 }}>Community Action<br />Development Corp.</span>
               </div>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+              <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
             </button>
           )}
 
           {/* Map state */}
           {stage === "map" && (
-            <div style={{ width: "min(90%,420px)", animation: "fadeSlideIn 0.4s ease" }}>
+            <div style={{ width: "min(90%,420px)", animation: "fadeSlideIn 0.4s ease", background: "white", borderRadius: 16, border: `1px solid ${T.border}`, padding: 12 }}>
               <OklahomaCountyMap
                 selectedCounty={null}
                 onSelectCounty={tapCounty}
-                dark={true}
+                dark={false}
               />
             </div>
           )}
@@ -2560,7 +2561,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         </div>
 
         {/* RIGHT — Content panel */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: "1px solid rgba(1,1,255,0.1)" }}>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
           <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} />
         </div>
       </div>
@@ -2585,8 +2586,8 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
       {/* Outer glow ring */}
       <div style={{
         position: "absolute", inset: "8%", borderRadius: "50%",
-        border: "1px solid rgba(1,1,255,0.2)",
-        boxShadow: "0 0 60px rgba(1,1,255,0.08), inset 0 0 60px rgba(1,1,255,0.04)",
+        border: "1px dashed rgba(1,1,255,0.2)",
+        boxShadow: "none",
       }} />
 
       {/* SVG connectors */}
@@ -2612,11 +2613,11 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
         position: "absolute", left: "50%", top: "50%",
         transform: "translate(-50%,-50%)",
         width: "clamp(72px,16%,88px)", aspectRatio: "1/1",
-        borderRadius: "50%", background: T.void,
+        borderRadius: "50%", background: "white",
         border: `2px solid ${T.blue}`,
         boxShadow: orbitTx === "out"
-          ? `0 0 0 16px rgba(1,1,255,0.12), 0 0 60px rgba(1,1,255,0.5)`
-          : `0 0 0 8px rgba(1,1,255,0.06), 0 0 40px rgba(1,1,255,0.3)`,
+          ? `0 0 0 12px rgba(1,1,255,0.08), 0 8px 32px rgba(1,1,255,0.18)`
+          : `0 0 0 6px rgba(1,1,255,0.06), 0 4px 20px rgba(1,1,255,0.14)`,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         gap: 2,
         transition: "box-shadow 0.3s ease",
@@ -2707,21 +2708,19 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             <div className="node-disc" style={{
               width: "clamp(40px,8.5%,54px)", aspectRatio: "1/1",
               borderRadius: "50%",
-              background: isPopped
-                ? `radial-gradient(circle at 35% 35%, rgba(1,1,255,0.4), ${T.void})`
-                : T.void,
-              border: `${isPopped ? 3 : 2}px solid ${isPopped ? "rgba(1,1,255,1)" : T.blue}`,
+              background: isPopped ? "#E4E4FF" : "white",
+              border: `${isPopped ? 3 : 2}px solid ${isPopped ? T.blue : T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.9rem,2vw,1.2rem)",
               boxShadow: isPopped
-                ? `0 0 32px rgba(1,1,255,0.7), 0 0 8px rgba(1,1,255,0.9), inset 0 0 16px rgba(1,1,255,0.2)`
-                : `0 0 16px rgba(1,1,255,0.25), inset 0 0 12px rgba(1,1,255,0.08)`,
+                ? `0 0 24px rgba(1,1,255,0.3), 0 4px 16px rgba(1,1,255,0.15)`
+                : `0 3px 12px rgba(1,1,255,0.12)`,
               transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-width 0.15s ease",
             }}>
               {icon}
             </div>
             <span style={{
-              color: isPopped ? "white" : "rgba(255,255,255,0.75)",
+              color: T.blue,
               fontSize: "clamp(0.38rem,0.85vw,0.52rem)",
               fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em",
               textAlign: "center", lineHeight: 1.2, whiteSpace: "nowrap",
@@ -2743,25 +2742,25 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 }) {
   if (stage === "entry") {
     return (
-      <div style={{ maxWidth: 520, color: "white" }}>
-        <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
-        <h1 style={{ fontSize: "clamp(2rem,3.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif" }}>
+      <div style={{ maxWidth: 520, color: T.textPrimary }}>
+        <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
+        <h1 style={{ fontSize: "clamp(2rem,3.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Community Action<br />
           <span style={{ color: T.blue }}>Development</span><br />
           Corporation
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+        <p style={{ color: T.textMuted, fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
           Serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, senior nutrition, and more. Tap the CADC logo to find services in your county.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
           <a href="tel:+15803355588" style={{ background: T.blue, color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.05em" }}>📞 580-335-5588</a>
-          <a href="/about" style={{ border: `1px solid rgba(1,1,255,0.4)`, color: "rgba(255,255,255,0.75)", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
+          <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
           {[["9","Programs"],["11","Head Start Centers"],["110","Transit Vehicles"],["6","Senior Meal Sites"],["17","Advantage Counties"],["1966","Est."]].map(([n,l])=>(
-            <div key={l} style={{ background: "rgba(1,1,255,0.1)", border: "1px solid rgba(1,1,255,0.2)", borderRadius: 10, padding: "14px 10px", textAlign: "center" }}>
-              <div style={{ color: "white", fontWeight: 900, fontSize: 22 }}>{n}</div>
-              <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
+            <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
+              <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
+              <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
             </div>
           ))}
         </div>
@@ -2771,27 +2770,27 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
   if (stage === "map") {
     return (
-      <div style={{ maxWidth: 520, color: "white", animation: "fadeSlideIn 0.4s ease" }}>
-        <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Select Your County</p>
-        <h2 style={{ fontSize: "clamp(1.6rem,2.8vw,2.4rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif" }}>
+      <div style={{ maxWidth: 520, color: T.textPrimary, animation: "fadeSlideIn 0.4s ease" }}>
+        <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Select Your County</p>
+        <h2 style={{ fontSize: "clamp(1.6rem,2.8vw,2.4rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Where do you need help?
         </h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>
+        <p style={{ color: T.textMuted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>
           Tap a county on the map to see which CADC programs are available in your area.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {SW_OK_COUNTIES.map(c => (
             <button key={c.id} onClick={() => tapCounty(c.id)} style={{
-              background: "rgba(1,1,255,0.12)", border: "1px solid rgba(1,1,255,0.3)",
-              color: "rgba(255,255,255,0.8)", padding: "8px 16px", borderRadius: 20,
+              background: "white", border: `1.5px solid ${T.blue}`,
+              color: T.blue, padding: "8px 16px", borderRadius: 20,
               fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(1,1,255,0.3)"; e.currentTarget.style.color = "white"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(1,1,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#E4E4FF"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "white"; }}
             >{c.name}</button>
           ))}
         </div>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 20 }}>9 base counties · Helping People. Changing Lives.</p>
+        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 20 }}>9 base counties · Helping People. Changing Lives.</p>
       </div>
     );
   }
@@ -2799,24 +2798,24 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "county" && activeCountyName) {
     const firstProg = availablePrograms[0];
     return (
-      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
         <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 8px" }}>{activeCountyName} County</p>
-        <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif" }}>
+        <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Programs available in your area
         </h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
           {availablePrograms.map(p => (
-            <div key={p.slug} style={{ background: "rgba(1,1,255,0.12)", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 600 }}>
+            <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600 }}>
               {p.icon} {p.shortName}
             </div>
           ))}
         </div>
         {firstProg && (
-          <div className="cadc-dark-content">
+          <div className="cadc-light-content">
             {firstProg.subAreas[0]?.content}
           </div>
         )}
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 16, fontStyle: "italic" }}>Tap a program node in the orbit for more detail.</p>
+        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 16, fontStyle: "italic" }}>Tap a program node in the orbit for more detail.</p>
       </div>
     );
   }
@@ -2824,31 +2823,31 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "program" && activeProgram) {
     const firstSub = activeProgram.subAreas[0];
     return (
-      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
-        <ProgramHeroBanner slug={activeProgram.slug} dark={true} />
+      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "fadeSlideIn 0.4s ease" }}>
+        <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: T.blue, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
-          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+          <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
+          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
             {activeProgram.icon} {activeProgram.name}
           </h2>
         </div>
         {firstSub && (
-          <div className="cadc-dark-content">
+          <div className="cadc-light-content">
             {firstSub.content}
           </div>
         )}
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Select any node in the orbit for more detail.</p>
+        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Select any node in the orbit for more detail.</p>
       </div>
     );
   }
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 540, color: "white", maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
-        <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: "white" }}>
+      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+        <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
-        <div className="cadc-dark-content">
+        <div className="cadc-light-content">
           {activeSubArea.content}
         </div>
       </div>
