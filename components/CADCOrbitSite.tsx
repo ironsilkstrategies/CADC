@@ -1222,6 +1222,102 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
   );
 }
 
+// ─── Sub-Area Photo Carousel ──────────────────────────────────────────────────
+// Auto-cycles through program photos every 3.5s with crossfade.
+// Shown at top of sub-area content panels when the program has photos.
+
+const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
+  "head-start": [
+    { src: "/images/hero/hero-1.jpg",  alt: "Head Start Civil Rights training, CADC banner" },
+    { src: "/images/hero/hero-8.jpg",  alt: "Head Start CPR and First Aid training" },
+    { src: "/images/hero/hero-10.jpg", alt: "Large Head Start staff training" },
+    { src: "/images/hero/hero-13.jpg", alt: "Child doing math manipulatives activity" },
+    { src: "/images/hero/hero-15.jpg", alt: "Head Start classroom visit with legislators" },
+    { src: "/images/hero/hero-25.jpg", alt: "Large Head Start staff meeting" },
+  ],
+  "senior-meals": [
+    { src: "/images/senior-dining-1.JPG",  alt: "Seniors dining together at a CADC meal site" },
+    { src: "/images/senior-dining-2.JPG",  alt: "Frederick senior nutrition congregate dining" },
+    { src: "/images/senior-dining-3.JPG",  alt: "Community dining room at CADC senior site" },
+    { src: "/images/senior-dining-6.JPG",  alt: "Wide view of community dining room" },
+    { src: "/images/senior-kitchen-staff.JPG", alt: "CADC senior nutrition kitchen staff" },
+    { src: "/images/hero/hero-19.jpg", alt: "Senior Easter kitchen crew" },
+    { src: "/images/hero/hero-20.jpg", alt: "Senior serving line, Easter decorations" },
+  ],
+  "advantage": [
+    { src: "/images/hero/hero-2.jpg",  alt: "Advantage meal prep, freezer loading" },
+    { src: "/images/hero/hero-24.jpg", alt: "Advantage freezer stocking" },
+  ],
+  "community-market": [
+    { src: "/images/community-market-1.PNG", alt: "CADC Community Market 42-foot mobile grocery trailer" },
+    { src: "/images/community-market-3.PNG", alt: "Fresh produce at the Community Market" },
+    { src: "/images/community-market-4.PNG", alt: "Dairy and refrigerated items" },
+    { src: "/images/community-market-6.PNG", alt: "Frozen foods section" },
+    { src: "/images/community-market-7.PNG", alt: "Refrigerated produce" },
+    { src: "/images/community-market-9.PNG", alt: "Pantry aisle" },
+  ],
+  "transit": [
+    { src: "/images/hero/hero-14.jpg", alt: "Transit mechanics with diagnostic equipment" },
+  ],
+  "weatherization": [
+    { src: "/images/hero/hero-17.jpg", alt: "Weatherization field crew in hi-vis vests" },
+  ],
+};
+
+function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
+  const photos = SUB_AREA_PHOTOS[programSlug];
+  const [idx, setIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (!photos || photos.length <= 1) return;
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx(i => (i + 1) % photos.length);
+        setVisible(true);
+      }, 400);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [photos?.length]);
+
+  if (!photos || photos.length === 0) return null;
+  const photo = photos[idx];
+
+  return (
+    <div style={{
+      width: "100%", height: 160, borderRadius: 12, overflow: "hidden",
+      marginBottom: 16, position: "relative",
+      background: "#e8eaff",
+    }}>
+      <img
+        src={photo.src}
+        alt={photo.alt}
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        style={{
+          width: "100%", height: "100%", objectFit: "cover", display: "block",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.4s ease",
+        }}
+      />
+      {photos.length > 1 && (
+        <div style={{
+          position: "absolute", bottom: 8, right: 10,
+          display: "flex", gap: 4,
+        }}>
+          {photos.map((_, i) => (
+            <div key={i} style={{
+              width: i === idx ? 16 : 5, height: 5, borderRadius: 3,
+              background: i === idx ? "white" : "rgba(255,255,255,0.45)",
+              transition: "width 0.3s ease, background 0.3s ease",
+            }} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Inline Photo Strip ───────────────────────────────────────────────────────
 // Used inside sub-area content — horizontal scrollable photo row
 // Place anywhere inside a cadc-content div
@@ -1360,7 +1456,7 @@ const PROGRAMS: ProgramData[] = [
               </ul>
             </div>
             <p className="cadc-note">This program is provided at no cost to the parent or guardian.</p>
-            <a href="https://childplus.com" target="_blank" rel="noopener noreferrer" className="cadc-btn">Start Application (ChildPlus) →</a>
+            <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Start Application (ChildPlus) →</a>
           </div>
         ),
       },
@@ -1377,7 +1473,7 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-label">All families are encouraged to apply</p>
               <p>Enrollment is based on a points system that considers many circumstances beyond the automatic eligibility categories above. We serve all children — don't count yourself out before you apply.</p>
             </div>
-            <a href="https://childplus.com" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
+            <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
           </div>
         ),
       },
@@ -1561,6 +1657,17 @@ const PROGRAMS: ProgramData[] = [
               ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
             </div>
             <p className="cadc-note">Wait time charged after the first hour. All vehicles are ADA lift or ramp equipped.</p>
+            <div className="cadc-card" style={{marginTop:12}}>
+              <p className="cadc-label">In-Town Service</p>
+              <div className="cadc-fare-table">
+                <div className="cadc-fare-header"><span>Ride Type</span><span>Standard</span><span>Elderly / Disabled</span></div>
+                {[
+                  ["In-town per stop","$1.00","$0.75"],
+                ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
+              </div>
+              <p style={{fontSize:12,margin:"8px 0 4px"}}>In-town service available in: El Reno · Weatherford · Clinton · Elk City · Sayre · Hobart · Frederick · Duncan</p>
+              <p className="cadc-note">In-town rides are scheduled on a first call, first serve basis.</p>
+            </div>
           </div>
         ),
       },
@@ -1643,8 +1750,13 @@ const PROGRAMS: ProgramData[] = [
             <div className="cadc-card">
               <p className="cadc-label">General eligibility</p>
               <ul className="cadc-list">
-                {["Income at or below 200% of federal poverty guidelines","Own or rent your primary residence","Priority for households with elderly members 60+","Priority for households with children under 6","Priority for persons with disabilities"].map(i=><li key={i}>{i}</li>)}
+                {["Income at or below 200% of federal poverty guidelines","Own or rent your primary residence","Priority for households with elderly members 60+","Priority for households with children 18 and under","Priority for persons with disabilities"].map(i=><li key={i}>{i}</li>)}
               </ul>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Income eligibility guidelines</p>
+              <p>Specific income thresholds are determined annually. View the current DOE/DHS income guidelines for your household size.</p>
+              <a href="https://www.okcommerce.gov/wp-content/uploads/Attachment-A-DOE-26-DHS-26-Income-Guidelines.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">View Income Guidelines →</a>
             </div>
           </div>
         ),
@@ -1848,7 +1960,27 @@ const PROGRAMS: ProgramData[] = [
             <div className="cadc-card">
               <p className="cadc-label">By the numbers</p>
               <div className="cadc-grid-2">
-                {["8 counties served","22 communities","42-foot mobile trailer","400+ SKUs on board","EBT/SNAP accepted","5-star customer rating"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+                {["8 counties served","20 communities","42-foot mobile trailer","400+ SKUs on board","EBT/SNAP accepted","5-star customer rating"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+              </div>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Communities we serve</p>
+              <div className="cadc-stack">
+                {[
+                  {county:"Beckham County",cities:"Erick"},
+                  {county:"Comanche County",cities:"Cache · Chattanooga · Fletcher · Geronimo · Lawton · Sterling"},
+                  {county:"Cotton County",cities:"Randlett · Temple"},
+                  {county:"Jefferson County",cities:"Ringling · Ryan"},
+                  {county:"Kiowa County",cities:"Lone Wolf · Mountain View"},
+                  {county:"Roger Mills County",cities:"Hammon"},
+                  {county:"Tillman County",cities:"Grandfield · Tipton"},
+                  {county:"Washita County",cities:"Burns Flat · Canute · Corn · Sentinel"},
+                ].map(r=>(
+                  <div key={r.county} className="cadc-card-sm">
+                    <p className="cadc-card-title" style={{margin:"0 0 2px"}}>{r.county}</p>
+                    <p style={{margin:0,fontSize:12}}>{r.cities}</p>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="cadc-card">
@@ -2034,9 +2166,14 @@ const PROGRAMS: ProgramData[] = [
             <div className="cadc-stack">
               {[
                 {n:"Leslea Hixson",t:"Executive Director"},
-                {n:"Robin Harris",t:"Director, Head Start & Early Head Start"},
+                {n:"Robin Harris",t:"Director, Head Start & Early Head Start",p:"580-726-3343",e:"rharris@cadcok.org"},
                 {n:"Kristie Jackson",t:"Advantage Director"},
-              ].map(p=><div key={p.n} className="cadc-card-sm"><p className="cadc-card-title">{p.n}</p><p>{p.t}</p></div>)}
+              ].map(p=><div key={p.n} className="cadc-card-sm">
+                <p className="cadc-card-title">{p.n}</p>
+                <p>{p.t}</p>
+                {"p" in p && <a href={`tel:+1${p.p.replace(/-/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.p}</a>}
+                {"e" in p && <a href={`mailto:${p.e}`} className="cadc-link" style={{display:"block"}}>{p.e}</a>}
+              </div>)}
             </div>
           </div>
         ),
@@ -2508,15 +2645,15 @@ const CADC_BASE_COUNTIES = [
 
 // Which programs are available per county
 const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
-  beckham:      ["head-start","transit","weatherization","advantage"],
+  beckham:      ["head-start","transit","weatherization","advantage","community-market"],
   canadian:     ["head-start","transit","weatherization","advantage"],
   comanche:     ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
-  cotton:       ["head-start","transit","weatherization","senior-meals","advantage"],
-  jefferson:    ["head-start","transit","weatherization","senior-meals","advantage"],
+  cotton:       ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
+  jefferson:    ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   kiowa:        ["head-start","transit","weatherization","advantage","community-market"],
-  "roger-mills":["head-start","transit","weatherization","advantage"],
-  tillman:      ["head-start","transit","weatherization","senior-meals","advantage"],
-  washita:      ["head-start","transit","weatherization","advantage"],
+  "roger-mills":["head-start","transit","weatherization","advantage","community-market"],
+  tillman:      ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
+  washita:      ["head-start","transit","weatherization","advantage","community-market"],
   // Transit extended
   blaine:       ["transit"], caddo: ["transit","advantage"], custer: ["transit","advantage"],
   dewey:        ["transit"], ellis: ["transit"], grady: ["transit","advantage"],
@@ -3225,6 +3362,9 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           </div>
         )}
         <p style={{ color: T.textMuted, fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Select any node in the orbit for more detail.</p>
+        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 8, padding: "10px 18px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          🏛️ Back to Home
+        </a>
       </div>
     );
   }
@@ -3235,9 +3375,13 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
+        {activeProgram && <SubAreaPhotoCarousel programSlug={activeProgram.slug} />}
         <div className="cadc-light-content">
           {activeSubArea.content}
         </div>
+        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 20, background: "white", border: `1px solid ${T.border}`, borderRadius: 8, padding: "10px 18px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          🏛️ Back to Home
+        </a>
       </div>
     );
   }
@@ -3516,6 +3660,9 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               <p style={{ color: T.textMuted, fontSize: 11, fontStyle: "italic", margin: 0 }}>Tap any node above to explore more.</p>
             </div>
           </div>
+          <a href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 20px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            🏛️ Back to Home
+          </a>
         </div>
       )}
 
@@ -3529,9 +3676,13 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               </h3>
             </div>
             <div style={{ padding: 20 }} className="cadc-light-content">
+              {activeProgram && <SubAreaPhotoCarousel programSlug={activeProgram.slug} />}
               {activeSubArea.content}
             </div>
           </div>
+          <a href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 20px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            🏛️ Back to Home
+          </a>
         </div>
       )}
 
