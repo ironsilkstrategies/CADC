@@ -472,7 +472,7 @@ function HSCard({ hs, onClose }: { hs: typeof HEAD_START_CENTERS[0]; onClose: ()
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             <a href={`tel:+1${hs.phone.replace(/\D/g,"")}`} aria-label={`Call ${hs.name}`} style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#0101FF", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>📞 {hs.phone}</a>
             <a href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Google Maps directions" style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#111827", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🗺️ Directions</a>
-            <a href="/#head-start" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#D97706", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>Learn About Head Start →</a>
+            <a href="/?program=head-start&area=ehs" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#D97706", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>Learn About Head Start →</a>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: 10, fontSize: 12, fontWeight: 700, color: "#6b7280", cursor: "pointer" }}>Close</button>
         </div>
@@ -781,7 +781,7 @@ export default function AboutPage() {
           <ul style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12, listStyle: "none", padding: 0, margin: 0 }}>
             {PROGRAMS.map(p => (
               <li key={p.slug}>
-                <Link href={`/#${p.slug}`} aria-label={`Learn more about ${p.name}`}
+                <Link href={`/?program=${p.slug}`} aria-label={`Learn more about ${p.name}`}
                   style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 20px", textDecoration: "none", display: "flex", alignItems: "center", gap: 12 }}
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#0101FF"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#e5e7eb"; }}
