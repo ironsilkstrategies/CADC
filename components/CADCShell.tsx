@@ -149,14 +149,14 @@ function ShellSketchField() {
 // ─── Shell Search Bar ─────────────────────────────────────────────────────────
 
 const SEARCH_PROGRAMS = [
-  { label: "Head Start & Early Head Start", icon: "🏫", href: "/#head-start" },
-  { label: "Red River Transportation", icon: "🚌", href: "/#transit" },
-  { label: "Weatherization & Housing", icon: "🏠", href: "/#weatherization" },
-  { label: "Senior Nutrition", icon: "🍽️", href: "/#senior-meals" },
-  { label: "Advantage Home Delivered Meals", icon: "🚗", href: "/#advantage" },
-  { label: "VITA Free Tax Help", icon: "📋", href: "/#tax-help" },
-  { label: "Community Market", icon: "🛒", href: "/#community-market" },
-  { label: "Employment & Workforce", icon: "💼", href: "/#employment" },
+  { label: "Head Start & Early Head Start", icon: "🏫", href: "/?program=head-start" },
+  { label: "Red River Transportation", icon: "🚌", href: "/?program=transit" },
+  { label: "Weatherization & Housing", icon: "🏠", href: "/?program=weatherization" },
+  { label: "Senior Nutrition", icon: "🍽️", href: "/?program=senior-meals" },
+  { label: "Advantage Home Delivered Meals", icon: "🚗", href: "/?program=advantage" },
+  { label: "VITA Free Tax Help", icon: "📋", href: "/?program=tax-help" },
+  { label: "Community Market", icon: "🛒", href: "/?program=community-market" },
+  { label: "Employment & Workforce", icon: "💼", href: "/?program=employment" },
   { label: "About CADC", icon: "🏛️", href: "/about" },
   { label: "Contact Us", icon: "📞", href: "/contact" },
   { label: "Beckham County", icon: "📍", href: "/#beckham" },
@@ -314,13 +314,13 @@ export default function CADCShell({ children, mainId = "main-content" }: CADCShe
             <div style={{ flex: "1 1 180px" }}>
               <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>Programs</p>
               {[
-                ["Head Start", "/#head-start"],
-                ["Red River Transit", "/#transit"],
-                ["Weatherization", "/#weatherization"],
-                ["Senior Nutrition", "/#senior-meals"],
-                ["Community Market", "/#community-market"],
-                ["Advantage Meals", "/#advantage"],
-                ["VITA Tax Help", "/#tax-help"],
+                ["Head Start", "/?program=head-start"],
+                ["Red River Transit", "/?program=transit"],
+                ["Weatherization", "/?program=weatherization"],
+                ["Senior Nutrition", "/?program=senior-meals"],
+                ["Community Market", "/?program=community-market"],
+                ["Advantage Meals", "/?program=advantage"],
+                ["VITA Tax Help", "/?program=tax-help"],
               ].map(([label, href]) => (
                 <a key={label} href={href} style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 13, textDecoration: "none", marginBottom: 8, transition: "color 0.2s" }}
                   onMouseEnter={e => (e.currentTarget.style.color = "white")}

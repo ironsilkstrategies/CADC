@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -2810,6 +2811,9 @@ type Stage = "entry" | "map" | "county" | "program" | "content";
 type TransitionState = "idle" | "out" | "in";
 
 export default function CADCOrbitSite() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [stage, setStage] = useState<Stage>("entry");
   const [activeCounty, setActiveCounty] = useState<string | null>(null);
   const [activeProgram, setActiveProgram] = useState<ProgramData | null>(null);
@@ -2820,6 +2824,64 @@ export default function CADCOrbitSite() {
   const [orbitTx, setOrbitTx] = useState<TransitionState>("idle");
   const [assembled, setAssembled] = useState(false);
   const isDesktop = useIsDesktop();
+
+  // ── URL hydration — run once on mount and whenever URL params change ──────
+  useEffect(() => {
+    const programSlug = searchParams.get("program");
+    const areaId      = searchParams.get("area");
+    const countyId    = searchParams.get("county");
+    const isMap       = searchParams.get("map") === "1";
+
+    if (programSlug) {
+      const prog = PROGRAMS.find(p => p.slug === programSlug);
+      if (prog) {
+        setActiveProgram(prog);
+        if (areaId) {
+          const area = prog.subAreas.find(a => a.id === areaId);
+          if (area) {
+            setActiveSubArea(area);
+            setStage("content");
+          } else {
+            setActiveSubArea(null);
+            setStage("program");
+          }
+        } else {
+          setActiveSubArea(null);
+          setStage("program");
+        }
+        if (countyId) setActiveCounty(countyId);
+        return;
+      }
+    }
+
+    if (countyId) {
+      setActiveCounty(countyId);
+      setActiveProgram(null);
+      setActiveSubArea(null);
+      setStage("county");
+      return;
+    }
+
+    // No params — entry screen
+    setStage("entry");
+    setActiveProgram(null);
+    setActiveSubArea(null);
+    setActiveCounty(null);
+
+    if (isMap) {
+      setStage("map");
+    }
+  }, [searchParams]);
+
+  // ── URL builder ────────────────────────────────────────────────────────────
+  function buildUrl(opts: { program?: string; area?: string; county?: string }): string {
+    const p = new URLSearchParams();
+    if (opts.county)  p.set("county", opts.county);
+    if (opts.program) p.set("program", opts.program);
+    if (opts.area)    p.set("area", opts.area);
+    const qs = p.toString();
+    return qs ? `/?${qs}` : "/";
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setAssembled(true), 400);
@@ -2832,12 +2894,14 @@ export default function CADCOrbitSite() {
     : PROGRAMS;
 
   function tapLogo() {
+    router.push("/?map=1");
     setStage("map");
   }
 
   function tapCounty(countyId: string) {
     setActiveCounty(countyId);
     setOrbitTx("out");
+    router.push(buildUrl({ county: countyId }));
     setTimeout(() => {
       setStage("county");
       setOrbitTx("in");
@@ -2857,6 +2921,7 @@ export default function CADCOrbitSite() {
       setOrbitTx("in");
       setGlowNode(null);
       setBeamNode(null);
+      router.push(buildUrl({ county: activeCounty ?? undefined, program: prog.slug }));
     }, 480);
     setTimeout(() => {
       setOrbitTx("idle");
@@ -2872,6 +2937,7 @@ export default function CADCOrbitSite() {
       setStage("content");
       setGlowNode(null);
       setPopNode(null);
+      router.push(buildUrl({ county: activeCounty ?? undefined, program: activeProgram?.slug, area: area.id }));
     }, 300);
   }
 
@@ -2881,14 +2947,18 @@ export default function CADCOrbitSite() {
       if (stage === "content") {
         setActiveSubArea(null);
         setStage("program");
+        router.push(buildUrl({ county: activeCounty ?? undefined, program: activeProgram?.slug }));
       } else if (stage === "program") {
         setActiveProgram(null);
         setStage(activeCounty ? "county" : "map");
+        router.push(activeCounty ? buildUrl({ county: activeCounty }) : "/?map=1");
       } else if (stage === "county") {
         setActiveCounty(null);
         setStage("map");
+        router.push("/?map=1");
       } else if (stage === "map") {
         setStage("entry");
+        router.push("/");
       }
       setOrbitTx("in");
     }, 300);
