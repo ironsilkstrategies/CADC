@@ -1408,6 +1408,100 @@ function PhotoGrid({ photos, dark }: {
 
 
 
+
+// ─── County Detail Popup ──────────────────────────────────────────────────────
+// Simple, one-tap deeper info. Used by Market "Communities we serve" and reusable elsewhere.
+function marketStopsForCounty(countyName: string, cities: string[]): { city: string; times: string[] }[] {
+  return cities.map(city => {
+    const times = new Set<string>();
+    Object.entries(MARKET_SCHEDULE_DATA.stops).forEach(([date, stops]) => {
+      stops.forEach(st => {
+        const loc = st.location.split("—")[0].trim().replace("Mt. View","Mountain View");
+        if (loc.toLowerCase().startsWith(city.toLowerCase())) {
+          const d = new Date(date + "T12:00:00");
+          times.add(`${d.toLocaleDateString("en-US",{weekday:"short"})} ${d.getDate()} · ${st.time}`);
+        }
+      });
+    });
+    return { city, times: [...times] };
+  });
+}
+
+function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; slug: string; cities: string[]; onClose: () => void }) {
+  const programs = PROGRAMS.filter(p => (COUNTY_PROGRAM_MAP[slug] ?? []).includes(p.slug));
+  const stops = marketStopsForCounty(county, cities);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div onClick={onClose} role="dialog" aria-modal="true" aria-label={`${county} details`}
+      style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(10,22,40,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 16, padding: 22, maxWidth: 420, width: "100%", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div>
+            <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>Community Market</p>
+            <h4 style={{ color: T.textPrimary, fontWeight: 800, fontSize: 20, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>{county}</h4>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{ background: T.void, border: `1px solid ${T.border}`, borderRadius: 8, width: 36, height: 36, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
+        </div>
+        <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "12px 0 8px" }}>Market stops this month</p>
+        {stops.map(st => (
+          <div key={st.city} style={{ background: "#F5F5FF", border: `1px solid #dcdcf5`, borderRadius: 10, padding: "10px 12px", marginBottom: 6 }}>
+            <p style={{ color: T.blue, fontWeight: 800, fontSize: 14, margin: "0 0 4px" }}>{st.city}</p>
+            {st.times.length > 0
+              ? st.times.map(t => <p key={t} style={{ color: "#374151", fontSize: 12, margin: "2px 0" }}>{t}</p>)
+              : <p style={{ color: T.textMuted, fontSize: 12, margin: 0, fontStyle: "italic" }}>Check the schedule for upcoming dates</p>}
+          </div>
+        ))}
+        <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "14px 0 8px" }}>Other CADC services in {county}</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {programs.map(p => <a key={p.slug} href={`/?county=${slug}&program=${p.slug}`} style={{ background: T.blueLight, color: T.blue, padding: "6px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{p.icon} {p.shortName}</a>)}
+        </div>
+        <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
+          <a href="tel:+15803051964" style={{ flex: 1, textAlign: "center", background: T.maroon, color: "white", padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>📞 Call the Market</a>
+          <a href={`/?county=${slug}`} style={{ flex: 1, textAlign: "center", background: "white", border: `1px solid ${T.blue}`, color: T.blue, padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>See county →</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const MARKET_COUNTIES: { county: string; slug: string; cities: string[] }[] = [
+  { county: "Beckham County",     slug: "beckham",     cities: ["Erick"] },
+  { county: "Comanche County",    slug: "comanche",    cities: ["Cache","Chattanooga","Fletcher","Geronimo","Lawton","Sterling"] },
+  { county: "Cotton County",      slug: "cotton",      cities: ["Randlett","Temple"] },
+  { county: "Jefferson County",   slug: "jefferson",   cities: ["Ringling","Ryan"] },
+  { county: "Kiowa County",       slug: "kiowa",       cities: ["Lone Wolf","Mountain View"] },
+  { county: "Roger Mills County", slug: "roger-mills", cities: ["Hammon"] },
+  { county: "Tillman County",     slug: "tillman",     cities: ["Grandfield","Tipton"] },
+  { county: "Washita County",     slug: "washita",     cities: ["Burns Flat","Canute","Corn","Sentinel"] },
+];
+
+function MarketCommunities() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const close = useCallback(() => setOpenIdx(null), []);
+  return (
+    <>
+      <p className="cadc-note" style={{ margin: "0 0 8px" }}>Tap a county for stop days, times, and other services nearby.</p>
+      <div className="cadc-stack">
+        {MARKET_COUNTIES.map((r, i) => (
+          <button key={r.county} onClick={() => setOpenIdx(i)} className="cadc-card-sm"
+            style={{ textAlign: "left", cursor: "pointer", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}
+            aria-label={`${r.county} — see market stop details`}>
+            <span>
+              <span className="cadc-card-title" style={{ display: "block", margin: "0 0 2px" }}>{r.county}</span>
+              <span style={{ fontSize: 12, color: "#374151" }}>{r.cities.join(" · ")}</span>
+            </span>
+            <span aria-hidden="true" style={{ color: T.blue, fontWeight: 800, fontSize: 18 }}>›</span>
+          </button>
+        ))}
+      </div>
+      {openIdx !== null && <CountyDetailPopup {...MARKET_COUNTIES[openIdx]} onClose={close} />}
+    </>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -1966,23 +2060,7 @@ const PROGRAMS: ProgramData[] = [
             </div>
             <div className="cadc-card">
               <p className="cadc-label">Communities we serve</p>
-              <div className="cadc-stack">
-                {[
-                  {county:"Beckham County",cities:"Erick"},
-                  {county:"Comanche County",cities:"Cache · Chattanooga · Fletcher · Geronimo · Lawton · Sterling"},
-                  {county:"Cotton County",cities:"Randlett · Temple"},
-                  {county:"Jefferson County",cities:"Ringling · Ryan"},
-                  {county:"Kiowa County",cities:"Lone Wolf · Mountain View"},
-                  {county:"Roger Mills County",cities:"Hammon"},
-                  {county:"Tillman County",cities:"Grandfield · Tipton"},
-                  {county:"Washita County",cities:"Burns Flat · Canute · Corn · Sentinel"},
-                ].map(r=>(
-                  <div key={r.county} className="cadc-card-sm">
-                    <p className="cadc-card-title" style={{margin:"0 0 2px"}}>{r.county}</p>
-                    <p style={{margin:0,fontSize:12}}>{r.cities}</p>
-                  </div>
-                ))}
-              </div>
+              <MarketCommunities />
             </div>
             <div className="cadc-card">
               <p className="cadc-label">Payment accepted</p>
@@ -2161,14 +2239,18 @@ const PROGRAMS: ProgramData[] = [
     tagline: "Governance, Policy Council, and agency leadership",
     subAreas: [
       {
-        id: "leadership", label: "Agency Leadership", shortLabel: "Leadership", icon: "👤",
+        id: "leadership", label: "Staff & Leadership", shortLabel: "Staff", icon: "👤",
         content: (
           <div className="cadc-light-content">
             <div className="cadc-stack">
               {[
-                {n:"Leslea Hixson",t:"Executive Director"},
+                {n:"Leslea Hixson",t:"Executive Director",p:"580-335-5588"},
                 {n:"Robin Harris",t:"Director, Head Start & Early Head Start",p:"580-726-3343",e:"rharris@cadcok.org"},
-                {n:"Kristie Jackson",t:"Advantage Director"},
+                {n:"Gilbert Nuncio",t:"Director, Red River Transportation",p:"580-928-2199"},
+                {n:"Robert Meador",t:"Director, Weatherization & Housing",p:"580-305-0853"},
+                {n:"Laura Vardell",t:"Director, Senior Nutrition",p:"580-335-5588"},
+                {n:"Scott Fraley",t:"Director, Community Market",p:"580-305-1964",e:"SFraley@cadcok.org"},
+                {n:"Kristie Jackson",t:"Director, Advantage Home Delivered Meals",p:"580-393-2216"},
               ].map(p=><div key={p.n} className="cadc-card-sm">
                 <p className="cadc-card-title">{p.n}</p>
                 <p>{p.t}</p>
@@ -2643,6 +2725,9 @@ function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
 const CADC_BASE_COUNTIES = [
   "beckham","canadian","comanche","cotton","jefferson","kiowa","roger-mills","tillman","washita"
 ];
+// Extended-service counties (Transit and/or Advantage only) — shown on map in a lighter tier.
+// Per Gilbert Nuncio 9/1/2026: Caddo, Custer, Stephens must appear on service area maps.
+const CADC_EXTENDED_COUNTIES = ["caddo","custer","stephens","grady","jackson","harmon","greer","mcclain"];
 
 // Which programs are available per county
 const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
@@ -2660,7 +2745,7 @@ const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
   dewey:        ["transit"], ellis: ["transit"], grady: ["transit","advantage"],
   harmon:       ["transit","advantage"], jackson: ["transit","advantage"],
   mcclain:      ["transit","advantage"], stephens: ["transit","advantage"],
-  greer:        ["transit","advantage"],
+  greer:        ["advantage"], // transit pending Gilbert confirmation
 };
 
 // Geographic county shapes — approximate SW Oklahoma positions
@@ -2690,34 +2775,34 @@ const SW_OK_ALL_COUNTIES: {fips:string;name:string;slug:string|null;isCADC:boole
   {fips:"40007",name:"Beaver",slug:null,isCADC:false,path:"M 204.6,66.5 L 172.6,66.5 L 173.3,12.4 L 176.5,12.4 L 180.3,12.4 L 183.5,12.3 L 187.4,12.3 L 194.4,12.3 L 197.7,12.2 L 201.0,12.2 L 204.1,12.2 L 231.6,12.0 L 238.3,12.0 L 240.4,12.0 L 246.9,12.1 L 247.2,12.2 L 247.1,56.3 L 247.1,66.5 L 233.2,66.5 L 223.0,66.5 L 215.0,66.5 L 206.4,66.5 L 204.6,66.5 Z",lx:209.9,ly:39.3},
   {fips:"40009",name:"Beckham",slug:"beckham",isCADC:true,path:"M 247.3,209.2 L 247.3,183.2 L 280.6,183.3 L 280.6,173.8 L 297.2,173.8 L 297.2,178.6 L 297.5,216.3 L 293.7,216.4 L 293.7,216.6 L 264.4,216.3 L 264.4,225.7 L 256.1,225.7 L 247.3,225.7 L 247.3,209.2 Z",lx:272.4,ly:199.8},
   {fips:"40011",name:"Blaine",slug:null,isCADC:false,path:"M 354.2,102.7 L 357.0,102.6 L 387.7,102.7 L 387.9,150.4 L 379.6,150.4 L 379.6,169.2 L 355.3,169.2 L 354.6,169.2 L 354.6,140.9 L 354.2,102.7 Z",lx:371.1,ly:135.9},
-  {fips:"40015",name:"Caddo",slug:null,isCADC:false,path:"M 355.6,244.7 L 355.5,218.4 L 355.3,178.7 L 355.3,169.2 L 379.6,169.2 L 380.2,188.1 L 396.6,188.0 L 396.9,244.7 L 355.6,244.7 Z",lx:376.1,ly:207.0},
+  {fips:"40015",name:"Caddo",slug:"caddo",isCADC:false,path:"M 355.6,244.7 L 355.5,218.4 L 355.3,178.7 L 355.3,169.2 L 379.6,169.2 L 380.2,188.1 L 396.6,188.0 L 396.9,244.7 L 355.6,244.7 Z",lx:376.1,ly:207.0},
   {fips:"40017",name:"Canadian",slug:"canadian",isCADC:true,path:"M 429.9,178.7 L 429.9,192.6 L 428.9,192.8 L 428.0,193.5 L 427.2,193.8 L 426.1,193.4 L 425.7,193.7 L 424.8,193.9 L 422.1,191.5 L 421.6,192.4 L 420.8,192.5 L 420.5,192.9 L 420.1,192.2 L 419.3,192.0 L 418.9,192.8 L 417.2,192.6 L 396.6,188.0 L 380.2,188.1 L 379.6,169.2 L 379.6,150.4 L 387.9,150.4 L 429.7,150.3 L 429.9,178.7 Z",lx:404.8,ly:172.1},
   {fips:"40019",name:"Carter",slug:null,isCADC:false,path:"M 487.8,318.7 L 484.9,329.7 L 438.6,329.6 L 438.5,306.0 L 438.5,282.4 L 455.0,282.4 L 455.0,296.6 L 479.7,296.7 L 487.8,301.3 L 487.8,318.7 Z",lx:463.1,ly:306.0},
   {fips:"40025",name:"Cimarron",slug:null,isCADC:false,path:"M 77.9,66.4 L 12.0,66.4 L 12.0,12.2 L 13.2,12.4 L 22.0,12.3 L 45.8,12.8 L 62.7,12.8 L 74.3,12.9 L 76.1,12.9 L 86.3,13.0 L 88.4,13.0 L 88.1,66.4 L 77.9,66.4 Z",lx:50.2,ly:39.3},
   {fips:"40027",name:"Cleveland",slug:null,isCADC:false,path:"M 429.9,188.1 L 449.4,188.1 L 461.8,188.1 L 471.4,188.1 L 471.4,236.8 L 455.8,232.9 L 454.8,220.7 L 440.1,205.8 L 438.9,197.7 L 429.9,192.4 L 429.9,188.1 Z",lx:450.7,ly:212.4},
   {fips:"40031",name:"Comanche",slug:"comanche",isCADC:true,path:"M 393.0,282.4 L 385.0,282.4 L 381.0,288.7 L 364.6,288.6 L 364.6,291.8 L 352.3,293.4 L 352.3,282.4 L 339.4,282.4 L 339.4,244.6 L 355.6,244.7 L 396.9,244.7 L 397.2,263.5 L 393.0,263.5 L 393.0,282.4 Z",lx:368.3,ly:269.0},
   {fips:"40033",name:"Cotton",slug:"cotton",isCADC:true,path:"M 390.9,325.0 L 388.5,324.7 L 381.1,322.9 L 378.7,321.0 L 375.6,320.3 L 374.1,321.3 L 372.9,323.4 L 372.8,324.2 L 370.2,326.9 L 366.9,330.4 L 364.6,329.5 L 360.8,322.9 L 357.1,319.9 L 356.3,319.9 L 356.4,301.2 L 352.3,293.4 L 364.6,291.8 L 364.6,288.6 L 381.0,288.7 L 385.0,282.4 L 393.0,282.4 L 393.3,282.4 L 393.3,305.9 L 393.3,322.0 L 390.9,325.0 Z",lx:372.8,ly:306.4},
-  {fips:"40039",name:"Custer",slug:null,isCADC:false,path:"M 296.3,141.0 L 354.6,140.9 L 354.6,169.2 L 355.3,169.2 L 355.3,178.7 L 297.2,178.6 L 297.2,173.8 L 296.3,141.0 Z",lx:325.8,ly:159.8},
+  {fips:"40039",name:"Custer",slug:"custer",isCADC:false,path:"M 296.3,141.0 L 354.6,140.9 L 354.6,169.2 L 355.3,169.2 L 355.3,178.7 L 297.2,178.6 L 297.2,173.8 L 296.3,141.0 Z",lx:325.8,ly:159.8},
   {fips:"40043",name:"Dewey",slug:null,isCADC:false,path:"M 295.9,119.2 L 295.8,102.8 L 329.2,103.1 L 354.2,102.7 L 354.6,140.9 L 296.3,141.0 L 295.9,119.2 Z",lx:325.2,ly:121.9},
   {fips:"40045",name:"Ellis",slug:null,isCADC:false,path:"M 247.3,114.6 L 247.3,66.5 L 247.1,56.3 L 278.3,56.4 L 279.0,102.8 L 295.8,102.8 L 295.9,119.2 L 286.9,122.9 L 282.0,135.1 L 269.6,135.8 L 262.9,130.3 L 262.3,120.6 L 256.1,121.9 L 253.2,130.0 L 247.3,133.5 L 247.3,114.6 Z",lx:271.5,ly:96.1},
   {fips:"40047",name:"Garfield",slug:null,isCADC:false,path:"M 446.3,56.3 L 446.4,56.3 L 446.4,102.8 L 429.6,102.8 L 396.0,102.7 L 396.0,56.3 L 446.3,56.3 Z",lx:421.2,ly:79.5},
   {fips:"40049",name:"Garvin",slug:null,isCADC:false,path:"M 438.5,282.4 L 438.4,263.5 L 430.2,263.5 L 430.2,244.7 L 487.9,244.8 L 487.9,268.3 L 466.9,269.9 L 471.3,282.5 L 455.0,282.4 L 438.5,282.4 Z",lx:459.0,ly:263.6},
-  {fips:"40051",name:"Grady",slug:null,isCADC:false,path:"M 396.6,188.0 L 417.2,192.6 L 418.9,192.8 L 419.3,192.0 L 420.1,192.2 L 420.5,192.9 L 420.8,192.5 L 421.6,192.4 L 422.1,191.5 L 424.8,193.9 L 425.7,193.7 L 426.1,193.4 L 427.2,193.8 L 428.0,193.5 L 428.9,192.8 L 429.9,192.6 L 430.2,244.7 L 430.2,263.5 L 397.3,263.5 L 397.2,263.5 L 397.1,244.7 L 396.9,244.7 L 396.6,188.0 Z",lx:413.4,ly:225.8},
+  {fips:"40051",name:"Grady",slug:"grady",isCADC:false,path:"M 396.6,188.0 L 417.2,192.6 L 418.9,192.8 L 419.3,192.0 L 420.1,192.2 L 420.5,192.9 L 420.8,192.5 L 421.6,192.4 L 422.1,191.5 L 424.8,193.9 L 425.7,193.7 L 426.1,193.4 L 427.2,193.8 L 428.0,193.5 L 428.9,192.8 L 429.9,192.6 L 430.2,244.7 L 430.2,263.5 L 397.3,263.5 L 397.2,263.5 L 397.1,244.7 L 396.9,244.7 L 396.6,188.0 Z",lx:413.4,ly:225.8},
   {fips:"40053",name:"Grant",slug:null,isCADC:false,path:"M 446.3,56.3 L 396.0,56.3 L 395.4,12.4 L 400.6,12.4 L 419.7,12.4 L 421.1,12.4 L 422.3,12.4 L 427.9,12.4 L 431.6,12.3 L 435.0,12.4 L 438.3,12.4 L 445.5,12.4 L 446.3,12.4 L 446.3,56.3 Z",lx:420.9,ly:34.3},
-  {fips:"40055",name:"Greer",slug:null,isCADC:false,path:"M 293.7,216.6 L 300.1,224.5 L 301.8,244.4 L 306.5,248.3 L 294.0,249.2 L 292.6,258.8 L 273.5,258.8 L 269.3,254.1 L 268.5,235.0 L 256.1,235.1 L 256.1,225.7 L 264.4,225.7 L 264.4,216.3 L 293.7,216.6 Z",lx:281.3,ly:237.6},
-  {fips:"40057",name:"Harmon",slug:null,isCADC:false,path:"M 247.3,256.5 L 247.3,225.7 L 256.1,225.7 L 256.1,235.1 L 268.5,235.0 L 269.3,254.1 L 273.5,258.8 L 273.5,282.4 L 259.4,282.6 L 253.4,275.1 L 247.5,276.5 L 247.3,276.6 L 247.3,256.5 Z",lx:260.4,ly:254.2},
+  {fips:"40055",name:"Greer",slug:"greer",isCADC:false,path:"M 293.7,216.6 L 300.1,224.5 L 301.8,244.4 L 306.5,248.3 L 294.0,249.2 L 292.6,258.8 L 273.5,258.8 L 269.3,254.1 L 268.5,235.0 L 256.1,235.1 L 256.1,225.7 L 264.4,225.7 L 264.4,216.3 L 293.7,216.6 Z",lx:281.3,ly:237.6},
+  {fips:"40057",name:"Harmon",slug:"harmon",isCADC:false,path:"M 247.3,256.5 L 247.3,225.7 L 256.1,225.7 L 256.1,235.1 L 268.5,235.0 L 269.3,254.1 L 273.5,258.8 L 273.5,282.4 L 259.4,282.6 L 253.4,275.1 L 247.5,276.5 L 247.3,276.6 L 247.3,256.5 Z",lx:260.4,ly:254.2},
   {fips:"40059",name:"Harper",slug:null,isCADC:false,path:"M 247.2,12.1 L 264.2,12.1 L 274.2,12.2 L 282.0,12.3 L 286.5,12.3 L 290.0,12.3 L 296.5,25.4 L 302.6,31.8 L 302.6,56.1 L 278.3,56.4 L 247.1,56.3 L 247.2,12.1 Z",lx:274.9,ly:34.2},
-  {fips:"40065",name:"Jackson",slug:null,isCADC:false,path:"M 309.2,300.7 L 305.3,293.6 L 297.8,289.4 L 294.5,296.6 L 291.2,296.8 L 290.2,295.2 L 285.4,292.4 L 280.7,292.0 L 277.4,296.7 L 271.3,296.3 L 265.6,290.7 L 259.4,282.6 L 273.5,282.4 L 273.5,258.8 L 292.6,258.8 L 294.0,249.2 L 306.5,248.3 L 314.2,245.2 L 314.1,261.2 L 321.7,261.3 L 317.7,268.2 L 308.5,283.8 L 309.2,300.7 Z",lx:290.5,ly:273.0},
+  {fips:"40065",name:"Jackson",slug:"jackson",isCADC:false,path:"M 309.2,300.7 L 305.3,293.6 L 297.8,289.4 L 294.5,296.6 L 291.2,296.8 L 290.2,295.2 L 285.4,292.4 L 280.7,292.0 L 277.4,296.7 L 271.3,296.3 L 265.6,290.7 L 259.4,282.6 L 273.5,282.4 L 273.5,258.8 L 292.6,258.8 L 294.0,249.2 L 306.5,248.3 L 314.2,245.2 L 314.1,261.2 L 321.7,261.3 L 317.7,268.2 L 308.5,283.8 L 309.2,300.7 Z",lx:290.5,ly:273.0},
   {fips:"40067",name:"Jefferson",slug:"jefferson",isCADC:true,path:"M 405.9,349.3 L 407.8,344.2 L 408.4,338.5 L 405.5,337.2 L 402.6,338.0 L 400.9,338.1 L 397.5,337.0 L 395.8,333.7 L 390.9,325.0 L 393.3,322.0 L 393.3,305.9 L 438.5,306.0 L 438.5,328.4 L 438.6,348.4 L 437.0,348.1 L 435.8,346.7 L 436.4,342.6 L 434.8,340.8 L 431.1,338.5 L 429.9,338.3 L 428.6,338.8 L 427.6,340.4 L 425.0,344.2 L 421.0,349.2 L 417.2,352.8 L 414.7,353.7 L 413.8,353.6 L 406.8,350.1 L 405.9,349.3 Z",lx:414.8,ly:329.8},
   {fips:"40073",name:"Kingfisher",slug:null,isCADC:false,path:"M 396.0,102.7 L 429.6,102.8 L 429.7,150.3 L 387.9,150.4 L 387.7,102.7 L 396.0,102.7 Z",lx:408.7,ly:126.6},
   {fips:"40075",name:"Kiowa",slug:"kiowa",isCADC:true,path:"M 355.5,218.4 L 355.6,244.7 L 339.4,244.6 L 339.4,272.9 L 325.7,272.9 L 325.7,268.2 L 317.7,268.2 L 321.7,261.3 L 314.1,261.2 L 314.2,245.2 L 306.5,248.3 L 301.8,244.4 L 300.1,224.5 L 293.7,216.6 L 293.7,216.4 L 297.5,216.3 L 345.3,216.4 L 355.5,218.4 Z",lx:324.6,ly:244.6},
   {fips:"40083",name:"Logan",slug:null,isCADC:false,path:"M 471.5,126.9 L 471.5,150.5 L 429.7,150.3 L 429.6,102.8 L 446.4,102.8 L 454.8,103.4 L 454.8,122.2 L 457.2,119.4 L 471.5,126.9 Z",lx:450.6,ly:126.6},
   {fips:"40085",name:"Love",slug:null,isCADC:false,path:"M 484.7,344.3 L 483.7,349.6 L 475.3,366.3 L 471.8,367.8 L 469.8,366.7 L 466.5,359.0 L 466.5,357.0 L 458.2,351.2 L 453.3,356.9 L 449.1,356.9 L 446.3,354.5 L 447.2,351.3 L 447.2,349.1 L 444.6,346.5 L 443.3,346.1 L 441.9,346.7 L 439.8,348.1 L 438.6,348.4 L 438.6,329.6 L 484.9,329.7 L 487.7,342.4 L 484.7,344.3 Z",lx:463.1,ly:348.8},
   {fips:"40093",name:"Major",slug:null,isCADC:false,path:"M 354.2,102.7 L 329.2,103.1 L 328.9,65.7 L 338.0,65.7 L 340.8,70.7 L 355.1,78.1 L 362.3,77.5 L 362.3,70.4 L 396.0,70.4 L 396.0,102.7 L 354.2,102.7 Z",lx:362.5,ly:84.4},
-  {fips:"40087",name:"McClain",slug:null,isCADC:false,path:"M 429.9,192.6 L 438.9,197.7 L 440.1,205.8 L 454.8,220.7 L 455.8,232.9 L 471.4,236.8 L 488.0,232.8 L 488.0,244.7 L 487.9,244.8 L 430.2,244.7 L 429.9,192.6 Z",lx:459.0,ly:218.6},
+  {fips:"40087",name:"McClain",slug:"mcclain",isCADC:false,path:"M 429.9,192.6 L 438.9,197.7 L 440.1,205.8 L 454.8,220.7 L 455.8,232.9 L 471.4,236.8 L 488.0,232.8 L 488.0,244.7 L 487.9,244.8 L 430.2,244.7 L 429.9,192.6 Z",lx:459.0,ly:218.6},
   {fips:"40109",name:"Oklahoma",slug:null,isCADC:false,path:"M 461.8,188.1 L 449.4,188.1 L 429.9,188.1 L 429.9,178.7 L 429.7,150.3 L 471.5,150.5 L 471.5,178.7 L 471.4,188.1 L 461.8,188.1 Z",lx:450.6,ly:169.2},
   {fips:"40129",name:"Roger Mills",slug:"roger-mills",isCADC:true,path:"M 247.3,161.9 L 247.3,133.5 L 253.2,130.0 L 256.1,121.9 L 262.3,120.6 L 262.9,130.3 L 269.6,135.8 L 282.0,135.1 L 286.9,122.9 L 295.9,119.2 L 296.3,141.0 L 297.2,173.8 L 280.6,173.8 L 280.6,183.3 L 247.3,183.2 L 247.3,161.9 Z",lx:272.3,ly:151.2},
-  {fips:"40137",name:"Stephens",slug:null,isCADC:false,path:"M 393.0,282.4 L 393.0,263.5 L 430.2,263.5 L 438.4,263.5 L 438.5,282.4 L 438.5,306.0 L 393.3,305.9 L 393.3,282.4 L 393.0,282.4 Z",lx:415.7,ly:284.8},
+  {fips:"40137",name:"Stephens",slug:"stephens",isCADC:false,path:"M 393.0,282.4 L 393.0,263.5 L 430.2,263.5 L 438.4,263.5 L 438.5,282.4 L 438.5,306.0 L 393.3,305.9 L 393.3,282.4 L 393.0,282.4 Z",lx:415.7,ly:284.8},
   {fips:"40139",name:"Texas",slug:null,isCADC:false,path:"M 170.8,66.5 L 88.1,66.4 L 88.4,13.0 L 98.2,12.9 L 121.8,12.8 L 130.9,12.7 L 136.5,12.7 L 140.8,12.6 L 152.3,12.6 L 163.8,12.5 L 164.8,12.5 L 168.0,12.4 L 173.3,12.4 L 172.6,66.5 L 170.8,66.5 Z",lx:130.7,ly:39.5},
   {fips:"40141",name:"Tillman",slug:"tillman",isCADC:true,path:"M 329.5,316.2 L 321.0,315.2 L 316.4,315.5 L 313.5,314.9 L 310.8,314.0 L 309.2,305.7 L 309.2,300.8 L 308.5,283.8 L 317.7,268.2 L 325.7,268.2 L 325.7,272.9 L 339.4,272.9 L 339.4,282.4 L 352.3,282.4 L 352.3,293.4 L 356.4,301.2 L 356.3,319.9 L 354.2,319.8 L 349.3,322.6 L 344.2,322.6 L 336.9,320.8 L 332.0,317.5 L 329.5,316.2 Z",lx:332.4,ly:295.4},
   {fips:"40149",name:"Washita",slug:"washita",isCADC:true,path:"M 355.5,218.4 L 345.3,216.4 L 297.5,216.3 L 297.2,178.6 L 355.3,178.7 L 355.5,218.4 Z",lx:326.3,ly:198.5},
@@ -2749,7 +2834,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
       <rect x={0} y={0} width={500} height={380} fill={bg} rx={8} />
 
       {/* Grey background counties first */}
-      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC).map(c => (
+      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC && !(c.slug && CADC_EXTENDED_COUNTIES.includes(c.slug))).map(c => (
         <g key={c.fips}>
           <path d={c.path} fill={greyFill} stroke={greyStroke} strokeWidth={0.6} strokeLinejoin="round" />
           <text x={c.lx} y={c.ly} textAnchor="middle" dominantBaseline="middle"
@@ -2758,6 +2843,24 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
           </text>
         </g>
       ))}
+
+      {/* Extended-service counties — Transit / Advantage only, lighter tier, clickable */}
+      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC && c.slug && CADC_EXTENDED_COUNTIES.includes(c.slug)).map(c => {
+        const isSel = selectedCounty === c.slug;
+        const isHov = hovered === c.slug;
+        return (
+          <g key={c.fips} style={{ cursor: "pointer" }}>
+            <path d={c.path}
+              fill={isSel ? selectedFill : isHov ? "rgba(1,1,255,0.14)" : "rgba(1,1,255,0.05)"}
+              stroke={isSel ? selectedFill : "rgba(1,1,255,0.4)"} strokeWidth={1} strokeDasharray="3 2" strokeLinejoin="round"
+              style={{ transition: "fill 0.18s ease" }}
+              onMouseEnter={() => setHovered(c.slug)} onMouseLeave={() => setHovered(null)}
+              onClick={() => c.slug && onSelectCounty(c.slug)} />
+            <text x={c.lx} y={c.ly + 2} textAnchor="middle" dominantBaseline="middle" fontSize={5.5} fontWeight="700"
+              fill={isSel ? selectedLabel : dark ? "rgba(255,255,255,0.6)" : "#3b3b8a"} style={{ pointerEvents:"none", userSelect:"none" }}>{c.name}</text>
+          </g>
+        );
+      })}
 
       {/* CADC counties on top — interactive */}
       {SW_OK_ALL_COUNTIES.filter(c => c.isCADC).map(c => {
@@ -2797,8 +2900,10 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
         <text x={13} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>CADC County</text>
         <rect x={72} y={-5} width={10} height={7} rx={1} fill={greyFill} stroke={greyStroke} strokeWidth={0.8}/>
         <text x={85} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Other County</text>
-        <circle cx={145} cy={-1.5} r={3} fill="#CC0000"/>
-        <text x={151} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
+        <rect x={145} y={-5} width={10} height={7} rx={1} fill="rgba(1,1,255,0.05)" stroke="rgba(1,1,255,0.4)" strokeWidth={0.8} strokeDasharray="2 1.5"/>
+        <text x={158} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Transit / Advantage only</text>
+        <circle cx={240} cy={-1.5} r={3} fill="#CC0000"/>
+        <text x={246} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
       </g>
     </svg>
   );
@@ -2966,7 +3071,9 @@ function CADCOrbitSiteInner() {
   }
 
   const activeCountyName = activeCounty
-    ? SW_OK_COUNTIES.find(c => c.id === activeCounty)?.name ?? activeCounty
+    ? SW_OK_COUNTIES.find(c => c.id === activeCounty)?.name
+      ?? SW_OK_ALL_COUNTIES.find(c => c.slug === activeCounty)?.name
+      ?? activeCounty
     : null;
 
   if (isDesktop) {
@@ -3020,7 +3127,7 @@ interface LayoutProps {
 
 function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
-    <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
+    <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflowX: "hidden" }}>
       {/* Skip to main content — AAA requirement */}
       <a href="#main-content" style={{
         position: "absolute", left: "-9999px", top: "auto", width: 1, height: 1, overflow: "hidden",
@@ -3032,66 +3139,23 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
       >Skip to main content</a>
       <SketchField />
 
-      {/* Utility nav */}
-      <nav role="navigation" aria-label="Main navigation" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
-        <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation — Home" style={{ height: 44, width: "auto", display: "block" }} />
-        <DesktopSearchBar onSelectProgram={tapProgram} onSelectCounty={tapCounty} />
-        <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-          <a
-            href="https://www.surveymonkey.com/r/26cadcneeds"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Take the 2026 CADC Community Needs Survey — your input shapes our programs (opens in new tab)"
-            style={{
-              background: T.maroon, color: "white",
-              padding: "8px 16px", borderRadius: 20,
-              fontSize: 11, fontWeight: 800, textDecoration: "none",
-              letterSpacing: "0.04em", whiteSpace: "nowrap",
-              display: "flex", alignItems: "center", gap: 6,
-              animation: "surveyPulse 3s ease-in-out infinite",
-            }}
-          >
-            📋 Take Our Survey
-          </a>
-          <a href="/" style={{ color: T.blue, fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em" }}>🏛️ Home</a>
-          {["About", "Contact", "580-335-5588"].map((item, i) => (
-            <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
-              style={{ color: T.textMuted, fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = T.blue)}
-              onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}
-            >{item}</a>
-          ))}
-        </div>
-      </nav>
+      <CADCHeader
+        crumbs={
+          stage === "entry" ? undefined
+          : stage === "map" ? ["Select County"]
+          : [activeCountyName ? `${activeCountyName} County` : "All Counties",
+             ...(activeProgram ? [activeProgram.shortName] : []),
+             ...(activeSubArea ? [activeSubArea.shortLabel] : [])]
+        }
+        onBack={stage !== "entry" ? goBack : undefined}
+      />
 
       {/* Main split layout */}
-      <div style={{ display: "flex", height: "100vh", paddingTop: 64 }}>
+      <div style={{ display: "flex", minHeight: "calc(100vh - 64px)" }}>
 
         {/* LEFT — Orbit / Map panel */}
         <div style={{ width: "42%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
           <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
-
-          {/* Back button */}
-          {stage !== "entry" && (
-            <button onClick={goBack} style={{
-              position: "absolute", top: 24, left: 48, zIndex: 10,
-              background: "white", border: `1px solid ${T.border}`,
-              color: T.blue, padding: "8px 18px", borderRadius: 8,
-              fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", cursor: "pointer",
-              textTransform: "uppercase", transition: "all 0.2s",
-              boxShadow: "0 2px 8px rgba(1,1,255,0.08)",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#E4E4FF"; e.currentTarget.style.borderColor = T.blue; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = T.border; }}
-            >← Back</button>
-          )}
-
-          {/* County label breadcrumb */}
-          {activeCountyName && (stage === "county" || stage === "program" || stage === "content") && (
-            <div style={{ position: "absolute", top: 24, right: 24, color: T.maroon, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em" }}>
-              {activeCountyName} County
-            </div>
-          )}
 
           {/* Entry state — large tappable logo */}
           {stage === "entry" && (
@@ -3142,6 +3206,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         </main>
       </div>
 
+      <CADCFooter />
       <DesktopStyles />
     </div>
   );
@@ -3411,7 +3476,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             {firstProg.subAreas[0]?.content}
           </div>
         )}
-        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 16, fontStyle: "italic" }}>Tap a program node in the orbit for more detail.</p>
+        <BackToTop />
       </div>
     );
   }
@@ -3432,10 +3497,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             {firstSub.content}
           </div>
         )}
-        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Select any node in the orbit for more detail.</p>
-        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 8, padding: "10px 18px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-          🏛️ Back to Home
-        </a>
+        <BackToTop />
       </div>
     );
   }
@@ -3450,9 +3512,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <div className="cadc-light-content">
           {activeSubArea.content}
         </div>
-        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 20, background: "white", border: `1px solid ${T.border}`, borderRadius: 8, padding: "10px 18px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-          🏛️ Back to Home
-        </a>
+        <BackToTop />
       </div>
     );
   }
@@ -3470,56 +3530,62 @@ const SEARCH_INDEX = [
   ...SW_OK_COUNTIES.map(c => ({ type: "county" as const, label: `${c.name} County`, shortLabel: c.name, icon: "📍", id: c.id })),
 ];
 
-function MobileSearchBar({ onSelectProgram, onSelectCounty }: {
-  onSelectProgram: (p: ProgramData) => void;
-  onSelectCounty: (id: string) => void;
-}) {
+
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SHARED SITE CHROME — header, menu drawer, breadcrumb, footer, back-to-top
+// Used by the orbit (mobile + desktop) AND by CADCShell (about/contact),
+// so every page has the identical header. Exported for CADCShell.
+// ═════════════════════════════════════════════════════════════════════════════
+
+export const SURVEY_URL = "https://www.surveymonkey.com/r/26cadcneeds";
+
+// Public / compliance documents. Replace href values with real PDF paths under /public/documents/
+export const PUBLIC_DOCUMENTS: { label: string; href: string; note?: string }[] = [
+  { label: "Title VI Non-Discrimination Notice", href: "/documents/title-vi-notice.pdf" },
+  { label: "EEO Statement",                      href: "/documents/eeo-statement.pdf" },
+  { label: "Annual Report",                      href: "/documents/annual-report.pdf" },
+  { label: "Federal Program Disclosures",        href: "/documents/federal-disclosures.pdf" },
+];
+
+// Unified header search — navigates by URL so it works on every page
+function HeaderSearch({ compact = false }: { compact?: boolean }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-
   const results = query.trim().length > 0
     ? SEARCH_INDEX.filter(item =>
         item.label.toLowerCase().includes(query.toLowerCase()) ||
         item.shortLabel.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 6)
+      ).slice(0, 7)
     : [];
-
-  function handleSelect(item: typeof SEARCH_INDEX[0]) {
+  function go(item: typeof SEARCH_INDEX[0]) {
     setQuery(""); setOpen(false);
-    if (item.type === "county") { onSelectCounty(item.id!); return; }
-    const prog = PROGRAMS.find(p => p.slug === item.slug);
-    if (prog) onSelectProgram(prog);
+    if (item.type === "county") router.push(`/?county=${item.id}`);
+    else if (item.type === "subarea") router.push(`/?program=${item.slug}&area=${(item as {subareaId:string}).subareaId}`);
+    else router.push(`/?program=${item.slug}`);
   }
-
+  const id = compact ? "cadc-search-m" : "cadc-search-d";
   return (
-    <div style={{ padding: "0 16px 10px", position: "relative" }} role="search">
-      <label htmlFor="cadc-search-mobile" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Search CADC programs, services, and counties</label>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : "#ddd"}`, borderRadius: 10, padding: "8px 12px", transition: "border-color 0.2s" }}>
-        <span aria-hidden="true" style={{ fontSize: 14, opacity: 0.5 }}>🔍</span>
-        <input
-          id="cadc-search-mobile"
-          type="search"
-          value={query}
+    <div style={{ position: "relative", width: compact ? "100%" : 300 }} role="search">
+      <label htmlFor={id} style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Search CADC programs, services, and counties</label>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : T.border}`, borderRadius: 10, padding: compact ? "9px 12px" : "7px 12px", transition: "border-color 0.2s" }}>
+        <span aria-hidden="true" style={{ fontSize: 13, opacity: 0.5 }}>🔍</span>
+        <input id={id} type="search" value={query} autoComplete="off"
           onChange={e => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder="Search programs, services, counties…"
-          autoComplete="off"
-          aria-autocomplete="list"
-          aria-controls="cadc-search-results-mobile"
-          aria-expanded={open && results.length > 0}
-          style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: T.textPrimary, outline: "none" }}
-        />
+          aria-autocomplete="list" aria-expanded={open && results.length > 0}
+          style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: T.textPrimary, outline: "none" }} />
         {query && <button onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>}
       </div>
       {open && results.length > 0 && (
-        <ul id="cadc-search-results-mobile" role="listbox" aria-label="Search results" style={{ position: "absolute", left: 16, right: 16, top: "100%", background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 100, margin: 0, padding: "6px 0", listStyle: "none" }}>
+        <ul role="listbox" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 300, margin: 0, padding: "6px 0", listStyle: "none" }}>
           {results.map((item, i) => (
             <li key={i} role="option" aria-selected={false}>
-              <button onMouseDown={() => handleSelect(item)} style={{ width: "100%", background: "none", border: "none", padding: "10px 16px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
-                onMouseEnter={e => e.currentTarget.style.background = "#F0F0FF"}
-                onMouseLeave={e => e.currentTarget.style.background = "none"}
-              >
+              <button onMouseDown={() => go(item)} style={{ width: "100%", background: "none", border: "none", padding: "9px 14px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+                onMouseEnter={e => e.currentTarget.style.background = "#F0F0FF"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                 <span aria-hidden="true">{item.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{item.label}</div>
@@ -3534,67 +3600,201 @@ function MobileSearchBar({ onSelectProgram, onSelectCounty }: {
   );
 }
 
-function DesktopSearchBar({ onSelectProgram, onSelectCounty }: {
-  onSelectProgram: (p: ProgramData) => void;
-  onSelectCounty: (id: string) => void;
-}) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const results = query.trim().length > 0
-    ? SEARCH_INDEX.filter(item =>
-        item.label.toLowerCase().includes(query.toLowerCase()) ||
-        item.shortLabel.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8)
-    : [];
-
-  function handleSelect(item: typeof SEARCH_INDEX[0]) {
-    setQuery(""); setOpen(false);
-    if (item.type === "county") { onSelectCounty(item.id!); return; }
-    const prog = PROGRAMS.find(p => p.slug === item.slug);
-    if (prog) onSelectProgram(prog);
-  }
-
+// Slide-out site menu — every feature reachable without the orbit
+function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [open, onClose]);
+  if (!open) return null;
+  const sectionLabel = (t: string) => <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "22px 0 8px" }}>{t}</p>;
+  const linkStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, padding: "11px 12px", borderRadius: 10, color: T.textPrimary, textDecoration: "none", fontSize: 15, fontWeight: 600, background: "white", border: `1px solid ${T.border}`, marginBottom: 6 };
   return (
-    <div style={{ position: "relative", width: 280 }} role="search">
-      <label htmlFor="cadc-search-desktop" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Search CADC programs, services, and counties</label>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : T.border}`, borderRadius: 8, padding: "7px 12px", transition: "border-color 0.2s" }}>
-        <span aria-hidden="true" style={{ fontSize: 13, opacity: 0.5 }}>🔍</span>
-        <input
-          id="cadc-search-desktop"
-          type="search"
-          value={query}
-          onChange={e => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder="Search programs…"
-          autoComplete="off"
-          aria-autocomplete="list"
-          aria-controls="cadc-search-results-desktop"
-          aria-expanded={open && results.length > 0}
-          style={{ flex: 1, border: "none", background: "transparent", fontSize: 12, color: T.textPrimary, outline: "none" }}
-        />
-        {query && <button onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>}
-      </div>
-      {open && results.length > 0 && (
-        <ul id="cadc-search-results-desktop" role="listbox" aria-label="Search results" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 200, margin: 0, padding: "6px 0", listStyle: "none" }}>
-          {results.map((item, i) => (
-            <li key={i} role="option" aria-selected={false}>
-              <button onMouseDown={() => handleSelect(item)} style={{ width: "100%", background: "none", border: "none", padding: "8px 14px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
-                onMouseEnter={e => e.currentTarget.style.background = "#F0F0FF"}
-                onMouseLeave={e => e.currentTarget.style.background = "none"}
-              >
-                <span aria-hidden="true" style={{ fontSize: 14 }}>{item.icon}</span>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textPrimary }}>{item.label}</div>
-                  <div style={{ fontSize: 10, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.type === "county" ? "County" : item.type === "program" ? "Program" : "Service"}</div>
-                </div>
+    <div onClick={onClose} role="dialog" aria-modal="true" aria-label="Site menu"
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(10,22,40,0.55)", backdropFilter: "blur(2px)" }}>
+      <div onClick={e => e.stopPropagation()}
+        style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "min(88vw, 380px)", background: T.void, overflowY: "auto", padding: "16px 18px 40px", boxShadow: "8px 0 32px rgba(0,0,0,0.25)", animation: "drawerIn 0.25s ease" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 34 }} />
+          <button onClick={onClose} aria-label="Close menu" style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 8, width: 38, height: 38, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
+        </div>
+
+        <a href="/" style={{ ...linkStyle, background: T.blue, color: "white", border: "none", marginTop: 12 }}>🏠 Home</a>
+        <a href="/about" style={linkStyle}>🏢 About CADC</a>
+        <a href="/contact" style={linkStyle}>📞 Contact &amp; Locations</a>
+
+        {sectionLabel("Programs & Services")}
+        {PROGRAMS.map(p => (
+          <div key={p.slug} style={{ marginBottom: 6 }}>
+            <div style={{ display: "flex", gap: 6 }}>
+              <a href={`/?program=${p.slug}`} style={{ ...linkStyle, flex: 1, marginBottom: 0 }}>
+                <span aria-hidden="true">{p.icon}</span>{p.name}
+              </a>
+              <button onClick={() => setExpanded(expanded === p.slug ? null : p.slug)}
+                aria-label={`${expanded === p.slug ? "Hide" : "Show"} ${p.shortName} sections`} aria-expanded={expanded === p.slug}
+                style={{ width: 44, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, cursor: "pointer", color: T.blue, fontSize: 14, fontWeight: 800 }}>
+                {expanded === p.slug ? "−" : "+"}
               </button>
-            </li>
+            </div>
+            {expanded === p.slug && (
+              <div style={{ padding: "6px 0 4px 14px", borderLeft: `2px solid ${T.blueLight}`, marginLeft: 10, marginTop: 4 }}>
+                {p.subAreas.map(a => (
+                  <a key={a.id} href={`/?program=${p.slug}&area=${a.id}`} style={{ display: "block", padding: "8px 10px", color: T.textPrimary, textDecoration: "none", fontSize: 14, borderRadius: 8 }}>
+                    <span aria-hidden="true" style={{ marginRight: 8 }}>{a.icon}</span>{a.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {sectionLabel("Find Services by County")}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {SW_OK_COUNTIES.map(c => (
+            <a key={c.id} href={`/?county=${c.id}`} style={{ background: "white", border: `1.5px solid ${T.blue}`, color: T.blue, padding: "7px 13px", borderRadius: 20, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{c.name}</a>
           ))}
-        </ul>
-      )}
+        </div>
+
+        {sectionLabel("Public Documents")}
+        {PUBLIC_DOCUMENTS.map(d => (
+          <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
+        ))}
+
+        {sectionLabel("Get Involved")}
+        <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>📋 2026 Community Needs Survey</a>
+        <a href="tel:+15803355588" style={linkStyle}>☎️ Call CADC — 580-335-5588</a>
+      </div>
     </div>
+  );
+}
+
+export interface CADCHeaderProps {
+  crumbs?: string[];           // e.g. ["Kiowa County","Transit","Fares"] — orbit only
+  onBack?: () => void;         // orbit only
+}
+
+// THE header. Identical on orbit, about, contact.
+export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
+  const isDesktop = useIsDesktop();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const close = useCallback(() => setMenuOpen(false), []);
+  const btn: React.CSSProperties = { background: "white", border: `1px solid ${T.border}`, borderRadius: 8, cursor: "pointer", color: T.blue, display: "flex", alignItems: "center", justifyContent: "center" };
+  return (
+    <>
+      <header role="banner" style={{ position: "sticky", top: 0, zIndex: 400, background: "white", borderBottom: `1px solid ${T.border}`, boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
+        <nav role="navigation" aria-label="Main navigation"
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: isDesktop ? "10px 32px" : "10px 14px" }}>
+          {/* LEFT — menu, logo/home */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+            <button onClick={() => setMenuOpen(true)} aria-label="Open site menu" aria-expanded={menuOpen} style={{ ...btn, width: 42, height: 42, fontSize: 20 }}>☰</button>
+            <a href="/" aria-label="CADC home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+              <img src="/images/cadc-logo.png" alt="CADC" style={{ height: isDesktop ? 40 : 32, width: "auto", display: "block" }} />
+              <span style={{ display: "flex", alignItems: "center", gap: 5, color: T.blue, fontWeight: 800, fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase", background: T.blueLight, padding: "6px 11px", borderRadius: 8 }}>🏠 Home</span>
+            </a>
+          </div>
+          {/* CENTER — desktop search */}
+          {isDesktop && <HeaderSearch />}
+          {/* RIGHT — links + call */}
+          <div style={{ display: "flex", alignItems: "center", gap: isDesktop ? 18 : 8 }}>
+            {isDesktop && [["About","/about"],["Contact","/contact"]].map(([l,h]) => (
+              <a key={l} href={h} style={{ color: T.textMuted, fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em" }}
+                onMouseEnter={e => (e.currentTarget.style.color = T.blue)} onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}>{l}</a>
+            ))}
+            <a href="tel:+15803355588" aria-label="Call CADC at 580-335-5588"
+              style={{ background: T.maroon, color: "white", padding: isDesktop ? "9px 16px" : "9px 13px", borderRadius: 8, fontSize: 12, fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}>
+              📞 {isDesktop ? "580-335-5588" : "Call"}
+            </a>
+          </div>
+        </nav>
+        {/* Mobile search row */}
+        {!isDesktop && <div style={{ padding: "0 14px 10px" }}><HeaderSearch compact /></div>}
+        {/* Breadcrumb strip — single clean row, only when navigating the orbit */}
+        {crumbs && crumbs.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: isDesktop ? "7px 32px" : "7px 14px", background: T.void, borderTop: `1px solid ${T.border}` }}>
+            {onBack && <button onClick={onBack} aria-label="Go back one step" style={{ ...btn, height: 28, padding: "0 10px", fontSize: 12, fontWeight: 700 }}>← Back</button>}
+            <div aria-label="You are here" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.textMuted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
+              {crumbs.map((c, i) => (
+                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                  {i > 0 && <span aria-hidden="true" style={{ opacity: 0.5 }}>›</span>}
+                  <span style={{ fontWeight: i === crumbs.length - 1 ? 800 : 600, color: i === crumbs.length - 1 ? T.textPrimary : T.textMuted, overflow: "hidden", textOverflow: "ellipsis" }}>{c}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </header>
+      <SiteMenuDrawer open={menuOpen} onClose={close} />
+      <style>{`@keyframes drawerIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }`}</style>
+    </>
+  );
+}
+
+// Survey band + footer — survey lives here now (not in the header)
+export function CADCFooter() {
+  return (
+    <>
+      <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
+        aria-label="Take the 2026 CADC Community Needs Survey (opens in new tab)"
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: T.maroon, color: "white", padding: "14px 20px", textDecoration: "none", fontSize: 13, fontWeight: 800, letterSpacing: "0.03em", textAlign: "center" }}>
+        📋 2026 Community Needs Survey — <span style={{ fontWeight: 500 }}>Make Your Voice Heard →</span>
+      </a>
+      <footer role="contentinfo" style={{ background: "#0A1628", color: "white", padding: "40px 24px 28px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
+          <div>
+            <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 48, width: "auto", marginBottom: 12, filter: "brightness(0) invert(1)" }} />
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>Helping People. Changing Lives.<br />Serving Southwest Oklahoma since 1966.</p>
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Programs</p>
+            {PROGRAMS.map(p => (
+              <a key={p.slug} href={`/?program=${p.slug}`} style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>{p.name}</a>
+            ))}
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact</p>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8, margin: "0 0 10px" }}>105 S. Main Street · P.O. Box 989<br />Frederick, OK 73542</p>
+            <a href="tel:+15803355588" style={{ color: "white", fontWeight: 800, fontSize: 16, textDecoration: "none", display: "block", marginBottom: 8 }}>580-335-5588</a>
+            <a href="/contact" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Contact &amp; Locations →</a>
+            <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>About CADC →</a>
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Public Documents &amp; Compliance</p>
+            {PUBLIC_DOCUMENTS.map(d => (
+              <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
+            ))}
+          </div>
+        </div>
+        <div style={{ maxWidth: 960, margin: "28px auto 0", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 18 }}>
+          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0, lineHeight: 1.6 }}>
+            © {new Date().getFullYear()} Community Action Development Corporation · cadcok.org · An Equal Opportunity Employer and Provider · Title VI Compliant
+          </p>
+        </div>
+      </footer>
+    </>
+  );
+}
+
+// Back-to-top — scrolls the window and the nearest scrollable panel
+export function BackToTop({ label = "↑ Back to top of page" }: { label?: string }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  function go() {
+    let el: HTMLElement | null = ref.current?.parentElement ?? null;
+    while (el) {
+      const oy = getComputedStyle(el).overflowY;
+      if ((oy === "auto" || oy === "scroll") && el.scrollHeight > el.clientHeight) { el.scrollTo({ top: 0, behavior: "smooth" }); }
+      el = el.parentElement;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  return (
+    <button ref={ref} onClick={go}
+      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 20px", color: T.blue, fontWeight: 700, fontSize: 12, cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+      {label}
+    </button>
   );
 }
 
@@ -3602,51 +3802,19 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
   return (
     <div style={{ background: T.ghost, minHeight: "100svh", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
 
-      {/* RESTORED: Blue utility bar */}
-      <div style={{ background: T.blue, padding: "9px 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <a href="tel:+18005245552" style={{ color: "white", fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.03em" }}>
-          📞 Ride the River: 1-800-524-5552
-        </a>
-      </div>
-
-      {/* Mobile header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 40, background: "white", borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {stage !== "entry" && (
-              <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Go back">←</button>
-            )}
-            <a href="/" aria-label="CADC home page">
-              <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 30, width: "auto", display: "block" }} />
-            </a>
-            {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
-            {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
-            {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
-            {stage === "content" && activeSubArea && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <a href="/" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>🏛️</a>
-            <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
-            <a href="/contact" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Contact</a>
-            <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">📞 Call</a>
-          </div>
-        </div>
-        {/* Survey banner */}
-        <a
-          href="https://www.surveymonkey.com/r/26cadcneeds"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Take the 2026 CADC Community Needs Survey — your voice shapes our programs (opens in new tab)"
-          style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            background: T.maroon, color: "white",
-            padding: "9px 20px", textDecoration: "none",
-            fontSize: 12, fontWeight: 800, letterSpacing: "0.03em",
-          }}
-        >
-          📋 <span>2026 Community Needs Survey — <strong>Make Your Voice Heard</strong></span>
-        </a>
-        <MobileSearchBar onSelectProgram={tapProgram} onSelectCounty={tapCounty} />
+      <CADCHeader
+        crumbs={
+          stage === "entry" ? undefined
+          : stage === "map" ? ["Select County"]
+          : [activeCountyName ? `${activeCountyName} County` : "All Counties",
+             ...(activeProgram ? [activeProgram.shortName] : []),
+             ...(activeSubArea ? [activeSubArea.shortLabel] : [])]
+        }
+        onBack={stage !== "entry" ? goBack : undefined}
+      />
+      {/* Ride the River quick line */}
+      <div style={{ background: T.blueLight, padding: "7px 20px", textAlign: "center" }}>
+        <a href="tel:+18005245552" style={{ color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🚌 Ride the River: 1-800-524-5552</a>
       </div>
 
       {/* ENTRY — Large tappable logo, centered */}
@@ -3730,13 +3898,9 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <div style={{ padding: 20 }} className="cadc-light-content">
               {activeProgram.subAreas[0]?.content}
             </div>
-            <div style={{ padding: "0 20px 16px" }}>
-              <p style={{ color: T.textMuted, fontSize: 11, fontStyle: "italic", margin: 0 }}>Tap any node above to explore more.</p>
-            </div>
           </div>
-          <a href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 20px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-            🏛️ Back to Home
-          </a>
+          <BackToTop />
+          <BackToTop />
         </div>
       )}
 
@@ -3754,9 +3918,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               {activeSubArea.content}
             </div>
           </div>
-          <a href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 20px", color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-            🏛️ Back to Home
-          </a>
+          <BackToTop />
         </div>
       )}
 
@@ -3776,6 +3938,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
         </div>
       )}
 
+      <CADCFooter />
       <MobileStyles />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { CADCHeader, CADCFooter } from "./CADCOrbitSite";
 
 // ─── Design tokens — must match CADCOrbitSite.tsx ────────────────────────────
 const T = {
@@ -148,78 +149,6 @@ function ShellSketchField() {
 
 // ─── Shell Search Bar ─────────────────────────────────────────────────────────
 
-const SEARCH_PROGRAMS = [
-  { label: "Head Start & Early Head Start", icon: "🏫", href: "/?program=head-start" },
-  { label: "Red River Transportation", icon: "🚌", href: "/?program=transit" },
-  { label: "Weatherization & Housing", icon: "🏠", href: "/?program=weatherization" },
-  { label: "Senior Nutrition", icon: "🍽️", href: "/?program=senior-meals" },
-  { label: "Advantage Home Delivered Meals", icon: "🚗", href: "/?program=advantage" },
-  { label: "VITA Free Tax Help", icon: "📋", href: "/?program=tax-help" },
-  { label: "Community Market", icon: "🛒", href: "/?program=community-market" },
-  { label: "Employment & Workforce", icon: "💼", href: "/?program=employment" },
-  { label: "About CADC", icon: "🏛️", href: "/about" },
-  { label: "Contact Us", icon: "📞", href: "/contact" },
-  { label: "Beckham County", icon: "📍", href: "/#beckham" },
-  { label: "Canadian County", icon: "📍", href: "/#canadian" },
-  { label: "Comanche County", icon: "📍", href: "/#comanche" },
-  { label: "Cotton County", icon: "📍", href: "/#cotton" },
-  { label: "Jefferson County", icon: "📍", href: "/#jefferson" },
-  { label: "Kiowa County", icon: "📍", href: "/#kiowa" },
-  { label: "Roger Mills County", icon: "📍", href: "/#roger-mills" },
-  { label: "Tillman County", icon: "📍", href: "/#tillman" },
-  { label: "Washita County", icon: "📍", href: "/#washita" },
-];
-
-function ShellSearchBar() {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const results = query.trim().length > 0
-    ? SEARCH_PROGRAMS.filter(p => p.label.toLowerCase().includes(query.toLowerCase())).slice(0, 7)
-    : [];
-
-  return (
-    <div style={{ position: "relative", width: 280 }} role="search">
-      <label htmlFor="shell-search" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>
-        Search CADC programs and services
-      </label>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : T.border}`, borderRadius: 8, padding: "7px 12px", transition: "border-color 0.2s" }}>
-        <span aria-hidden="true" style={{ fontSize: 13, opacity: 0.5 }}>🔍</span>
-        <input
-          id="shell-search"
-          type="search"
-          value={query}
-          onChange={e => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder="Search programs…"
-          autoComplete="off"
-          aria-autocomplete="list"
-          aria-controls="shell-search-results"
-          aria-expanded={open && results.length > 0}
-          style={{ flex: 1, border: "none", background: "transparent", fontSize: 12, color: T.textPrimary, outline: "none" }}
-        />
-        {query && (
-          <button onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16, padding: 0 }}>×</button>
-        )}
-      </div>
-      {open && results.length > 0 && (
-        <ul id="shell-search-results" role="listbox" aria-label="Search results" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 200, margin: 0, padding: "6px 0", listStyle: "none" }}>
-          {results.map((item, i) => (
-            <li key={i} role="option" aria-selected={false}>
-              <a href={item.href} onMouseDown={() => setOpen(false)} style={{ width: "100%", padding: "8px 14px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: T.textPrimary }}
-                onMouseEnter={e => (e.currentTarget.style.background = "#F0F0FF")}
-                onMouseLeave={e => (e.currentTarget.style.background = "none")}
-              >
-                <span aria-hidden="true" style={{ fontSize: 14 }}>{item.icon}</span>
-                <span style={{ fontSize: 12, fontWeight: 700 }}>{item.label}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
 
 // ─── CADC Shell ───────────────────────────────────────────────────────────────
 
@@ -242,135 +171,14 @@ export default function CADCShell({ children, mainId = "main-content" }: CADCShe
       {/* Floating sketch background */}
       <ShellSketchField />
 
-      {/* Survey banner */}
-      <a
-        href="https://www.surveymonkey.com/r/26cadcneeds"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Take the 2026 CADC Community Needs Survey — your voice shapes our programs (opens in new tab)"
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: T.maroon, color: "white", padding: "9px 20px", textDecoration: "none", fontSize: 12, fontWeight: 800, letterSpacing: "0.03em", position: "relative", zIndex: 50 }}
-      >
-        📋 <span>2026 Community Needs Survey — <strong>Make Your Voice Heard</strong></span>
-      </a>
-
-      {/* Nav — matches desktop nav in CADCOrbitSite exactly */}
-      <nav
-        role="navigation"
-        aria-label="Main navigation"
-        style={{ position: "sticky", top: 0, zIndex: 40, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}
-      >
-        <Link href="/" aria-label="CADC home page">
-          <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 44, width: "auto", display: "block" }} />
-        </Link>
-
-        <ShellSearchBar />
-
-        <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-          <a
-            href="https://www.surveymonkey.com/r/26cadcneeds"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Take the 2026 CADC Community Needs Survey (opens in new tab)"
-            style={{ background: T.maroon, color: "white", padding: "8px 16px", borderRadius: 20, fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.04em", whiteSpace: "nowrap" }}
-          >
-            📋 Take Our Survey
-          </a>
-          {[
-            { label: "Home", href: "/" },
-            { label: "About", href: "/about" },
-            { label: "Contact", href: "/contact" },
-            { label: "580-335-5588", href: "tel:+15803355588" },
-          ].map(item => (
-            <a
-              key={item.label}
-              href={item.href}
-              style={{ color: item.label === "Home" ? T.blue : T.textMuted, fontSize: 13, fontWeight: item.label === "Home" ? 700 : 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = T.blue)}
-              onMouseLeave={e => (e.currentTarget.style.color = item.label === "Home" ? T.blue : T.textMuted)}
-            >{item.label === "Home" ? "🏛️ Home" : item.label}</a>
-          ))}
-        </div>
-      </nav>
+      <CADCHeader />
 
       {/* Page content */}
       <main id={mainId} role="main" style={{ position: "relative", zIndex: 1 }}>
         {children}
       </main>
 
-      {/* Footer */}
-      <footer style={{ background: "#0A1628", color: "white", padding: "48px 48px 32px", position: "relative", zIndex: 1 }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 48, marginBottom: 40 }}>
-            {/* Logo + tagline */}
-            <div style={{ flex: "1 1 240px" }}>
-              <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 56, width: "auto", marginBottom: 16, filter: "brightness(0) invert(1)" }} />
-              <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, maxWidth: 280 }}>
-                Helping People. Changing Lives.<br />
-                Serving Southwest Oklahoma since 1966.
-              </p>
-            </div>
-
-            {/* Programs */}
-            <div style={{ flex: "1 1 180px" }}>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>Programs</p>
-              {[
-                ["Head Start", "/?program=head-start"],
-                ["Red River Transit", "/?program=transit"],
-                ["Weatherization", "/?program=weatherization"],
-                ["Senior Nutrition", "/?program=senior-meals"],
-                ["Community Market", "/?program=community-market"],
-                ["Advantage Meals", "/?program=advantage"],
-                ["VITA Tax Help", "/?program=tax-help"],
-              ].map(([label, href]) => (
-                <a key={label} href={href} style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 13, textDecoration: "none", marginBottom: 8, transition: "color 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
-                >{label}</a>
-              ))}
-            </div>
-
-            {/* Contact */}
-            <div style={{ flex: "1 1 200px" }}>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>Contact</p>
-              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, lineHeight: 1.8, marginBottom: 12 }}>
-                105 S. Main Street<br />
-                Frederick, OK 73542
-              </p>
-              <a href="tel:+15803355588" style={{ color: "white", fontWeight: 700, fontSize: 15, textDecoration: "none", display: "block", marginBottom: 8 }}>580-335-5588</a>
-              <a href="/contact" style={{ color: "rgba(1,1,255,0.7)", fontSize: 13, textDecoration: "none", fontWeight: 600 }}>Contact page →</a>
-            </div>
-
-            {/* Survey CTA */}
-            <div style={{ flex: "1 1 200px" }}>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>Community Input</p>
-              <a
-                href="https://www.surveymonkey.com/r/26cadcneeds"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ display: "block", background: T.maroon, color: "white", padding: "14px 18px", borderRadius: 10, textDecoration: "none", fontWeight: 700, fontSize: 13, lineHeight: 1.5 }}
-              >
-                📋 2026 Community Needs Survey<br />
-                <span style={{ fontWeight: 400, fontSize: 11, opacity: 0.8 }}>Your input shapes our programs</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Bottom bar */}
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 24, display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0 }}>
-              © {new Date().getFullYear()} Community Action Development Corporation · cadcok.org · EEO / Title VI Compliant
-            </p>
-            <div style={{ display: "flex", gap: 20 }}>
-              {[["About", "/about"], ["Contact", "/contact"], ["Privacy", "/privacy"]].map(([label, href]) => (
-                <a key={label} href={href} style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textDecoration: "none", transition: "color 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
-                >{label}</a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
+      <CADCFooter />
 
       {/* ADA + focus styles */}
       <style>{`
