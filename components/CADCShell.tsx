@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { CADCHeader, CADCFooter } from "./CADCOrbitSite";
+import { CADCHeader, CADCFooter, CmsProvider } from "./CADCOrbitSite";
 
 // ─── Design tokens — must match CADCOrbitSite.tsx ────────────────────────────
 const T = {
@@ -159,6 +159,7 @@ interface CADCShellProps {
 
 export default function CADCShell({ children, mainId = "main-content" }: CADCShellProps) {
   return (
+    <CmsProvider>
     <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative" }}>
       {/* ADA skip link */}
       <a
@@ -187,5 +188,6 @@ export default function CADCShell({ children, mainId = "main-content" }: CADCShe
         @media (forced-colors: active) { button, a { border: 1px solid ButtonText; } }
       `}</style>
     </div>
+    </CmsProvider>
   );
 }

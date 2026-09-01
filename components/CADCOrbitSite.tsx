@@ -16,7 +16,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense, createContext, useContext } from "react";
+import { DEFAULT_CONTENT, fetchContent, type SiteContent } from "@/lib/cms";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -68,6 +69,16 @@ function useIsDesktop() {
     return () => mq.removeEventListener("change", handler);
   }, []);
   return isDesktop;
+}
+
+// ─── Live content (Vercel KV via /api/cms) ────────────────────────────────────
+// Directors edit at /admin. Falls back to DEFAULT_CONTENT / hardcoded data.
+const CmsContext = createContext<SiteContent>(DEFAULT_CONTENT);
+export function useCms() { return useContext(CmsContext); }
+export function CmsProvider({ children }: { children: React.ReactNode }) {
+  const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  useEffect(() => { fetchContent().then(setContent); }, []);
+  return <CmsContext.Provider value={content}>{children}</CmsContext.Provider>;
 }
 
 // ─── Senior Nutrition Menu Data ───────────────────────────────────────────────
@@ -137,8 +148,8 @@ const MARKET_SCHEDULE_DATA = {
   } as Record<string, { time: string; location: string }[]>,
 };
 
-function generateMealICS(): string {
-  const { month, year, meals } = MENU_DATA;
+function generateMealICS(data: typeof MENU_DATA = MENU_DATA): string {
+  const { month, year, meals } = data;
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -164,8 +175,8 @@ function generateMealICS(): string {
   return lines.join("\r\n");
 }
 
-function generateMarketICS(): string {
-  const { month, year, stops } = MARKET_SCHEDULE_DATA;
+function generateMarketICS(data: typeof MARKET_SCHEDULE_DATA = MARKET_SCHEDULE_DATA): string {
+  const { month, year, stops } = data;
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -213,7 +224,8 @@ function downloadICS(content: string, filename: string) {
 function MarketSchedule({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const { month, year, note, transportation, stops } = MARKET_SCHEDULE_DATA;
+  const cms = useCms();
+  const { month, year, note, stops } = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
 
   const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
   const lastDay = new Date(year, firstDay.getMonth() + 1, 0);
@@ -355,6 +367,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
 }
 
 function MarketSchedulePanel() {
+  const cms = useCms(); const md = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
   return (
     <div className="cadc-light-content">
       <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
@@ -362,8 +375,8 @@ function MarketSchedulePanel() {
       </p>
       <MarketSchedule dark={false} />
       <button
-        onClick={() => downloadICS(generateMarketICS(), `cadc-community-market-${MARKET_SCHEDULE_DATA.month.toLowerCase()}-${MARKET_SCHEDULE_DATA.year}.ics`)}
-        aria-label={`Download ${MARKET_SCHEDULE_DATA.month} ${MARKET_SCHEDULE_DATA.year} market schedule as ICS file`}
+        onClick={() => downloadICS(generateMarketICS(md), `cadc-community-market-${md.month.toLowerCase()}-${md.year}.ics`)}
+        aria-label={`Download ${md.month} ${md.year} market schedule as ICS file`}
         style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 4, background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "10px 16px", fontSize: 12, fontWeight: 700, color: "#0101FF", cursor: "pointer", letterSpacing: "0.04em" }}
       >
         📅 Save Schedule to Calendar (.ics)
@@ -384,7 +397,8 @@ function MarketSchedulePanel() {
 function MealCalendar({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const { month, year, note, meals } = MENU_DATA;
+  const cms = useCms();
+  const { month, year, note, meals } = cms.seniorMenu ?? MENU_DATA;
 
   // Build calendar grid — full weeks containing the month
   const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
@@ -553,7 +567,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
 
 // MealCalendarPanel detects desktop (dark) vs mobile (light) context
 function MealCalendarPanel() {
-  const isDesktop = useIsDesktop();
+  const cms = useCms(); const mn = cms.seniorMenu ?? MENU_DATA;
   return (
     <div className="cadc-light-content">
       <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
@@ -561,8 +575,8 @@ function MealCalendarPanel() {
       </p>
       <MealCalendar dark={false} />
       <button
-        onClick={() => downloadICS(generateMealICS(), `cadc-senior-meals-${MENU_DATA.month.toLowerCase()}-${MENU_DATA.year}.ics`)}
-        aria-label={`Download ${MENU_DATA.month} ${MENU_DATA.year} senior meal calendar as ICS file`}
+        onClick={() => downloadICS(generateMealICS(mn), `cadc-senior-meals-${mn.month.toLowerCase()}-${mn.year}.ics`)}
+        aria-label={`Download ${mn.month} ${mn.year} senior meal calendar as ICS file`}
         style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 4, background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "10px 16px", fontSize: 12, fontWeight: 700, color: "#0101FF", cursor: "pointer", letterSpacing: "0.04em" }}
       >
         📅 Save to Calendar (.ics)
@@ -1502,6 +1516,24 @@ function MarketCommunities() {
   );
 }
 
+
+// Staff & Leadership — editable from /admin
+function StaffList() {
+  const { staff } = useCms();
+  return (
+    <div className="cadc-stack">
+      {staff.map(p => (
+        <div key={p.name + p.title} className="cadc-card-sm">
+          <p className="cadc-card-title">{p.name}</p>
+          <p>{p.title}</p>
+          {p.phone && <a href={`tel:+1${p.phone.replace(/\D/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.phone}</a>}
+          {p.email && <a href={`mailto:${p.email}`} className="cadc-link" style={{display:"block"}}>{p.email}</a>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -1722,8 +1754,11 @@ const PROGRAMS: ProgramData[] = [
           <div className="cadc-light-content">
             <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
             <div className="cadc-card">
-              <p className="cadc-label">Toll-free scheduling</p>
-              <a href="tel:+18005245552" className="cadc-btn">📞 1-800-524-5552</a>
+              <p className="cadc-label">Schedule a ride</p>
+              <a href="tel:+18005245552" className="cadc-btn" style={{marginBottom:8}}>📞 1-800-524-5552</a>
+              <a href="tel:+18005597344" className="cadc-btn">📞 1-800-559-7344</a>
+              <p className="cadc-note">Two scheduling lines — call either. Spanish-speaking staff available.</p>
+              <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
             </div>
             <div className="cadc-card">
               <p className="cadc-label">Counties served</p>
@@ -1849,9 +1884,23 @@ const PROGRAMS: ProgramData[] = [
               </ul>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Income eligibility guidelines</p>
-              <p>Specific income thresholds are determined annually. View the current DOE/DHS income guidelines for your household size.</p>
-              <a href="https://www.okcommerce.gov/wp-content/uploads/Attachment-A-DOE-26-DHS-26-Income-Guidelines.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">View Income Guidelines →</a>
+              <p className="cadc-label">2026–2027 Income eligibility guidelines</p>
+              <p style={{fontSize:11,margin:"0 0 10px",color:"#374151"}}>DOE WAP, DOE BIL &amp; DHS LIHEAP · Effective April 1, 2026 – March 30, 2027 · 200% of Federal Poverty Level</p>
+              <div className="cadc-fare-table">
+                <div className="cadc-fare-header"><span>Household Size</span><span>100% FPL</span><span>200% FPL</span></div>
+                {[
+                  ["1 person","$15,960","$31,920"],
+                  ["2 people","$21,640","$43,280"],
+                  ["3 people","$27,320","$54,640"],
+                  ["4 people","$33,000","$66,000"],
+                  ["5 people","$38,680","$77,360"],
+                  ["6 people","$44,360","$88,720"],
+                  ["7 people","$50,040","$100,080"],
+                  ["8 people","$55,720","$111,440"],
+                ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
+              </div>
+              <p className="cadc-note">For households exceeding 8 persons, add $10,760 per additional member at 200% FPL.</p>
+              <a href="https://www.okcommerce.gov/wp-content/uploads/Attachment-A-DOE-26-DHS-26-Income-Guidelines.pdf" target="_blank" rel="noopener noreferrer" className="cadc-link" style={{display:"block",marginTop:8,fontSize:12}}>Source: Oklahoma Commerce DOE WAP Program Notice 26-6 →</a>
             </div>
           </div>
         ),
@@ -2122,7 +2171,7 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "market-schedule", label: "September Schedule", shortLabel: "Schedule", icon: "📅",
+        id: "market-schedule", label: "Monthly Schedule", shortLabel: "Schedule", icon: "📅",
         content: <MarketSchedulePanel />,
       },
       {
@@ -2242,22 +2291,7 @@ const PROGRAMS: ProgramData[] = [
         id: "leadership", label: "Staff & Leadership", shortLabel: "Staff", icon: "👤",
         content: (
           <div className="cadc-light-content">
-            <div className="cadc-stack">
-              {[
-                {n:"Leslea Hixson",t:"Executive Director",p:"580-335-5588"},
-                {n:"Robin Harris",t:"Director, Head Start & Early Head Start",p:"580-726-3343",e:"rharris@cadcok.org"},
-                {n:"Gilbert Nuncio",t:"Director, Red River Transportation",p:"580-928-2199"},
-                {n:"Robert Meador",t:"Director, Weatherization & Housing",p:"580-305-0853"},
-                {n:"Laura Vardell",t:"Director, Senior Nutrition",p:"580-335-5588"},
-                {n:"Scott Fraley",t:"Director, Community Market",p:"580-305-1964",e:"SFraley@cadcok.org"},
-                {n:"Kristie Jackson",t:"Director, Advantage Home Delivered Meals",p:"580-393-2216"},
-              ].map(p=><div key={p.n} className="cadc-card-sm">
-                <p className="cadc-card-title">{p.n}</p>
-                <p>{p.t}</p>
-                {"p" in p && <a href={`tel:+1${p.p.replace(/-/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.p}</a>}
-                {"e" in p && <a href={`mailto:${p.e}`} className="cadc-link" style={{display:"block"}}>{p.e}</a>}
-              </div>)}
-            </div>
+            <StaffList />
           </div>
         ),
       },
@@ -2265,10 +2299,62 @@ const PROGRAMS: ProgramData[] = [
         id: "board-members", label: "Board of Directors", shortLabel: "Board", icon: "🏛️",
         content: (
           <div className="cadc-light-content">
-            <p>CADC is governed by a Board of Directors representing the communities we serve across Southwest Oklahoma.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Board information coming soon</p>
-              <p>Contact us for board meeting schedules and governance documents.</p>
+            <p>CADC is governed by a tripartite Board of Directors — public sector, private sector, and low-income community representatives — from each county we serve. Members serve 3-year terms. Source: FY '25 CSBG Board Membership Roster, August 18, 2025.</p>
+            <p style={{fontSize:11,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Chairman: Eddie Whitworth · Frederick, OK</p>
+            <div className="cadc-stack">
+              {[
+                {county:"Beckham County",members:[
+                  {name:"Purcy Walker",addr:"Box 461, Elk City, OK 73648",phone:"580-821-0303",sector:"Low Income",group:"Sayre Senior Citizens Group",term:"4/2025–4/2028"},
+                  {name:"Tate Finnell",addr:"P.O. Box 67, Sayre, OK 73662",phone:"928-2457 / Cell: 580-243-8612",sector:"Public",group:"Beckham County Commissioners (Exec. Committee)",term:"4/2023–4/2026"},
+                  {name:"Jackie Anderson",addr:"1208 S. Washington, Elk City, OK 73644",phone:"580-309-7887",sector:"Private",group:"Elk City Chamber of Commerce",term:"6/2025–6/2028"},
+                ]},
+                {county:"Cotton County",members:[
+                  {name:"Dave Johnson",addr:"508 S. Broadway, Walters, OK 73572",phone:"580-458-1524 / Cell: 580-755-0551",sector:"Private",group:"Walters Chamber of Commerce (Vice-Chairman Exec. Committee)",term:"6/2023–6/2026"},
+                  {name:"Milton Honeycutt",addr:"P.O. Box 10, Randlett, OK",phone:"940-642-5020",sector:"Public",group:"Cotton County Commissioners",term:"1/2023–1/2026"},
+                  {name:"Paul Metcalfe",addr:"211 E. Colorado St., Walters, OK 73572",phone:"580-512-9005",sector:"Low Income",group:"Walters Church of the Nazarene",term:"3/2023–3/2026"},
+                ]},
+                {county:"Comanche County",members:[
+                  {name:"Jo Peters",addr:"6306 SW Brookline Ave., Lawton, OK 73505",phone:"580-512-2006",sector:"Private",group:"NAACP Chapter 6131",term:"9/2024–9/2027"},
+                  {name:"Chandra Barnett",addr:"2213 SW Edinburough Dr., Lawton, OK 73505",phone:"",sector:"Low Income",group:"Cache Sr. Citizens Group",term:"11/2024–11/2027"},
+                ]},
+                {county:"Jefferson County",members:[
+                  {name:"(Seat Vacant)",addr:"",phone:"",sector:"",group:"Contact CADC to learn about board opportunities",term:""},
+                ]},
+                {county:"Kiowa County",members:[
+                  {name:"Gary Jennings",addr:"300 16th St., Snyder, OK 73566",phone:"580-682-0288",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"9/2022–9/2025"},
+                  {name:"Chris Block",addr:"14070 N. 2180 Rd., Hobart, OK 73651",phone:"",sector:"Low Income",group:"",term:"11/2024–11/2027"},
+                ]},
+                {county:"Roger Mills County",members:[
+                  {name:"Monty Denny",addr:"9071 US 283, Cheyenne, OK 73628",phone:"580-497-7773",sector:"Public",group:"Roger Mills County Commissioners / Cheyenne & Arapaho Tribes",term:"1/2023–1/2026"},
+                  {name:"Rector Candy",addr:"202 S. 7th St., Hammon, OK 73650",phone:"",sector:"Private",group:"",term:"1/2024–1/2027"},
+                ]},
+                {county:"Tillman County",members:[
+                  {name:"Roger Heap",addr:"P.O. Box 796, Frederick, OK 73542",phone:"580-770-1405",sector:"Public",group:"Frederick Lions Club",term:"1/2024–1/2027"},
+                  {name:"Eddie Whitworth",addr:"520 N. 18th, Frederick, OK 73542",phone:"335-1175",sector:"Public",group:"Frederick Head Start Parents' Committee (Chairman)",term:"2/2024–2/2027"},
+                  {name:"Araceli Rodriguez",addr:"819 Willard, Frederick, OK 73542",phone:"305-7260",sector:"Private",group:"Frederick Chamber of Commerce",term:"5/2025–5/2028"},
+                ]},
+                {county:"Washita County",members:[
+                  {name:"Bruce Mayfield",addr:"11246 N. 2420 Rd., Colony, OK 73021",phone:"580-393-1129",sector:"Private",group:"Town of Sentinel (Sec Exec Committee)",term:"7/2024–7/2027"},
+                  {name:"Betty Mayfield",addr:"11246 N. 2420 Rd., Colony, OK 73021",phone:"",sector:"Low Income",group:"Head Start",term:"5/2025–5/2028"},
+                  {name:"Greg Chandler",addr:"P.O. Box 93, Sentinel, OK 73664",phone:"C: 580-821-0467 / Shop: 580-674-3392",sector:"Public",group:"Washita County Commissioners",term:"1/2023–1/2026"},
+                ]},
+              ].map(({county,members})=>(
+                <div key={county} className="cadc-card-sm">
+                  <p className="cadc-card-title">{county}</p>
+                  {members.map(m=>(
+                    <div key={m.name} style={{marginBottom:10,paddingBottom:10,borderBottom:"1px solid #e5e7eb"}}>
+                      <p style={{fontWeight:700,fontSize:13,margin:"0 0 2px"}}>{m.name}</p>
+                      {m.sector && <p style={{fontSize:10,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 2px"}}>{m.sector} Sector{m.group ? ` — ${m.group}` : ""}</p>}
+                      {m.addr && <p style={{fontSize:11,color:"#6b7280",margin:"0 0 2px"}}>{m.addr}</p>}
+                      {m.phone && <a href={"tel:+1" + m.phone.split("/")[0].replace(/\D/g,"")} style={{fontSize:11,color:"#0101FF",fontWeight:700,textDecoration:"none",display:"block"}}>{m.phone}</a>}
+                      {m.term && <p style={{fontSize:10,color:"#9ca3af",margin:"4px 0 0"}}>Term: {m.term}</p>}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="cadc-card" style={{marginTop:12}}>
+              <p className="cadc-label">Board questions</p>
               <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
             </div>
           </div>
@@ -2732,7 +2818,7 @@ const CADC_EXTENDED_COUNTIES = ["caddo","custer","stephens","grady","jackson","h
 // Which programs are available per county
 const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
   beckham:      ["head-start","transit","weatherization","advantage","community-market"],
-  canadian:     ["head-start","transit","weatherization","advantage"],
+  canadian:     ["head-start","transit","advantage"], // Weatherization not yet active per Robert Meador 9/1/2026
   comanche:     ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   cotton:       ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   jefferson:    ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
@@ -3543,10 +3629,10 @@ export const SURVEY_URL = "https://www.surveymonkey.com/r/26cadcneeds";
 
 // Public / compliance documents. Replace href values with real PDF paths under /public/documents/
 export const PUBLIC_DOCUMENTS: { label: string; href: string; note?: string }[] = [
-  { label: "Title VI Non-Discrimination Notice", href: "/documents/title-vi-notice.pdf" },
-  { label: "EEO Statement",                      href: "/documents/eeo-statement.pdf" },
-  { label: "Annual Report",                      href: "/documents/annual-report.pdf" },
-  { label: "Federal Program Disclosures",        href: "/documents/federal-disclosures.pdf" },
+  { label: "Title VI Policy (Red River Transportation)", href: "/documents/title-vi-policy.pdf" },
+  { label: "Affirmative Action Plan 2023",               href: "/documents/affirmative-action-plan-2023.pdf" },
+  { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
+  { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
 ];
 
 // Unified header search — navigates by URL so it works on every page
@@ -3603,6 +3689,7 @@ function HeaderSearch({ compact = false }: { compact?: boolean }) {
 // Slide-out site menu — every feature reachable without the orbit
 function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const { documents } = useCms();
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -3660,7 +3747,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
         </div>
 
         {sectionLabel("Public Documents")}
-        {PUBLIC_DOCUMENTS.map(d => (
+        {documents.map(d => (
           <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
         ))}
 
@@ -3680,11 +3767,18 @@ export interface CADCHeaderProps {
 // THE header. Identical on orbit, about, contact.
 export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
   const isDesktop = useIsDesktop();
+  const { announcement } = useCms();
   const [menuOpen, setMenuOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const btn: React.CSSProperties = { background: "white", border: `1px solid ${T.border}`, borderRadius: 8, cursor: "pointer", color: T.blue, display: "flex", alignItems: "center", justifyContent: "center" };
   return (
     <>
+      {announcement?.enabled && announcement.text && (
+        <a href={announcement.href || undefined} role="status" aria-live="polite"
+          style={{ display: "block", background: T.blue, color: "white", padding: "10px 16px", textAlign: "center", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+          📣 {announcement.text}{announcement.href ? " →" : ""}
+        </a>
+      )}
       <header role="banner" style={{ position: "sticky", top: 0, zIndex: 400, background: "white", borderBottom: `1px solid ${T.border}`, boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
         <nav role="navigation" aria-label="Main navigation"
           style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: isDesktop ? "10px 32px" : "10px 14px" }}>
@@ -3735,6 +3829,15 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
 
 // Survey band + footer — survey lives here now (not in the header)
 export function CADCFooter() {
+  const { documents } = useCms();
+  const router = useRouter();
+  // Hidden staff door — tap the © line 5 times within 3 seconds → /admin
+  const taps = useRef<number[]>([]);
+  function secretTap() {
+    const now = Date.now();
+    taps.current = [...taps.current.filter(t => now - t < 3000), now];
+    if (taps.current.length >= 5) { taps.current = []; router.push("/admin"); }
+  }
   return (
     <>
       <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
@@ -3763,13 +3866,13 @@ export function CADCFooter() {
           </div>
           <div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Public Documents &amp; Compliance</p>
-            {PUBLIC_DOCUMENTS.map(d => (
+            {documents.map(d => (
               <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
             ))}
           </div>
         </div>
         <div style={{ maxWidth: 960, margin: "28px auto 0", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 18 }}>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0, lineHeight: 1.6 }}>
+          <p onClick={secretTap} style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0, lineHeight: 1.6, userSelect: "none", cursor: "default" }}>
             © {new Date().getFullYear()} Community Action Development Corporation · cadcok.org · An Equal Opportunity Employer and Provider · Title VI Compliant
           </p>
         </div>
@@ -4319,7 +4422,7 @@ export default function CADCOrbitSite() {
         <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
       </div>
     }>
-      <CADCOrbitSiteInner />
+      <CmsProvider><CADCOrbitSiteInner /></CmsProvider>
     </Suspense>
   );
 }
