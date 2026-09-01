@@ -1746,7 +1746,7 @@ const PROGRAMS: ProgramData[] = [
     shortName: "Transit",
     icon: "🚌",
     color: T.blue,
-    tagline: "110 vehicles · ADA equipped · 12 counties",
+    tagline: "220,175 passenger trips · 1.5M revenue miles · 12 counties",
     subAreas: [
       {
         id: "rides", label: "Schedule a Ride", shortLabel: "Schedule", icon: "📅",
@@ -1915,7 +1915,7 @@ const PROGRAMS: ProgramData[] = [
     shortName: "Senior Meals",
     icon: "🍽️",
     color: T.blue,
-    tagline: "More than a meal — nutrition, connection, and dignity",
+    tagline: "28,827 congregate meals · 24,485 home-delivered · 327 clients served in 2025",
     subAreas: [
       {
         id: "sn-about", label: "About the Program", shortLabel: "About", icon: "ℹ️",
@@ -2049,7 +2049,7 @@ const PROGRAMS: ProgramData[] = [
         id: "vita-what", label: "About VITA", shortLabel: "About", icon: "ℹ️",
         content: (
           <div className="cadc-light-content">
-            <p>The Volunteer Income Tax Assistance (VITA) program offers free tax preparation by IRS-certified volunteers to individuals and families who generally make $67,000 or less.</p>
+            <p>The Volunteer Income Tax Assistance (VITA) program offers free tax preparation by IRS-certified volunteers to individuals and families who generally make $55,000 or less. In 2025, CADC completed 91 tax returns. VITA has been available in Beckham, Cotton, Kiowa, Washita, and Tillman counties for 18 years.</p>
             <div className="cadc-grid-2">
               {["$0 filing cost","IRS-certified volunteers","Federal and state returns","EITC maximization","No hidden fees","Secure and confidential"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
             </div>
@@ -2318,7 +2318,7 @@ const PROGRAMS: ProgramData[] = [
                   {name:"Chandra Barnett",addr:"2213 SW Edinburough Dr., Lawton, OK 73505",phone:"",sector:"Low Income",group:"Cache Sr. Citizens Group",term:"11/2024–11/2027"},
                 ]},
                 {county:"Jefferson County",members:[
-                  {name:"(Seat Vacant)",addr:"",phone:"",sector:"",group:"Contact CADC to learn about board opportunities",term:""},
+                  {name:"Bryce Bohot",addr:"",phone:"",sector:"",group:"Jefferson County",term:""},
                 ]},
                 {county:"Kiowa County",members:[
                   {name:"Gary Jennings",addr:"300 16th St., Snyder, OK 73566",phone:"580-682-0288",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"9/2022–9/2025"},
@@ -2413,8 +2413,9 @@ const PROGRAMS: ProgramData[] = [
             <p>CADC Advantage provides home-delivered meals to older adults and individuals with disabilities through Oklahoma Medicaid waiver programs — Advantage, Living Choice, and Medically Fragile.</p>
             <p>Meals are delivered every two weeks. Members may receive 14 or 28 meals per delivery, plus fresh milk and juice. Both frozen and shelf-stable meal options are available.</p>
             <div className="cadc-card">
-              <p className="cadc-label">17 counties served</p>
-              <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Grady · Greer · Harmon · Jackson · Jefferson · Kiowa · McClain · Roger Mills · Stephens · Tillman · Washita</p>
+              <p className="cadc-label">13 counties served</p>
+              <p>Beckham · Caddo · Comanche · Cotton · Custer · Greer · Harmon · Jackson · Jefferson · Kiowa · Roger Mills · Tillman · Washita</p>
+              <p className="cadc-note">Service area per Annual Report 2025. Contact CADC for eligibility confirmation in your county.</p>
             </div>
           </div>
         ),
