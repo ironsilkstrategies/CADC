@@ -18,7 +18,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import CADCServiceMap from "./CADCServiceMap";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -494,12 +493,11 @@ function MealCalendarPanel() {
   );
 }
 
-// ServiceMapPanel — wraps CADCServiceMap with dark/light context detection
+// ServiceMapPanel — uses the built-in OklahomaCountyMap
 function ServiceMapPanel() {
-  const isDesktop = useIsDesktop();
   return (
-    <div className="cadc-light-content">
-      <CADCServiceMap dark={isDesktop} />
+    <div style={{ background: "white", borderRadius: 12, border: `1px solid ${T.border}`, padding: 12, margin: "12px 0" }}>
+      <OklahomaCountyMap selectedCounty={null} onSelectCounty={() => {}} dark={false} />
     </div>
   );
 }
