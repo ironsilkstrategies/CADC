@@ -532,6 +532,15 @@ export default function AboutPage() {
             <a href={`tel:+1${contact.mainPhone.replace(/\D/g,"")}`} aria-label={`Call CADC main office at ${contact.mainPhone}`} style={{ background: "#CC0000", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
               📞 {contact.mainPhone}
             </a>
+            <a
+              href="https://www.surveymonkey.com/r/26cadcneeds"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Take the 2026 CADC Community Needs Survey (opens in new tab)"
+              style={{ background: "#0101FF", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}
+            >
+              📋 2026 Community Survey
+            </a>
             {annualReport && (
               <a href={(annualReport as { href: string }).href} target="_blank" rel="noopener noreferrer" aria-label="Download 2024 Annual Report (opens in new tab)" style={{ border: "1px solid #0101FF", color: "#0101FF", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
                 2024 Annual Report ↗
