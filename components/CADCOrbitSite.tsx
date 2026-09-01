@@ -16,7 +16,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -2810,7 +2810,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
 type Stage = "entry" | "map" | "county" | "program" | "content";
 type TransitionState = "idle" | "out" | "in";
 
-export default function CADCOrbitSite() {
+function CADCOrbitSiteInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -4145,5 +4145,18 @@ function MobileStyles() {
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 12px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; }
     `}</style>
+  );
+}
+
+// ─── Suspense wrapper — required by Next.js for useSearchParams() ─────────────
+export default function CADCOrbitSite() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F9FF" }}>
+        <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
+      </div>
+    }>
+      <CADCOrbitSiteInner />
+    </Suspense>
   );
 }
