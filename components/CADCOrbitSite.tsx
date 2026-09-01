@@ -1281,23 +1281,26 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
 
 function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
   const photos = SUB_AREA_PHOTOS[programSlug];
-  const [idx, setIdx] = useState(0);
-  const [visible, setVisible] = useState(true);
+  const [current, setCurrent] = useState(0);
+  const [next, setNext] = useState(1);
+  const [transitioning, setTransitioning] = useState(false);
 
   useEffect(() => {
     if (!photos || photos.length <= 1) return;
     const interval = setInterval(() => {
-      setVisible(false);
+      const nextIdx = (current + 1) % photos.length;
+      setNext(nextIdx);
+      setTransitioning(true);
       setTimeout(() => {
-        setIdx(i => (i + 1) % photos.length);
-        setVisible(true);
-      }, 400);
-    }, 3500);
+        setCurrent(nextIdx);
+        setTransitioning(false);
+      }, 700);
+    }, 4000);
     return () => clearInterval(interval);
-  }, [photos?.length]);
+  }, [current, photos?.length]);
 
   if (!photos || photos.length === 0) return null;
-  const photo = photos[idx];
+  const idx = current;
 
   return (
     <div style={{
@@ -1305,14 +1308,28 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
       marginBottom: 16, position: "relative",
       background: "#e8eaff",
     }}>
+      {/* Bottom layer — current photo, always fully visible */}
       <img
-        src={photo.src}
-        alt={photo.alt}
+        src={photos[current]?.src}
+        alt={photos[current]?.alt}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
-          width: "100%", height: "100%", objectFit: "cover", display: "block",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.4s ease",
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%", objectFit: "cover",
+          opacity: 1,
+        }}
+      />
+      {/* Top layer — next photo, fades in over the current */}
+      <img
+        key={next}
+        src={photos[next]?.src}
+        alt={photos[next]?.alt}
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%", objectFit: "cover",
+          opacity: transitioning ? 1 : 0,
+          transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
         }}
       />
       {photos.length > 1 && (
@@ -1322,7 +1339,7 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         }}>
           {photos.map((_, i) => (
             <div key={i} style={{
-              width: i === idx ? 16 : 5, height: 5, borderRadius: 3,
+              width: i === current ? 16 : 5, height: 5, borderRadius: 3,
               background: i === idx ? "white" : "rgba(255,255,255,0.45)",
               transition: "width 0.3s ease, background 0.3s ease",
             }} />
@@ -1529,6 +1546,98 @@ function StaffList() {
           {p.phone && <a href={`tel:+1${p.phone.replace(/\D/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.phone}</a>}
           {p.email && <a href={`mailto:${p.email}`} className="cadc-link" style={{display:"block"}}>{p.email}</a>}
         </div>
+      ))}
+    </div>
+  );
+}
+
+
+// ─── Program Quick-Action CTAs ────────────────────────────────────────────────
+// The single most important action a visitor wants from each program landing.
+// Shows as a prominent button strip at the top of the program content panel.
+
+const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string; areaId?: string; desc: string }[]> = {
+  "head-start": [
+    { label: "Apply Now", icon: "📝", href: "https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447", desc: "Start your child's application" },
+    { label: "Who Qualifies", icon: "✅", areaId: "enrollment", desc: "Check eligibility" },
+  ],
+  "transit": [
+    { label: "Schedule a Ride", icon: "📞", href: "tel:+18005245552", desc: "Call 1-800-524-5552" },
+    { label: "View Fares", icon: "💲", areaId: "fares", desc: "See pricing" },
+  ],
+  "weatherization": [
+    { label: "Apply Online", icon: "🏠", href: "https://ok.mywaplink.org", desc: "Oklahoma WAP Portal" },
+    { label: "Check Eligibility", icon: "✅", areaId: "eligibility-weath", desc: "Income guidelines" },
+  ],
+  "senior-meals": [
+    { label: "View Menu", icon: "📋", areaId: "sn-menu", desc: "September meal calendar" },
+    { label: "Find a Site", icon: "📍", areaId: "congregate", desc: "6 dining locations" },
+  ],
+  "community-market": [
+    { label: "See Schedule", icon: "📅", areaId: "market-schedule", desc: "September stop times" },
+    { label: "Call Scott", icon: "📞", href: "tel:+15803051964", desc: "580-305-1964" },
+  ],
+  "tax-help": [
+    { label: "What to Bring", icon: "📎", areaId: "vita-bring", desc: "Required documents" },
+    { label: "Call to Schedule", icon: "📞", href: "tel:+15803355588", desc: "580-335-5588" },
+  ],
+  "employment": [
+    { label: "View Openings", icon: "💼", href: "https://www.facebook.com/cadcok", desc: "CADC on Facebook" },
+  ],
+  "advantage": [
+    { label: "Check Eligibility", icon: "✅", areaId: "adv-eligibility", desc: "SoonerCare required" },
+    { label: "Call to Apply", icon: "📞", href: "tel:+18009877767", desc: "1-800-987-7767" },
+  ],
+  "board": [
+    { label: "Staff Directory", icon: "👤", areaId: "leadership", desc: "All program directors" },
+    { label: "Policy Council", icon: "📋", areaId: "policy-council", desc: "Get involved" },
+  ],
+};
+
+function ProgramCTABar({ slug, onSelectArea }: { slug: string; onSelectArea: (id: string) => void }) {
+  const ctas = PROGRAM_CTAS[slug];
+  if (!ctas || ctas.length === 0) return null;
+  return (
+    <div style={{
+      display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20,
+    }}>
+      {ctas.map(cta => (
+        cta.href
+          ? <a key={cta.label} href={cta.href}
+              target={cta.href.startsWith("http") ? "_blank" : undefined}
+              rel={cta.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              style={{
+                flex: "1 1 auto", display: "flex", flexDirection: "column", alignItems: "center",
+                gap: 4, padding: "12px 16px", borderRadius: 12, textDecoration: "none",
+                background: T.blue, color: "white",
+                fontWeight: 800, fontSize: 14, letterSpacing: "0.02em",
+                boxShadow: "0 4px 16px rgba(1,1,255,0.25)",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(1,1,255,0.35)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 16px rgba(1,1,255,0.25)"; }}
+            >
+              <span style={{ fontSize: 22 }}>{cta.icon}</span>
+              <span>{cta.label}</span>
+              <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.8 }}>{cta.desc}</span>
+            </a>
+          : <button key={cta.label} onClick={() => onSelectArea(cta.areaId!)}
+              style={{
+                flex: "1 1 auto", display: "flex", flexDirection: "column", alignItems: "center",
+                gap: 4, padding: "12px 16px", borderRadius: 12, border: `2px solid ${T.blue}`,
+                background: "white", color: T.blue, cursor: "pointer",
+                fontWeight: 800, fontSize: 14, letterSpacing: "0.02em",
+                boxShadow: "0 4px 16px rgba(1,1,255,0.1)",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease",
+                fontFamily: "inherit",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = T.blueLight; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = ""; }}
+            >
+              <span style={{ fontSize: 22 }}>{cta.icon}</span>
+              <span>{cta.label}</span>
+              <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6 }}>{cta.desc}</span>
+            </button>
       ))}
     </div>
   );
@@ -3289,7 +3398,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
         {/* RIGHT — Content panel */}
         <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
-          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} />
+          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} tapSubArea={tapSubArea} />
         </main>
       </div>
 
@@ -3464,10 +3573,10 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
   );
 }
 
-function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty }: {
+function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty, tapSubArea }: {
   stage: Stage; activeCountyName: string | null; activeProgram: ProgramData | null;
   activeSubArea: SubArea | null; availablePrograms: ProgramData[];
-  tapCounty: (id: string) => void;
+  tapCounty: (id: string) => void; tapSubArea: (a: SubArea) => void;
 }) {
   if (stage === "entry") {
     return (
@@ -3999,11 +4108,16 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
                 {activeProgram.icon} {activeProgram.name}
               </h2>
             </div>
-            <div style={{ padding: 20 }} className="cadc-light-content">
+            <div style={{ padding: "16px 20px 0" }}>
+              <ProgramCTABar slug={activeProgram.slug} onSelectArea={(areaId) => {
+                const area = activeProgram.subAreas.find(a => a.id === areaId);
+                if (area) tapSubArea(area);
+              }} />
+            </div>
+            <div style={{ padding: "0 20px 20px" }} className="cadc-light-content">
               {activeProgram.subAreas[0]?.content}
             </div>
           </div>
-          <BackToTop />
           <BackToTop />
         </div>
       )}
