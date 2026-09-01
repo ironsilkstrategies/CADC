@@ -2253,19 +2253,17 @@ const SKETCHES = [
     // Person figure inside
     ctx.moveTo(4,-16); ctx.arc(4,-16,5,0,Math.PI*2);
     ctx.moveTo(4,-11); ctx.lineTo(2,0);
-    // Arm reaching out
     ctx.moveTo(2,-4); ctx.bezierCurveTo(-8,0,-14,6,-12,10);
     ctx.stroke();
   }},
-    // adult 1
+  // Simple family (2 adults + child)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath(); ctx.arc(-12,-14,4,0,Math.PI*2);
     ctx.moveTo(-12,-10); ctx.lineTo(-12,2); ctx.moveTo(-18,-2); ctx.lineTo(-6,-2);
     ctx.moveTo(-12,2); ctx.lineTo(-16,14); ctx.moveTo(-12,2); ctx.lineTo(-8,14);
-    // child
     ctx.moveTo(0,-10); ctx.arc(0,-10,3,0,Math.PI*2);
     ctx.moveTo(0,-7); ctx.lineTo(0,2); ctx.moveTo(-4,0); ctx.lineTo(4,0);
     ctx.moveTo(0,2); ctx.lineTo(-3,10); ctx.moveTo(0,2); ctx.lineTo(3,10);
-    // adult 2
     ctx.moveTo(12,-14); ctx.arc(12,-14,4,0,Math.PI*2);
     ctx.moveTo(12,-10); ctx.lineTo(12,2); ctx.moveTo(6,-2); ctx.lineTo(18,-2);
     ctx.moveTo(12,2); ctx.lineTo(8,14); ctx.moveTo(12,2); ctx.lineTo(16,14);
