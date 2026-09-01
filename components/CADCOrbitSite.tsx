@@ -2478,39 +2478,22 @@ function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
     ? HERO_POOLS[programSlug]
     : HERO_POOLS["general"];
 
-  // Compute daily seed once — stable across renders, only changes at midnight CST
-  const pool = useMemo(() => {
+  // Pick one photo for the day — same photo all day, changes at midnight CST
+  const photo = useMemo(() => {
     const seed = getDailySeed() + (programSlug ? programSlug.split("").reduce((a,c)=>a+c.charCodeAt(0),0) : 0);
-    return seededShuffle(rawPool, seed);
+    const idx = Math.abs(seed) % rawPool.length;
+    return rawPool[idx];
   }, [programSlug]); // eslint-disable-line react-hooks/exhaustive-deps
-  // Note: rawPool is derived from programSlug so programSlug is the only real dep
 
-  const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const safeIndex = pool.length > 0 ? index % pool.length : 0;
-
-  useEffect(() => {
-    if (pool.length <= 1) return;
-    const timer = setInterval(() => {
-      setVisible(false);
-      setTimeout(() => {
-        setIndex(i => (i + 1) % pool.length);
-        setVisible(true);
-      }, 1500);
-    }, 6500);
-    return () => clearInterval(timer);
-  }, [pool.length]);
-
-  if (pool.length === 0) return null;
+  if (!photo) return null;
 
   return (
-    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden", borderRadius: 0 }} aria-hidden="true">
+    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }} aria-hidden="true">
       <div style={{
         position: "absolute", inset: 0,
-        backgroundImage: `url(${pool[safeIndex]})`,
+        backgroundImage: `url(${photo})`,
         backgroundSize: "cover", backgroundPosition: "center",
-        opacity: visible ? 0.13 : 0,
-        transition: "opacity 1.5s ease-in-out",
+        opacity: 0.13,
         filter: "saturate(0.5)",
       }} />
     </div>
