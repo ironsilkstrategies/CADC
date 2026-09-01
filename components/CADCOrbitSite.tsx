@@ -16,7 +16,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -2445,13 +2445,13 @@ function SketchField() {
 // Category-locked crossfade — orbit panel only, daily random seed (resets at midnight CST)
 
 const HERO_POOLS: Record<string, string[]> = {
-  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/images/hero-${n}.jpg`),
-  "senior-meals":    [12,19,20,21].map(n=>`/images/hero-${n}.jpg`),
-  "advantage":       [2,24].map(n=>`/images/hero-${n}.jpg`),
+  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/images/hero/hero-${n}.jpg`),
+  "senior-meals":    [12,19,20,21].map(n=>`/images/hero/hero-${n}.jpg`),
+  "advantage":       [2,24].map(n=>`/images/hero/hero-${n}.jpg`),
   "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
-  "transit":         [14].map(n=>`/images/hero-${n}.jpg`),
-  "weatherization":  [17].map(n=>`/images/hero-${n}.jpg`),
-  "general":         [6,7,15,16,18,5].map(n=>`/images/hero-${n}.jpg`),
+  "transit":         [14].map(n=>`/images/hero/hero-${n}.jpg`),
+  "weatherization":  [17].map(n=>`/images/hero/hero-${n}.jpg`),
+  "general":         [6,7,15,16,18,5].map(n=>`/images/hero/hero-${n}.jpg`),
 };
 
 // Daily seed — resets at midnight CST (UTC-6). Same visitor gets same photo order all day.
@@ -2478,16 +2478,16 @@ function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
     ? HERO_POOLS[programSlug]
     : HERO_POOLS["general"];
 
-  // Shuffle once per day per pool — same order all day, resets at midnight CST
-  const seed = getDailySeed() + (programSlug ? programSlug.split("").reduce((a,c)=>a+c.charCodeAt(0),0) : 0);
-  const pool = seededShuffle(rawPool, seed);
+  // Compute daily seed once — stable across renders, only changes at midnight CST
+  const pool = useMemo(() => {
+    const seed = getDailySeed() + (programSlug ? programSlug.split("").reduce((a,c)=>a+c.charCodeAt(0),0) : 0);
+    return seededShuffle(rawPool, seed);
+  }, [programSlug]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Note: rawPool is derived from programSlug so programSlug is the only real dep
 
-  // Index persists across program changes — no jarring reset
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
-
-  // When pool switches, clamp index if needed
-  const safeIndex = index % pool.length;
+  const safeIndex = pool.length > 0 ? index % pool.length : 0;
 
   useEffect(() => {
     if (pool.length <= 1) return;
