@@ -1,141 +1,203 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-import { contact, complianceDocs } from "@/lib/org";
-import { transitOffices, headStartCenters } from "@/lib/locations";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Contact CADC | Community Action Development Corporation",
-  description:
-    "Contact Community Action Development Corporation — main office in Frederick, OK. Transit scheduling, Head Start enrollment, and program information.",
-};
+import { useState } from "react";
+import CADCShell from "@/components/CADCShell";
+
+// ─── Contact Data ─────────────────────────────────────────────────────────────
+
+const OFFICES = [
+  {
+    name: "Main Office — Frederick",
+    address: "105 S. Main Street, Frederick, OK 73542",
+    phone: "580-335-5588",
+    phoneHref: "tel:+15803355588",
+    hours: "Mon–Fri 8:00am–5:00pm",
+    mapsUrl: "https://maps.google.com/?q=105+S+Main+Street+Frederick+OK+73542",
+    appleMapsUrl: "https://maps.apple.com/?q=105+S+Main+Street+Frederick+OK+73542",
+    programs: ["All programs", "Executive office", "HR", "Finance"],
+  },
+  {
+    name: "Red River Transit — Sayre",
+    address: "304 W. Main, Sayre, OK 73662",
+    phone: "580-928-2199",
+    phoneHref: "tel:+15809282199",
+    hours: "Mon–Fri 8:00am–5:00pm",
+    mapsUrl: "https://maps.google.com/?q=304+W+Main+Sayre+OK+73662",
+    appleMapsUrl: "https://maps.apple.com/?q=304+W+Main+Sayre+OK+73662",
+    programs: ["Red River Transportation"],
+  },
+  {
+    name: "Advantage — Sentinel",
+    address: "122 S. 3rd Butler Building, Sentinel, OK 73664",
+    phone: "580-393-2216",
+    phoneHref: "tel:+15803932216",
+    hours: "Mon–Fri 8:00am–5:00pm",
+    mapsUrl: "https://maps.google.com/?q=122+S+3rd+Sentinel+OK+73664",
+    appleMapsUrl: "https://maps.apple.com/?q=122+S+3rd+Sentinel+OK+73664",
+    programs: ["Advantage Home Delivered Meals"],
+  },
+  {
+    name: "Advantage — Lawton",
+    address: "802 SW A Ave, Suite B, Lawton, OK 73501",
+    phone: "580-699-8880",
+    phoneHref: "tel:+15806998880",
+    hours: "Mon–Fri 8:00am–5:00pm",
+    mapsUrl: "https://maps.google.com/?q=802+SW+A+Ave+Suite+B+Lawton+OK+73501",
+    appleMapsUrl: "https://maps.apple.com/?q=802+SW+A+Ave+Lawton+OK+73501",
+    programs: ["Advantage Home Delivered Meals"],
+  },
+];
+
+const DIRECTORS = [
+  { name: "Leslea Hixson", title: "Executive Director", phone: "580-335-5588", email: null },
+  { name: "Robin Harris", title: "Head Start & Early Head Start Director", phone: "580-335-5588", email: null },
+  { name: "Gilbert Nuncio", title: "Red River Transit Director", phone: "580-928-2199", email: null },
+  { name: "Robert Meador", title: "Weatherization Director", phone: "580-335-5588", email: null },
+  { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-335-5588", email: null },
+  { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "SFraley@cadcok.org" },
+  { name: "Kristie Jackson", title: "Advantage Director", phone: "580-393-2216", email: null },
+];
+
+// ─── Contact Page ─────────────────────────────────────────────────────────────
 
 export default function ContactPage() {
-  const titleVI = complianceDocs.filter(d => d.program === "transit");
+  const [copied, setCopied] = useState<string | null>(null);
+
+  function copyEmail(email: string) {
+    navigator.clipboard.writeText(email).then(() => {
+      setCopied(email);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  }
 
   return (
-    <div className="min-h-screen" style={{ background: "#F8F8FF", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
+    <CADCShell mainId="main-contact-content">
 
       {/* Hero */}
-      <section style={{ background: "#000014", position: "relative", overflow: "hidden", padding: "80px 0 56px" }}>
-        <div style={{
-          position: "absolute", inset: 0, opacity: 0.04,
-          backgroundImage: "linear-gradient(rgba(1,1,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(1,1,255,0.8) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }} />
-        <div style={{ position: "relative", maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.45)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", marginBottom: 28 }}>
-            <span>←</span> Back to Home
-          </Link>
-          <p style={{ color: "#0101FF", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 14 }}>
-            We're here to help
+      <header style={{ background: "rgba(248,249,255,0.92)", borderBottom: "1px solid #e5e7eb", padding: "48px 0 40px" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px" }}>
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>We're Here to Help</p>
+          <h1 style={{ color: "#0101FF", fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 16 }}>Contact CADC</h1>
+          <p style={{ color: "#374151", fontSize: 16, lineHeight: 1.75, maxWidth: 560, marginBottom: 24 }}>
+            Reach us by phone, visit a location, or connect with the program director who can help you most.
           </p>
-          <h1 style={{ color: "white", fontSize: "clamp(2rem,5vw,3rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 16 }}>
-            Contact <span style={{ color: "#0101FF" }}>CADC</span>
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, lineHeight: 1.7 }}>
-            Main office · Frederick, Oklahoma · Serving 9 counties across Southwest Oklahoma
-          </p>
+          <a
+            href="tel:+15803355588"
+            aria-label="Call CADC main office at 580-335-5588"
+            style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#CC0000", color: "white", padding: "14px 28px", borderRadius: 8, fontWeight: 800, fontSize: 16, textDecoration: "none" }}
+          >
+            📞 580-335-5588
+          </a>
         </div>
-      </section>
+      </header>
 
-      <div style={{ maxWidth: 800, margin: "0 auto", padding: "48px 24px 80px", display: "flex", flexDirection: "column", gap: 48 }}>
+      {/* Main content */}
+      <div id="main-contact-content" style={{ maxWidth: 860, margin: "0 auto", padding: "56px 24px 80px", display: "flex", flexDirection: "column", gap: 56 }}>
 
-        {/* Primary contact cards */}
-        <section>
-          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>Main Contact</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
-
-            {/* Main phone */}
-            <div style={{ background: "#0101FF", borderRadius: 16, padding: 24 }}>
-              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 8px" }}>Main Line</p>
-              <a href={contact.mainPhoneHref} style={{ color: "white", fontSize: "clamp(1.1rem,3vw,1.5rem)", fontWeight: 800, textDecoration: "none", display: "block", marginBottom: 8 }}>
-                {contact.mainPhone}
-              </a>
-              <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, margin: 0, lineHeight: 1.5 }}>
-                {contact.address.street}<br />
-                {contact.address.city}, {contact.address.state} {contact.address.zip}
-              </p>
-              <a
-                href={`https://maps.apple.com/?address=${encodeURIComponent(`${contact.address.street}, ${contact.address.city}, ${contact.address.state} ${contact.address.zip}`)}`}
-                target="_blank" rel="noopener noreferrer"
-                style={{ display: "inline-block", marginTop: 12, color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}
-              >
-                📍 Get directions →
-              </a>
-            </div>
-
-            {/* Transit */}
-            <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 16, padding: 24 }}>
-              <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 8px" }}>Red River Transportation</p>
-              <a href={contact.transitPhoneHref} style={{ color: "#0101FF", fontSize: "clamp(1.1rem,3vw,1.5rem)", fontWeight: 800, textDecoration: "none", display: "block", marginBottom: 8 }}>
-                {contact.transitPhone}
-              </a>
-              <p style={{ color: "#6b7280", fontSize: 12, margin: 0, lineHeight: 1.5 }}>
-                Toll-free · Schedule rides to medical appointments, dialysis, work, and shopping
-              </p>
-            </div>
-
-            {/* Social */}
-            <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 16, padding: 24 }}>
-              <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 12px" }}>Find Us Online</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <a href={contact.social.facebook} target="_blank" rel="noopener noreferrer" style={{ color: "#0101FF", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
-                  Facebook — WeAreCADC →
-                </a>
-                <a href={contact.social.instagram} target="_blank" rel="noopener noreferrer" style={{ color: "#0101FF", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
-                  Instagram — @wearecadc →
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Transit offices */}
-        <section>
-          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 8 }}>Red River Transportation</p>
-          <h2 style={{ color: "#0101FF", fontSize: "clamp(1.1rem,2.5vw,1.5rem)", fontWeight: 800, marginBottom: 20 }}>Transit Office Locations</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
-            {transitOffices.map(o => (
-              <div key={o.id} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "18px 20px" }}>
-                <p style={{ color: "#111827", fontWeight: 800, fontSize: 14, margin: "0 0 4px" }}>{o.city}</p>
-                <p style={{ color: "#6b7280", fontSize: 12, margin: "0 0 8px", lineHeight: 1.5 }}>{o.street}<br />{o.city}, {o.state} {o.zip}</p>
-                <a href={o.phoneHref} style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>{o.phone}</a>
-                <div style={{ marginTop: 8 }}>
-                  <a
-                    href={`https://maps.apple.com/?address=${encodeURIComponent(`${o.street}, ${o.city}, ${o.state} ${o.zip}`)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ color: "#9ca3af", fontSize: 11, fontWeight: 600, textDecoration: "none" }}
-                  >📍 Directions</a>
+        {/* Office locations */}
+        <section aria-labelledby="offices-heading">
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Offices</p>
+          <h2 id="offices-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Find a Location Near You</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))", gap: 16 }}>
+            {OFFICES.map(office => (
+              <div key={office.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: "20px 22px" }}>
+                <p style={{ color: "#0101FF", fontWeight: 800, fontSize: 14, margin: "0 0 4px" }}>{office.name}</p>
+                <p style={{ color: "#6b7280", fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{office.address}</p>
+                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 4px" }}>Hours</p>
+                <p style={{ color: "#374151", fontSize: 12, margin: "0 0 12px" }}>{office.hours}</p>
+                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 4px" }}>Programs</p>
+                <p style={{ color: "#374151", fontSize: 12, margin: "0 0 16px", lineHeight: 1.5 }}>{office.programs.join(" · ")}</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <a href={office.phoneHref} aria-label={`Call ${office.name}`} style={{ flex: 1, minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, background: "#0101FF", color: "white", padding: "9px 12px", borderRadius: 8, fontWeight: 700, fontSize: 11, textDecoration: "none" }}>
+                    📞 {office.phone}
+                  </a>
+                  <a href={office.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={`Directions to ${office.name} via Google Maps`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, background: "#f0f0ff", color: "#0101FF", padding: "9px 12px", borderRadius: 8, fontWeight: 700, fontSize: 11, textDecoration: "none", border: "1px solid rgba(1,1,255,0.2)" }}>
+                    🗺️ Directions
+                  </a>
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {titleVI.map(d => (
-              <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer"
-                style={{ color: "#6b7280", fontSize: 11, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 2 }}>
-                {d.label}
-              </a>
-            ))}
-          </div>
         </section>
 
-        {/* Head Start centers */}
-        <section>
-          <p style={{ color: "#7E0001", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 8 }}>Head Start & Early Head Start</p>
-          <h2 style={{ color: "#0101FF", fontSize: "clamp(1.1rem,2.5vw,1.5rem)", fontWeight: 800, marginBottom: 20 }}>11 Centers Across Southwest Oklahoma</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
-            {headStartCenters.map(c => (
-              <div key={c.id} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 18px" }}>
-                <p style={{ color: "#111827", fontWeight: 800, fontSize: 13, margin: "0 0 3px" }}>{c.name}</p>
-                <p style={{ color: "#9ca3af", fontSize: 11, margin: "0 0 6px", lineHeight: 1.4 }}>{c.street}, {c.city}</p>
-                <a href={c.phoneHref} style={{ color: "#0101FF", fontWeight: 700, fontSize: 12, textDecoration: "none" }}>{c.phone}</a>
+        {/* Program directors */}
+        <section aria-labelledby="directors-heading">
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Program Directors</p>
+          <h2 id="directors-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Contact the Right Person</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))", gap: 12 }}>
+            {DIRECTORS.map(d => (
+              <div key={d.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 18px" }}>
+                <p style={{ color: "#111827", fontWeight: 800, fontSize: 14, margin: "0 0 2px" }}>{d.name}</p>
+                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" }}>{d.title}</p>
+                <a href={`tel:+1${d.phone.replace(/\D/g,"")}`} aria-label={`Call ${d.name} at ${d.phone}`} style={{ display: "flex", alignItems: "center", gap: 6, color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none", marginBottom: d.email ? 8 : 0 }}>
+                  📞 {d.phone}
+                </a>
+                {d.email && (
+                  <button
+                    onClick={() => copyEmail(d.email!)}
+                    aria-label={`Copy email address for ${d.name}`}
+                    style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: copied === d.email ? "#059669" : "#0101FF", fontWeight: 700, fontSize: 13, cursor: "pointer", padding: 0 }}
+                  >
+                    {copied === d.email ? "✓ Copied!" : `✉️ ${d.email}`}
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </section>
 
+        {/* Quick contact cards */}
+        <section aria-labelledby="quick-contact-heading">
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Quick Access</p>
+          <h2 id="quick-contact-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>What Do You Need?</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: 12 }}>
+            {[
+              { icon: "🏫", title: "Head Start Enrollment", desc: "Early childhood education for children birth–5", href: "/#head-start" },
+              { icon: "🚌", title: "Schedule a Ride", desc: "Red River Transportation — call to book", href: "tel:+15809282199" },
+              { icon: "🍽️", title: "Senior Meal Sites", desc: "Congregate dining at 6 locations", href: "/#senior-meals" },
+              { icon: "🚗", title: "Advantage Meals", desc: "Home-delivered meals for seniors", href: "tel:+15803932216" },
+              { icon: "🏠", title: "Weatherization", desc: "Energy efficiency & housing assistance", href: "/#weatherization" },
+              { icon: "🛒", title: "Community Market", desc: "Mobile grocery — call Scott Fraley", href: "tel:+15803051964" },
+              { icon: "📋", title: "VITA Tax Help", desc: "Free tax preparation services", href: "/#tax-help" },
+              { icon: "📊", title: "2026 Community Survey", desc: "Shape CADC's future programs", href: "https://www.surveymonkey.com/r/26cadcneeds" },
+            ].map(card => (
+              <a
+                key={card.title}
+                href={card.href}
+                target={card.href.startsWith("http") ? "_blank" : undefined}
+                rel={card.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                aria-label={card.title}
+                style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 18px", textDecoration: "none", display: "block", transition: "border-color 0.2s, box-shadow 0.2s" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#0101FF"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 4px 16px rgba(1,1,255,0.1)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#e5e7eb"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none"; }}
+              >
+                <span style={{ fontSize: 22, display: "block", marginBottom: 8 }} aria-hidden="true">{card.icon}</span>
+                <p style={{ color: "#111827", fontWeight: 700, fontSize: 13, margin: "0 0 4px" }}>{card.title}</p>
+                <p style={{ color: "#6b7280", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{card.desc}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Emergency / after hours */}
+        <section style={{ background: "#F0F0FF", borderRadius: 16, padding: "32px 36px", border: "1px solid rgba(1,1,255,0.12)" }} aria-labelledby="main-contact-cta">
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Main Office</p>
+          <h2 id="main-contact-cta" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.8rem)", fontWeight: 800, marginBottom: 8 }}>Community Action Development Corporation</h2>
+          <p style={{ color: "#374151", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+            105 S. Main Street, Frederick, OK 73542<br />
+            Mon–Fri 8:00am–5:00pm
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <a href="tel:+15803355588" aria-label="Call CADC at 580-335-5588" style={{ background: "#CC0000", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
+              📞 580-335-5588
+            </a>
+            <a href="/about" style={{ border: "1px solid #0101FF", color: "#0101FF", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
+              About CADC →
+            </a>
+          </div>
+        </section>
+
       </div>
-    </div>
+    </CADCShell>
   );
 }
