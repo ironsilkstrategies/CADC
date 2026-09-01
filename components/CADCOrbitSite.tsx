@@ -3250,6 +3250,31 @@ function DesktopStyles() {
       .cadc-dark-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 8px 14px; border-top: 1px solid rgba(1,1,255,0.1); }
       .cadc-dark-content .cadc-fare-row span { color: rgba(255,255,255,0.65); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
       .cadc-dark-content .cadc-content { display: flex; flex-direction: column; }
+
+      /* ── Light content styles (desktop) ── */
+      .cadc-light-content p { color: #374151; font-size: 15px; line-height: 1.75; margin: 0 0 14px; }
+      .cadc-light-content strong { color: #111827; }
+      .cadc-light-content h3 { color: #111827; font-size: 17px; font-weight: 700; margin: 0 0 10px; }
+      .cadc-light-content .cadc-card { background: #E4E4FF; border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+      .cadc-light-content .cadc-card-sm { background: #f5f5ff; border: 1px solid #dcdcf5; border-radius: 10px; padding: 14px 16px; margin: 6px 0; }
+      .cadc-light-content .cadc-card-title { color: #0101FF; font-weight: 700; font-size: 11px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+      .cadc-light-content .cadc-label { color: #cc0000; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin: 0 0 10px; display: block; }
+      .cadc-light-content .cadc-list { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px; }
+      .cadc-light-content .cadc-list li { color: #374151; font-size: 14px; padding-left: 16px; position: relative; line-height: 1.5; }
+      .cadc-light-content .cadc-list li::before { content: "·"; position: absolute; left: 0; color: #0101FF; font-weight: 900; font-size: 18px; line-height: 1; top: 1px; }
+      .cadc-light-content .cadc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+      .cadc-light-content .cadc-chip { background: #E4E4FF; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #0101FF; font-weight: 600; text-align: center; line-height: 1.3; }
+      .cadc-light-content .cadc-stack { display: flex; flex-direction: column; gap: 8px; }
+      .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: #cc0000; color: white; padding: 13px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; letter-spacing: 0.04em; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+      .cadc-light-content .cadc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(204,0,0,0.3); }
+      .cadc-light-content .cadc-link { color: #0101FF; font-weight: 700; font-size: 14px; text-decoration: none; }
+      .cadc-light-content .cadc-note { color: #9ca3af; font-size: 11px; font-style: italic; margin: 8px 0 0; }
+      .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 14px 0; }
+      .cadc-light-content .cadc-fare-header { display: grid; grid-template-columns: 2fr 1fr 1fr; background: #0101FF; padding: 10px 14px; }
+      .cadc-light-content .cadc-fare-header span { color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+      .cadc-light-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 9px 14px; border-top: 1px solid #e5e7eb; }
+      .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 13px; }
+      .cadc-light-content .cadc-content { display: flex; flex-direction: column; gap: 4px; }
     `}</style>
   );
 }
