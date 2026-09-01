@@ -18,7 +18,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import CADCServiceMap from "./CADCServiceMap";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -494,12 +493,11 @@ function MealCalendarPanel() {
   );
 }
 
-// ServiceMapPanel — wraps CADCServiceMap with dark/light context detection
+// ServiceMapPanel — uses the built-in OklahomaCountyMap
 function ServiceMapPanel() {
-  const isDesktop = useIsDesktop();
   return (
-    <div className="cadc-light-content">
-      <CADCServiceMap dark={isDesktop} />
+    <div style={{ background: "white", borderRadius: 12, border: `1px solid ${T.border}`, padding: 12, margin: "12px 0" }}>
+      <OklahomaCountyMap selectedCounty={null} onSelectCounty={() => {}} dark={false} />
     </div>
   );
 }
@@ -1148,13 +1146,18 @@ function PhotoStrip({ photos, dark }: {
 }) {
   return (
     <div style={{
-      display: "flex", gap: 8, overflowX: "auto", margin: "14px 0",
-      paddingBottom: 6, paddingRight: 4,
+      display: "flex", gap: 8,
+      overflowX: "scroll",
+      overflowY: "visible",
+      margin: "14px -12px",
+      padding: "0 12px 8px",
       scrollbarWidth: "none",
+      WebkitOverflowScrolling: "touch",
+      isolation: "isolate",
     }}>
       {photos.map((photo, i) => (
         <div key={i} style={{
-          flex: "0 0 auto", width: 150, height: 110,
+          flex: "0 0 auto", width: 160, height: 115,
           borderRadius: 10, overflow: "hidden",
           background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
           border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
@@ -1183,7 +1186,9 @@ function PhotoGrid({ photos, dark }: {
 }) {
   return (
     <div style={{
-      display: "grid", gridTemplateColumns: "1fr 1fr",
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gridAutoRows: "auto",
       gap: 8, margin: "14px 0",
     }}>
       {photos.slice(0, 6).map((photo, i) => (
@@ -1198,7 +1203,11 @@ function PhotoGrid({ photos, dark }: {
             alt={photo.alt}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
-              if (el.parentElement) el.parentElement.style.display = "none";
+              const parent = el.parentElement;
+              if (parent) {
+                parent.style.display = "none";
+                parent.style.gridColumn = "unset";
+              }
             }}
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
@@ -2541,7 +2550,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
           {/* Map state */}
           {stage === "map" && (
-            <div style={{ width: "min(90%,600px)", animation: "fadeSlideIn 0.4s ease", background: "white", borderRadius: 16, border: `1px solid ${T.border}`, padding: 16 }}>
+            <div style={{ width: "min(90%,800px)", animation: "fadeSlideIn 0.4s ease", background: "white", borderRadius: 16, border: `1px solid ${T.border}`, padding: 16 }}>
               <OklahomaCountyMap
                 selectedCounty={null}
                 onSelectCounty={tapCounty}
