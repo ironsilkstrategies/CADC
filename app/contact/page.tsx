@@ -152,13 +152,13 @@ export default function ContactPage() {
           <h2 id="quick-contact-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>What Do You Need?</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: 12 }}>
             {[
-              { icon: "🏫", title: "Head Start Enrollment", desc: "Early childhood education for children birth–5", href: "/#head-start" },
+              { icon: "🏫", title: "Head Start Enrollment", desc: "Early childhood education for children birth–5", href: "/?program=head-start" },
               { icon: "🚌", title: "Schedule a Ride", desc: "Red River Transportation — call to book", href: "tel:+15809282199" },
-              { icon: "🍽️", title: "Senior Meal Sites", desc: "Congregate dining at 6 locations", href: "/#senior-meals" },
+              { icon: "🍽️", title: "Senior Meal Sites", desc: "Congregate dining at 6 locations", href: "/?program=senior-meals" },
               { icon: "🚗", title: "Advantage Meals", desc: "Home-delivered meals for seniors", href: "tel:+15803932216" },
-              { icon: "🏠", title: "Weatherization", desc: "Energy efficiency & housing assistance", href: "/#weatherization" },
+              { icon: "🏠", title: "Weatherization", desc: "Energy efficiency & housing assistance", href: "/?program=weatherization" },
               { icon: "🛒", title: "Community Market", desc: "Mobile grocery — call Scott Fraley", href: "tel:+15803051964" },
-              { icon: "📋", title: "VITA Tax Help", desc: "Free tax preparation services", href: "/#tax-help" },
+              { icon: "📋", title: "VITA Tax Help", desc: "Free tax preparation services", href: "/?program=tax-help" },
               { icon: "📊", title: "2026 Community Survey", desc: "Shape CADC's future programs", href: "https://www.surveymonkey.com/r/26cadcneeds" },
             ].map(card => (
               <a
