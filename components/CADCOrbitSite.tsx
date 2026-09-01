@@ -3144,6 +3144,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             </div>
             <span style={{
               color: isPopped ? T.blue : T.blue,
+            
               fontSize: "clamp(0.36rem,1.6vw,0.48rem)",
               fontWeight: isPopped ? 800 : 700,
               textTransform: "uppercase", letterSpacing: "0.05em",
