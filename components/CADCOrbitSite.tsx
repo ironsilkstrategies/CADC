@@ -2243,8 +2243,20 @@ const SKETCHES = [
     ctx.moveTo(-5,-12); ctx.lineTo(5,-12);
     ctx.stroke();
   }},
-  // Simple family (2 adults + child)
-  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+  // CADC logo mark — heart with person embracing (brand icon)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    // Heart shape
+    ctx.beginPath();
+    ctx.moveTo(0,18);
+    ctx.bezierCurveTo(-22,4,-22,-16,0,-8);
+    ctx.bezierCurveTo(22,-16,22,4,0,18);
+    // Person figure inside
+    ctx.moveTo(4,-16); ctx.arc(4,-16,5,0,Math.PI*2);
+    ctx.moveTo(4,-11); ctx.lineTo(2,0);
+    // Arm reaching out
+    ctx.moveTo(2,-4); ctx.bezierCurveTo(-8,0,-14,6,-12,10);
+    ctx.stroke();
+  }},
     // adult 1
     ctx.beginPath(); ctx.arc(-12,-14,4,0,Math.PI*2);
     ctx.moveTo(-12,-10); ctx.lineTo(-12,2); ctx.moveTo(-18,-2); ctx.lineTo(-6,-2);
@@ -2664,12 +2676,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
       {/* Utility nav */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
-          <div>
-            <div style={{ color: T.blue, fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>CADC</div>
-            <div style={{ color: T.textMuted, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase" }}>Community Action Development Corporation</div>
-          </div>
-        </div>
+          <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 44, width: "auto", display: "block" }} />
         <div style={{ display: "flex", gap: 32 }}>
           {["About", "Contact", "580-335-5588"].map((item, i) => (
             <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
@@ -2716,15 +2723,14 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
               style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}
             >
               <div style={{
-                width: 200, height: 200, borderRadius: "50%", background: "white",
+                width: 220, height: 220, borderRadius: "50%", background: "white",
                 border: `4px solid ${T.blue}`,
                 boxShadow: `0 0 0 12px rgba(1,1,255,0.08), 0 0 60px rgba(1,1,255,0.2)`,
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: 20,
                 animation: "logoAssemble 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards, logoFloat 3.5s ease-in-out 0.8s infinite",
               }}>
-                <span style={{ color: T.blue, fontWeight: 900, fontSize: 42, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
-                <div style={{ width: 48, height: 3, background: T.maroon, borderRadius: 2 }} />
-                <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", lineHeight: 1.3 }}>Community Action<br />Development Corp.</span>
+                <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
               </div>
               <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
             </button>
@@ -3069,10 +3075,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           {stage !== "entry" && (
             <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Back">←</button>
           )}
-          {/* CADC logo circle */}
-          <div style={{ width: 38, height: 38, borderRadius: "50%", border: `2px solid ${T.blue}`, display: "flex", alignItems: "center", justifyContent: "center", background: "white" }}>
-            <span style={{ color: T.blue, fontWeight: 900, fontSize: 10, letterSpacing: "0.05em" }}>CADC</span>
-          </div>
+          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 34, width: "auto", display: "block" }} />
           {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
           {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
           {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
@@ -3093,14 +3096,13 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}
           >
             <div style={{
-              width: 200, height: 200, borderRadius: "50%", background: "white",
+              width: 220, height: 220, borderRadius: "50%", background: "white",
               border: `4px solid ${T.blue}`,
               boxShadow: `0 0 0 10px rgba(1,1,255,0.06), 0 8px 40px rgba(1,1,255,0.15)`,
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: 20,
             }}>
-              <span style={{ color: T.blue, fontWeight: 900, fontSize: 40, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
-              <div style={{ width: 44, height: 3, background: T.maroon, borderRadius: 2 }} />
-              <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", lineHeight: 1.4 }}>Community Action<br />Development Corp.</span>
+              <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
             <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
