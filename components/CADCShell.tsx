@@ -276,6 +276,7 @@ export default function CADCShell({ children, mainId = "main-content" }: CADCShe
             📋 Take Our Survey
           </a>
           {[
+            { label: "Home", href: "/" },
             { label: "About", href: "/about" },
             { label: "Contact", href: "/contact" },
             { label: "580-335-5588", href: "tel:+15803355588" },
@@ -283,10 +284,10 @@ export default function CADCShell({ children, mainId = "main-content" }: CADCShe
             <a
               key={item.label}
               href={item.href}
-              style={{ color: T.textMuted, fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
+              style={{ color: item.label === "Home" ? T.blue : T.textMuted, fontSize: 13, fontWeight: item.label === "Home" ? 700 : 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
               onMouseEnter={e => (e.currentTarget.style.color = T.blue)}
-              onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}
-            >{item.label}</a>
+              onMouseLeave={e => (e.currentTarget.style.color = item.label === "Home" ? T.blue : T.textMuted)}
+            >{item.label === "Home" ? "🏛️ Home" : item.label}</a>
           ))}
         </div>
       </nav>

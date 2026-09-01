@@ -2983,6 +2983,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
           >
             📋 Take Our Survey
           </a>
+          <a href="/" style={{ color: T.blue, fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em" }}>🏛️ Home</a>
           {["About", "Contact", "580-335-5588"].map((item, i) => (
             <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
               style={{ color: T.textMuted, fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
@@ -3545,13 +3546,16 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             {stage !== "entry" && (
               <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Go back">←</button>
             )}
-            <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 30, width: "auto", display: "block" }} />
+            <a href="/" aria-label="CADC home page">
+              <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 30, width: "auto", display: "block" }} />
+            </a>
             {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
             {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
             {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
             {stage === "content" && activeSubArea && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <a href="/" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>🏛️</a>
             <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
             <a href="/contact" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Contact</a>
             <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">📞 Call</a>
