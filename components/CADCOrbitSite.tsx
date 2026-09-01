@@ -1496,7 +1496,7 @@ const PROGRAMS: ProgramData[] = [
   {
     slug: "weatherization",
     name: "Weatherization & Housing",
-    shortName: "Weatherization",
+    shortName: "Weatherize",
     icon: "🏠",
     color: T.blue,
     tagline: "Free home energy improvements for qualifying households",
@@ -2254,7 +2254,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
   const selectedLabel = "white";
 
   return (
-    <svg viewBox="0 0 500 380" style={{ width: "100%", display: "block" }}
+    <svg viewBox="0 60 500 320" style={{ width: "100%", display: "block" }}
       aria-label="SW Oklahoma county map — CADC service counties highlighted in blue">
       <rect x={0} y={0} width={500} height={380} fill={bg} rx={8} />
 
@@ -2470,7 +2470,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
           <div>
             <div style={{ color: T.blue, fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>CADC</div>
-            <div style={{ color: T.textMuted, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>Community Action</div>
+            <div style={{ color: T.textMuted, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase" }}>Community Action Development Corporation</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 32 }}>
@@ -2666,7 +2666,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             style={{
               position: "absolute",
               left: `${x}%`, top: `${y}%`,
-              width: "clamp(52px,11%,68px)",
+              width: "clamp(72px,14%,90px)",
               transform: `translate(calc(-50% + ${exitX}px), calc(-50% + ${exitY}px)) scale(${isPopped ? 1.28 : entryScale})`,
               display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
               background: "none", border: "none", cursor: "pointer", padding: 0,
@@ -2718,8 +2718,10 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             <span style={{
               color: T.blue,
               fontSize: "clamp(0.38rem,0.85vw,0.52rem)",
-              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em",
-              textAlign: "center", lineHeight: 1.2, whiteSpace: "nowrap",
+              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
+              textAlign: "center", lineHeight: 1.25,
+              whiteSpace: "normal", wordBreak: "break-word",
+              width: "clamp(56px,12vw,80px)",
               transition: "color 0.2s ease",
             }}>
               {label}
