@@ -286,7 +286,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
 function MarketSchedulePanel() {
   const isDesktop = useIsDesktop();
   return (
-    <div className="cadc-content">
+    <div className="cadc-light-content">
       <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
         Tap any market day to see stop locations and times. Schedule updates monthly.
       </p>
@@ -477,7 +477,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
 function MealCalendarPanel() {
   const isDesktop = useIsDesktop();
   return (
-    <div className="cadc-content">
+    <div className="cadc-light-content">
       <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
         Tap any day to see the full meal. Menu rotates monthly — check back for updates.
       </p>
@@ -498,7 +498,7 @@ function MealCalendarPanel() {
 function ServiceMapPanel() {
   const isDesktop = useIsDesktop();
   return (
-    <div className="cadc-content">
+    <div className="cadc-light-content">
       <CADCServiceMap dark={isDesktop} />
     </div>
   );
@@ -1218,7 +1218,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
             <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
             <div className="cadc-card">
@@ -1233,7 +1233,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "hs", label: "Head Start Preschool", shortLabel: "Preschool", icon: "📖",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Head Start serves children ages 3–5 with full-day, full-year preschool at no cost to income-eligible families. Every child receives education, health, nutrition, and family support — all in one place.</p>
             <div className="cadc-grid-2">
               {["Full-day preschool at no cost","Health screenings","Nutritious meals daily","Family engagement","School readiness goals","Individualized learning plans"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
@@ -1244,7 +1244,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "apply", label: "How to Apply", shortLabel: "Apply", icon: "📝",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Enrollment is open year-round. Applications are reviewed on a rolling basis — spaces fill quickly. Apply as early as possible.</p>
             <div className="cadc-card">
               <p className="cadc-label">What you'll need</p>
@@ -1260,7 +1260,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5.</p>
             <div className="cadc-card">
               <p className="cadc-label">Automatically eligible</p>
@@ -1277,7 +1277,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "ehs-education", label: "EHS Education", shortLabel: "EHS Ed", icon: "🧸",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Our Early Head Start education approach supports infants and toddlers across all developmental domains using evidence-based tools and individualized instruction.</p>
             <div className="cadc-stack">
               {[
@@ -1294,7 +1294,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "hs-education", label: "HS Education", shortLabel: "HS Ed", icon: "📚",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Our Head Start Preschool education program supports 3 and 4-year-old children across all developmental domains through evidence-based curriculum, individualized instruction, and rigorous assessment.</p>
             <div className="cadc-stack">
               {[
@@ -1313,7 +1313,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "health", label: "Health & Wellness", shortLabel: "Health", icon: "🏥",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Every enrolled child receives comprehensive health services. Our Health, Mental Health, and Disabilities Coordinator ensures every child's needs are documented and met.</p>
             <div className="cadc-stack">
               {[
@@ -1331,7 +1331,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "nutrition", label: "Nutrition", shortLabel: "Nutrition", icon: "🥗",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>All meals meet <strong>CACFP (Child and Adult Care Food Program)</strong> requirements — a federal nutrition standard ensuring balanced, age-appropriate meals every day.</p>
             <ul className="cadc-list">
               {["Breakfast, lunch, and snacks served daily at no cost","Menus planned by nutrition staff to meet CACFP standards","Age-appropriate portions and food groups","Formula, diapers, and wipes provided for Early Head Start infants","Allergy accommodations with doctor's documentation","Family nutrition education and resources"].map(i=><li key={i}>{i}</li>)}
@@ -1342,7 +1342,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "parent-engagement", label: "Parent Engagement", shortLabel: "Parents", icon: "👨‍👩‍👧",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Parent and community involvement is not optional at Head Start — it is foundational. Families are partners in the program, and the community is part of the team.</p>
             <div className="cadc-stack">
               {[
@@ -1368,7 +1368,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "safety", label: "Safety & Training", shortLabel: "Safety", icon: "🛡️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Safety is embedded in every aspect of our program. Centers meet all Oklahoma Child Care Licensing (OKDHS) requirements and follow federal Head Start Program Performance Standards (45 CFR §1302.47).</p>
             <div className="cadc-stack">
               {[
@@ -1383,7 +1383,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "faq", label: "FAQs", shortLabel: "FAQ", icon: "❓",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Answers to the questions families ask us every day.</p>
             <div className="cadc-stack">
               {[
@@ -1421,7 +1421,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "rides", label: "Schedule a Ride", shortLabel: "Schedule", icon: "📅",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
             <div className="cadc-card">
               <p className="cadc-label">Toll-free scheduling</p>
@@ -1438,7 +1438,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "fares", label: "Fare Schedule", shortLabel: "Fares", icon: "💲",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Fares are calculated on round-trip mileage. Reduced fares apply to riders age 55+ and persons with disabilities. Effective October 1, 2022.</p>
             <div className="cadc-fare-table">
               <div className="cadc-fare-header"><span>Distance</span><span>Standard</span><span>Reduced</span></div>
@@ -1460,7 +1460,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <div className="cadc-stack">
               {[
                 {name:"Frederick Office",addr:"105 S. Main, Frederick, OK 73542",phone:"580-335-5588",href:"tel:+15803355588"},
@@ -1480,7 +1480,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "ada", label: "ADA & Accessibility", shortLabel: "ADA", icon: "♿",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>All 110 Red River Transportation vehicles are equipped with lifts or ramps. No rider is turned away due to a mobility device or disability.</p>
             <div className="cadc-card">
               <p className="cadc-label">Title VI Non-Discrimination</p>
@@ -1496,7 +1496,7 @@ const PROGRAMS: ProgramData[] = [
   {
     slug: "weatherization",
     name: "Weatherization & Housing",
-    shortName: "Weatherize",
+    shortName: "Weatherization",
     icon: "🏠",
     color: T.blue,
     tagline: "Free home energy improvements for qualifying households",
@@ -1504,7 +1504,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "what", label: "What We Do", shortLabel: "Overview", icon: "🔧",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>The Weatherization Assistance Program (WAP) provides free home energy improvements to income-eligible households. Funded through the Department of Energy and Oklahoma DHS.</p>
             <div className="cadc-grid-2">
               {["Insulation installation","Air sealing","Heating & cooling system upgrades","Energy audits","Window and door improvements","Health and safety measures"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
@@ -1515,7 +1515,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "apply-weath", label: "Apply", shortLabel: "Apply", icon: "📝",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Applications are submitted online through the Oklahoma Weatherization portal. The process typically includes an energy audit of your home before work begins.</p>
             <div className="cadc-card">
               <p className="cadc-label">Apply online</p>
@@ -1531,7 +1531,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "eligibility-weath", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Eligibility is based on household income. Priority is given to elderly residents, people with disabilities, and families with young children.</p>
             <div className="cadc-card">
               <p className="cadc-label">General eligibility</p>
@@ -1557,7 +1557,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "sn-about", label: "About the Program", shortLabel: "About", icon: "ℹ️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>CADC's Senior Nutrition Program serves adults 60 and older with nutritious meals, meaningful community connection, and caring support. Our sites are more than places to eat — they are places where seniors gather, build friendships, and stay connected.</p>
             <p>For those who are unable to attend a congregate site, our Home-Delivered Meal Program brings a hot meal and a friendly visit directly to their door.</p>
             <PhotoGrid dark={false} photos={[
@@ -1603,7 +1603,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "congregate", label: "Congregate Meals", shortLabel: "Congregate", icon: "🍽️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Hot, nutritious meals served in a welcoming environment at 6 community sites across Southwest Oklahoma. Seniors enjoy a meal with others, participate in activities, socialize, and build friendships.</p>
             <PhotoStrip dark={false} photos={[
               { src: PHOTOS.seniorNutrition.frederickDining, alt: "Frederick senior nutrition congregate dining room, serving line" },
@@ -1653,7 +1653,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "sn-homedelivered", label: "Home Delivered", shortLabel: "Home Delivery", icon: "🚗",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Our Home-Delivered Meal Program helps seniors who are unable to attend a congregate meal site. Nutritious meals are delivered directly to their homes — along with a friendly visit and an important connection to the community.</p>
             <div className="cadc-card">
               <p className="cadc-label">Meal contribution</p>
@@ -1685,7 +1685,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "vita-what", label: "About VITA", shortLabel: "About", icon: "ℹ️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>The Volunteer Income Tax Assistance (VITA) program offers free tax preparation by IRS-certified volunteers to individuals and families who generally make $67,000 or less.</p>
             <div className="cadc-grid-2">
               {["$0 filing cost","IRS-certified volunteers","Federal and state returns","EITC maximization","No hidden fees","Secure and confidential"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
@@ -1696,7 +1696,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "vita-bring", label: "What to Bring", shortLabel: "Bring", icon: "📎",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <div className="cadc-card">
               <p className="cadc-label">Required documents</p>
               <ul className="cadc-list">
@@ -1725,7 +1725,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "market-about", label: "About the Market", shortLabel: "About", icon: "ℹ️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>The CADC Community Market is a mobile grocery store housed in a 42-foot customized trailer — bringing fresh, affordable, and nutritious food directly to communities across Southwest Oklahoma that have lost access to full-service grocery stores.</p>
             <p>The market is open to the general public regardless of ZIP code. No membership or eligibility required.</p>
             <PhotoStrip dark={false} photos={[
@@ -1763,7 +1763,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "market-products", label: "What We Carry", shortLabel: "Products", icon: "🥦",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>The Community Market carries 400+ SKUs — from fresh produce to frozen meals to household essentials. We stock the brands and products you know and trust.</p>
             <PhotoGrid dark={false} photos={[
               { src: PHOTOS.communityMarket.freshProduce, alt: "Fresh produce — watermelons, apples, sweet potatoes, onions" },
@@ -1810,7 +1810,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "market-recipes", label: "Budget Recipes", shortLabel: "Recipes", icon: "🍳",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>The Community Market provides easy, budget-friendly meal ideas for our shoppers. All ingredients available on the market.</p>
             <div className="cadc-stack">
               {[
@@ -1884,7 +1884,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "jobs", label: "Open Positions", shortLabel: "Jobs", icon: "📋",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>CADC has positions across multiple programs — Head Start, transit, weatherization, administration, and more. We serve 9 counties and our team reflects the communities we're in.</p>
             <div className="cadc-card">
               <p className="cadc-label">View current openings</p>
@@ -1900,7 +1900,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "why", label: "Why CADC", shortLabel: "Why CADC", icon: "⭐",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Working at CADC means showing up every day for the people in your community who need it most — children, seniors, families navigating hard times.</p>
             <div className="cadc-grid-2">
               {["Mission-driven work","Benefits package","Community impact","Professional development","Stable employment","Regional reach"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
@@ -1923,7 +1923,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "leadership", label: "Agency Leadership", shortLabel: "Leadership", icon: "👤",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <div className="cadc-stack">
               {[
                 {n:"Leslea Hixson",t:"Executive Director"},
@@ -1937,7 +1937,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "board-members", label: "Board of Directors", shortLabel: "Board", icon: "🏛️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>CADC is governed by a Board of Directors representing the communities we serve across Southwest Oklahoma.</p>
             <div className="cadc-card">
               <p className="cadc-label">Board information coming soon</p>
@@ -1950,7 +1950,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "policy-council", label: "Policy Council", shortLabel: "Policy Council", icon: "📋",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>The Head Start Policy Council is a governing body that includes parents of currently enrolled children and community representatives. Policy Council members have a real voice in how the program operates.</p>
             <div className="cadc-card">
               <p className="cadc-label">Parent involvement in governance</p>
@@ -1968,7 +1968,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "about-cadc", label: "About CADC", shortLabel: "About", icon: "🏢",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Community Action Development Corporation (CADC) has been serving Southwest Oklahoma families since 1966. We are a private, non-profit Community Action Agency and Community Action Partnership member.</p>
             <div className="cadc-card">
               <p className="cadc-label">Main office</p>
@@ -1996,7 +1996,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-about", label: "About the Program", shortLabel: "About", icon: "ℹ️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>CADC Advantage provides home-delivered meals to older adults and individuals with disabilities through Oklahoma Medicaid waiver programs — Advantage, Living Choice, and Medically Fragile.</p>
             <p>Meals are delivered every two weeks. Members may receive 14 or 28 meals per delivery, plus fresh milk and juice. Both frozen and shelf-stable meal options are available.</p>
             <div className="cadc-card">
@@ -2009,7 +2009,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-eligibility", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>To receive Advantage Home Delivered Meals, applicants must meet all of the following criteria:</p>
             <div className="cadc-card">
               <ul className="cadc-list">
@@ -2027,7 +2027,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-meals", label: "Meal Options", shortLabel: "Meals", icon: "🍱",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>Members choose from a rotating selection of frozen and shelf-stable meals designed to meet nutritional needs. Fresh milk and juice are included with every delivery.</p>
             <div className="cadc-card">
               <p className="cadc-label">Delivery schedule</p>
@@ -2045,7 +2045,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <div className="cadc-stack">
               {[
                 {n:"Sentinel — Emily Correll",addr:"122 S. 3rd Butler Building, Sentinel, OK 73664",p:"580-393-2216",href:"tel:+15803932216"},
@@ -2065,7 +2065,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-donate", label: "Support & Donate", shortLabel: "Donate", icon: "❤️",
         content: (
-          <div className="cadc-content">
+          <div className="cadc-light-content">
             <p>CADC is exploring ways for community members and businesses to support our nutrition programs directly. Details coming soon — check back or contact us to express interest.</p>
             <div className="cadc-card">
               <p className="cadc-label">Coming soon</p>
@@ -2721,7 +2721,8 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
               textAlign: "center", lineHeight: 1.25,
               whiteSpace: "normal", wordBreak: "break-word",
-              width: "clamp(56px,12vw,80px)",
+              width: "clamp(64px,12vw,84px)",
+              fontSize: "clamp(0.34rem,0.78vw,0.48rem)",
               transition: "color 0.2s ease",
             }}>
               {label}
