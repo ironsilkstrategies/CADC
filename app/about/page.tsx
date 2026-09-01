@@ -34,9 +34,9 @@ const PROGRAMS = [
 const STAFF = [
   { name: "Leslea Hixson", title: "Executive Director", bio: "Executive Director since January 2024. Previously served as CADC's Head Start/Early Head Start Director. Holds a bachelor's degree in Elementary Education and a master's in Education Administration, with 17 years in public education as a teacher and administrator." },
   { name: "Terry Collom", title: "Chief Financial Officer", bio: "CFO with 16 years at CADC. Bachelor's degree in Accounting from Cameron University and 27 years of experience in the accounting field, including 10 years in private manufacturing." },
-  { name: "Robin Harris", title: "Head Start & Early Head Start Director", bio: "Leads CADC's Head Start and Early Head Start program across 11 centers in Southwest Oklahoma." },
+  { name: "Robin Harris", title: "Head Start & Early Head Start Director", bio: "Leads CADC's Head Start and Early Head Start program across 11 centers in Southwest Oklahoma.", phone: "580-726-3343", email: "rharris@cadcok.org" },
   { name: "Gilbert Nuncio", title: "Transit Director", bio: "13 years with CADC. Started as a Red River Transportation driver in 2014, promoted to Maintenance Supervisor in 2016, Route Supervisor in 2018, and Transit Director in 2021." },
-  { name: "Robert Meador", title: "Weatherization & Housing Director", bio: "Joined CADC in September 1991. Has overseen weatherization of over a thousand homes and led numerous housing rehabilitation projects over a 35-year career in community action." },
+  { name: "Robert Meador", title: "Weatherization & Housing Director", bio: "Joined CADC in September 1991. Has overseen weatherization of over a thousand homes and led numerous housing rehabilitation projects over a 35-year career in community action.", phone: "580-305-0853" },
   { name: "Laura Vardell", title: "Senior Nutrition Director", bio: "4 years with CADC, overseeing congregate meal programs across Southwest Oklahoma." },
   { name: "Scott Fraley", title: "Community Market Director", bio: "Brings 30+ years of leadership experience in retail, merchandising, and materials management. Born and raised in Frederick, deeply rooted in the community." },
   { name: "Kristie Jackson", title: "Advantage Director", bio: "Started at CADC as a Head Start teacher in September 2022. Long personal history with CADC — attended Head Start as a child, as did her children." },
@@ -392,17 +392,18 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
 
 // Head Start centers — 11 locations across SW Oklahoma
 const HEAD_START_CENTERS = [
-  { name: "Hobart Head Start",      city: "Hobart",      county: "Kiowa",      x: 318, y: 248, phone: "580-335-5588", mapsQuery: "Hobart OK 73651" },
-  { name: "Altus Head Start",       city: "Altus",        county: "Jackson",    x: 282, y: 278, phone: "580-335-5588", mapsQuery: "Altus OK 73521" },
-  { name: "Lawton Head Start",      city: "Lawton",       county: "Comanche",   x: 370, y: 265, phone: "580-335-5588", mapsQuery: "Lawton OK 73501" },
-  { name: "Frederick Head Start",   city: "Frederick",    county: "Tillman",    x: 330, y: 290, phone: "580-335-5588", mapsQuery: "Frederick OK 73542" },
-  { name: "Sayre Head Start",       city: "Sayre",        county: "Beckham",    x: 264, y: 196, phone: "580-335-5588", mapsQuery: "Sayre OK 73662" },
-  { name: "Elk City Head Start",    city: "Elk City",     county: "Beckham",    x: 258, y: 210, phone: "580-335-5588", mapsQuery: "Elk City OK 73644" },
-  { name: "Clinton Head Start",     city: "Clinton",      county: "Washita",    x: 304, y: 186, phone: "580-335-5588", mapsQuery: "Clinton OK 73601" },
-  { name: "Weatherford Head Start", city: "Weatherford",  county: "Custer",     x: 326, y: 158, phone: "580-335-5588", mapsQuery: "Weatherford OK 73096" },
-  { name: "Anadarko Head Start",    city: "Anadarko",     county: "Caddo",      x: 370, y: 220, phone: "580-335-5588", mapsQuery: "Anadarko OK 73005" },
-  { name: "El Reno Head Start",     city: "El Reno",      county: "Canadian",   x: 418, y: 168, phone: "580-335-5588", mapsQuery: "El Reno OK 73036" },
-  { name: "Chickasha Head Start",   city: "Chickasha",    county: "Grady",      x: 414, y: 232, phone: "580-335-5588", mapsQuery: "Chickasha OK 73018" },
+  // Per Robin Harris email 9/1/2026 — 11 centers, 7 counties
+  { name: "Erick Head Start",       city: "Erick",       county: "Beckham",      x: 254, y: 206, phone: "580-726-3343", mapsQuery: "Erick OK 73645" },
+  { name: "Sayre Head Start",       city: "Sayre",       county: "Beckham",      x: 268, y: 196, phone: "580-726-3343", mapsQuery: "Sayre OK 73662" },
+  { name: "Temple Head Start",      city: "Temple",      county: "Cotton",       x: 368, y: 298, phone: "580-726-3343", mapsQuery: "Temple OK 73568" },
+  { name: "Ringling Head Start",    city: "Ringling",    county: "Jefferson",    x: 406, y: 326, phone: "580-726-3343", mapsQuery: "Ringling OK 73456" },
+  { name: "Hobart Head Start",      city: "Hobart",      county: "Kiowa",        x: 316, y: 248, phone: "580-726-3343", mapsQuery: "Hobart OK 73651" },
+  { name: "Hammon Head Start",      city: "Hammon",      county: "Roger Mills",  x: 262, y: 148, phone: "580-726-3343", mapsQuery: "Hammon OK 73650" },
+  { name: "Grandfield Head Start",  city: "Grandfield",  county: "Tillman",      x: 322, y: 308, phone: "580-726-3343", mapsQuery: "Grandfield OK 73546" },
+  { name: "Frederick Head Start",   city: "Frederick",   county: "Tillman",      x: 338, y: 284, phone: "580-726-3343", mapsQuery: "Frederick OK 73542" },
+  { name: "Burns Flat Head Start",  city: "Burns Flat",  county: "Washita",      x: 308, y: 192, phone: "580-726-3343", mapsQuery: "Burns Flat OK 73624" },
+  { name: "Cordell Head Start",     city: "Cordell",     county: "Washita",      x: 330, y: 186, phone: "580-726-3343", mapsQuery: "Cordell OK 73632" },
+  { name: "Sentinel Head Start",    city: "Sentinel",    county: "Washita",      x: 318, y: 202, phone: "580-726-3343", mapsQuery: "Sentinel OK 73664" },
 ];
 
 // SVG Pin component — sleek minimal teardrop
@@ -595,15 +596,13 @@ function LocationMap() {
             {n:"Temple",      x:366,  y:302},
             {n:"Ringling",    x:404,  y:330},
             {n:"Ryan",        x:408,  y:344},
-            {n:"Sentinel",    x:319,  y:204},
+            {n:"Sentinel",    x:319,  y:208},
             {n:"Hobart",      x:316,  y:253},
-            {n:"Altus",       x:280,  y:283},
-            {n:"Clinton",     x:302,  y:191},
-            {n:"Elk City",    x:256,  y:215},
-            {n:"Anadarko",    x:368,  y:226},
-            {n:"El Reno",     x:416,  y:174},
-            {n:"Chickasha",   x:412,  y:238},
-            {n:"Weatherford", x:324,  y:163},
+            {n:"Erick",       x:254,  y:211},
+            {n:"Hammon",      x:262,  y:153},
+            {n:"Grandfield",  x:322,  y:313},
+            {n:"Burns Flat",  x:306,  y:197},
+            {n:"Cordell",     x:332,  y:191},
           ].map(c => (
             <text key={c.n} x={c.x} y={c.y} textAnchor="middle" fontSize={3.8} fill="#6b7280" fontStyle="italic" style={{ userSelect: "none", pointerEvents: "none" }}>{c.n}</text>
           ))}
@@ -803,7 +802,13 @@ export default function AboutPage() {
               <li key={s.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: "20px 22px" }}>
                 <p style={{ color: "#111827", fontWeight: 800, fontSize: 15, margin: "0 0 3px" }}>{s.name}</p>
                 <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.09em", margin: "0 0 10px" }}>{s.title}</p>
-                <p style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.65, margin: 0 }}>{s.bio}</p>
+                <p style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{s.bio}</p>
+                {"phone" in s && (s as {phone?:string}).phone && (
+                  <a href={`tel:+1${(s as {phone:string}).phone.replace(/\D/g,"")}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 12, textDecoration: "none", marginRight: 12 }}>📞 {(s as {phone:string}).phone}</a>
+                )}
+                {"email" in s && (s as {email?:string}).email && (
+                  <a href={`mailto:${(s as {email:string}).email}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 12, textDecoration: "none" }}>✉️ {(s as {email:string}).email}</a>
+                )}
               </li>
             ))}
           </ul>
