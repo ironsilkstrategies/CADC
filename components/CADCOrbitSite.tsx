@@ -2442,8 +2442,7 @@ function SketchField() {
 }
 
 // ─── Hero Photo Rotation System ──────────────────────────────────────────────
-// Category-locked crossfade — only photos matching the active program/stage
-// rotate in. Falls back to GENERAL pool when no program is selected.
+// Category-locked crossfade — orbit panel only, daily random seed (resets at midnight CST)
 
 const HERO_POOLS: Record<string, string[]> = {
   "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/hero/hero-${n}.jpg`),
@@ -2455,57 +2454,64 @@ const HERO_POOLS: Record<string, string[]> = {
   "general":         [6,7,15,16,18,5].map(n=>`/hero/hero-${n}.jpg`),
 };
 
+// Daily seed — resets at midnight CST (UTC-6). Same visitor gets same photo order all day.
+function getDailySeed(): number {
+  const now = new Date();
+  // CST offset: UTC-6
+  const cst = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+  return cst.getFullYear() * 10000 + (cst.getMonth() + 1) * 100 + cst.getDate();
+}
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const a = [...arr];
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(s) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
-  const pool = programSlug && HERO_POOLS[programSlug]
+  const rawPool = programSlug && HERO_POOLS[programSlug]
     ? HERO_POOLS[programSlug]
     : HERO_POOLS["general"];
 
-  const [current, setCurrent] = useState(0);
-  const [next, setNext] = useState(1 % pool.length);
-  const [fading, setFading] = useState(false);
+  // Shuffle once per day per pool — same order all day, resets at midnight CST
+  const seed = getDailySeed() + (programSlug ? programSlug.split("").reduce((a,c)=>a+c.charCodeAt(0),0) : 0);
+  const pool = seededShuffle(rawPool, seed);
+
+  // Index persists across program changes — no jarring reset
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  // When pool switches, clamp index if needed
+  const safeIndex = index % pool.length;
 
   useEffect(() => {
-    // Reset when pool changes
-    setCurrent(0);
-    setNext(1 % pool.length);
-    setFading(false);
-  }, [programSlug]);
-
-  useEffect(() => {
-    const hold = setTimeout(() => {
-      setFading(true);
-      const transition = setTimeout(() => {
-        setCurrent(c => {
-          const n = (c + 1) % pool.length;
-          setNext((n + 1) % pool.length);
-          return n;
-        });
-        setFading(false);
+    if (pool.length <= 1) return;
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % pool.length);
+        setVisible(true);
       }, 1500);
-      return () => clearTimeout(transition);
-    }, 5000);
-    return () => clearTimeout(hold);
-  }, [current, pool.length]);
+    }, 6500);
+    return () => clearInterval(timer);
+  }, [pool.length]);
+
+  if (pool.length === 0) return null;
 
   return (
-    <div style={{ position: "absolute", inset: 0, zIndex: 0 }} aria-hidden="true">
-      {/* Current photo */}
+    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden", borderRadius: 0 }} aria-hidden="true">
       <div style={{
         position: "absolute", inset: 0,
-        backgroundImage: `url(${pool[current]})`,
+        backgroundImage: `url(${pool[safeIndex]})`,
         backgroundSize: "cover", backgroundPosition: "center",
-        opacity: fading ? 0 : 0.12,
+        opacity: visible ? 0.13 : 0,
         transition: "opacity 1.5s ease-in-out",
-        filter: "saturate(0.6)",
-      }} />
-      {/* Next photo (preloaded, fades in) */}
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: `url(${pool[next]})`,
-        backgroundSize: "cover", backgroundPosition: "center",
-        opacity: fading ? 0.12 : 0,
-        transition: "opacity 1.5s ease-in-out",
-        filter: "saturate(0.6)",
+        filter: "saturate(0.5)",
       }} />
     </div>
   );
@@ -2834,7 +2840,6 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         onFocus={e => { e.currentTarget.style.left = "0"; e.currentTarget.style.width = "auto"; e.currentTarget.style.height = "auto"; }}
         onBlur={e => { e.currentTarget.style.left = "-9999px"; e.currentTarget.style.width = "1px"; e.currentTarget.style.height = "1px"; }}
       >Skip to main content</a>
-      <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
       <SketchField />
 
       {/* Utility nav */}
@@ -2873,6 +2878,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
         {/* LEFT — Orbit / Map panel */}
         <div style={{ width: "42%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
+          <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
 
           {/* Back button */}
           {stage !== "entry" && (
