@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { contact, complianceDocs } from "@/lib/org";
+import CADCShell from "@/components/CADCShell";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -679,44 +680,21 @@ export default function AboutPage() {
   const annualReport = complianceDocs.find((d: { label: string }) => d.label === "2024 Annual Report");
 
   return (
-    <div className="min-h-screen" style={{ background: "#F8F8FF", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
+    <CADCShell mainId="main-about-content">
 
-      {/* Skip to main content */}
-      <a href="#main-about-content" style={{ position: "absolute", left: "-9999px", top: "auto", width: 1, height: 1, overflow: "hidden", zIndex: 9999, background: "#0101FF", color: "white", padding: "12px 20px", fontWeight: 700, fontSize: 14, textDecoration: "none" }}
-        onFocus={e => { e.currentTarget.style.left = "0"; e.currentTarget.style.width = "auto"; e.currentTarget.style.height = "auto"; }}
-        onBlur={e => { e.currentTarget.style.left = "-9999px"; e.currentTarget.style.width = "1px"; e.currentTarget.style.height = "1px"; }}
-      >Skip to main content</a>
-
-      {/* Hero */}
-      <header style={{ background: "#F8F9FF", borderBottom: "1px solid #e5e7eb", padding: "56px 0 48px", position: "relative" }}>
+      {/* Hero — no standalone nav needed, shell handles it */}
+      <header style={{ background: "rgba(248,249,255,0.92)", borderBottom: "1px solid #e5e7eb", padding: "48px 0 40px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px" }}>
-          <Link href="/" aria-label="Back to CADC home page" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#6b7280", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", marginBottom: 28 }}>
-            ← Back to Home
-          </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 24, flexWrap: "wrap" }}>
-            <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 72, width: "auto" }} />
-            <div>
-              <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 6 }}>Southwest Oklahoma · Since 1966</p>
-              <h1 style={{ color: "#0101FF", fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 800, lineHeight: 1.1, margin: 0 }}>
-                Community Action<br />Development Corporation
-              </h1>
-            </div>
-          </div>
-          <p style={{ color: "#374151", fontSize: 16, lineHeight: 1.75, maxWidth: 600, marginBottom: 28 }}>
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Southwest Oklahoma · Since 1966</p>
+          <h1 style={{ color: "#0101FF", fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 16 }}>
+            About CADC
+          </h1>
+          <p style={{ color: "#374151", fontSize: 16, lineHeight: 1.75, maxWidth: 600, marginBottom: 24 }}>
             Since 1966, CADC has worked alongside families across Southwest Oklahoma — connecting people to the resources, programs, and support they need to build stable, healthy lives.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <a href={`tel:+1${contact.mainPhone.replace(/\D/g,"")}`} aria-label={`Call CADC main office at ${contact.mainPhone}`} style={{ background: "#CC0000", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
               📞 {contact.mainPhone}
-            </a>
-            <a
-              href="https://www.surveymonkey.com/r/26cadcneeds"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Take the 2026 CADC Community Needs Survey (opens in new tab)"
-              style={{ background: "#0101FF", color: "white", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}
-            >
-              📋 2026 Community Survey
             </a>
             {annualReport && (
               <a href={(annualReport as { href: string }).href} target="_blank" rel="noopener noreferrer" aria-label="Download 2024 Annual Report (opens in new tab)" style={{ border: "1px solid #0101FF", color: "#0101FF", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
@@ -823,24 +801,6 @@ export default function AboutPage() {
         </section>
 
       </main>
-
-      {/* ADA compliance styles */}
-      <style>{`
-        *:focus-visible {
-          outline: 3px solid #0101FF !important;
-          outline-offset: 3px !important;
-          border-radius: 4px;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            transition-duration: 0.01ms !important;
-          }
-        }
-        @media (forced-colors: active) {
-          button, a { border: 1px solid ButtonText; }
-        }
-      `}</style>
-    </div>
+    </CADCShell>
   );
 }
