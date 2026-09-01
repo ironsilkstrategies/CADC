@@ -2441,7 +2441,77 @@ function SketchField() {
   );
 }
 
-// ─── County service data for county-first flow ───────────────────────────────
+// ─── Hero Photo Rotation System ──────────────────────────────────────────────
+// Category-locked crossfade — only photos matching the active program/stage
+// rotate in. Falls back to GENERAL pool when no program is selected.
+
+const HERO_POOLS: Record<string, string[]> = {
+  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/hero/hero-${n}.jpg`),
+  "senior-meals":    [12,19,20,21].map(n=>`/hero/hero-${n}.jpg`),
+  "advantage":       [2,24].map(n=>`/hero/hero-${n}.jpg`),
+  "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
+  "transit":         [14].map(n=>`/hero/hero-${n}.jpg`),
+  "weatherization":  [17].map(n=>`/hero/hero-${n}.jpg`),
+  "general":         [6,7,15,16,18,5].map(n=>`/hero/hero-${n}.jpg`),
+};
+
+function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
+  const pool = programSlug && HERO_POOLS[programSlug]
+    ? HERO_POOLS[programSlug]
+    : HERO_POOLS["general"];
+
+  const [current, setCurrent] = useState(0);
+  const [next, setNext] = useState(1 % pool.length);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    // Reset when pool changes
+    setCurrent(0);
+    setNext(1 % pool.length);
+    setFading(false);
+  }, [programSlug]);
+
+  useEffect(() => {
+    const hold = setTimeout(() => {
+      setFading(true);
+      const transition = setTimeout(() => {
+        setCurrent(c => {
+          const n = (c + 1) % pool.length;
+          setNext((n + 1) % pool.length);
+          return n;
+        });
+        setFading(false);
+      }, 1500);
+      return () => clearTimeout(transition);
+    }, 5000);
+    return () => clearTimeout(hold);
+  }, [current, pool.length]);
+
+  return (
+    <div style={{ position: "absolute", inset: 0, zIndex: 0 }} aria-hidden="true">
+      {/* Current photo */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: `url(${pool[current]})`,
+        backgroundSize: "cover", backgroundPosition: "center",
+        opacity: fading ? 0 : 0.12,
+        transition: "opacity 1.5s ease-in-out",
+        filter: "saturate(0.6)",
+      }} />
+      {/* Next photo (preloaded, fades in) */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: `url(${pool[next]})`,
+        backgroundSize: "cover", backgroundPosition: "center",
+        opacity: fading ? 0.12 : 0,
+        transition: "opacity 1.5s ease-in-out",
+        filter: "saturate(0.6)",
+      }} />
+    </div>
+  );
+}
+
+
 
 const CADC_BASE_COUNTIES = [
   "beckham","canadian","comanche","cotton","jefferson","kiowa","roger-mills","tillman","washita"
@@ -2764,6 +2834,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         onFocus={e => { e.currentTarget.style.left = "0"; e.currentTarget.style.width = "auto"; e.currentTarget.style.height = "auto"; }}
         onBlur={e => { e.currentTarget.style.left = "-9999px"; e.currentTarget.style.width = "1px"; e.currentTarget.style.height = "1px"; }}
       >Skip to main content</a>
+      <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
       <SketchField />
 
       {/* Utility nav */}
