@@ -391,54 +391,41 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
 };
 
 // Head Start centers — 11 locations across SW Oklahoma
-// Positioned using known city locations within county SVG bounds
 const HEAD_START_CENTERS = [
-  { name: "Hobart HS",      city: "Hobart",      county: "Kiowa",      x: 318, y: 248 },
-  { name: "Altus HS",       city: "Altus",        county: "Jackson",    x: 282, y: 278 },
-  { name: "Lawton HS",      city: "Lawton",       county: "Comanche",   x: 370, y: 265 },
-  { name: "Frederick HS",   city: "Frederick",    county: "Tillman",    x: 330, y: 290 },
-  { name: "Sayre HS",       city: "Sayre",        county: "Beckham",    x: 264, y: 196 },
-  { name: "Elk City HS",    city: "Elk City",     county: "Beckham",    x: 258, y: 210 },
-  { name: "Clinton HS",     city: "Clinton",      county: "Washita",    x: 304, y: 186 },
-  { name: "Weatherford HS", city: "Weatherford",  county: "Custer",     x: 326, y: 158 },
-  { name: "Anadarko HS",    city: "Anadarko",     county: "Caddo",      x: 370, y: 220 },
-  { name: "El Reno HS",     city: "El Reno",      county: "Canadian",   x: 418, y: 168 },
-  { name: "Chickasha HS",   city: "Chickasha",    county: "Grady",      x: 414, y: 232 },
+  { name: "Hobart Head Start",      city: "Hobart",      county: "Kiowa",      x: 318, y: 248, phone: "580-335-5588", mapsQuery: "Hobart OK 73651" },
+  { name: "Altus Head Start",       city: "Altus",        county: "Jackson",    x: 282, y: 278, phone: "580-335-5588", mapsQuery: "Altus OK 73521" },
+  { name: "Lawton Head Start",      city: "Lawton",       county: "Comanche",   x: 370, y: 265, phone: "580-335-5588", mapsQuery: "Lawton OK 73501" },
+  { name: "Frederick Head Start",   city: "Frederick",    county: "Tillman",    x: 330, y: 290, phone: "580-335-5588", mapsQuery: "Frederick OK 73542" },
+  { name: "Sayre Head Start",       city: "Sayre",        county: "Beckham",    x: 264, y: 196, phone: "580-335-5588", mapsQuery: "Sayre OK 73662" },
+  { name: "Elk City Head Start",    city: "Elk City",     county: "Beckham",    x: 258, y: 210, phone: "580-335-5588", mapsQuery: "Elk City OK 73644" },
+  { name: "Clinton Head Start",     city: "Clinton",      county: "Washita",    x: 304, y: 186, phone: "580-335-5588", mapsQuery: "Clinton OK 73601" },
+  { name: "Weatherford Head Start", city: "Weatherford",  county: "Custer",     x: 326, y: 158, phone: "580-335-5588", mapsQuery: "Weatherford OK 73096" },
+  { name: "Anadarko Head Start",    city: "Anadarko",     county: "Caddo",      x: 370, y: 220, phone: "580-335-5588", mapsQuery: "Anadarko OK 73005" },
+  { name: "El Reno Head Start",     city: "El Reno",      county: "Canadian",   x: 418, y: 168, phone: "580-335-5588", mapsQuery: "El Reno OK 73036" },
+  { name: "Chickasha Head Start",   city: "Chickasha",    county: "Grady",      x: 414, y: 232, phone: "580-335-5588", mapsQuery: "Chickasha OK 73018" },
 ];
 
-// SVG Pin component — clean teardrop shape
-function Pin({ x, y, color, label, onClick, size = 10 }: {
+// SVG Pin component — sleek minimal teardrop
+function Pin({ x, y, color, label, onClick, size = 6 }: {
   x: number; y: number; color: string; label: string;
   onClick: () => void; size?: number;
 }) {
   return (
-    <g
-      style={{ cursor: "pointer" }}
-      onClick={onClick}
-      role="button"
-      aria-label={label}
-    >
-      {/* Drop shadow */}
-      <ellipse cx={x} cy={y + 1} rx={size * 0.6} ry={size * 0.2} fill="rgba(0,0,0,0.2)" />
-      {/* Pin body */}
+    <g style={{ cursor: "pointer" }} onClick={onClick} role="button" aria-label={label}>
+      {/* Subtle drop shadow */}
+      <ellipse cx={x} cy={y + 0.5} rx={size * 0.5} ry={size * 0.15} fill="rgba(0,0,0,0.15)" />
+      {/* Pin circle head */}
+      <circle cx={x} cy={y - size * 1.8} r={size} fill={color} stroke="white" strokeWidth={1.2} />
+      {/* Pin tail */}
       <path
-        d={`M${x},${y - size * 2.2}
-           C${x - size},${y - size * 2.2} ${x - size},${y - size * 0.8} ${x},${y - size * 0.8}
-           C${x + size},${y - size * 0.8} ${x + size},${y - size * 2.2} ${x},${y - size * 2.2}Z`}
+        d={`M${x - size * 0.45},${y - size * 0.9} L${x},${y} L${x + size * 0.45},${y - size * 0.9}`}
         fill={color}
         stroke="white"
-        strokeWidth={1.5}
-      />
-      {/* Pin point */}
-      <path
-        d={`M${x - size * 0.4},${y - size * 0.9} L${x},${y} L${x + size * 0.4},${y - size * 0.9}`}
-        fill={color}
-        stroke="white"
-        strokeWidth={0.8}
+        strokeWidth={0.6}
         strokeLinejoin="round"
       />
       {/* Inner dot */}
-      <circle cx={x} cy={y - size * 1.55} r={size * 0.35} fill="white" opacity={0.9} />
+      <circle cx={x} cy={y - size * 1.8} r={size * 0.3} fill="white" opacity={0.85} />
     </g>
   );
 }
@@ -448,16 +435,55 @@ function HSMarker({ x, y }: { x: number; y: number }) {
   return (
     <g style={{ pointerEvents: "none" }}>
       <rect
-        x={x - 4} y={y - 4} width={8} height={8}
-        fill="#D97706" stroke="white" strokeWidth={1}
+        x={x - 3} y={y - 3} width={6} height={6}
+        fill="#D97706" stroke="white" strokeWidth={0.8}
         transform={`rotate(45 ${x} ${y})`}
       />
     </g>
   );
 }
 
+// Head Start detail card modal
+function HSCard({ hs, onClose }: { hs: typeof HEAD_START_CENTERS[0]; onClose: () => void }) {
+  const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(hs.mapsQuery)}`;
+  const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(hs.mapsQuery)}`;
+  return (
+    <div
+      role="dialog" aria-modal="true" aria-labelledby={`hs-title-${hs.city}`}
+      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+      onClick={onClose}
+    >
+      <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 20, maxWidth: 380, width: "100%", overflow: "hidden", boxShadow: "0 24px 64px rgba(0,0,0,0.2)" }}>
+        <div style={{ background: "#D97706", padding: "20px 24px", position: "relative" }}>
+          <button onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "white", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+          <p id={`hs-title-${hs.city}`} style={{ color: "white", fontWeight: 800, fontSize: 16, margin: 0 }}>🏫 {hs.name}</p>
+          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, margin: "4px 0 0" }}>{hs.city} · {hs.county} County</p>
+        </div>
+        <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Program</p>
+            <p style={{ color: "#111827", fontSize: 14, margin: 0 }}>Head Start & Early Head Start</p>
+            <p style={{ color: "#6b7280", fontSize: 12, margin: "4px 0 0" }}>Free early childhood education — birth through age 5</p>
+          </div>
+          <div>
+            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Enrollment</p>
+            <p style={{ color: "#111827", fontSize: 14, margin: 0 }}>Open year-round · No cost to eligible families</p>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <a href={`tel:+1${hs.phone.replace(/\D/g,"")}`} aria-label={`Call ${hs.name}`} style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#0101FF", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>📞 {hs.phone}</a>
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Google Maps directions" style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#111827", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🗺️ Directions</a>
+            <a href="/#head-start" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#D97706", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>Learn About Head Start →</a>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: 10, fontSize: 12, fontWeight: 700, color: "#6b7280", cursor: "pointer" }}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LocationMap() {
   const [selected, setSelected] = useState<CADCLocation | null>(null);
+  const [selectedHS, setSelectedHS] = useState<typeof HEAD_START_CENTERS[0] | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [hoveredHS, setHoveredHS] = useState<string | null>(null);
 
@@ -584,18 +610,17 @@ function LocationMap() {
 
           {/* ── Head Start centers — amber diamonds ── */}
           {HEAD_START_CENTERS.map(hs => (
-            <g key={hs.name}>
+            <g key={hs.name} style={{ cursor: "pointer" }} onClick={() => setSelectedHS(hs)} role="button" aria-label={`${hs.name} — tap for details`}>
               <HSMarker x={hs.x} y={hs.y} />
               {hoveredHS === hs.name && (
                 <g>
-                  <rect x={hs.x - 20} y={hs.y - 18} width={40} height={10} rx={2} fill="rgba(217,119,6,0.95)" />
-                  <text x={hs.x} y={hs.y - 11} textAnchor="middle" fontSize={3.5} fill="white" fontWeight="700">{hs.city}</text>
+                  <rect x={hs.x - 22} y={hs.y - 20} width={44} height={12} rx={2} fill="rgba(217,119,6,0.95)" />
+                  <text x={hs.x} y={hs.y - 12} textAnchor="middle" fontSize={4} fill="white" fontWeight="700">{hs.city}</text>
                 </g>
               )}
               <rect
-                x={hs.x - 8} y={hs.y - 8} width={16} height={16}
+                x={hs.x - 10} y={hs.y - 10} width={20} height={20}
                 fill="transparent"
-                style={{ cursor: "pointer" }}
                 onMouseEnter={() => setHoveredHS(hs.name)}
                 onMouseLeave={() => setHoveredHS(null)}
               />
@@ -615,7 +640,7 @@ function LocationMap() {
                 color={color}
                 label={`${loc.name} — ${loc.city}, ${loc.county} County`}
                 onClick={() => setSelected(loc)}
-                size={9}
+                size={6}
               />
             );
           })}
@@ -668,8 +693,9 @@ function LocationMap() {
         </div>
       </div>
 
-      {/* Detail modal */}
+      {/* Detail modals */}
       {selected && <LocationCard loc={selected} onClose={() => setSelected(null)} />}
+      {selectedHS && <HSCard hs={selectedHS} onClose={() => setSelectedHS(null)} />}
     </section>
   );
 }
