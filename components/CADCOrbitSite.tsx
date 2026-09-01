@@ -1153,7 +1153,7 @@ function PhotoStrip({ photos, dark }: {
       overflowX: "auto",
       overflowY: "hidden",
       margin: "14px 0",
-      padding: "4px 0 10px",
+      padding: "4px 20px 10px 0",
       scrollbarWidth: "none",
       msOverflowStyle: "none",
     } as React.CSSProperties}>
@@ -1188,6 +1188,11 @@ function PhotoGrid({ photos, dark }: {
 }) {
   const [failed, setFailed] = useState<Set<number>>(new Set());
   const visible = photos.slice(0, 6).filter((_, i) => !failed.has(i));
+  // If first photo spans full width and remaining count is odd, drop the last to avoid orphan cell
+  const hasSpan = visible.length >= 3;
+  const remaining = hasSpan ? visible.slice(1) : visible;
+  const evenRemaining = remaining.length % 2 !== 0 ? remaining.slice(0, -1) : remaining;
+  const display = hasSpan ? [visible[0], ...evenRemaining] : evenRemaining;
 
   return (
     <div style={{
@@ -1195,12 +1200,12 @@ function PhotoGrid({ photos, dark }: {
       gridTemplateColumns: "1fr 1fr",
       gap: 8, margin: "14px 0",
     }}>
-      {visible.map((photo, i) => (
+      {display.map((photo, i) => (
         <div key={photo.src} style={{
           borderRadius: 10, overflow: "hidden", aspectRatio: "4/3",
           background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
           border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
-          gridColumn: i === 0 && visible.length >= 3 ? "1 / span 2" : "auto",
+          gridColumn: i === 0 && hasSpan ? "1 / span 2" : "auto",
         }}>
           <img
             src={photo.src}
