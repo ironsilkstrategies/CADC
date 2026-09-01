@@ -1014,7 +1014,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             </div>
             <span style={{
               color: T.blue,
-              fontSize: isMobile ? "clamp(0.30rem,1.4vw,0.40rem)" : "clamp(0.30rem,0.68vw,0.40rem)",
+              fontSize: isMobile ? "clamp(0.40rem,1.6vw,0.52rem)" : "clamp(0.42rem,0.85vw,0.58rem)",
               fontWeight: isActive ? 800 : 700,
               textTransform:"uppercase", letterSpacing:"0.02em",
               textAlign:"center", lineHeight:1.2,
@@ -2741,7 +2741,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.03em",
               textAlign: "center", lineHeight: 1.2,
               whiteSpace: "nowrap",
-              fontSize: "clamp(0.30rem,0.68vw,0.42rem)",
+              fontSize: "clamp(0.42rem,0.85vw,0.58rem)",
               transition: "color 0.2s ease",
             }}>
               {label}
