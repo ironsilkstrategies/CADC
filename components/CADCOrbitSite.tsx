@@ -1168,7 +1168,7 @@ function PhotoStrip({ photos, dark }: {
           }}
           style={{
             flex: "0 0 auto",
-            width: 155, height: 110,
+            width: 130, height: 100,
             borderRadius: 10,
             objectFit: "cover",
             border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
@@ -2816,7 +2816,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "county" && activeCountyName) {
     const firstProg = availablePrograms[0];
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 24, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Programs available in your area
         </h2>
@@ -2840,7 +2840,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "program" && activeProgram) {
     const firstSub = activeProgram.subAreas[0];
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 24, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
@@ -2860,7 +2860,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 24, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
