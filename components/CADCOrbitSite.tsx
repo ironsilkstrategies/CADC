@@ -2043,7 +2043,7 @@ const PROGRAMS: ProgramData[] = [
               <p>Available to individuals age 60 and older. Spouses and caregivers may also be eligible — contact us for details.</p>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Staff training & safety</p>
+              <p className="cadc-label">Staff training &amp; safety</p>
               <div className="cadc-stack">
                 {[
                   {t:"Food Handlers Certification",d:"All nutrition staff are required to complete a Food Handlers class prior to working in our kitchens."},
@@ -2559,7 +2559,7 @@ const PROGRAMS: ProgramData[] = [
               </ul>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Milk & juice options</p>
+              <p className="cadc-label">Milk &amp; juice options</p>
               <p>Whole milk, 2% milk, chocolate milk, buttermilk, almond milk (sweet, unsweetened, vanilla), orange juice, apple juice. Purchased through Braum's where available; local grocery partners used in other areas.</p>
             </div>
           </div>
