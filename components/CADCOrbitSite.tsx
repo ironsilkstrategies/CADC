@@ -2445,13 +2445,13 @@ function SketchField() {
 // Category-locked crossfade — orbit panel only, daily random seed (resets at midnight CST)
 
 const HERO_POOLS: Record<string, string[]> = {
-  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/hero/hero-${n}.jpg`),
-  "senior-meals":    [12,19,20,21].map(n=>`/hero/hero-${n}.jpg`),
-  "advantage":       [2,24].map(n=>`/hero/hero-${n}.jpg`),
+  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/images/hero-${n}.jpg`),
+  "senior-meals":    [12,19,20,21].map(n=>`/images/hero-${n}.jpg`),
+  "advantage":       [2,24].map(n=>`/images/hero-${n}.jpg`),
   "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
-  "transit":         [14].map(n=>`/hero/hero-${n}.jpg`),
-  "weatherization":  [17].map(n=>`/hero/hero-${n}.jpg`),
-  "general":         [6,7,15,16,18,5].map(n=>`/hero/hero-${n}.jpg`),
+  "transit":         [14].map(n=>`/images/hero-${n}.jpg`),
+  "weatherization":  [17].map(n=>`/images/hero-${n}.jpg`),
+  "general":         [6,7,15,16,18,5].map(n=>`/images/hero-${n}.jpg`),
 };
 
 // Daily seed — resets at midnight CST (UTC-6). Same visitor gets same photo order all day.
