@@ -2114,7 +2114,154 @@ function orbitPos(i: number, total: number, radiusPct: number) {
 
 // ─── Particle field (desktop) ─────────────────────────────────────────────────
 
-function ParticleField() {
+// ─── Sketch Field (desktop background) ───────────────────────────────────────
+// Hand-drawn-style silhouettes of CADC program icons floating like particles.
+// Blues Clues sketch energy — stroke only, wobbly paths, warm + professional.
+
+const SKETCHES = [
+  // School bus (Transit)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-22,-8); ctx.lineTo(-22,6); ctx.lineTo(-18,10); ctx.lineTo(18,10);
+    ctx.lineTo(22,6); ctx.lineTo(22,-8); ctx.lineTo(-22,-8);
+    ctx.moveTo(-22,0); ctx.lineTo(22,0);
+    ctx.moveTo(-14,-8); ctx.lineTo(-14,0);
+    ctx.moveTo(-5,-8); ctx.lineTo(-5,0);
+    ctx.moveTo(5,-8); ctx.lineTo(5,0);
+    ctx.moveTo(14,-8); ctx.lineTo(14,0);
+    ctx.moveTo(-16,10); ctx.arc(-16,10,4,0,Math.PI*2);
+    ctx.moveTo(16,10); ctx.arc(16,10,4,0,Math.PI*2);
+    ctx.stroke();
+  }},
+  // House (Weatherization)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,-18); ctx.lineTo(20,0); ctx.lineTo(20,18);
+    ctx.lineTo(-20,18); ctx.lineTo(-20,0); ctx.closePath();
+    ctx.moveTo(0,-18); ctx.lineTo(-20,0);
+    ctx.moveTo(-6,18); ctx.lineTo(-6,6); ctx.lineTo(6,6); ctx.lineTo(6,18);
+    ctx.moveTo(-14,4); ctx.lineTo(-8,4); ctx.lineTo(-8,10); ctx.lineTo(-14,10); ctx.closePath();
+    ctx.stroke();
+  }},
+  // Grocery cart (Community Market)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-20,-10); ctx.lineTo(-14,-10); ctx.lineTo(-10,8); ctx.lineTo(14,8);
+    ctx.lineTo(16,-2); ctx.lineTo(-10,-2);
+    ctx.moveTo(-10,8); ctx.lineTo(-12,14);
+    ctx.moveTo(-8,14); ctx.arc(-8,14,3,0,Math.PI*2);
+    ctx.moveTo(12,14); ctx.arc(12,14,3,0,Math.PI*2);
+    ctx.stroke();
+  }},
+  // Fork + plate (Senior Meals)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.arc(0,0,16,0,Math.PI*2);
+    ctx.moveTo(-4,-12); ctx.lineTo(-4,12);
+    ctx.moveTo(-7,-12); ctx.lineTo(-7,-6); ctx.arc(-5.5,-6,1.5,Math.PI,0); ctx.lineTo(-4,-12);
+    ctx.moveTo(6,-12); ctx.lineTo(6,-4); ctx.bezierCurveTo(6,2,9,6,9,12);
+    ctx.moveTo(6,-4); ctx.bezierCurveTo(6,2,3,6,3,12);
+    ctx.stroke();
+  }},
+  // Child figure (Head Start)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.arc(0,-14,5,0,Math.PI*2);
+    ctx.moveTo(0,-9); ctx.lineTo(0,4);
+    ctx.moveTo(-10,0); ctx.lineTo(10,0);
+    ctx.moveTo(0,4); ctx.lineTo(-7,18);
+    ctx.moveTo(0,4); ctx.lineTo(7,18);
+    ctx.stroke();
+  }},
+  // Wheelchair (ADA/Transit)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.arc(2,-14,4,0,Math.PI*2);
+    ctx.moveTo(2,-10); ctx.lineTo(0,0); ctx.lineTo(10,0); ctx.lineTo(12,8);
+    ctx.moveTo(0,0); ctx.lineTo(-4,14);
+    ctx.arc(-4,18,4,0,Math.PI*2);
+    ctx.arc(12,12,5,0,Math.PI*2);
+    ctx.stroke();
+  }},
+  // Star / sun (general warmth)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    for (let i=0;i<8;i++) {
+      const a = (i/8)*Math.PI*2;
+      const r1=5,r2=14;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*r1, Math.sin(a)*r1);
+      ctx.lineTo(Math.cos(a)*r2, Math.sin(a)*r2);
+      ctx.stroke();
+    }
+  }},
+  // Heart (community care)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,14);
+    ctx.bezierCurveTo(-20,-2,-20,-18,0,-10);
+    ctx.bezierCurveTo(20,-18,20,-2,0,14);
+    ctx.stroke();
+  }},
+  // Leaf (weatherization/environment)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,16); ctx.bezierCurveTo(-18,8,-18,-14,0,-18);
+    ctx.bezierCurveTo(18,-14,18,8,0,16);
+    ctx.moveTo(0,16); ctx.lineTo(0,-18);
+    ctx.stroke();
+  }},
+  // Open hand (helping)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-10,18); ctx.lineTo(-10,-4); ctx.lineTo(-8,-14); ctx.lineTo(-6,-4);
+    ctx.moveTo(-6,-4); ctx.lineTo(-6,-16); ctx.lineTo(-4,-4);
+    ctx.moveTo(-4,-4); ctx.lineTo(-4,-16); ctx.lineTo(-2,-4);
+    ctx.moveTo(-2,-4); ctx.lineTo(-2,-14); ctx.lineTo(0,-4);
+    ctx.moveTo(-10,-4); ctx.bezierCurveTo(-18,-4,-18,10,-10,18);
+    ctx.lineTo(8,18); ctx.bezierCurveTo(14,18,14,10,8,10);
+    ctx.lineTo(0,-4);
+    ctx.stroke();
+  }},
+  // Book (education)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,-14); ctx.lineTo(0,14);
+    ctx.moveTo(0,-14); ctx.lineTo(-16,-10); ctx.lineTo(-16,18); ctx.lineTo(0,14);
+    ctx.moveTo(0,-14); ctx.lineTo(16,-10); ctx.lineTo(16,18); ctx.lineTo(0,14);
+    ctx.moveTo(-14,-4); ctx.lineTo(-4,-4);
+    ctx.moveTo(-14,2); ctx.lineTo(-4,2);
+    ctx.moveTo(4,-4); ctx.lineTo(14,-4);
+    ctx.moveTo(4,2); ctx.lineTo(14,2);
+    ctx.stroke();
+  }},
+  // Crayon (Head Start / kids)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-5,-18); ctx.lineTo(-5,12); ctx.lineTo(5,12); ctx.lineTo(5,-18);
+    ctx.closePath();
+    ctx.moveTo(-5,12); ctx.lineTo(0,20); ctx.lineTo(5,12);
+    ctx.moveTo(-5,-12); ctx.lineTo(5,-12);
+    ctx.stroke();
+  }},
+  // Simple family (2 adults + child)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    // adult 1
+    ctx.beginPath(); ctx.arc(-12,-14,4,0,Math.PI*2);
+    ctx.moveTo(-12,-10); ctx.lineTo(-12,2); ctx.moveTo(-18,-2); ctx.lineTo(-6,-2);
+    ctx.moveTo(-12,2); ctx.lineTo(-16,14); ctx.moveTo(-12,2); ctx.lineTo(-8,14);
+    // child
+    ctx.moveTo(0,-10); ctx.arc(0,-10,3,0,Math.PI*2);
+    ctx.moveTo(0,-7); ctx.lineTo(0,2); ctx.moveTo(-4,0); ctx.lineTo(4,0);
+    ctx.moveTo(0,2); ctx.lineTo(-3,10); ctx.moveTo(0,2); ctx.lineTo(3,10);
+    // adult 2
+    ctx.moveTo(12,-14); ctx.arc(12,-14,4,0,Math.PI*2);
+    ctx.moveTo(12,-10); ctx.lineTo(12,2); ctx.moveTo(6,-2); ctx.lineTo(18,-2);
+    ctx.moveTo(12,2); ctx.lineTo(8,14); ctx.moveTo(12,2); ctx.lineTo(16,14);
+    ctx.stroke();
+  }},
+];
+
+function SketchField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -2128,34 +2275,63 @@ function ParticleField() {
     canvas.width = W;
     canvas.height = H;
 
-    const PARTICLE_COUNT = 120;
-    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 1.5 + 0.3,
-      alpha: Math.random() * 0.5 + 0.1,
-    }));
+    // 22 floating sketch instances — varied sizes, speeds, rotation
+    const instances = Array.from({ length: 22 }, (_, i) => {
+      const sketch = SKETCHES[i % SKETCHES.length];
+      const scale = 0.5 + Math.random() * 1.4; // 0.5x–1.9x
+      const speed = 0.08 + Math.random() * 0.18;
+      return {
+        sketch,
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * speed,
+        vy: (Math.random() - 0.5) * speed,
+        scale,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.004, // slow drift rotation
+        alpha: 0.04 + Math.random() * 0.08, // 4–12% opacity
+      };
+    });
 
     let raf: number;
     function draw() {
       if (!ctx) return;
       ctx.clearRect(0, 0, W, H);
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0) p.x = W;
-        if (p.x > W) p.x = 0;
-        if (p.y < 0) p.y = H;
-        if (p.y > H) p.y = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(1,1,255,${p.alpha})`;
-        ctx.fill();
+
+      for (const inst of instances) {
+        // Move
+        inst.x += inst.vx;
+        inst.y += inst.vy;
+        inst.rotation += inst.rotSpeed;
+
+        // Wrap at edges
+        if (inst.x < -60) inst.x = W + 60;
+        if (inst.x > W + 60) inst.x = -60;
+        if (inst.y < -60) inst.y = H + 60;
+        if (inst.y > H + 60) inst.y = -60;
+
+        // Draw sketch
+        ctx.save();
+        ctx.translate(inst.x, inst.y);
+        ctx.rotate(inst.rotation);
+        ctx.scale(inst.scale, inst.scale);
+        ctx.globalAlpha = inst.alpha;
+
+        // Parse color for stroke
+        const isMaroon = inst.sketch.color === "#CC0000";
+        ctx.strokeStyle = isMaroon ? "rgba(204,0,0,1)" : "rgba(1,1,255,1)";
+        ctx.lineWidth = 1.8 / inst.scale;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        inst.sketch.draw(ctx);
+
+        ctx.restore();
       }
+
       raf = requestAnimationFrame(draw);
     }
+
     draw();
     return () => cancelAnimationFrame(raf);
   }, []);
@@ -2483,7 +2659,7 @@ interface LayoutProps {
 function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
     <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
-      <ParticleField />
+      <SketchField />
 
       {/* Utility nav */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
