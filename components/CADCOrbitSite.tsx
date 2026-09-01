@@ -2770,7 +2770,23 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
       <nav role="navigation" aria-label="Main navigation" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
         <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation — Home" style={{ height: 44, width: "auto", display: "block" }} />
         <DesktopSearchBar onSelectProgram={tapProgram} onSelectCounty={tapCounty} />
-        <div style={{ display: "flex", gap: 32 }}>
+        <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+          <a
+            href="https://www.surveymonkey.com/r/26cadcneeds"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Take the 2026 CADC Community Needs Survey — your input shapes our programs (opens in new tab)"
+            style={{
+              background: T.maroon, color: "white",
+              padding: "8px 16px", borderRadius: 20,
+              fontSize: 11, fontWeight: 800, textDecoration: "none",
+              letterSpacing: "0.04em", whiteSpace: "nowrap",
+              display: "flex", alignItems: "center", gap: 6,
+              animation: "surveyPulse 3s ease-in-out infinite",
+            }}
+          >
+            📋 Take Our Survey
+          </a>
           {["About", "Contact", "580-335-5588"].map((item, i) => (
             <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
               style={{ color: T.textMuted, fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
@@ -3057,6 +3073,26 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             </div>
           ))}
         </div>
+        {/* Survey CTA */}
+        <a
+          href="https://www.surveymonkey.com/r/26cadcneeds"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Take the 2026 CADC Community Needs Survey — your feedback shapes our programs (opens in new tab)"
+          style={{
+            display: "flex", alignItems: "center", gap: 14, marginTop: 20,
+            background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)",
+            borderRadius: 12, padding: "16px 20px", textDecoration: "none",
+            boxShadow: "0 4px 20px rgba(204,0,0,0.25)",
+          }}
+        >
+          <span style={{ fontSize: 28 }}>📋</span>
+          <div>
+            <p style={{ color: "white", fontWeight: 800, fontSize: 13, margin: 0, letterSpacing: "0.02em" }}>2026 CADC Community Needs Survey</p>
+            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>Your input directly shapes which programs we fund and expand.</p>
+          </div>
+          <span style={{ color: "white", fontSize: 18, marginLeft: "auto" }}>→</span>
+        </a>
       </div>
     );
   }
@@ -3317,6 +3353,21 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">📞 Call</a>
           </div>
         </div>
+        {/* Survey banner */}
+        <a
+          href="https://www.surveymonkey.com/r/26cadcneeds"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Take the 2026 CADC Community Needs Survey — your voice shapes our programs (opens in new tab)"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            background: T.maroon, color: "white",
+            padding: "9px 20px", textDecoration: "none",
+            fontSize: 12, fontWeight: 800, letterSpacing: "0.03em",
+          }}
+        >
+          📋 <span>2026 Community Needs Survey — <strong>Make Your Voice Heard</strong></span>
+        </a>
         <MobileSearchBar onSelectProgram={tapProgram} onSelectCounty={tapCounty} />
       </div>
 
@@ -3580,6 +3631,11 @@ function DesktopStyles() {
   return (
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
+
+      @keyframes surveyPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(204,0,0,0.4); }
+        50%       { box-shadow: 0 0 0 6px rgba(204,0,0,0); }
+      }
 
       /* ── Logo entry — spring-inspired float with glow bloom ── */
       @keyframes logoFloat {
