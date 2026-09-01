@@ -2717,7 +2717,6 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             </div>
             <span style={{
               color: T.blue,
-              fontSize: "clamp(0.38rem,0.85vw,0.52rem)",
               fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
               textAlign: "center", lineHeight: 1.25,
               whiteSpace: "normal", wordBreak: "break-word",
