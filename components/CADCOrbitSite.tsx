@@ -2673,8 +2673,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
       {/* Utility nav */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 44, width: "auto", display: "block" }} />
+        <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 44, width: "auto", display: "block" }} />
         <div style={{ display: "flex", gap: 32 }}>
           {["About", "Contact", "580-335-5588"].map((item, i) => (
             <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
