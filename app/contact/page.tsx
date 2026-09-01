@@ -50,9 +50,9 @@ const OFFICES = [
 
 const DIRECTORS = [
   { name: "Leslea Hixson", title: "Executive Director", phone: "580-335-5588", email: null },
-  { name: "Robin Harris", title: "Head Start & Early Head Start Director", phone: "580-335-5588", email: null },
+  { name: "Robin Harris", title: "Head Start & Early Head Start Director", phone: "580-726-3343", email: "rharris@cadcok.org" },
   { name: "Gilbert Nuncio", title: "Red River Transit Director", phone: "580-928-2199", email: null },
-  { name: "Robert Meador", title: "Weatherization Director", phone: "580-335-5588", email: null },
+  { name: "Robert Meador", title: "Weatherization Director", phone: "580-305-0853", email: null },
   { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-335-5588", email: null },
   { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "SFraley@cadcok.org" },
   { name: "Kristie Jackson", title: "Advantage Director", phone: "580-393-2216", email: null },
@@ -179,7 +179,7 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Emergency / after hours */}
+        {/* Main office CTA */}
         <section style={{ background: "#F0F0FF", borderRadius: 16, padding: "32px 36px", border: "1px solid rgba(1,1,255,0.12)" }} aria-labelledby="main-contact-cta">
           <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Main Office</p>
           <h2 id="main-contact-cta" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.8rem)", fontWeight: 800, marginBottom: 8 }}>Community Action Development Corporation</h2>
