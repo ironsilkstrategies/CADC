@@ -980,7 +980,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             style={{
               position:"absolute",
               left:`${x}%`, top:`${y}%`,
-              width: isMobile ? "clamp(48px,13vw,64px)" : "clamp(52px,11%,68px)",
+              width: isMobile ? "clamp(60px,16vw,80px)" : "clamp(80px,14%,110px)",
               transform:`translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(${sc})`,
               display:"flex",flexDirection:"column",alignItems:"center",gap: isMobile?3:5,
               background:"none",border:"none",cursor:"pointer",padding:0,
@@ -1014,12 +1014,12 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             </div>
             <span style={{
               color: T.blue,
-              fontSize: isMobile ? "clamp(0.36rem,1.6vw,0.48rem)" : "clamp(0.38rem,0.85vw,0.52rem)",
+              fontSize: isMobile ? "clamp(0.30rem,1.4vw,0.40rem)" : "clamp(0.30rem,0.68vw,0.40rem)",
               fontWeight: isActive ? 800 : 700,
-              textTransform:"uppercase", letterSpacing:"0.05em",
+              textTransform:"uppercase", letterSpacing:"0.02em",
               textAlign:"center", lineHeight:1.2,
-              width: isMobile ? "clamp(48px,13vw,64px)" : "clamp(52px,11%,68px)",
-              overflowWrap:"break-word",
+              width: isMobile ? "clamp(60px,16vw,80px)" : "clamp(80px,14%,110px)",
+              whiteSpace: "nowrap",
               textShadow: isMobile ? "none" : isActive ? "0 0 12px rgba(1,1,255,0.8)" : "0 0 8px rgba(1,1,255,0.3)",
             }}>
               {label}
@@ -1152,10 +1152,11 @@ function PhotoStrip({ photos, dark }: {
       display: "flex", gap: 8,
       overflowX: "auto",
       overflowY: "hidden",
-      margin: "14px 0",
-      padding: "4px 20px 10px 0",
+      margin: "14px -12px 14px 0",
+      padding: "4px 32px 10px 0",
       scrollbarWidth: "none",
       msOverflowStyle: "none",
+      boxSizing: "border-box",
     } as React.CSSProperties}>
       {visible.map((photo, i) => (
         <div key={photo.src} style={{
@@ -2686,7 +2687,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             style={{
               position: "absolute",
               left: `${x}%`, top: `${y}%`,
-              width: "clamp(72px,14%,90px)",
+              width: "clamp(80px,15%,110px)",
               transform: `translate(calc(-50% + ${exitX}px), calc(-50% + ${exitY}px)) scale(${isPopped ? 1.28 : entryScale})`,
               display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
               background: "none", border: "none", cursor: "pointer", padding: 0,
@@ -2737,11 +2738,10 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             </div>
             <span style={{
               color: T.blue,
-              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-              textAlign: "center", lineHeight: 1.25,
-              whiteSpace: "normal", wordBreak: "break-word",
-              width: "clamp(64px,12vw,84px)",
-              fontSize: "clamp(0.34rem,0.78vw,0.48rem)",
+              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.03em",
+              textAlign: "center", lineHeight: 1.2,
+              whiteSpace: "nowrap",
+              fontSize: "clamp(0.30rem,0.68vw,0.42rem)",
               transition: "color 0.2s ease",
             }}>
               {label}
