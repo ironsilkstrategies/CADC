@@ -136,6 +136,77 @@ const MARKET_SCHEDULE_DATA = {
   } as Record<string, { time: string; location: string }[]>,
 };
 
+function generateMealICS(): string {
+  const { month, year, meals } = MENU_DATA;
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//CADC//Senior Nutrition Menu//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:CADC Senior Meals — ${month} ${year}`,
+    "X-WR-CALDESC:CADC Senior Nutrition congregate meal menu",
+  ];
+  Object.entries(meals).forEach(([date, meal]) => {
+    const d = date.replace(/-/g, "");
+    lines.push(
+      "BEGIN:VEVENT",
+      `DTSTART;VALUE=DATE:${d}`,
+      `DTEND;VALUE=DATE:${d}`,
+      `SUMMARY:🍽️ CADC Meal: ${meal.headline}`,
+      `DESCRIPTION:${meal.full.join("\\n")}\\n\\nCADC Senior Nutrition | 580-335-5588 | cadcok.org`,
+      `LOCATION:CADC Senior Meal Sites — Frederick\\, Ringling\\, Cache\\, Temple\\, Walters\\, Ryan`,
+      "END:VEVENT"
+    );
+  });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function generateMarketICS(): string {
+  const { month, year, stops } = MARKET_SCHEDULE_DATA;
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//CADC//Community Market Schedule//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:CADC Community Market — ${month} ${year}`,
+    "X-WR-CALDESC:CADC Community Market stop schedule",
+  ];
+  Object.entries(stops).forEach(([date, dayStops]) => {
+    const d = date.replace(/-/g, "");
+    dayStops.forEach(stop => {
+      const [start, end] = stop.time.split("–");
+      const toTime = (t: string, base: string) => {
+        const clean = t?.trim() || base.trim();
+        const [h, m] = clean.replace(/[ap]m/i,"").split(":").map(Number);
+        const isPM = clean.toLowerCase().includes("p") || (h !== 12 && h < 8);
+        return `${String(isPM ? (h === 12 ? 12 : h + 12) : (h === 12 ? 0 : h)).padStart(2,"0")}${String(m||0).padStart(2,"0")}00`;
+      };
+      lines.push(
+        "BEGIN:VEVENT",
+        `DTSTART:${d}T${toTime(start, "09")}`,
+        `DTEND:${d}T${toTime(end||start, "11")}`,
+        `SUMMARY:🛒 CADC Market: ${stop.location}`,
+        `DESCRIPTION:CADC Community Market stop\\nTime: ${stop.time}\\nLocation: ${stop.location}\\n\\nNeed a ride? Call/text 580-374-5518\\ncadcok.org`,
+        `LOCATION:${stop.location}\\, Southwest Oklahoma`,
+        "END:VEVENT"
+      );
+    });
+  });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function downloadICS(content: string, filename: string) {
+  const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── Market Schedule Component ────────────────────────────────────────────────
 
 function MarketSchedule({ dark }: { dark: boolean }) {
@@ -283,16 +354,23 @@ function MarketSchedule({ dark }: { dark: boolean }) {
 }
 
 function MarketSchedulePanel() {
-  const isDesktop = useIsDesktop();
   return (
     <div className="cadc-light-content">
-      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
         Tap any market day to see stop locations and times. Schedule updates monthly.
       </p>
-      <MarketSchedule dark={isDesktop} />
-      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#EEF0FF", borderRadius: 10 }}>
+      <MarketSchedule dark={false} />
+      <button
+        onClick={() => downloadICS(generateMarketICS(), `cadc-community-market-${MARKET_SCHEDULE_DATA.month.toLowerCase()}-${MARKET_SCHEDULE_DATA.year}.ics`)}
+        aria-label={`Download ${MARKET_SCHEDULE_DATA.month} ${MARKET_SCHEDULE_DATA.year} market schedule as ICS file`}
+        style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 4, background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "10px 16px", fontSize: 12, fontWeight: 700, color: "#0101FF", cursor: "pointer", letterSpacing: "0.04em" }}
+      >
+        📅 Save Schedule to Calendar (.ics)
+      </button>
+      <p style={{ fontSize: 10, color: "#9ca3af", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <div style={{ marginTop: 4, padding: "10px 14px", background: "#EEF0FF", borderRadius: 10 }}>
         <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: T.blue, margin: "0 0 6px" }}>Need a ride to the market?</p>
-        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Call or text 580-374-5518</a>
+        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call or text for a ride at 580-374-5518">Call or text 580-374-5518</a>
       </div>
     </div>
   );
@@ -477,17 +555,25 @@ function MealCalendarPanel() {
   const isDesktop = useIsDesktop();
   return (
     <div className="cadc-light-content">
-      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
         Tap any day to see the full meal. Menu rotates monthly — check back for updates.
       </p>
-      <MealCalendar dark={isDesktop} />
-      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(204,0,0,0.9)" : "#CC0000", margin: "0 0 6px" }}>About our menus</p>
-        <p style={{ fontSize: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers. Each menu cycle covers three months.</p>
+      <MealCalendar dark={false} />
+      <button
+        onClick={() => downloadICS(generateMealICS(), `cadc-senior-meals-${MENU_DATA.month.toLowerCase()}-${MENU_DATA.year}.ics`)}
+        aria-label={`Download ${MENU_DATA.month} ${MENU_DATA.year} senior meal calendar as ICS file`}
+        style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 4, background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "10px 16px", fontSize: 12, fontWeight: 700, color: "#0101FF", cursor: "pointer", letterSpacing: "0.04em" }}
+      >
+        📅 Save to Calendar (.ics)
+      </button>
+      <p style={{ fontSize: 10, color: "#9ca3af", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <div style={{ marginTop: 4, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>About our menus</p>
+        <p style={{ fontSize: 12, color: "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers.</p>
       </div>
-      <div style={{ marginTop: 10, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(204,0,0,0.9)" : "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
-        <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-335-5588</a>
+      <div style={{ marginTop: 10, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
+        <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">580-335-5588</a>
       </div>
     </div>
   );
@@ -2461,7 +2547,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
   const selectedLabel = "white";
 
   return (
-    <svg viewBox="0 60 500 320" style={{ width: "100%", display: "block" }}
+    <svg viewBox="150 60 360 310" style={{ width: "100%", display: "block" }}
       aria-label="SW Oklahoma county map — CADC service counties highlighted in blue">
       <rect x={0} y={0} width={500} height={380} fill={bg} rx={8} />
 
@@ -2669,11 +2755,21 @@ interface LayoutProps {
 function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
     <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
+      {/* Skip to main content — AAA requirement */}
+      <a href="#main-content" style={{
+        position: "absolute", left: "-9999px", top: "auto", width: 1, height: 1, overflow: "hidden",
+        zIndex: 9999, background: T.blue, color: "white", padding: "12px 20px",
+        fontWeight: 700, fontSize: 14, textDecoration: "none", borderRadius: "0 0 8px 0",
+      }}
+        onFocus={e => { e.currentTarget.style.left = "0"; e.currentTarget.style.width = "auto"; e.currentTarget.style.height = "auto"; }}
+        onBlur={e => { e.currentTarget.style.left = "-9999px"; e.currentTarget.style.width = "1px"; e.currentTarget.style.height = "1px"; }}
+      >Skip to main content</a>
       <SketchField />
 
       {/* Utility nav */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
-        <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 44, width: "auto", display: "block" }} />
+      <nav role="navigation" aria-label="Main navigation" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
+        <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation — Home" style={{ height: 44, width: "auto", display: "block" }} />
+        <DesktopSearchBar onSelectProgram={tapProgram} onSelectCounty={tapCounty} />
         <div style={{ display: "flex", gap: 32 }}>
           {["About", "Contact", "580-335-5588"].map((item, i) => (
             <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
@@ -2757,9 +2853,9 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         </div>
 
         {/* RIGHT — Content panel */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
+        <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
           <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} />
-        </div>
+        </main>
       </div>
 
       <DesktopStyles />
@@ -3055,6 +3151,142 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
 // ─── MOBILE LAYOUT ────────────────────────────────────────────────────────────
 
+// ─── Search Components ────────────────────────────────────────────────────────
+
+const SEARCH_INDEX = [
+  ...PROGRAMS.map(p => ({ type: "program" as const, label: p.name, shortLabel: p.shortName, icon: p.icon, slug: p.slug })),
+  ...PROGRAMS.flatMap(p => p.subAreas.map(s => ({ type: "subarea" as const, label: s.label, shortLabel: s.shortLabel, icon: s.icon, slug: p.slug, subareaId: s.id }))),
+  ...SW_OK_COUNTIES.map(c => ({ type: "county" as const, label: `${c.name} County`, shortLabel: c.name, icon: "📍", id: c.id })),
+];
+
+function MobileSearchBar({ onSelectProgram, onSelectCounty }: {
+  onSelectProgram: (p: ProgramData) => void;
+  onSelectCounty: (id: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const results = query.trim().length > 0
+    ? SEARCH_INDEX.filter(item =>
+        item.label.toLowerCase().includes(query.toLowerCase()) ||
+        item.shortLabel.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 6)
+    : [];
+
+  function handleSelect(item: typeof SEARCH_INDEX[0]) {
+    setQuery(""); setOpen(false);
+    if (item.type === "county") { onSelectCounty(item.id!); return; }
+    const prog = PROGRAMS.find(p => p.slug === item.slug);
+    if (prog) onSelectProgram(prog);
+  }
+
+  return (
+    <div style={{ padding: "0 16px 10px", position: "relative" }} role="search">
+      <label htmlFor="cadc-search-mobile" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Search CADC programs, services, and counties</label>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : "#ddd"}`, borderRadius: 10, padding: "8px 12px", transition: "border-color 0.2s" }}>
+        <span aria-hidden="true" style={{ fontSize: 14, opacity: 0.5 }}>🔍</span>
+        <input
+          id="cadc-search-mobile"
+          type="search"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          placeholder="Search programs, services, counties…"
+          autoComplete="off"
+          aria-autocomplete="list"
+          aria-controls="cadc-search-results-mobile"
+          aria-expanded={open && results.length > 0}
+          style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: T.textPrimary, outline: "none" }}
+        />
+        {query && <button onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>}
+      </div>
+      {open && results.length > 0 && (
+        <ul id="cadc-search-results-mobile" role="listbox" aria-label="Search results" style={{ position: "absolute", left: 16, right: 16, top: "100%", background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 100, margin: 0, padding: "6px 0", listStyle: "none" }}>
+          {results.map((item, i) => (
+            <li key={i} role="option" aria-selected={false}>
+              <button onMouseDown={() => handleSelect(item)} style={{ width: "100%", background: "none", border: "none", padding: "10px 16px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+                onMouseEnter={e => e.currentTarget.style.background = "#F0F0FF"}
+                onMouseLeave={e => e.currentTarget.style.background = "none"}
+              >
+                <span aria-hidden="true">{item.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{item.label}</div>
+                  <div style={{ fontSize: 10, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.type === "county" ? "County" : item.type === "program" ? "Program" : "Service"}</div>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function DesktopSearchBar({ onSelectProgram, onSelectCounty }: {
+  onSelectProgram: (p: ProgramData) => void;
+  onSelectCounty: (id: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const results = query.trim().length > 0
+    ? SEARCH_INDEX.filter(item =>
+        item.label.toLowerCase().includes(query.toLowerCase()) ||
+        item.shortLabel.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8)
+    : [];
+
+  function handleSelect(item: typeof SEARCH_INDEX[0]) {
+    setQuery(""); setOpen(false);
+    if (item.type === "county") { onSelectCounty(item.id!); return; }
+    const prog = PROGRAMS.find(p => p.slug === item.slug);
+    if (prog) onSelectProgram(prog);
+  }
+
+  return (
+    <div style={{ position: "relative", width: 280 }} role="search">
+      <label htmlFor="cadc-search-desktop" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Search CADC programs, services, and counties</label>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : T.border}`, borderRadius: 8, padding: "7px 12px", transition: "border-color 0.2s" }}>
+        <span aria-hidden="true" style={{ fontSize: 13, opacity: 0.5 }}>🔍</span>
+        <input
+          id="cadc-search-desktop"
+          type="search"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          placeholder="Search programs…"
+          autoComplete="off"
+          aria-autocomplete="list"
+          aria-controls="cadc-search-results-desktop"
+          aria-expanded={open && results.length > 0}
+          style={{ flex: 1, border: "none", background: "transparent", fontSize: 12, color: T.textPrimary, outline: "none" }}
+        />
+        {query && <button onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>}
+      </div>
+      {open && results.length > 0 && (
+        <ul id="cadc-search-results-desktop" role="listbox" aria-label="Search results" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 200, margin: 0, padding: "6px 0", listStyle: "none" }}>
+          {results.map((item, i) => (
+            <li key={i} role="option" aria-selected={false}>
+              <button onMouseDown={() => handleSelect(item)} style={{ width: "100%", background: "none", border: "none", padding: "8px 14px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+                onMouseEnter={e => e.currentTarget.style.background = "#F0F0FF"}
+                onMouseLeave={e => e.currentTarget.style.background = "none"}
+              >
+                <span aria-hidden="true" style={{ fontSize: 14 }}>{item.icon}</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textPrimary }}>{item.label}</div>
+                  <div style={{ fontSize: 10, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.type === "county" ? "County" : item.type === "program" ? "Program" : "Service"}</div>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
     <div style={{ background: T.ghost, minHeight: "100svh", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
@@ -3067,22 +3299,25 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
       </div>
 
       {/* Mobile header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 40, background: "white", borderBottom: `1px solid ${T.border}`, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {stage !== "entry" && (
-            <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Back">←</button>
-          )}
-          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 34, width: "auto", display: "block" }} />
-          {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
-          {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
-          {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
-          {stage === "content" && activeSubArea && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>}
+      <div style={{ position: "sticky", top: 0, zIndex: 40, background: "white", borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {stage !== "entry" && (
+              <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Go back">←</button>
+            )}
+            <img src="/images/cadc-logo.png" alt="CADC Community Action Development Corporation" style={{ height: 30, width: "auto", display: "block" }} />
+            {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
+            {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
+            {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
+            {stage === "content" && activeSubArea && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
+            <a href="/contact" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Contact</a>
+            <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">📞 Call</a>
+          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
-          <a href="/contact" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Contact</a>
-          <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>📞 Call</a>
-        </div>
+        <MobileSearchBar onSelectProgram={tapProgram} onSelectCounty={tapCounty} />
       </div>
 
       {/* ENTRY — Large tappable logo, centered */}
@@ -3113,7 +3348,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <p style={{ color: T.maroon, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 6px" }}>Select Your County</p>
             <h2 style={{ color: T.blue, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>Where do you need help?</h2>
           </div>
-          <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, overflow: "hidden", padding: 12 }}>
+          <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, overflow: "hidden", padding: 8 }}>
             <OklahomaCountyMap selectedCounty={null} onSelectCounty={tapCounty} dark={false} />
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16, justifyContent: "center" }}>
@@ -3413,6 +3648,30 @@ function DesktopStyles() {
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
 
+      /* ── ADA / WCAG 2.1 AAA Focus Styles ── */
+      *:focus-visible {
+        outline: 3px solid #0101FF !important;
+        outline-offset: 3px !important;
+        border-radius: 4px;
+      }
+      button:focus-visible, a:focus-visible {
+        outline: 3px solid #0101FF !important;
+        outline-offset: 3px !important;
+      }
+      /* High contrast mode support */
+      @media (forced-colors: active) {
+        .node-disc { border: 2px solid ButtonText !important; }
+        button { border: 1px solid ButtonText; }
+      }
+      /* Reduced motion — disable all animations */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
       /* ── Node hover glow ── */
       .node-disc {
         transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.15s ease;
@@ -3503,6 +3762,22 @@ function MobileStyles() {
         0%   { transform: scale(1); }
         40%  { transform: scale(1.12); }
         100% { transform: scale(1); }
+      }
+
+      *:focus-visible {
+        outline: 3px solid #0101FF !important;
+        outline-offset: 3px !important;
+        border-radius: 4px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      @media (forced-colors: active) {
+        .node-disc { border: 2px solid ButtonText !important; }
       }
 
       .node-disc { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
