@@ -14,7 +14,6 @@
  *   Back navigation collapses through stages
  */
 
-
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -1145,19 +1144,21 @@ function PhotoStrip({ photos, dark }: {
   photos: { src: string; alt: string }[];
   dark: boolean;
 }) {
+  const [failed, setFailed] = useState<Set<number>>(new Set());
+  const visible = photos.filter((_, i) => !failed.has(i));
+
   return (
     <div style={{
       display: "flex", gap: 8,
-      overflowX: "scroll",
-      overflowY: "visible",
-      margin: "14px -12px",
-      padding: "0 12px 8px",
+      overflowX: "auto",
+      overflowY: "hidden",
+      margin: "14px 0",
+      padding: "4px 0 10px",
       scrollbarWidth: "none",
-      WebkitOverflowScrolling: "touch",
-      isolation: "isolate",
-    }}>
-      {photos.map((photo, i) => (
-        <div key={i} style={{
+      msOverflowStyle: "none",
+    } as React.CSSProperties}>
+      {visible.map((photo, i) => (
+        <div key={photo.src} style={{
           flex: "0 0 auto", width: 160, height: 115,
           borderRadius: 10, overflow: "hidden",
           background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
@@ -1166,9 +1167,9 @@ function PhotoStrip({ photos, dark }: {
           <img
             src={photo.src}
             alt={photo.alt}
-            onError={(e) => {
-              const el = e.target as HTMLImageElement;
-              if (el.parentElement) el.parentElement.style.display = "none";
+            onError={() => {
+              const originalIndex = photos.findIndex(p => p.src === photo.src);
+              setFailed(prev => new Set([...prev, originalIndex]));
             }}
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
@@ -1185,30 +1186,28 @@ function PhotoGrid({ photos, dark }: {
   photos: { src: string; alt: string }[];
   dark: boolean;
 }) {
+  const [failed, setFailed] = useState<Set<number>>(new Set());
+  const visible = photos.slice(0, 6).filter((_, i) => !failed.has(i));
+
   return (
     <div style={{
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
-      gridAutoRows: "auto",
       gap: 8, margin: "14px 0",
     }}>
-      {photos.slice(0, 6).map((photo, i) => (
-        <div key={i} style={{
+      {visible.map((photo, i) => (
+        <div key={photo.src} style={{
           borderRadius: 10, overflow: "hidden", aspectRatio: "4/3",
           background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
           border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
-          gridColumn: i === 0 && photos.length >= 3 ? "1 / span 2" : "auto",
+          gridColumn: i === 0 && visible.length >= 3 ? "1 / span 2" : "auto",
         }}>
           <img
             src={photo.src}
             alt={photo.alt}
-            onError={(e) => {
-              const el = e.target as HTMLImageElement;
-              const parent = el.parentElement;
-              if (parent) {
-                parent.style.display = "none";
-                parent.style.gridColumn = "unset";
-              }
+            onError={() => {
+              const originalIndex = photos.findIndex(p => p.src === photo.src);
+              setFailed(prev => new Set([...prev, originalIndex]));
             }}
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
@@ -2812,7 +2811,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "county" && activeCountyName) {
     const firstProg = availablePrograms[0];
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 12, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", overflowX: "visible", paddingRight: 12, animation: "fadeSlideIn 0.4s ease" }}>
         <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Programs available in your area
         </h2>
@@ -2836,7 +2835,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "program" && activeProgram) {
     const firstSub = activeProgram.subAreas[0];
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 12, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", overflowX: "visible", paddingRight: 12, animation: "fadeSlideIn 0.4s ease" }}>
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
@@ -2856,7 +2855,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 12, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", overflowX: "visible", paddingRight: 12, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
