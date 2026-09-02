@@ -2950,7 +2950,8 @@ const CADC_BASE_COUNTIES = [
 ];
 // Extended-service counties (Transit and/or Advantage only) — shown on map in a lighter tier.
 // Per Gilbert Nuncio 9/1/2026: Caddo, Custer, Stephens must appear on service area maps.
-const CADC_EXTENDED_COUNTIES = ["caddo","custer","stephens","grady","jackson","harmon","greer","mcclain"];
+// Per Robert Meador 9/2/2026: Garvin added to expansion counties.
+const CADC_EXTENDED_COUNTIES = ["caddo","custer","stephens","grady","jackson","harmon","greer","mcclain","garvin"];
 
 // Which programs are available per county
 const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
@@ -2963,12 +2964,17 @@ const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
   "roger-mills":["head-start","transit","weatherization","advantage","community-market"],
   tillman:      ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   washita:      ["head-start","transit","weatherization","advantage","community-market"],
-  // Transit extended
+  // Transit + Advantage extended counties
   blaine:       ["transit"], caddo: ["transit","advantage"], custer: ["transit","advantage"],
-  dewey:        ["transit"], ellis: ["transit"], grady: ["transit","advantage"],
-  harmon:       ["transit","advantage"], jackson: ["transit","advantage"],
-  mcclain:      ["transit","advantage"], stephens: ["transit","advantage"],
-  greer:        ["advantage"], // transit pending Gilbert confirmation
+  dewey:        ["transit"], ellis: ["transit"],
+  // Weatherization expanded counties per Robert Meador 9/2/2026
+  grady:        ["transit","weatherization","advantage"],
+  harmon:       ["transit","weatherization","advantage"],
+  jackson:      ["transit","weatherization","advantage"],
+  mcclain:      ["transit","weatherization","advantage"],
+  stephens:     ["transit","weatherization","advantage"],
+  greer:        ["weatherization","advantage"],
+  garvin:       ["weatherization"], // expansion county per Robert Meador 9/2/2026
 };
 
 // Geographic county shapes — approximate SW Oklahoma positions
@@ -3009,7 +3015,7 @@ const SW_OK_ALL_COUNTIES: {fips:string;name:string;slug:string|null;isCADC:boole
   {fips:"40043",name:"Dewey",slug:null,isCADC:false,path:"M 295.9,119.2 L 295.8,102.8 L 329.2,103.1 L 354.2,102.7 L 354.6,140.9 L 296.3,141.0 L 295.9,119.2 Z",lx:325.2,ly:121.9},
   {fips:"40045",name:"Ellis",slug:null,isCADC:false,path:"M 247.3,114.6 L 247.3,66.5 L 247.1,56.3 L 278.3,56.4 L 279.0,102.8 L 295.8,102.8 L 295.9,119.2 L 286.9,122.9 L 282.0,135.1 L 269.6,135.8 L 262.9,130.3 L 262.3,120.6 L 256.1,121.9 L 253.2,130.0 L 247.3,133.5 L 247.3,114.6 Z",lx:271.5,ly:96.1},
   {fips:"40047",name:"Garfield",slug:null,isCADC:false,path:"M 446.3,56.3 L 446.4,56.3 L 446.4,102.8 L 429.6,102.8 L 396.0,102.7 L 396.0,56.3 L 446.3,56.3 Z",lx:421.2,ly:79.5},
-  {fips:"40049",name:"Garvin",slug:null,isCADC:false,path:"M 438.5,282.4 L 438.4,263.5 L 430.2,263.5 L 430.2,244.7 L 487.9,244.8 L 487.9,268.3 L 466.9,269.9 L 471.3,282.5 L 455.0,282.4 L 438.5,282.4 Z",lx:459.0,ly:263.6},
+  {fips:"40049",name:"Garvin",slug:"garvin",isCADC:false,path:"M 438.5,282.4 L 438.4,263.5 L 430.2,263.5 L 430.2,244.7 L 487.9,244.8 L 487.9,268.3 L 466.9,269.9 L 471.3,282.5 L 455.0,282.4 L 438.5,282.4 Z",lx:459.0,ly:263.6},
   {fips:"40051",name:"Grady",slug:"grady",isCADC:false,path:"M 396.6,188.0 L 417.2,192.6 L 418.9,192.8 L 419.3,192.0 L 420.1,192.2 L 420.5,192.9 L 420.8,192.5 L 421.6,192.4 L 422.1,191.5 L 424.8,193.9 L 425.7,193.7 L 426.1,193.4 L 427.2,193.8 L 428.0,193.5 L 428.9,192.8 L 429.9,192.6 L 430.2,244.7 L 430.2,263.5 L 397.3,263.5 L 397.2,263.5 L 397.1,244.7 L 396.9,244.7 L 396.6,188.0 Z",lx:413.4,ly:225.8},
   {fips:"40053",name:"Grant",slug:null,isCADC:false,path:"M 446.3,56.3 L 396.0,56.3 L 395.4,12.4 L 400.6,12.4 L 419.7,12.4 L 421.1,12.4 L 422.3,12.4 L 427.9,12.4 L 431.6,12.3 L 435.0,12.4 L 438.3,12.4 L 445.5,12.4 L 446.3,12.4 L 446.3,56.3 Z",lx:420.9,ly:34.3},
   {fips:"40055",name:"Greer",slug:"greer",isCADC:false,path:"M 293.7,216.6 L 300.1,224.5 L 301.8,244.4 L 306.5,248.3 L 294.0,249.2 L 292.6,258.8 L 273.5,258.8 L 269.3,254.1 L 268.5,235.0 L 256.1,235.1 L 256.1,225.7 L 264.4,225.7 L 264.4,216.3 L 293.7,216.6 Z",lx:281.3,ly:237.6},
