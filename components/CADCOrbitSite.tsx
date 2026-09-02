@@ -1062,16 +1062,17 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
               : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />}
         </span>
-        <span style={{
-          color:T.blue,
-          fontSize: isMobile ? "clamp(0.35rem,1.8vw,0.5rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
-          fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase",
-          textAlign:"center", padding:"0 4px", lineHeight:1.2,
-          opacity: orbitTx === "out" ? 0 : 1,
-          transition:"opacity 0.2s ease",
-        }}>
-          {isSubLevel ? activeProgram?.shortName : "CADC"}
-        </span>
+        {/* Only show text label at entry stage — hide when program icon fills hub */}
+        {!isSubLevel && (
+          <span style={{
+            color:T.blue,
+            fontSize: isMobile ? "clamp(0.35rem,1.8vw,0.5rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
+            fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase",
+            textAlign:"center", padding:"0 4px", lineHeight:1.2,
+            opacity: orbitTx === "out" ? 0 : 1,
+            transition:"opacity 0.2s ease",
+          }}>CADC</span>
+        )}
       </div>
 
       {/* Orbit nodes */}
@@ -3499,16 +3500,16 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               ? activeProgram?.icon
               : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "85%", height: "85%", objectFit: "contain", display: "block" }} />}
         </span>
-        <span style={{
-          color: T.blue,
-          fontSize: (stage === "program" || stage === "content") ? "clamp(0.32rem,0.7vw,0.42rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
-          fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
-          textAlign: "center", padding: "0 4px", lineHeight: 1.2,
-          transition: "opacity 0.2s ease",
-          opacity: orbitTx === "out" ? 0 : 1,
-        }}>
-          {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
-        </span>
+        {!(stage === "program" || stage === "content") && (
+          <span style={{
+            color: T.blue,
+            fontSize: "clamp(0.35rem,0.8vw,0.5rem)",
+            fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
+            textAlign: "center", padding: "0 4px", lineHeight: 1.2,
+            transition: "opacity 0.2s ease",
+            opacity: orbitTx === "out" ? 0 : 1,
+          }}>CADC</span>
+        )}
       </div>
 
       {/* Nodes */}
@@ -3725,8 +3726,11 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
-          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
-            {activeProgram.icon} {activeProgram.name}
+          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary, display:"flex", alignItems:"center", gap: 12 }}>
+            {PROGRAM_ICONS[activeProgram.slug]
+              ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:48,height:48,objectFit:"contain",flexShrink:0}} />
+              : <span>{activeProgram.icon}</span>}
+            {activeProgram.name}
           </h2>
         </div>
         {firstSub && (
@@ -4149,8 +4153,11 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
             <div style={{ background: T.blue, padding: "14px 20px" }}>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
-              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
-                {activeProgram.icon} {activeProgram.name}
+              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif", display:"flex", alignItems:"center", gap: 10 }}>
+                {PROGRAM_ICONS[activeProgram.slug]
+                  ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:36,height:36,objectFit:"contain",flexShrink:0}} />
+                  : <span>{activeProgram.icon}</span>}
+                {activeProgram.name}
               </h2>
             </div>
             <div style={{ padding: "16px 20px 0" }}>
@@ -4256,9 +4263,9 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
           : (stage === "program" || stage === "content")
               ? <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{activeProgram?.icon}</span>
               : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />}
-        <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>
-          {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
-        </span>
+        {!(stage === "program" || stage === "content") && (
+          <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>CADC</span>
+        )}
       </div>
 
       {/* Nodes */}
