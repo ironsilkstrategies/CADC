@@ -3476,8 +3476,13 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
         <span style={{
           fontSize: "clamp(1rem,2.5vw,1.4rem)",
           animation: orbitTx !== "idle" ? "hubSpin 0.45s ease-in-out" : "none",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          width: "75%", height: "75%",
         }}>
-          {(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}
+          {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+            ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            : (stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}
         </span>
         <span style={{
           color: T.blue,
@@ -3556,21 +3561,22 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               }} />
             )}
             <div className="node-disc" style={{
-              width: "clamp(40px,8.5%,54px)", aspectRatio: "1/1",
+              width: 64, height: 64,
               borderRadius: "50%",
               background: isPopped ? "#E4E4FF" : "white",
               border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.9rem,2vw,1.2rem)",
               overflow: "hidden",
+              flexShrink: 0,
               boxShadow: isPopped
                 ? `0 0 24px rgba(1,1,255,0.3), 0 4px 16px rgba(1,1,255,0.15)`
                 : `0 3px 12px rgba(1,1,255,0.12)`,
               transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-width 0.15s ease",
             }}>
-              {PROGRAM_ICONS[prog.slug]
+              {isProgLevel && PROGRAM_ICONS[prog.slug]
                 ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
-                    style={{ width: "92%", height: "92%", objectFit: "contain", display: "block" }} />
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 : icon}
             </div>
             <span style={{
@@ -4224,7 +4230,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       }}>
         {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
           ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
-              style={{ width: "70%", height: "70%", objectFit: "contain", display: "block" }} />
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%" }} />
           : <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}</span>}
         <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>
           {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
@@ -4284,13 +4290,14 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               }} />
             )}
             <div style={{
-              width: "clamp(34px,10vw,48px)", aspectRatio: "1/1",
+              width: "clamp(44px,12vw,58px)", height: "clamp(44px,12vw,58px)",
               borderRadius: "50%",
               background: isPopped ? "#E4E4FF" : "white",
               border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.85rem,4vw,1.1rem)",
               overflow: "hidden",
+              flexShrink: 0,
               boxShadow: isPopped
                 ? `0 0 18px rgba(1,1,255,0.4), 0 4px 14px rgba(1,1,255,0.2)`
                 : "0 2px 10px rgba(1,1,255,0.14)",
@@ -4298,7 +4305,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             }}>
               {!isSubLevel && PROGRAM_ICONS[prog.slug]
                 ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
-                    style={{ width: "92%", height: "92%", objectFit: "contain", display: "block" }} />
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 : icon}
             </div>
             <span style={{
