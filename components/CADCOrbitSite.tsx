@@ -1053,8 +1053,11 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
         transition:"transform 0s", // let spring handle it
       }}>
-        <span style={{fontSize: isMobile ? "clamp(1rem,5vw,1.4rem)" : "clamp(1rem,2.5vw,1.4rem)"}}>
-          {isSubLevel ? activeProgram?.icon : "🏛️"}
+        <span style={{fontSize: isMobile ? "clamp(1rem,5vw,1.4rem)" : "clamp(1rem,2.5vw,1.4rem)", display:"flex",alignItems:"center",justifyContent:"center",width:"75%",height:"75%"}}>
+          {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+            ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+                style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%",display:"block"}} />
+            : isSubLevel ? activeProgram?.icon : "🏛️"}
         </span>
         <span style={{
           color:T.blue,
@@ -1073,6 +1076,8 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         const id = isSubLevel ? (item as SubArea).id : (item as ProgramData).slug;
         const label = isSubLevel ? (item as SubArea).shortLabel : (item as ProgramData).shortName;
         const icon = isSubLevel ? (item as SubArea).icon : (item as ProgramData).icon;
+        const progSlug = !isSubLevel ? (item as ProgramData).slug : null;
+        const customIcon = progSlug ? PROGRAM_ICONS[progSlug] : null;
         const spring = nodeSpringMap.current.get(id) ?? createNodeSpring(0);
 
         const baseAngle = (i / items.length) * Math.PI * 2;
@@ -1114,18 +1119,23 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             )}
             {/* Node disc */}
             <div className="node-disc" style={{
-              width: isMobile ? "clamp(34px,10vw,48px)" : "clamp(44px,9.5%,60px)",
-              aspectRatio:"1/1", borderRadius:"50%",
+              width: isMobile ? "clamp(44px,12vw,58px)" : 64,
+              height: isMobile ? "clamp(44px,12vw,58px)" : 64,
+              borderRadius:"50%",
               background: isActive ? "#E4E4FF" : isMobile ? "white" : "rgba(1,5,30,0.9)",
               border:`${isActive?3:2}px solid ${T.blue}`,
               display:"flex",alignItems:"center",justifyContent:"center",
               fontSize: isMobile ? "clamp(0.85rem,4vw,1.1rem)" : "clamp(1rem,2vw,1.3rem)",
+              overflow:"hidden", flexShrink:0,
               boxShadow: isActive
                 ? `0 0 24px rgba(1,1,255,0.7), 0 0 48px rgba(1,1,255,0.3), inset 0 0 12px rgba(1,1,255,0.1)`
                 : `0 0 ${8+glow*20}px rgba(1,1,255,${0.15+glow*0.3}), 0 4px 16px rgba(0,0,0,0.3)`,
               transition:"box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease",
             }}>
-              {icon}
+              {customIcon
+                ? <img src={customIcon} alt={label}
+                    style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+                : icon}
             </div>
             <span style={{
               color: T.blue,
@@ -3685,8 +3695,11 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         </h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
           {availablePrograms.map(p => (
-            <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600 }}>
-              {p.icon} {p.shortName}
+            <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600, display:"flex", alignItems:"center", gap: 6 }}>
+              {PROGRAM_ICONS[p.slug]
+                ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:18,height:18,objectFit:"cover",borderRadius:"50%"}} />
+                : p.icon}
+              {p.shortName}
             </div>
           ))}
         </div>
@@ -3852,7 +3865,11 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
           <div key={p.slug} style={{ marginBottom: 6 }}>
             <div style={{ display: "flex", gap: 6 }}>
               <a href={`/?program=${p.slug}`} style={{ ...linkStyle, flex: 1, marginBottom: 0 }}>
-                <span aria-hidden="true">{p.icon}</span>{p.name}
+                {PROGRAM_ICONS[p.slug]
+                  ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true"
+                      style={{width:28,height:28,objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  : <span aria-hidden="true">{p.icon}</span>}
+                {p.name}
               </a>
               <button onClick={() => setExpanded(expanded === p.slug ? null : p.slug)}
                 aria-label={`${expanded === p.slug ? "Hide" : "Show"} ${p.shortName} sections`} aria-expanded={expanded === p.slug}
