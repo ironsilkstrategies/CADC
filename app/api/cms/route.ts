@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 const redis = Redis.fromEnv();
 
+// Public read
 export async function GET() {
   try {
     const data = await redis.get<SiteContent>(CMS_KEY);
@@ -20,6 +21,7 @@ export async function GET() {
   }
 }
 
+// Protected write
 export async function POST(req: NextRequest) {
   const key = req.headers.get("x-admin-key");
   if (!process.env.ADMIN_PASSWORD || key !== process.env.ADMIN_PASSWORD) {
@@ -38,6 +40,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true, updatedAt: next.updatedAt });
 }
 
+// Login check
 export async function HEAD(req: NextRequest) {
   const key = req.headers.get("x-admin-key");
   const ok = !!process.env.ADMIN_PASSWORD && key === process.env.ADMIN_PASSWORD;
