@@ -83,7 +83,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   staff: [
     { name: "Leslea Hixson",  title: "Executive Director", phone: "580-335-5588" },
     { name: "Robin Harris",   title: "Director, Head Start & Early Head Start", phone: "580-726-3343", email: "rharris@cadcok.org" },
-    { name: "Gilbert Nuncio", title: "Director, Red River Transportation", phone: "580-928-2199" },
+    { name: "Gilbert Nuncio", title: "Director, Red River Transportation", phone: "580-335-2691" },
     { name: "Robert Meador",  title: "Director, Weatherization & Housing", phone: "580-305-0853" },
     { name: "Laura Vardell",  title: "Director, Senior Nutrition", phone: "580-335-5588" },
     { name: "Scott Fraley",   title: "Director, Community Market", phone: "580-305-1964", email: "SFraley@cadcok.org" },
