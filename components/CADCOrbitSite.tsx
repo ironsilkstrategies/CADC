@@ -49,6 +49,7 @@ const PROGRAM_ICONS: Record<string, string> = {
   "community-market":  "/images/icons/community-market.png",
   "employment":        "/images/icons/employment.png",
   "board":             "/images/icons/board-leadership.png",
+  "advantage":         "/images/icons/community-market.png", // temp — replace when Advantage icon is ready
 };
 
 // ─── All program content ──────────────────────────────────────────────────────
@@ -1053,11 +1054,13 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
         transition:"transform 0s", // let spring handle it
       }}>
-        <span style={{fontSize: isMobile ? "clamp(1rem,5vw,1.4rem)" : "clamp(1rem,2.5vw,1.4rem)", display:"flex",alignItems:"center",justifyContent:"center",width:"75%",height:"75%"}}>
+        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"78%",height:"78%"}}>
           {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
             ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
-                style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%",display:"block"}} />
-            : isSubLevel ? activeProgram?.icon : "🏛️"}
+                style={{width:"90%",height:"90%",objectFit:"contain",display:"block"}} />
+            : isSubLevel
+              ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"85%",height:"85%",objectFit:"contain",display:"block"}} />}
         </span>
         <span style={{
           color:T.blue,
@@ -1134,7 +1137,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             }}>
               {customIcon
                 ? <img src={customIcon} alt={label}
-                    style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+                    style={{width:"90%",height:"90%",objectFit:"contain",display:"block"}} />
                 : icon}
             </div>
             <span style={{
@@ -3491,8 +3494,10 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
         }}>
           {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
             ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-            : (stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}
+                style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
+            : (stage === "program" || stage === "content")
+              ? activeProgram?.icon
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "85%", height: "85%", objectFit: "contain", display: "block" }} />}
         </span>
         <span style={{
           color: T.blue,
@@ -3586,7 +3591,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
             }}>
               {isProgLevel && PROGRAM_ICONS[prog.slug]
                 ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
                 : icon}
             </div>
             <span style={{
@@ -3697,7 +3702,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           {availablePrograms.map(p => (
             <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600, display:"flex", alignItems:"center", gap: 6 }}>
               {PROGRAM_ICONS[p.slug]
-                ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:18,height:18,objectFit:"cover",borderRadius:"50%"}} />
+                ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:22,height:22,objectFit:"contain"}} />
                 : p.icon}
               {p.shortName}
             </div>
@@ -3867,7 +3872,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
               <a href={`/?program=${p.slug}`} style={{ ...linkStyle, flex: 1, marginBottom: 0 }}>
                 {PROGRAM_ICONS[p.slug]
                   ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true"
-                      style={{width:28,height:28,objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                      style={{width:32,height:32,objectFit:"contain",flexShrink:0}} />
                   : <span aria-hidden="true">{p.icon}</span>}
                 {p.name}
               </a>
@@ -4247,8 +4252,10 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       }}>
         {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
           ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%" }} />
-          : <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}</span>}
+              style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
+          : (stage === "program" || stage === "content")
+              ? <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{activeProgram?.icon}</span>
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />}
         <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>
           {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
         </span>
@@ -4322,7 +4329,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             }}>
               {!isSubLevel && PROGRAM_ICONS[prog.slug]
                 ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
                 : icon}
             </div>
             <span style={{
