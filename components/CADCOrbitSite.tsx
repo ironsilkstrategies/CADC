@@ -1562,7 +1562,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
     { label: "Who Qualifies", icon: "✅", areaId: "enrollment", desc: "Check eligibility" },
   ],
   "transit": [
-    { label: "Schedule a Ride", icon: "📞", href: "tel:+18005245552", desc: "Call 1-800-524-5552" },
+    { label: "Schedule a Ride", icon: "📞", href: "tel:+15803352691", desc: "Call (580) 335-2691" },
     { label: "View Fares", icon: "💲", areaId: "fares", desc: "See pricing" },
   ],
   "weatherization": [
@@ -1864,9 +1864,8 @@ const PROGRAMS: ProgramData[] = [
             <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
             <div className="cadc-card">
               <p className="cadc-label">Schedule a ride</p>
-              <a href="tel:+18005245552" className="cadc-btn" style={{marginBottom:8}}>📞 1-800-524-5552</a>
-              <a href="tel:+18005597344" className="cadc-btn">📞 1-800-559-7344</a>
-              <p className="cadc-note">Two scheduling lines — call either. Spanish-speaking staff available.</p>
+              <a href="tel:+15803352691" className="cadc-btn">📞 (580) 335-2691</a>
+              <p className="cadc-note">Spanish-speaking staff available. ADA equipped vehicles.</p>
               <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
             </div>
             <div className="cadc-card">
@@ -3091,7 +3090,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
       })}
 
       {/* Legend */}
-      <g transform="translate(12,370)">
+      <g transform="translate(12,348)">
         <rect x={0} y={-5} width={10} height={7} rx={1} fill={cadcFill} stroke={cadcStroke} strokeWidth={0.8}/>
         <text x={13} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>CADC County</text>
         <rect x={72} y={-5} width={10} height={7} rx={1} fill={greyFill} stroke={greyStroke} strokeWidth={0.8}/>
@@ -4027,7 +4026,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
       />
       {/* Ride the River quick line */}
       <div style={{ background: T.blueLight, padding: "7px 20px", textAlign: "center" }}>
-        <a href="tel:+18005245552" style={{ color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🚌 Ride the River: 1-800-524-5552</a>
+        <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🚌 Ride the River: (580) 335-2691</a>
       </div>
 
       {/* ENTRY — Large tappable logo, centered */}
