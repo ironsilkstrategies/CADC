@@ -37,6 +37,20 @@ const T = {
   textMuted:   "#6b7280",
 };
 
+// ─── Program icon images (replaces emoji on program-level orbit nodes) ────────
+// Each value is the public path to the individual icon PNG.
+// Sub-area nodes still use emoji — only top-level program nodes use these.
+const PROGRAM_ICONS: Record<string, string> = {
+  "head-start":        "/images/icons/head-start.png",
+  "transit":           "/images/icons/transit.png",
+  "weatherization":    "/images/icons/weatherization.png",
+  "senior-meals":      "/images/icons/senior-nutrition.png",
+  "tax-help":          "/images/icons/vita.png",
+  "community-market":  "/images/icons/community-market.png",
+  "employment":        "/images/icons/employment.png",
+  "board":             "/images/icons/board-leadership.png",
+};
+
 // ─── All program content ──────────────────────────────────────────────────────
 
 interface SubArea {
@@ -3548,12 +3562,16 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.9rem,2vw,1.2rem)",
+              overflow: "hidden",
               boxShadow: isPopped
                 ? `0 0 24px rgba(1,1,255,0.3), 0 4px 16px rgba(1,1,255,0.15)`
                 : `0 3px 12px rgba(1,1,255,0.12)`,
               transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-width 0.15s ease",
             }}>
-              {icon}
+              {PROGRAM_ICONS[prog.slug]
+                ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
+                    style={{ width: "92%", height: "92%", objectFit: "contain", display: "block" }} />
+                : icon}
             </div>
             <span style={{
               color: T.blue,
@@ -4146,7 +4164,10 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             {availablePrograms.map(p => (
               <button key={p.slug} onClick={() => tapProgram(p)}
                 style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 12, padding: 16, textAlign: "left", cursor: "pointer" }}>
-                <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>
+                {PROGRAM_ICONS[p.slug]
+                  ? <img src={PROGRAM_ICONS[p.slug]} alt={p.shortName}
+                      style={{ width: 44, height: 44, objectFit: "contain", display: "block", marginBottom: 6 }} />
+                  : <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>}
                 <span style={{ color: T.blue, fontWeight: 700, fontSize: 12, display: "block" }}>{p.shortName}</span>
                 <span style={{ color: T.textMuted, fontSize: 10 }}>{p.tagline}</span>
               </button>
@@ -4201,7 +4222,10 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         boxShadow: `0 0 0 5px rgba(1,1,255,0.08), 0 4px 20px rgba(1,1,255,0.18)`,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
       }}>
-        <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}</span>
+        {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+          ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+              style={{ width: "70%", height: "70%", objectFit: "contain", display: "block" }} />
+          : <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}</span>}
         <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>
           {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
         </span>
@@ -4266,12 +4290,16 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.85rem,4vw,1.1rem)",
+              overflow: "hidden",
               boxShadow: isPopped
                 ? `0 0 18px rgba(1,1,255,0.4), 0 4px 14px rgba(1,1,255,0.2)`
                 : "0 2px 10px rgba(1,1,255,0.14)",
               transition: "box-shadow 0.2s ease, background 0.15s ease",
             }}>
-              {icon}
+              {!isSubLevel && PROGRAM_ICONS[prog.slug]
+                ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
+                    style={{ width: "92%", height: "92%", objectFit: "contain", display: "block" }} />
+                : icon}
             </div>
             <span style={{
               color: isPopped ? T.blue : T.blue,
