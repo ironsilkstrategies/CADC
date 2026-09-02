@@ -49,7 +49,7 @@ const PROGRAM_ICONS: Record<string, string> = {
   "community-market":  "/images/icons/community-market.png",
   "employment":        "/images/icons/employment.png",
   "board":             "/images/icons/board-leadership.png",
-  "advantage":         "/images/icons/community-market.png", // temp — replace when Advantage icon is ready
+  "advantage":         "/images/icons/advantage.png",
 };
 
 // ─── All program content ──────────────────────────────────────────────────────
@@ -1044,23 +1044,23 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       {/* Hub center */}
       <div style={{
         position:"absolute", left:"50%", top:"50%",
-        width: isMobile ? "clamp(60px,18vw,80px)" : "clamp(72px,16%,88px)",
+        width: isMobile ? "clamp(60px,18vw,80px)" : "clamp(96px,18%,116px)",
         aspectRatio:"1/1",
         transform:`translate(-50%,-50%) scale(${hubS})`,
         borderRadius:"50%",
-        background: isMobile ? "white" : T.void,
+        background: "white",
         border:`2.5px solid ${T.blue}`,
         boxShadow:`0 0 0 ${8*hubG}px rgba(1,1,255,${0.04+pulseAlpha*0.08}), 0 0 ${40*hubG}px rgba(1,1,255,${0.2+pulseAlpha*0.15}), inset 0 0 20px rgba(1,1,255,${0.05+pulseAlpha*0.05})`,
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
         transition:"transform 0s", // let spring handle it
       }}>
-        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"78%",height:"78%"}}>
+        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"88%",height:"88%"}}>
           {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
             ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
-                style={{width:"90%",height:"90%",objectFit:"contain",display:"block"}} />
+                style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
             : isSubLevel
               ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"85%",height:"85%",objectFit:"contain",display:"block"}} />}
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />}
         </span>
         <span style={{
           color:T.blue,
@@ -1125,14 +1125,14 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               width: isMobile ? "clamp(44px,12vw,58px)" : 64,
               height: isMobile ? "clamp(44px,12vw,58px)" : 64,
               borderRadius:"50%",
-              background: isActive ? "#E4E4FF" : isMobile ? "white" : "rgba(1,5,30,0.9)",
+              background: isActive ? "#E4E4FF" : "white",
               border:`${isActive?3:2}px solid ${T.blue}`,
               display:"flex",alignItems:"center",justifyContent:"center",
               fontSize: isMobile ? "clamp(0.85rem,4vw,1.1rem)" : "clamp(1rem,2vw,1.3rem)",
               overflow:"hidden", flexShrink:0,
               boxShadow: isActive
-                ? `0 0 24px rgba(1,1,255,0.7), 0 0 48px rgba(1,1,255,0.3), inset 0 0 12px rgba(1,1,255,0.1)`
-                : `0 0 ${8+glow*20}px rgba(1,1,255,${0.15+glow*0.3}), 0 4px 16px rgba(0,0,0,0.3)`,
+                ? `0 0 20px rgba(1,1,255,0.35), 0 4px 16px rgba(1,1,255,0.15)`
+                : `0 3px 12px rgba(1,1,255,0.12), 0 1px 4px rgba(0,0,0,0.08)`,
               transition:"box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease",
             }}>
               {customIcon
@@ -1148,7 +1148,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               textAlign:"center", lineHeight:1.2,
               width: isMobile ? "clamp(60px,16vw,80px)" : "clamp(80px,14%,110px)",
               whiteSpace: "nowrap",
-              textShadow: isMobile ? "none" : isActive ? "0 0 12px rgba(1,1,255,0.8)" : "0 0 8px rgba(1,1,255,0.3)",
+              textShadow: "none",
             }}>
               {label}
             </span>
