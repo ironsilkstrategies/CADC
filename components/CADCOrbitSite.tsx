@@ -96,6 +96,16 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
   return <CmsContext.Provider value={content}>{children}</CmsContext.Provider>;
 }
 
+
+// ─── Stat tracking helpers ────────────────────────────────────────────────────
+function trackStat(type: "program" | "county" | "search" | "visit", key?: string) {
+  fetch("/api/cms/stats", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, key }),
+  }).catch(() => {}); // fire-and-forget, never throws
+}
+
 // ─── Senior Nutrition Menu Data ───────────────────────────────────────────────
 // To update: change month, year, and meals object only. Keys are YYYY-MM-DD.
 
@@ -1671,6 +1681,105 @@ function ProgramCTABar({ slug, onSelectArea }: { slug: string; onSelectArea: (id
   );
 }
 
+// ─── Transit Booking Form ─────────────────────────────────────────────────────
+function TransitBookingForm() {
+  const [form, setForm] = useState({ name: "", phone: "", pickupAddress: "", destination: "", requestedDate: "", requestedTime: "", accessibility: "none", notes: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+  async function submit() {
+    if (!form.name || !form.phone || !form.pickupAddress || !form.destination || !form.requestedDate) { setState("err"); return; }
+    setState("sending");
+    const r = await fetch("/api/cms/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }).catch(() => null);
+    setState(r?.ok ? "done" : "err");
+  }
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div className="cadc-card" style={{ textAlign: "center", background: "#F0FFF4", border: "1px solid #059669" }}>
+        <p style={{ fontSize: 32, margin: "0 0 8px" }}>✅</p>
+        <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Ride request received!</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Gilbert's team will confirm your ride by phone. Questions? Call <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700 }}>(580) 335-2691</a>.</p>
+      </div>
+    </div>
+  );
+  return (
+    <div className="cadc-light-content">
+      <p>Request a ride online and Gilbert's team will confirm by phone. You can also call directly at <a href="tel:+15803352691" className="cadc-link">(580) 335-2691</a>.</p>
+      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in all required fields.</p>}
+      <div className="cadc-card">
+        <p className="cadc-label">Your name *</p>
+        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" />
+        <p className="cadc-label" style={{marginTop:10}}>Phone number *</p>
+        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" />
+        <p className="cadc-label" style={{marginTop:10}}>Pickup address *</p>
+        <input className="cadc-input" value={form.pickupAddress} onChange={f("pickupAddress")} placeholder="Street address, city" />
+        <p className="cadc-label" style={{marginTop:10}}>Destination *</p>
+        <input className="cadc-input" value={form.destination} onChange={f("destination")} placeholder="Where are you going?" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 10 }}>
+          <div>
+            <p className="cadc-label">Date *</p>
+            <input className="cadc-input" type="date" value={form.requestedDate} onChange={f("requestedDate")} />
+          </div>
+          <div>
+            <p className="cadc-label">Preferred time</p>
+            <input className="cadc-input" type="time" value={form.requestedTime} onChange={f("requestedTime")} />
+          </div>
+        </div>
+        <p className="cadc-label" style={{marginTop:10}}>Accessibility needs</p>
+        <select className="cadc-input" value={form.accessibility} onChange={f("accessibility")}>
+          <option value="none">None</option>
+          <option value="wheelchair">Wheelchair lift needed</option>
+          <option value="walker">Walker / mobility aid</option>
+          <option value="oxygen">Oxygen equipment</option>
+          <option value="other">Other — I'll explain in notes</option>
+        </select>
+        <p className="cadc-label" style={{marginTop:10}}>Additional notes</p>
+        <textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" style={{ minHeight: 72, resize: "vertical" }} />
+        <button className="cadc-btn" style={{ marginTop: 14, width: "100%", opacity: state === "sending" ? 0.6 : 1 }} onClick={submit} disabled={state === "sending"}>
+          {state === "sending" ? "Sending…" : "Submit Ride Request →"}
+        </button>
+        <p className="cadc-note" style={{marginTop:8}}>Spanish-speaking staff available. ADA vehicles on all routes.</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Intake Lead Capture Form ─────────────────────────────────────────────────
+function IntakeLeadForm({ program, step, children }: { program: string; step: string; children: React.ReactNode }) {
+  const [form, setForm] = useState({ name: "", phone: "", county: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+  async function submit() {
+    setState("sending");
+    await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, program, step }) }).catch(() => {});
+    setState("done");
+  }
+  return (
+    <div>
+      {children}
+      {state !== "done" ? (
+        <div className="cadc-card" style={{ marginTop: 14, background: "#F0F0FF", border: `1px solid ${T.blue}` }}>
+          <p className="cadc-label">Want us to follow up with you?</p>
+          <p style={{ fontSize: 13, color: "#374151", margin: "0 0 10px" }}>Leave your name and number and a CADC staff member will reach out to help you through the process.</p>
+          <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Your name" style={{ marginBottom: 8 }} />
+          <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="Phone number" style={{ marginBottom: 8 }} />
+          <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+            <option value="">Your county (optional)</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+          </select>
+          <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} onClick={submit} disabled={state === "sending"}>
+            {state === "sending" ? "Sending…" : "Request a Follow-Up Call"}
+          </button>
+        </div>
+      ) : (
+        <div className="cadc-card" style={{ marginTop: 14, background: "#F0FFF4", border: "1px solid #059669", textAlign: "center" }}>
+          <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 4px" }}>Got it — we'll be in touch.</p>
+          <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A CADC staff member will call you soon to help.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -1727,7 +1836,8 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
         content: (
-          <div className="cadc-light-content">
+          <IntakeLeadForm program="head-start" step="enrollment">
+            <div className="cadc-light-content">
             <p>EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5.</p>
             <div className="cadc-card">
               <p className="cadc-label">Automatically eligible</p>
@@ -1738,7 +1848,8 @@ const PROGRAMS: ProgramData[] = [
               <p>Enrollment is based on a points system that considers many circumstances beyond the automatic eligibility categories above. We serve all children — don't count yourself out before you apply.</p>
             </div>
             <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
-          </div>
+            </div>
+          </IntakeLeadForm>
         ),
       },
       {
@@ -1887,22 +1998,7 @@ const PROGRAMS: ProgramData[] = [
     subAreas: [
       {
         id: "rides", label: "Schedule a Ride", shortLabel: "Schedule", icon: "📅",
-        content: (
-          <div className="cadc-light-content">
-            <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Schedule a ride</p>
-              <a href="tel:+15803352691" className="cadc-btn">📞 (580) 335-2691</a>
-              <p className="cadc-note">Spanish-speaking staff available. ADA equipped vehicles.</p>
-              <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Counties served</p>
-              <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Jefferson · Kiowa · Roger Mills · Stephens · Tillman · Washita</p>
-              <p className="cadc-note">Canadian County: no in-town service for Mustang or Yukon. Comanche County: no in-town service for Lawton.</p>
-            </div>
-          </div>
-        ),
+        content: <TransitBookingForm />,
       },
       {
         id: "fares", label: "Fare Schedule", shortLabel: "Fares", icon: "💲",
@@ -2011,7 +2107,8 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "eligibility-weath", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <div className="cadc-light-content">
+          <IntakeLeadForm program="weatherization" step="eligibility">
+            <div className="cadc-light-content">
             <p>Eligibility is based on household income. Priority is given to elderly residents, people with disabilities, and families with young children.</p>
             <div className="cadc-card">
               <p className="cadc-label">General eligibility</p>
@@ -2038,7 +2135,8 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-note">For households exceeding 8 persons, add $10,760 per additional member at 200% FPL.</p>
               <a href="https://www.okcommerce.gov/wp-content/uploads/Attachment-A-DOE-26-DHS-26-Income-Guidelines.pdf" target="_blank" rel="noopener noreferrer" className="cadc-link" style={{display:"block",marginTop:8,fontSize:12}}>Source: Oklahoma Commerce DOE WAP Program Notice 26-6 →</a>
             </div>
-          </div>
+            </div>
+          </IntakeLeadForm>
         ),
       },
     ],
@@ -2559,7 +2657,8 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-eligibility", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <div className="cadc-light-content">
+          <IntakeLeadForm program="advantage" step="eligibility">
+            <div className="cadc-light-content">
             <p>To receive Advantage Home Delivered Meals, applicants must meet all of the following criteria:</p>
             <div className="cadc-card">
               <ul className="cadc-list">
@@ -2571,7 +2670,8 @@ const PROGRAMS: ProgramData[] = [
               <a href="tel:+18009877767" className="cadc-btn">📞 1-800-987-7767</a>
               <p className="cadc-note">Or call 405-522-5050</p>
             </div>
-          </div>
+            </div>
+          </IntakeLeadForm>
         ),
       },
       {
@@ -3159,6 +3259,9 @@ function CADCOrbitSiteInner() {
   const [assembled, setAssembled] = useState(false);
   const isDesktop = useIsDesktop();
 
+  // ── Visit counter — fire once on mount ──────────────────────────────────
+  useEffect(() => { trackStat("visit"); }, []);
+
   // ── URL hydration — run once on mount and whenever URL params change ──────
   useEffect(() => {
     const programSlug = searchParams.get("program");
@@ -3233,6 +3336,7 @@ function CADCOrbitSiteInner() {
   }
 
   function tapCounty(countyId: string) {
+    trackStat("county", countyId); // stat tracking
     setActiveCounty(countyId);
     setOrbitTx("out");
     router.push(buildUrl({ county: countyId }));
@@ -3244,6 +3348,7 @@ function CADCOrbitSiteInner() {
   }
 
   function tapProgram(prog: ProgramData) {
+    trackStat("program", prog.slug); // stat tracking
     setPopNode(prog.slug);
     setBeamNode(prog.slug);
     setGlowNode(prog.slug);
@@ -4511,8 +4616,9 @@ function DesktopStyles() {
       .cadc-light-content .cadc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
       .cadc-light-content .cadc-chip { background: #E4E4FF; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #0101FF; font-weight: 600; text-align: center; line-height: 1.3; }
       .cadc-light-content .cadc-stack { display: flex; flex-direction: column; gap: 8px; }
-      .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: #cc0000; color: white; padding: 13px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; letter-spacing: 0.04em; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+      .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: #cc0000; color: white; padding: 13px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; letter-spacing: 0.04em; transition: transform 0.15s ease, box-shadow 0.15s ease; border: none; cursor: pointer; font-family: inherit; }
       .cadc-light-content .cadc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(204,0,0,0.3); }
+      .cadc-light-content .cadc-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
       .cadc-light-content .cadc-link { color: #0101FF; font-weight: 700; font-size: 14px; text-decoration: none; }
       .cadc-light-content .cadc-note { color: #9ca3af; font-size: 11px; font-style: italic; margin: 8px 0 0; }
       .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 14px 0; }
@@ -4521,6 +4627,10 @@ function DesktopStyles() {
       .cadc-light-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 9px 14px; border-top: 1px solid #e5e7eb; }
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 13px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; gap: 4px; }
+      .cadc-input { width: 100%; font-size: 15px; padding: 11px 12px; border: 1px solid #e5e7eb; border-radius: 10px; box-sizing: border-box; font-family: inherit; color: #111827; background: white; outline: none; transition: border-color 0.15s ease; }
+      .cadc-input:focus { border-color: #0101FF; box-shadow: 0 0 0 3px rgba(1,1,255,0.08); }
+      select.cadc-input { appearance: auto; }
+      textarea.cadc-input { resize: vertical; }
     `}</style>
   );
 }
