@@ -595,6 +595,19 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
         <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>These features are built and ready. They activate when the amended contract is signed. Turning one on before the amendment is signed is at your discretion.</p>
       </div>
       {premiumFeatures.map(f => <Toggle key={f.key} f={f} />)}
+
+      <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "16px 0 8px" }}>📋 Forms & Intake — Amendment Scope</p>
+      <div style={{ ...card, background: "#FFF8E7", border: `1px solid ${AMBER}`, padding: "10px 14px", marginBottom: 12 }}>
+        <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>Each form feeds directly into the Intake Leads tab. Every submission — complete or partial — becomes a documented outreach touchpoint for grant reporting. All off by default.</p>
+      </div>
+      {([
+        { key: "formServiceScreener",        label: "Universal Service Screener",         icon: "🔍", desc: "\"Find Your Benefits\" — 6 questions that surface which CADC programs a resident qualifies for. Most impactful intake tool on the site." },
+        { key: "formHeadStartPreEnroll",     label: "Head Start Pre-Enrollment Form",     icon: "🏫", desc: "Captures family interest before ChildPlus. Robin's team gets a lead queue to follow up with every family who expresses interest." },
+        { key: "formWeatherizationInterest", label: "Weatherization Interest Form",       icon: "🏠", desc: "Waitlist intake for Robert's program. Captures address, household, utility info, and priority factors to help triage the queue." },
+        { key: "formVitaAppointment",        label: "VITA Appointment Request",           icon: "📋", desc: "Tax season appointment intake — name, phone, county, return type, language preference. Replaces the phone queue during VITA season." },
+        { key: "formVolunteerInterest",      label: "Volunteer Interest Form",            icon: "🤝", desc: "Public volunteer pipeline — feeds the volunteer hour tracker. Captures skills, availability, and program interest." },
+        { key: "formCommunityNeeds",         label: "Community Needs Survey",             icon: "📊", desc: "Quarterly 8-question survey. Results feed the grant impact dashboard and help CADC document community need for funders." },
+      ] as { key: keyof SiteFeatures; label: string; icon: string; desc: string }[]).map(f => <Toggle key={f.key} f={f} />)}
     </>
   );
 }
