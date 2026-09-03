@@ -181,8 +181,7 @@ export default function AdminPage() {
         {tab === "stats"     && <StatsPanel       stats={stats} />}
         {tab === "schedule"  && <SchedulePanel    schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
         {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
-        {tab === "impact"    && <ImpactPanel      adminKey={key} />}
-      </div>
+        {tab === "impact"    && <ImpactPanel      adminKey={key} />}      </div>
     </div>
   );
 }
@@ -542,47 +541,60 @@ function DocsEditor({ v, onChange }: { v: PublicDoc[]; onChange: (v: PublicDoc[]
 
 // ─── Features Editor ──────────────────────────────────────────────────────────
 function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFeatures) => void }) {
-  const features: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
-    { key: "transitBooking", label: "Online Ride Booking",    icon: "🚌", desc: "Shows the online ride request form on Transit → Schedule a Ride. When off, displays the call button only." },
-    { key: "intakeLeads",    label: "Follow-Up Capture",      icon: "📥", desc: "Shows the follow-up contact form on Head Start, Weatherization, and Advantage eligibility pages. Sends leads to the Intake Leads tab." },
-    { key: "volunteerLog",   label: "Volunteer Hour Logger",  icon: "🤝", desc: "Shows the public volunteer hour submission form. When off, only admin staff can log hours from this panel." },
-    { key: "spanishToggle",  label: "Spanish / English Toggle", icon: "🌐", desc: "Shows the ES/EN language toggle button in the site header. Turn on when Spanish translations are fully ready." },
+  const safe = { ...{ spanishToggle: false, transitBooking: false, intakeLeads: false, volunteerLog: false, faqAccordion: false, boardPortal: false, contentScheduling: false, grantPdf: false }, ...v };
+
+  const baseFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
+    { key: "spanishToggle", label: "Spanish / English Toggle", icon: "🌐", desc: "Shows the ES/EN language toggle in the site header. Turn on when Spanish translations are fully ready." },
   ];
+
+  const premiumFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
+    { key: "transitBooking",    label: "Online Ride Booking",         icon: "🚌", desc: "Online ride request form on Transit → Schedule a Ride. Off = call button only." },
+    { key: "intakeLeads",       label: "Follow-Up Capture",           icon: "📥", desc: "Follow-up contact form on eligibility pages. Sends inquiries to the Intake Leads tab." },
+    { key: "volunteerLog",      label: "Volunteer Hour Logger",       icon: "🤝", desc: "Public volunteer hour submission form for Head Start in-kind match tracking." },
+    { key: "faqAccordion",      label: "Head Start FAQ",              icon: "❓", desc: "FAQ accordion section on Head Start program page. Robin requested — toggle on when content is ready." },
+    { key: "boardPortal",       label: "Board Document Portal",       icon: "📁", desc: "Board Documents sub-area in Board & Leadership — Tiffany uploads agendas, minutes, resolutions." },
+    { key: "contentScheduling", label: "Content Scheduling",          icon: "🗓️", desc: "Scheduled content publishing system — stage updates to go live automatically on a future date." },
+    { key: "grantPdf",          label: "Grant Impact PDF",            icon: "📈", desc: "Quarterly impact report generator in the admin panel. Pulls all site data into a grant-ready PDF." },
+  ];
+
+  function Toggle({ f }: { f: { key: keyof SiteFeatures; label: string; desc: string; icon: string } }) {
+    const on = !!safe[f.key];
+    return (
+      <div style={{ ...card, display: "flex", alignItems: "flex-start", gap: 14 }}>
+        <div style={{ fontSize: 26, flexShrink: 0 }}>{f.icon}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <span style={{ fontWeight: 800, fontSize: 14 }}>{f.label}</span>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: on ? GREEN : MUTED }}>{on ? "ON" : "Off"}</span>
+              <div onClick={() => onChange({ ...safe, [f.key]: !on })}
+                style={{ width: 44, height: 24, borderRadius: 12, cursor: "pointer", background: on ? GREEN : "#D1D5DB", position: "relative", transition: "background 0.2s ease" }}>
+                <div style={{ position: "absolute", top: 2, left: on ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "white", transition: "left 0.2s ease", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+              </div>
+            </label>
+          </div>
+          <p style={{ fontSize: 12, color: "#6B7280", margin: 0, lineHeight: 1.5 }}>{f.desc}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
         <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-          Turn site features on or off without a code change. Features marked <strong>Off</strong> are hidden from the public but stay fully built — flip them on anytime. Save after toggling.
+          Toggle site features on or off instantly — no code change, no deploy. <strong>Base features</strong> are part of the core contract. <strong>Premium features</strong> are amendment scope — turn on when the contract is signed. Save after any change.
         </p>
       </div>
-      {features.map(f => (
-        <div key={f.key} style={{ ...card, display: "flex", alignItems: "flex-start", gap: 14 }}>
-          <div style={{ fontSize: 28, flexShrink: 0 }}>{f.icon}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <span style={{ fontWeight: 800, fontSize: 15 }}>{f.label}</span>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: v[f.key] ? GREEN : MUTED }}>{v[f.key] ? "ON" : "Off"}</span>
-                <div
-                  onClick={() => onChange({ ...v, [f.key]: !v[f.key] })}
-                  style={{
-                    width: 44, height: 24, borderRadius: 12, cursor: "pointer",
-                    background: v[f.key] ? GREEN : "#D1D5DB",
-                    position: "relative", transition: "background 0.2s ease",
-                  }}
-                >
-                  <div style={{
-                    position: "absolute", top: 2, left: v[f.key] ? 22 : 2,
-                    width: 20, height: 20, borderRadius: "50%", background: "white",
-                    transition: "left 0.2s ease", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                  }} />
-                </div>
-              </label>
-            </div>
-            <p style={{ fontSize: 13, color: "#6B7280", margin: 0, lineHeight: 1.5 }}>{f.desc}</p>
-          </div>
-        </div>
-      ))}
+
+      <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "4px 0 8px" }}>Base Features</p>
+      {baseFeatures.map(f => <Toggle key={f.key} f={f} />)}
+
+      <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "16px 0 8px" }}>⭐ Premium — Amendment Scope</p>
+      <div style={{ ...card, background: "#FFF8E7", border: `1px solid ${AMBER}`, padding: "10px 14px", marginBottom: 12 }}>
+        <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>These features are built and ready. They activate when the amended contract is signed. Turning one on before the amendment is signed is at your discretion.</p>
+      </div>
+      {premiumFeatures.map(f => <Toggle key={f.key} f={f} />)}
     </>
   );
 }
