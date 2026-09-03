@@ -10,9 +10,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_CONTENT,
   fetchLeads, fetchStats, fetchVolunteer, fetchBookings,
-  type SiteContent, type SiteFeatures, type Meal, type MarketStop, type StaffMember,
+  type SiteContent, type SiteFeatures, type BoardDoc, type ScheduledItem, type Meal, type MarketStop, type StaffMember,
   type PublicDoc, type IntakeLead, type SiteStats, type VolunteerEntry,
-  type TransitBooking,
+  type TransitBooking, fetchSchedule,
 } from "@/lib/cms";
 
 const BLUE = "#0101FF", MAROON = "#CC0000", BORDER = "#e5e7eb", MUTED = "#6b7280";
@@ -22,7 +22,7 @@ const input: React.CSSProperties = { width: "100%", fontSize: 16, padding: "12px
 const lbl: React.CSSProperties = { color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", display: "block" };
 const btn = (bg = BLUE, fg = "white"): React.CSSProperties => ({ background: bg, color: fg, border: bg === "white" ? `1px solid ${BLUE}` : "none", borderRadius: 10, padding: "12px 18px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit" });
 
-type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings" | "features";
+type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings" | "features" | "schedule" | "board-docs" | "impact";
 const TABS: { id: Tab; label: string; icon: string; who: string }[] = [
   { id: "features",  label: "Features",      icon: "⚡", who: "Leslea" },
   { id: "announce",  label: "Alert",         icon: "🚨", who: "Leslea" },
@@ -34,6 +34,9 @@ const TABS: { id: Tab; label: string; icon: string; who: string }[] = [
   { id: "bookings",  label: "Transit Rides", icon: "🚌", who: "Gilbert" },
   { id: "volunteer", label: "Volunteer Hrs", icon: "🤝", who: "Robin" },
   { id: "stats",     label: "Site Stats",    icon: "📊", who: "Leslea" },
+  { id: "schedule",  label: "Scheduled",     icon: "🗓️", who: "Leslea" },
+  { id: "board-docs",label: "Board Docs",    icon: "📁", who: "Tiffany" },
+  { id: "impact",    label: "Impact PDF",    icon: "📈", who: "Leslea" },
 ];
 
 const HS_CENTERS = ["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"];
@@ -73,6 +76,8 @@ export default function AdminPage() {
   const [stats, setStats] = useState<SiteStats | null>(null);
   const [volunteer, setVolunteer] = useState<VolunteerEntry[]>([]);
   const [bookings, setBookings] = useState<TransitBooking[]>([]);
+  const [schedule, setSchedule] = useState<ScheduledItem[]>([]);
+  const [impactLoading, setImpactLoading] = useState(false);
 
   useEffect(() => {
     const k = sessionStorage.getItem("cadc-admin-key");
@@ -88,6 +93,7 @@ export default function AdminPage() {
     fetchStats(key).then(setStats);
     fetchVolunteer(key).then(setVolunteer);
     fetchBookings(key).then(setBookings);
+    fetchSchedule(key).then(setSchedule);
   }, [authed, key]);
 
   async function login() {
@@ -135,7 +141,7 @@ export default function AdminPage() {
     </div>
   );
 
-  const isContentTab = ["features","announce","menu","market","staff","docs"].includes(tab);
+  const isContentTab = ["features","announce","menu","market","staff","docs","board-docs"].includes(tab);
 
   return (
     <div style={{ minHeight: "100vh", background: "#F8F9FF", fontFamily: "'Space Grotesk','Inter',sans-serif", color: "#111827" }}>
@@ -173,6 +179,9 @@ export default function AdminPage() {
         {tab === "bookings"  && <BookingsPanel    bookings={bookings}           onUpdateStatus={updateBookingStatus} />}
         {tab === "volunteer" && <VolunteerPanel   entries={volunteer}           adminKey={key} onDelete={deleteVolunteer} onAdd={e => setVolunteer(v => [e, ...v])} />}
         {tab === "stats"     && <StatsPanel       stats={stats} />}
+        {tab === "schedule"  && <SchedulePanel    schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
+        {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
+        {tab === "impact"    && <ImpactPanel      adminKey={key} />}
       </div>
     </div>
   );
@@ -573,6 +582,207 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
           </div>
         </div>
       ))}
+    </>
+  );
+}
+
+// ─── Schedule Panel ────────────────────────────────────────────────────────────
+function SchedulePanel({ schedule, adminKey, onUpdate }: { schedule: ScheduledItem[]; adminKey: string; onUpdate: (s: ScheduledItem[]) => void }) {
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ title: "", section: "announcement" as ScheduledItem["section"], publishAt: "", expiresAt: "" });
+  const [saving, setSaving] = useState(false);
+  const now = new Date().toISOString();
+
+  async function cancel(id: string) {
+    await fetch("/api/cms/schedule", { method: "PATCH", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ id, status: "cancelled" }) });
+    onUpdate(schedule.map(s => s.id === id ? { ...s, status: "cancelled" } : s));
+  }
+  async function remove(id: string) {
+    await fetch("/api/cms/schedule", { method: "DELETE", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ id }) });
+    onUpdate(schedule.filter(s => s.id !== id));
+  }
+
+  const upcoming = schedule.filter(s => s.status === "scheduled" && s.publishAt > now);
+  const published = schedule.filter(s => s.status === "published");
+  const past = schedule.filter(s => s.status === "cancelled" || s.status === "expired");
+
+  return (
+    <>
+      <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          Stage content updates in advance. A scheduled item goes live automatically at the date and time you set — no login required at publish time. Use this for month-end menu swaps, announcements, or any planned content change.
+        </p>
+      </div>
+      <button style={{ ...btn(), width: "100%", marginBottom: 14 }} onClick={() => setShowForm(!showForm)}>{showForm ? "✕ Cancel" : "+ Schedule an Update"}</button>
+      {showForm && (
+        <div style={card}>
+          <span style={lbl}>Title (internal — staff only)</span>
+          <input style={{ ...input, marginBottom: 10 }} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. October Senior Menu" />
+          <span style={lbl}>What are you scheduling?</span>
+          <select style={{ ...input, marginBottom: 10 }} value={form.section} onChange={e => setForm(f => ({ ...f, section: e.target.value as ScheduledItem["section"] }))}>
+            <option value="announcement">Alert Banner</option>
+            <option value="seniorMenu">Senior Nutrition Menu</option>
+            <option value="marketSchedule">Community Market Schedule</option>
+            <option value="staff">Staff Directory</option>
+            <option value="documents">Documents</option>
+            <option value="boardDocs">Board Documents</option>
+          </select>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+            <div><span style={lbl}>Publish date & time *</span><input style={input} type="datetime-local" value={form.publishAt} onChange={e => setForm(f => ({ ...f, publishAt: e.target.value }))} /></div>
+            <div><span style={lbl}>Auto-expire (optional)</span><input style={input} type="datetime-local" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))} /></div>
+          </div>
+          <p style={{ fontSize: 12, color: MUTED, margin: "0 0 14px" }}>Note: You'll need to paste in the actual content payload after creating the item — or contact Chris to set up the full payload for complex content like menus.</p>
+          <button style={{ ...btn(), width: "100%" }} onClick={async () => {
+            if (!form.title || !form.publishAt) return;
+            setSaving(true);
+            const r = await fetch("/api/cms/schedule", { method: "POST", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ ...form, publishAt: new Date(form.publishAt).toISOString(), expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : undefined, createdBy: "admin", payload: {} }) });
+            if (r.ok) { const j = await r.json(); onUpdate([...schedule, { ...form, id: j.id, publishAt: new Date(form.publishAt).toISOString(), status: "scheduled", createdBy: "admin", createdAt: new Date().toISOString(), payload: {} }]); setShowForm(false); }
+            setSaving(false);
+          }} disabled={saving}>{saving ? "Saving…" : "Schedule Update"}</button>
+        </div>
+      )}
+      {upcoming.length > 0 && (
+        <div style={card}>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12, color: BLUE }}>🗓️ Upcoming ({upcoming.length})</div>
+          {upcoming.map(s => (
+            <div key={s.id} style={{ padding: "10px 0", borderBottom: `1px solid ${BORDER}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div><div style={{ fontWeight: 700, fontSize: 14 }}>{s.title}</div><div style={{ fontSize: 11, color: MUTED }}>{s.section} · Publishes {new Date(s.publishAt).toLocaleString()}</div></div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={() => cancel(s.id)} style={{ ...btn("white", AMBER), padding: "4px 10px", fontSize: 11, border: `1px solid ${AMBER}` }}>Cancel</button>
+                  <button onClick={() => remove(s.id)} style={{ ...btn("white", MAROON), padding: "4px 10px", fontSize: 11, borderColor: MAROON }}>×</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {published.length > 0 && (
+        <div style={card}>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12, color: GREEN }}>✅ Published ({published.length})</div>
+          {published.slice(0, 10).map(s => (
+            <div key={s.id} style={{ padding: "8px 0", borderBottom: `1px solid ${BORDER}`, fontSize: 13 }}>
+              <span style={{ fontWeight: 700 }}>{s.title}</span><span style={{ color: MUTED, marginLeft: 8 }}>{new Date(s.publishAt).toLocaleDateString()}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {upcoming.length === 0 && published.length === 0 && <p style={{ color: MUTED, textAlign: "center", padding: 40 }}>No scheduled updates yet.</p>}
+    </>
+  );
+}
+
+// ─── Board Docs Admin Panel ───────────────────────────────────────────────────
+const BD_CATS = [
+  { key: "agenda",         label: "Meeting Agenda" },
+  { key: "minutes",        label: "Meeting Minutes" },
+  { key: "resolution",     label: "Resolution" },
+  { key: "policy-council", label: "Policy Council" },
+  { key: "annual-report",  label: "Annual Report" },
+  { key: "other",          label: "Other" },
+] as const;
+
+function BoardDocsAdminPanel({ content, adminKey, onChange }: { content: SiteContent; adminKey: string; onChange: (v: BoardDoc[]) => void }) {
+  const docs = content.boardDocs ?? [];
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ title: "", category: "agenda" as BoardDoc["category"], date: new Date().toISOString().slice(0, 10), href: "" });
+  const [saving, setSaving] = useState(false);
+
+  async function add() {
+    if (!form.title || !form.href) return;
+    setSaving(true);
+    const r = await fetch("/api/cms/board-docs", { method: "POST", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ ...form, uploadedBy: "admin" }) });
+    if (r.ok) { const { id } = await r.json(); onChange([{ ...form, id, uploadedBy: "admin", uploadedAt: new Date().toISOString() }, ...docs]); setForm(f => ({ ...f, title: "", href: "" })); setShowForm(false); }
+    setSaving(false);
+  }
+  async function remove(id: string) {
+    await fetch("/api/cms/board-docs", { method: "DELETE", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ id }) });
+    onChange(docs.filter(d => d.id !== id));
+  }
+
+  return (
+    <>
+      <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          Upload board agendas, minutes, and resolutions. Each document appears in the Board & Leadership section of the public site. Files must be uploaded to <strong>/documents/board/</strong> in the repo first — then paste the link here.
+        </p>
+      </div>
+      <button style={{ ...btn(), width: "100%", marginBottom: 14 }} onClick={() => setShowForm(!showForm)}>{showForm ? "✕ Cancel" : "+ Add Board Document"}</button>
+      {showForm && (
+        <div style={card}>
+          <span style={lbl}>Document title</span>
+          <input style={{ ...input, marginBottom: 10 }} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Board Meeting Minutes — September 2026" />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+            <div><span style={lbl}>Category</span>
+              <select style={input} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value as BoardDoc["category"] }))}>
+                {BD_CATS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+              </select>
+            </div>
+            <div><span style={lbl}>Meeting date</span><input style={input} type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} /></div>
+          </div>
+          <span style={lbl}>File path</span>
+          <input style={{ ...input, marginBottom: 14 }} value={form.href} onChange={e => setForm(f => ({ ...f, href: e.target.value }))} placeholder="/documents/board/minutes-sept-2026.pdf" />
+          <button style={{ ...btn(), width: "100%" }} onClick={add} disabled={saving}>{saving ? "Saving…" : "Add Document"}</button>
+        </div>
+      )}
+      {docs.length === 0 && !showForm && <p style={{ color: MUTED, textAlign: "center", padding: 40 }}>No board documents posted yet.</p>}
+      {docs.map(doc => (
+        <div key={doc.id} style={{ ...card, padding: 12, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.title}</div>
+            <div style={{ fontSize: 11, color: MUTED }}>{doc.category} · {doc.date}</div>
+          </div>
+          <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+            <a href={doc.href} target="_blank" rel="noopener noreferrer" style={{ ...btn("white", BLUE), padding: "6px 10px", fontSize: 11, textDecoration: "none" }}>View</a>
+            <button onClick={() => remove(doc.id)} style={{ ...btn("white", MAROON), padding: "6px 10px", fontSize: 11, borderColor: MAROON }}>×</button>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+// ─── Impact PDF Panel ─────────────────────────────────────────────────────────
+function ImpactPanel({ adminKey }: { adminKey: string }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function generate() {
+    setLoading(true); setError("");
+    const r = await fetch("/api/cms/grant-impact", { headers: { "x-admin-key": adminKey } });
+    if (!r.ok) { setError("Failed to generate. Try again."); setLoading(false); return; }
+    const html = await r.text();
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `cadc-impact-report-${new Date().toISOString().slice(0,7)}.html`;
+    a.click(); URL.revokeObjectURL(url);
+    setLoading(false);
+  }
+
+  return (
+    <>
+      <div style={{ ...card, background: "#F0FFF4", border: `1px solid ${GREEN}` }}>
+        <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8, color: GREEN }}>📈 Quarterly Impact Report</div>
+        <p style={{ margin: "0 0 14px", fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          Generate a one-page impact summary from all site data — engagement stats, intake leads, volunteer hours, and transit requests. Opens as an HTML file you can print to PDF and attach to grant applications.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 16 }}>
+          {[["📊","Site engagement & top programs"],["📥","Intake inquiries & follow-up rates"],["🤝","Volunteer hours & match value"]].map(([icon, label]) => (
+            <div key={label as string} style={{ background: "white", border: `1px solid ${GREEN}`, borderRadius: 8, padding: 10, fontSize: 11, textAlign: "center" }}>
+              <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>
+              <div style={{ color: "#374151", lineHeight: 1.4 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+        <button style={{ ...btn(GREEN), width: "100%", fontSize: 15 }} onClick={generate} disabled={loading}>
+          {loading ? "Generating…" : "📥 Download Impact Report"}
+        </button>
+        {error && <p style={{ color: MAROON, fontSize: 13, marginTop: 10 }}>{error}</p>}
+        <p style={{ fontSize: 11, color: MUTED, marginTop: 10 }}>
+          The downloaded file opens in any browser. Use File → Print → Save as PDF to create the final PDF document.
+        </p>
+      </div>
     </>
   );
 }
