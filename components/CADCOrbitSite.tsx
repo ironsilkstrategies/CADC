@@ -1861,8 +1861,87 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
   );
 }
 
-// ─── Board Documents Panel ────────────────────────────────────────────────────
-function BoardDocsPanel() {
+// ─── Head Start FAQ Accordion ─────────────────────────────────────────────────
+const HS_FAQS = [
+  { q: "Who qualifies for Early Head Start and Head Start?", a: "EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5. Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF). Enrollment is based on a points system — all families are encouraged to apply." },
+  { q: "What do I need to bring to apply?", a: "Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable." },
+  { q: "Are children with disabilities or special needs accepted?", a: "Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP." },
+  { q: "Can parents apply to work at CADC Head Start?", a: "Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588." },
+  { q: "How can parents or community members get involved?", a: "Just show up at any center — no call or appointment needed. Parents, grandparents, neighbors, and local volunteers are all welcome. Every hour you contribute counts as an in-kind donation that helps keep the program free for families." },
+  { q: "What should I expect during a home visit?", a: "CADC attempts two home visits per year per family. Your Center Staff will work with you on goals, connect you to resources, and discuss your child's development. If a home visit isn't possible, an alternative location can be arranged." },
+  { q: "How does Head Start support my child's health?", a: "CADC provides vision, hearing, and mental health screenings. Other screenings — including dental exams — are the parent's responsibility, though we will help direct you to the right resources. Children with conditions such as asthma must have an inhaler on-site." },
+  { q: "What if my child has allergies or special dietary needs?", a: "A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program." },
+  { q: "I need a new parent handbook or school calendar. What do I do?", a: "Contact your child's center directly. Each center can provide current handbooks and calendars. You can also find updates through your classroom's private Facebook page." },
+];
+
+function HeadStartFAQ() {
+  const { features } = useCms();
+  const [open, setOpen] = useState<number | null>(null);
+
+  if (!features?.faqAccordion) return (
+    <div className="cadc-light-content">
+      <p>Answers to the questions families ask us every day.</p>
+      <div className="cadc-stack">
+        {HS_FAQS.map(item => (
+          <div key={item.q} className="cadc-card-sm">
+            <p className="cadc-card-title">{item.q}</p>
+            <p>{item.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Answers to the questions families ask us every day. Tap a question to expand it.</p>
+      <div style={{ marginTop: 12 }}>
+        {HS_FAQS.map((item, i) => (
+          <div key={i} style={{ borderBottom: `1px solid ${T.border}`, overflow: "hidden" }}>
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: "14px 4px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, fontFamily: "inherit" }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: T.textPrimary, lineHeight: 1.4, flex: 1 }}>{item.q}</span>
+              <span style={{ color: T.blue, fontWeight: 800, fontSize: 18, flexShrink: 0, transform: open === i ? "rotate(45deg)" : "none", transition: "transform 0.2s ease" }}>+</span>
+            </button>
+            {open === i && (
+              <div style={{ padding: "0 4px 14px", fontSize: 14, color: T.textMuted, lineHeight: 1.6 }}>
+                {item.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="cadc-card" style={{ marginTop: 16 }}>
+        <p className="cadc-label">Still have questions?</p>
+        <a href="tel:+15803355588" className="cadc-link">Call us at 580-335-5588</a>
+        <a href="tel:+15807263343" className="cadc-link" style={{ display: "block", marginTop: 6 }}>Head Start direct: 580-726-3343</a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Board Docs Section (gated behind boardPortal feature) ────────────────────
+function BoardDocsSectionGated() {
+  const { features } = useCms();
+  if (!features?.boardPortal) return (
+    <div className="cadc-light-content">
+      <div className="cadc-card" style={{ textAlign: "center", padding: 28 }}>
+        <p style={{ fontSize: 28, margin: "0 0 8px" }}>📄</p>
+        <p style={{ fontWeight: 700, margin: "0 0 6px" }}>Board documents coming soon.</p>
+        <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Agendas, minutes, and resolutions will be posted here.</p>
+      </div>
+      <div className="cadc-card">
+        <p className="cadc-label">Questions about board documents</p>
+        <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+        <a href="mailto:tcamero@cadcok.org" className="cadc-link" style={{ display: "block", marginTop: 6 }}>tcamero@cadcok.org</a>
+      </div>
+    </div>
+  );
+  return <BoardDocsPanel />;
+}
+
+const PROGRAMS: ProgramData[] = [
   const { boardDocs } = useCms();
   const docs = boardDocs ?? [];
   const categories = [
@@ -2095,29 +2174,7 @@ const PROGRAMS: ProgramData[] = [
       },
       {
         id: "faq", label: "FAQs", shortLabel: "FAQ", icon: "❓",
-        content: (
-          <div className="cadc-light-content">
-            <p>Answers to the questions families ask us every day.</p>
-            <div className="cadc-stack">
-              {[
-                {q:"Who qualifies for Early Head Start and Head Start?",a:"EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5. Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF). Enrollment is based on a points system that considers many circumstances — all families are encouraged to apply."},
-                {q:"What do I need to bring to apply?",a:"Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable."},
-                {q:"Are children with disabilities or special needs accepted?",a:"Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP."},
-                {q:"Can parents apply to work at CADC Head Start?",a:"Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588."},
-                {q:"How can parents or community members get involved?",a:"Just show up at any center — no call or appointment needed. Parents, grandparents, neighbors, and local volunteers are all welcome. Every hour you contribute counts as an in-kind donation that helps keep the program free for families."},
-                {q:"What should I expect during a home visit?",a:"CADC attempts two home visits per year per family. Your Center Staff will work with you on goals, connect you to resources, and discuss your child's development. If a home visit isn't possible due to safety concerns or family preference, an alternative location can be arranged to maintain confidentiality."},
-                {q:"How does Head Start support my child's health?",a:"CADC provides vision, hearing, and mental health screenings. Other screenings — including dental exams — are the parent's responsibility, though we will help direct you to the right resources. Health needs are documented and monitored by our Health Coordinator. Children with conditions such as asthma must have an inhaler on-site."},
-                {q:"What if my child has allergies or special dietary needs?",a:"A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program."},
-                {q:"I need a new parent handbook or school calendar. What do I do?",a:"Contact your child's center directly. Each center can provide current handbooks and calendars. You can also find updates through your classroom's private Facebook page."},
-              ].map(item => (
-                <div key={item.q} className="cadc-card-sm">
-                  <p className="cadc-card-title">{item.q}</p>
-                  <p>{item.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ),
+        content: <HeadStartFAQ />,
       },
     ],
   },
@@ -2766,7 +2823,7 @@ const PROGRAMS: ProgramData[] = [
       },
       {
         id: "board-docs", label: "Documents & Minutes", shortLabel: "Documents", icon: "📄",
-        content: <BoardDocsPanel />,
+        content: <BoardDocsSectionGated />,
       },
     ],
   },
