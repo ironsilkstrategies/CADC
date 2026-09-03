@@ -57,7 +57,7 @@ const ES: Record<string, string> = {
   "Contact Us": "Contáctenos",
   "Find a Location": "Encontrar Ubicación",
   // Footer
-  {t("Reducing poverty in communities by empowering people", lang)}: "Reduciendo la pobreza en las comunidades empoderando a las personas",
+  "Reducing poverty in communities by empowering people": "Reduciendo la pobreza en las comunidades empoderando a las personas",
   "Helping People. Changing Lives.": "Ayudando a las personas. Cambiando vidas.",
   "Serving": "Sirviendo",
   "counties across Southwest Oklahoma": "condados en el suroeste de Oklahoma",
