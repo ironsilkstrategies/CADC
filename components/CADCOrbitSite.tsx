@@ -1680,6 +1680,27 @@ function ProgramCTABar({ slug, onSelectArea }: { slug: string; onSelectArea: (id
   );
 }
 
+// ─── Transit Ride Section — shows booking form or simple CTA based on feature flag
+function TransitRideSection() {
+  const { features } = useCms();
+  if (features?.transitBooking) return <TransitBookingForm />;
+  return (
+    <div className="cadc-light-content">
+      <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
+      <div className="cadc-card">
+        <p className="cadc-label">Schedule a ride</p>
+        <a href="tel:+15803352691" className="cadc-btn">📞 (580) 335-2691</a>
+        <p className="cadc-note">Spanish-speaking staff available. ADA equipped vehicles.</p>
+        <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
+      </div>
+      <div className="cadc-card">
+        <p className="cadc-label">Counties served</p>
+        <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Jefferson · Kiowa · Roger Mills · Stephens · Tillman · Washita</p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Transit Booking Form ─────────────────────────────────────────────────────
 function TransitBookingForm() {
   const [form, setForm] = useState({ name: "", phone: "", pickupAddress: "", destination: "", requestedDate: "", requestedTime: "", accessibility: "none", notes: "" });
@@ -1740,6 +1761,13 @@ function TransitBookingForm() {
       </div>
     </div>
   );
+}
+
+// ─── Intake Lead Section — shows follow-up form or just content based on feature flag
+function IntakeLeadSection({ program, step, children }: { program: string; step: string; children: React.ReactNode }) {
+  const { features } = useCms();
+  if (features?.intakeLeads) return <IntakeLeadForm program={program} step={step}>{children}</IntakeLeadForm>;
+  return <>{children}</>;
 }
 
 // ─── Intake Lead Capture Form ─────────────────────────────────────────────────
@@ -1835,7 +1863,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
         content: (
-          <IntakeLeadForm program="head-start" step="enrollment">
+          <IntakeLeadSection program="head-start" step="enrollment">
             <div className="cadc-light-content">
             <p>EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5.</p>
             <div className="cadc-card">
@@ -1848,7 +1876,7 @@ const PROGRAMS: ProgramData[] = [
             </div>
             <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
             </div>
-          </IntakeLeadForm>
+          </IntakeLeadSection>
         ),
       },
       {
@@ -1997,7 +2025,7 @@ const PROGRAMS: ProgramData[] = [
     subAreas: [
       {
         id: "rides", label: "Schedule a Ride", shortLabel: "Schedule", icon: "📅",
-        content: <TransitBookingForm />,
+        content: <TransitRideSection />,
       },
       {
         id: "fares", label: "Fare Schedule", shortLabel: "Fares", icon: "💲",
@@ -2106,7 +2134,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "eligibility-weath", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <IntakeLeadForm program="weatherization" step="eligibility">
+          <IntakeLeadSection program="weatherization" step="eligibility">
             <div className="cadc-light-content">
             <p>Eligibility is based on household income. Priority is given to elderly residents, people with disabilities, and families with young children.</p>
             <div className="cadc-card">
@@ -2656,7 +2684,7 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-eligibility", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <IntakeLeadForm program="advantage" step="eligibility">
+          <IntakeLeadSection program="advantage" step="eligibility">
             <div className="cadc-light-content">
             <p>To receive Advantage Home Delivered Meals, applicants must meet all of the following criteria:</p>
             <div className="cadc-card">
