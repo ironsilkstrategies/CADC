@@ -34,7 +34,7 @@ const ES: Record<string, string> = {
   "Contact & Locations": "Contacto y Ubicaciones",
   "Programs & Services": "Programas y Servicios",
   "Find Services by County": "Buscar Servicios por Condado",
-  {t("Tap a program node to explore", lang)}: "Toque un nodo para explorar",
+  "Tap a program node to explore": "Toque un nodo para explorar",
   "programs available": "programas disponibles",
   "All Counties": "Todos los Condados",
   "View all services": "Ver todos los servicios",
