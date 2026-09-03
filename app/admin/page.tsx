@@ -546,6 +546,7 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
     { key: "transitBooking", label: "Online Ride Booking",    icon: "🚌", desc: "Shows the online ride request form on Transit → Schedule a Ride. When off, displays the call button only." },
     { key: "intakeLeads",    label: "Follow-Up Capture",      icon: "📥", desc: "Shows the follow-up contact form on Head Start, Weatherization, and Advantage eligibility pages. Sends leads to the Intake Leads tab." },
     { key: "volunteerLog",   label: "Volunteer Hour Logger",  icon: "🤝", desc: "Shows the public volunteer hour submission form. When off, only admin staff can log hours from this panel." },
+    { key: "spanishToggle",  label: "Spanish / English Toggle", icon: "🌐", desc: "Shows the ES/EN language toggle button in the site header. Turn on when Spanish translations are fully ready." },
   ];
   return (
     <>
