@@ -4177,7 +4177,7 @@ export interface CADCHeaderProps {
 // THE header. Identical on orbit, about, contact.
 export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
   const isDesktop = useIsDesktop();
-  const { announcement } = useCms();
+  const { announcement, features } = useCms();
   const { lang, setLang } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
@@ -4209,12 +4209,14 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
               <a key={l} href={h} style={{ color: T.textMuted, fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em" }}
                 onMouseEnter={e => (e.currentTarget.style.color = T.blue)} onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}>{l}</a>
             ))}
-            {/* Language toggle */}
-            <button onClick={() => setLang(l => l === "en" ? "es" : "en")}
-              aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
-              style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.06em" }}>
-              {lang === "en" ? "ES" : "EN"}
-            </button>
+            {/* Language toggle — only shows when spanishToggle feature is on */}
+            {features?.spanishToggle && (
+              <button onClick={() => setLang(lang === "en" ? "es" : "en")}
+                aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
+                style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.06em" }}>
+                {lang === "en" ? "ES" : "EN"}
+              </button>
+            )}
             <a href="tel:+15803355588" aria-label="Call CADC at 580-335-5588"
               style={{ background: T.maroon, color: "white", padding: isDesktop ? "9px 16px" : "9px 13px", borderRadius: 8, fontSize: 12, fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}>
               📞 {isDesktop ? "580-335-5588" : t("Call", lang)}
