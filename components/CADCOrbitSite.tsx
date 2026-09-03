@@ -1059,6 +1059,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         transform:`translate(-50%,-50%) scale(${hubS})`,
         borderRadius:"50%",
         background: T.void,
+        overflow:"hidden",
         border:`2.5px solid ${T.blue}`,
         boxShadow:`0 0 0 ${8*hubG}px rgba(1,1,255,${0.04+pulseAlpha*0.08}), 0 0 ${40*hubG}px rgba(1,1,255,${0.2+pulseAlpha*0.15}), inset 0 0 20px rgba(1,1,255,${0.05+pulseAlpha*0.05})`,
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
@@ -1070,8 +1071,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
           : isSubLevel
             ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
-            : <img src="/images/cadc-logo.png" alt="CADC"
-                style={{width:"96%",height:"96%",objectFit:"contain",display:"block",padding:"4px"}} />}
+            : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",borderRadius:"50%",clipPath:"circle(50% at 50% 50%)"}} />}
         {/* Only show text label at entry stage — hide when program icon fills hub */}
         {!isSubLevel && (
           <span style={{
@@ -3609,7 +3609,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
                 style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
             : (stage === "program" || stage === "content")
               ? activeProgram?.icon
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "85%", height: "85%", objectFit: "contain", display: "block" }} />}
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%", clipPath: "circle(50% at 50% 50%)" }} />}
         </span>
         {!(stage === "program" || stage === "content") && (
           <span style={{
@@ -4373,7 +4373,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
           : (stage === "program" || stage === "content")
               ? <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{activeProgram?.icon}</span>
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />}
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%", clipPath: "circle(50% at 50% 50%)" }} />}
         {!(stage === "program" || stage === "content") && (
           <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>CADC</span>
         )}
