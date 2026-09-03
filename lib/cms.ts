@@ -1,69 +1,66 @@
 // ─── CADC Site CMS — content model ──────────────────────────────────────────
-// Everything directors can edit from /admin lives here. Stored in Vercel KV
-// under key "cadc:content". DEFAULT_CONTENT is used until the first save and
-// whenever KV is unreachable, so the public site never breaks.
-
 export interface Meal { headline: string; full: string[] }
 export interface MarketStop { time: string; location: string }
 export interface StaffMember { name: string; title: string; phone?: string; email?: string }
 export interface PublicDoc { label: string; href: string }
 
-// ─── Intake lead — captured when someone starts but doesn't finish an application
 export interface IntakeLead {
-  id: string;           // uuid
-  ts: string;           // ISO timestamp
-  program: string;      // "head-start" | "weatherization" | "advantage" | "tax-help" | "transit"
-  county?: string;
-  name?: string;
-  phone?: string;
-  email?: string;
-  step: string;         // where they dropped off — e.g. "eligibility", "contact"
-  notes?: string;
-  status: "new" | "contacted" | "enrolled" | "ineligible" | "closed";
+  id: string; ts: string; program: string; county?: string;
+  name?: string; phone?: string; email?: string; step: string;
+  notes?: string; status: "new" | "contacted" | "enrolled" | "ineligible" | "closed";
 }
 
-// ─── Site stats — incremented server-side on program taps, county views, searches
 export interface SiteStats {
-  programTaps: Record<string, number>;   // slug → count
-  countyViews: Record<string, number>;   // county slug → count
-  searchTerms: Record<string, number>;   // term → count
+  programTaps: Record<string, number>;
+  countyViews: Record<string, number>;
+  searchTerms: Record<string, number>;
   weeklyVisits: number;
-  lastReset: string;                     // ISO — reset weekly
+  lastReset: string;
 }
 
-// ─── Volunteer / in-kind hour log — Head Start matching requirement tracker
 export interface VolunteerEntry {
-  id: string;
-  ts: string;
-  volunteerName: string;
-  supervisorName: string;
-  program: string;       // "head-start" | "early-head-start"
-  center: string;        // e.g. "Hobart", "Erick"
-  date: string;          // YYYY-MM-DD
-  hours: number;
+  id: string; ts: string; volunteerName: string; supervisorName: string;
+  program: string; center: string; date: string; hours: number;
   type: "volunteer" | "in-kind-space" | "in-kind-services" | "public-school-collab";
   description?: string;
 }
 
-// ─── Transit booking request
 export interface TransitBooking {
-  id: string;
-  ts: string;
-  name: string;
-  phone: string;
-  pickupAddress: string;
-  destination: string;
-  requestedDate: string;
-  requestedTime: string;
-  accessibility: string;
-  status: "new" | "confirmed" | "completed" | "cancelled";
+  id: string; ts: string; name: string; phone: string;
+  pickupAddress: string; destination: string;
+  requestedDate: string; requestedTime: string;
+  accessibility: string; status: "new" | "confirmed" | "completed" | "cancelled";
   notes?: string;
 }
 
+// ─── #7 Content scheduling ────────────────────────────────────────────────────
+export interface ScheduledItem {
+  id: string;
+  title: string;
+  section: "announcement" | "seniorMenu" | "marketSchedule" | "staff" | "documents" | "boardDocs";
+  publishAt: string;       // ISO — goes live at this datetime
+  expiresAt?: string;      // ISO — optional auto-expiry
+  payload: unknown;        // the content to swap in at publish time
+  status: "scheduled" | "published" | "expired" | "cancelled";
+  createdBy: string;
+  createdAt: string;
+}
+
+// ─── #9 Board document portal ─────────────────────────────────────────────────
+export interface BoardDoc {
+  id: string;
+  title: string;
+  category: "agenda" | "minutes" | "resolution" | "policy-council" | "annual-report" | "other";
+  date: string;            // YYYY-MM-DD — meeting or document date
+  href: string;            // /documents/board/filename.pdf
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
 export interface SiteFeatures {
-  transitBooking: boolean;   // online ride request form on Transit → Schedule page
-  intakeLeads: boolean;      // follow-up capture form on eligibility/enrollment pages
-  volunteerLog: boolean;     // public volunteer hour submission form (Head Start)
+  transitBooking: boolean;
+  intakeLeads: boolean;
+  volunteerLog: boolean;
 }
 
 export interface SiteContent {
@@ -75,23 +72,22 @@ export interface SiteContent {
   marketSchedule: { month: string; year: number; note: string; transportation: string; stops: Record<string, MarketStop[]> };
   staff: StaffMember[];
   documents: PublicDoc[];
+  boardDocs: BoardDoc[];
 }
 
-export const CMS_KEY          = "cadc:content";
-export const LEADS_KEY        = "cadc:leads";
-export const STATS_KEY        = "cadc:stats";
-export const VOLUNTEER_KEY    = "cadc:volunteer";
-export const BOOKINGS_KEY     = "cadc:bookings";
+export const CMS_KEY        = "cadc:content";
+export const LEADS_KEY      = "cadc:leads";
+export const STATS_KEY      = "cadc:stats";
+export const VOLUNTEER_KEY  = "cadc:volunteer";
+export const BOOKINGS_KEY   = "cadc:bookings";
+export const SCHEDULE_KEY   = "cadc:schedule";
 
 export const DEFAULT_CONTENT: SiteContent = {
   updatedAt: "2026-09-01T00:00:00.000Z",
   updatedBy: "seed",
   announcement: { enabled: false, text: "", href: "", type: "info" },
-  features: {
-    transitBooking: false,  // off until amendment signed
-    intakeLeads: false,     // off until amendment signed
-    volunteerLog: false,    // off until amendment signed
-  },
+  features: { transitBooking: false, intakeLeads: false, volunteerLog: false },
+  boardDocs: [],
   seniorMenu: {
     month: "September", year: 2026,
     note: "8 oz milk served daily at all congregate sites",
@@ -149,13 +145,13 @@ export const DEFAULT_CONTENT: SiteContent = {
     },
   },
   staff: [
-    { name: "Leslea Hixson",   title: "Executive Director",                          phone: "580-335-5588" },
-    { name: "Robin Harris",    title: "Director, Head Start & Early Head Start",      phone: "580-726-3343", email: "rharris@cadcok.org" },
-    { name: "Gilbert Nuncio",  title: "Director, Red River Transportation",           phone: "580-335-2691" },
-    { name: "Robert Meador",   title: "Director, Weatherization & Housing",           phone: "580-305-0853" },
-    { name: "Laura Vardell",   title: "Director, Senior Nutrition",                   phone: "580-335-5588" },
-    { name: "Scott Fraley",    title: "Director, Community Market",                   phone: "580-305-1964", email: "SFraley@cadcok.org" },
-    { name: "Kristie Jackson", title: "Director, Advantage Home Delivered Meals",     phone: "580-393-2216" },
+    { name: "Leslea Hixson",   title: "Executive Director",                         phone: "580-335-5588" },
+    { name: "Robin Harris",    title: "Director, Head Start & Early Head Start",     phone: "580-726-3343", email: "rharris@cadcok.org" },
+    { name: "Gilbert Nuncio",  title: "Director, Red River Transportation",          phone: "580-335-2691" },
+    { name: "Robert Meador",   title: "Director, Weatherization & Housing",          phone: "580-305-0853" },
+    { name: "Laura Vardell",   title: "Director, Senior Nutrition",                  phone: "580-335-5588" },
+    { name: "Scott Fraley",    title: "Director, Community Market",                  phone: "580-305-1964", email: "SFraley@cadcok.org" },
+    { name: "Kristie Jackson", title: "Director, Advantage Home Delivered Meals",    phone: "580-393-2216" },
   ],
   documents: [
     { label: "Title VI Policy (Red River Transportation)", href: "/documents/title-vi-policy.pdf" },
@@ -165,7 +161,6 @@ export const DEFAULT_CONTENT: SiteContent = {
   ],
 };
 
-// ─── Client-side fetch with graceful fallback ─────────────────────────────────
 export async function fetchContent(): Promise<SiteContent> {
   try {
     const r = await fetch("/api/cms", { cache: "no-store" });
@@ -175,35 +170,37 @@ export async function fetchContent(): Promise<SiteContent> {
   } catch { return DEFAULT_CONTENT; }
 }
 
-// ─── Admin helpers — fetch secondary data stores ──────────────────────────────
 export async function fetchLeads(adminKey: string): Promise<IntakeLead[]> {
   try {
     const r = await fetch("/api/cms/leads", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return [];
-    return r.json();
+    if (!r.ok) return []; return r.json();
   } catch { return []; }
 }
 
 export async function fetchStats(adminKey: string): Promise<SiteStats | null> {
   try {
     const r = await fetch("/api/cms/stats", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return null;
-    return r.json();
+    if (!r.ok) return null; return r.json();
   } catch { return null; }
 }
 
 export async function fetchVolunteer(adminKey: string): Promise<VolunteerEntry[]> {
   try {
     const r = await fetch("/api/cms/volunteer", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return [];
-    return r.json();
+    if (!r.ok) return []; return r.json();
   } catch { return []; }
 }
 
 export async function fetchBookings(adminKey: string): Promise<TransitBooking[]> {
   try {
     const r = await fetch("/api/cms/bookings", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return [];
-    return r.json();
+    if (!r.ok) return []; return r.json();
+  } catch { return []; }
+}
+
+export async function fetchSchedule(adminKey: string): Promise<ScheduledItem[]> {
+  try {
+    const r = await fetch("/api/cms/schedule", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
+    if (!r.ok) return []; return r.json();
   } catch { return []; }
 }
