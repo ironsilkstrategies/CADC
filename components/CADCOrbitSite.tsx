@@ -1941,16 +1941,17 @@ function BoardDocsSectionGated() {
   return <BoardDocsPanel />;
 }
 
-const PROGRAMS: ProgramData[] = [
+// ─── Board Documents Panel ────────────────────────────────────────────────────
+function BoardDocsPanel() {
   const { boardDocs } = useCms();
   const docs = boardDocs ?? [];
   const categories = [
-    { key: "agenda",        label: "Meeting Agendas",    icon: "📋" },
-    { key: "minutes",       label: "Meeting Minutes",    icon: "📝" },
-    { key: "resolution",    label: "Resolutions",        icon: "⚖️" },
-    { key: "policy-council",label: "Policy Council",     icon: "👥" },
-    { key: "annual-report", label: "Annual Reports",     icon: "📊" },
-    { key: "other",         label: "Other Documents",    icon: "📄" },
+    { key: "agenda",         label: "Meeting Agendas",    icon: "📋" },
+    { key: "minutes",        label: "Meeting Minutes",    icon: "📝" },
+    { key: "resolution",     label: "Resolutions",        icon: "⚖️" },
+    { key: "policy-council", label: "Policy Council",     icon: "👥" },
+    { key: "annual-report",  label: "Annual Reports",     icon: "📊" },
+    { key: "other",          label: "Other Documents",    icon: "📄" },
   ] as const;
 
   const byCategory = (cat: string) => docs.filter(d => d.category === cat).sort((a, b) => b.date.localeCompare(a.date));
