@@ -86,7 +86,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   updatedAt: "2026-09-01T00:00:00.000Z",
   updatedBy: "seed",
   announcement: { enabled: false, text: "", href: "", type: "info" },
-  features: { transitBooking: false, intakeLeads: false, volunteerLog: false },
+  features: { transitBooking: false, intakeLeads: false, volunteerLog: false, spanishToggle: false },
   boardDocs: [],
   seniorMenu: {
     month: "September", year: 2026,
