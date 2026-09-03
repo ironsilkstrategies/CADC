@@ -21,6 +21,52 @@ import { DEFAULT_CONTENT, fetchContent, type SiteContent } from "@/lib/cms";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
+// ─── #8 Spanish / English translation map ────────────────────────────────────
+type Lang = "en" | "es";
+
+const ES: Record<string, string> = {
+  // Navigation & UI
+  "Home": "Inicio",
+  "Back": "Regresar",
+  "Call": "Llamar",
+  "Search programs, services, counties...": "Buscar programas, servicios, condados...",
+  "About CADC": "Acerca de CADC",
+  "Contact & Locations": "Contacto y Ubicaciones",
+  "Programs & Services": "Programas y Servicios",
+  "Find Services by County": "Buscar Servicios por Condado",
+  {t("Tap a program node to explore", lang)}: "Toque un nodo para explorar",
+  "programs available": "programas disponibles",
+  "All Counties": "Todos los Condados",
+  "View all services": "Ver todos los servicios",
+  // Programs
+  "Head Start": "Head Start",
+  "Red River Transit": "Tránsito Red River",
+  "Weatherization": "Climatización",
+  "Senior Nutrition": "Nutrición para Adultos Mayores",
+  "VITA Free Tax Help": "Ayuda Gratuita con Impuestos VITA",
+  "Community Market": "Mercado Comunitario",
+  "Employment & Workforce": "Empleo y Fuerza Laboral",
+  "Board & Leadership": "Junta Directiva y Liderazgo",
+  "Advantage Home Delivered Meals": "Comidas a Domicilio Advantage",
+  // Common CTA
+  "Apply Now": "Aplicar Ahora",
+  "Schedule a Ride": "Programar un Viaje",
+  "View Menu": "Ver Menú",
+  "See Schedule": "Ver Horario",
+  "Learn More": "Saber Más",
+  "Contact Us": "Contáctenos",
+  "Find a Location": "Encontrar Ubicación",
+  // Footer
+  {t("Reducing poverty in communities by empowering people", lang)}: "Reduciendo la pobreza en las comunidades empoderando a las personas",
+  "Helping People. Changing Lives.": "Ayudando a las personas. Cambiando vidas.",
+  "Serving": "Sirviendo",
+  "counties across Southwest Oklahoma": "condados en el suroeste de Oklahoma",
+};
+
+function t(key: string, lang: Lang): string {
+  return lang === "es" ? (ES[key] ?? key) : key;
+}
+
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
 const T = {
@@ -1807,6 +1853,60 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
   );
 }
 
+// ─── Board Documents Panel ────────────────────────────────────────────────────
+function BoardDocsPanel() {
+  const { boardDocs } = useCms();
+  const docs = boardDocs ?? [];
+  const categories = [
+    { key: "agenda",        label: "Meeting Agendas",    icon: "📋" },
+    { key: "minutes",       label: "Meeting Minutes",    icon: "📝" },
+    { key: "resolution",    label: "Resolutions",        icon: "⚖️" },
+    { key: "policy-council",label: "Policy Council",     icon: "👥" },
+    { key: "annual-report", label: "Annual Reports",     icon: "📊" },
+    { key: "other",         label: "Other Documents",    icon: "📄" },
+  ] as const;
+
+  const byCategory = (cat: string) => docs.filter(d => d.category === cat).sort((a, b) => b.date.localeCompare(a.date));
+
+  if (docs.length === 0) return (
+    <div className="cadc-light-content">
+      <div className="cadc-card" style={{ textAlign: "center", padding: 32 }}>
+        <p style={{ fontSize: 28, margin: "0 0 10px" }}>📄</p>
+        <p style={{ fontWeight: 700, margin: "0 0 6px" }}>No documents posted yet.</p>
+        <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Board agendas, minutes, and resolutions will appear here when uploaded by CADC staff.</p>
+      </div>
+      <div className="cadc-card">
+        <p className="cadc-label">Questions about board documents</p>
+        <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+        <a href="mailto:tcamero@cadcok.org" className="cadc-link" style={{ display: "block", marginTop: 6 }}>tcamero@cadcok.org</a>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      {categories.map(({ key, label, icon }) => {
+        const items = byCategory(key);
+        if (items.length === 0) return null;
+        return (
+          <div key={key} className="cadc-card">
+            <p className="cadc-label">{icon} {label}</p>
+            <div className="cadc-stack">
+              {items.map(doc => (
+                <a key={doc.id} href={doc.href} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f3f4f6", textDecoration: "none", color: T.blue, fontWeight: 700, fontSize: 13, gap: 12 }}>
+                  <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.title}</span>
+                  <span style={{ fontSize: 11, color: "#6B7280", fontWeight: 400, flexShrink: 0 }}>{new Date(doc.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -2656,6 +2756,10 @@ const PROGRAMS: ProgramData[] = [
         id: "service-map", label: "Service Area Map", shortLabel: "Map", icon: "🗺️",
         content: <ServiceMapPanel />,
       },
+      {
+        id: "board-docs", label: "Documents & Minutes", shortLabel: "Documents", icon: "📄",
+        content: <BoardDocsPanel />,
+      },
     ],
   },
 // ── 9. ADVANTAGE HOME DELIVERED MEALS ─────────────────────────────────────
@@ -3284,6 +3388,7 @@ function CADCOrbitSiteInner() {
   const [beamNode, setBeamNode] = useState<string | null>(null);
   const [orbitTx, setOrbitTx] = useState<TransitionState>("idle");
   const [assembled, setAssembled] = useState(false);
+  const [lang, setLang] = useState<Lang>("en");
   const isDesktop = useIsDesktop();
 
   // ── Visit counter — fire once on mount ──────────────────────────────────
@@ -4095,9 +4200,15 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
               <a key={l} href={h} style={{ color: T.textMuted, fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em" }}
                 onMouseEnter={e => (e.currentTarget.style.color = T.blue)} onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}>{l}</a>
             ))}
+            {/* Language toggle */}
+            <button onClick={() => setLang(l => l === "en" ? "es" : "en")}
+              aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
+              style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.06em" }}>
+              {lang === "en" ? "ES" : "EN"}
+            </button>
             <a href="tel:+15803355588" aria-label="Call CADC at 580-335-5588"
               style={{ background: T.maroon, color: "white", padding: isDesktop ? "9px 16px" : "9px 13px", borderRadius: 8, fontSize: 12, fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}>
-              📞 {isDesktop ? "580-335-5588" : "Call"}
+              📞 {isDesktop ? "580-335-5588" : t("Call", lang)}
             </a>
           </div>
         </nav>
@@ -4106,7 +4217,7 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
         {/* Breadcrumb strip — single clean row, only when navigating the orbit */}
         {crumbs && crumbs.length > 0 && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: isDesktop ? "7px 32px" : "7px 14px", background: T.void, borderTop: `1px solid ${T.border}` }}>
-            {onBack && <button onClick={onBack} aria-label="Go back one step" style={{ ...btn, height: 28, padding: "0 10px", fontSize: 12, fontWeight: 700 }}>← Back</button>}
+            {onBack && <button onClick={onBack} aria-label="Go back one step" style={{ ...btn, height: 28, padding: "0 10px", fontSize: 12, fontWeight: 700 }}>{`← ${t("Back", lang)}`}</button>}
             <div aria-label="You are here" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.textMuted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
               {crumbs.map((c, i) => (
                 <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0 }}>
