@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_CONTENT,
   fetchLeads, fetchStats, fetchVolunteer, fetchBookings,
-  type SiteContent, type Meal, type MarketStop, type StaffMember,
+  type SiteContent, type SiteFeatures, type Meal, type MarketStop, type StaffMember,
   type PublicDoc, type IntakeLead, type SiteStats, type VolunteerEntry,
   type TransitBooking,
 } from "@/lib/cms";
@@ -22,8 +22,9 @@ const input: React.CSSProperties = { width: "100%", fontSize: 16, padding: "12px
 const lbl: React.CSSProperties = { color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", display: "block" };
 const btn = (bg = BLUE, fg = "white"): React.CSSProperties => ({ background: bg, color: fg, border: bg === "white" ? `1px solid ${BLUE}` : "none", borderRadius: 10, padding: "12px 18px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit" });
 
-type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings";
+type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings" | "features";
 const TABS: { id: Tab; label: string; icon: string; who: string }[] = [
+  { id: "features",  label: "Features",      icon: "⚡", who: "Leslea" },
   { id: "announce",  label: "Alert",         icon: "🚨", who: "Leslea" },
   { id: "menu",      label: "Senior Menu",   icon: "🍽️", who: "Laura" },
   { id: "market",    label: "Market",        icon: "🛒", who: "Scott" },
@@ -134,7 +135,7 @@ export default function AdminPage() {
     </div>
   );
 
-  const isContentTab = ["announce","menu","market","staff","docs"].includes(tab);
+  const isContentTab = ["features","announce","menu","market","staff","docs"].includes(tab);
 
   return (
     <div style={{ minHeight: "100vh", background: "#F8F9FF", fontFamily: "'Space Grotesk','Inter',sans-serif", color: "#111827" }}>
@@ -162,6 +163,7 @@ export default function AdminPage() {
         {loading && <p style={{ color: MUTED }}>Loading…</p>}
         {isContentTab && <p style={{ color: MUTED, fontSize: 12, margin: "6px 0 14px" }}>Usually updated by <strong>{TABS.find(t => t.id === tab)?.who}</strong>. Last update: {new Date(content.updatedAt).toLocaleString()} by {content.updatedBy}.</p>}
 
+        {tab === "features"  && <FeaturesEditor   v={content.features ?? { transitBooking: false, intakeLeads: false, volunteerLog: false }} onChange={v => update("features" as keyof SiteContent, v)} />}
         {tab === "announce"  && <AnnounceEditor  v={content.announcement}    onChange={v => update("announcement", v)} />}
         {tab === "menu"      && <MenuEditor       v={content.seniorMenu}       onChange={v => update("seniorMenu", v)} />}
         {tab === "market"    && <MarketEditor     v={content.marketSchedule}   onChange={v => update("marketSchedule", v)} />}
@@ -525,6 +527,52 @@ function DocsEditor({ v, onChange }: { v: PublicDoc[]; onChange: (v: PublicDoc[]
         </div>
       ))}
       <button style={{ ...btn(), width: "100%" }} onClick={() => onChange([...v, { label: "", href: "/documents/" }])}>+ Add document</button>
+    </>
+  );
+}
+
+// ─── Features Editor ──────────────────────────────────────────────────────────
+function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFeatures) => void }) {
+  const features: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
+    { key: "transitBooking", label: "Online Ride Booking",    icon: "🚌", desc: "Shows the online ride request form on Transit → Schedule a Ride. When off, displays the call button only." },
+    { key: "intakeLeads",    label: "Follow-Up Capture",      icon: "📥", desc: "Shows the follow-up contact form on Head Start, Weatherization, and Advantage eligibility pages. Sends leads to the Intake Leads tab." },
+    { key: "volunteerLog",   label: "Volunteer Hour Logger",  icon: "🤝", desc: "Shows the public volunteer hour submission form. When off, only admin staff can log hours from this panel." },
+  ];
+  return (
+    <>
+      <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          Turn site features on or off without a code change. Features marked <strong>Off</strong> are hidden from the public but stay fully built — flip them on anytime. Save after toggling.
+        </p>
+      </div>
+      {features.map(f => (
+        <div key={f.key} style={{ ...card, display: "flex", alignItems: "flex-start", gap: 14 }}>
+          <div style={{ fontSize: 28, flexShrink: 0 }}>{f.icon}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span style={{ fontWeight: 800, fontSize: 15 }}>{f.label}</span>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: v[f.key] ? GREEN : MUTED }}>{v[f.key] ? "ON" : "Off"}</span>
+                <div
+                  onClick={() => onChange({ ...v, [f.key]: !v[f.key] })}
+                  style={{
+                    width: 44, height: 24, borderRadius: 12, cursor: "pointer",
+                    background: v[f.key] ? GREEN : "#D1D5DB",
+                    position: "relative", transition: "background 0.2s ease",
+                  }}
+                >
+                  <div style={{
+                    position: "absolute", top: 2, left: v[f.key] ? 22 : 2,
+                    width: 20, height: 20, borderRadius: "50%", background: "white",
+                    transition: "left 0.2s ease", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                  }} />
+                </div>
+              </label>
+            </div>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: 0, lineHeight: 1.5 }}>{f.desc}</p>
+          </div>
+        </div>
+      ))}
     </>
   );
 }
