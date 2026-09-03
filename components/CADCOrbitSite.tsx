@@ -2787,7 +2787,9 @@ const PROGRAMS: ProgramData[] = [
         content: <WeatherizationInterestForm />,
       },
     ],
-  }, ────────────────────────────────────────────────────────
+  },
+
+  // ── 4. SENIOR MEALS ────────────────────────────────────────────────────────
   {
     slug: "senior-meals",
     name: "Senior Nutrition",
