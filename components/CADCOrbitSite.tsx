@@ -142,6 +142,14 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
   return <CmsContext.Provider value={content}>{children}</CmsContext.Provider>;
 }
 
+// ─── Lang context — shared across orbit + about + contact pages ───────────────
+const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: "en", setLang: () => {} });
+export function useLang() { return useContext(LangContext); }
+export function LangProvider({ children }: { children: React.ReactNode }) {
+  const [lang, setLang] = useState<Lang>("en");
+  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>;
+}
+
 
 // ─── Stat tracking helpers ────────────────────────────────────────────────────
 function trackStat(type: "program" | "county" | "search" | "visit", key?: string) {
@@ -3388,7 +3396,7 @@ function CADCOrbitSiteInner() {
   const [beamNode, setBeamNode] = useState<string | null>(null);
   const [orbitTx, setOrbitTx] = useState<TransitionState>("idle");
   const [assembled, setAssembled] = useState(false);
-  const [lang, setLang] = useState<Lang>("en");
+  const { lang, setLang } = useLang();
   const isDesktop = useIsDesktop();
 
   // ── Visit counter — fire once on mount ──────────────────────────────────
@@ -4170,6 +4178,7 @@ export interface CADCHeaderProps {
 export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
   const isDesktop = useIsDesktop();
   const { announcement } = useCms();
+  const { lang, setLang } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const btn: React.CSSProperties = { background: "white", border: `1px solid ${T.border}`, borderRadius: 8, cursor: "pointer", color: T.blue, display: "flex", alignItems: "center", justifyContent: "center" };
@@ -4856,7 +4865,7 @@ export default function CADCOrbitSite() {
         <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
       </div>
     }>
-      <CmsProvider><CADCOrbitSiteInner /></CmsProvider>
+      <LangProvider><CmsProvider><CADCOrbitSiteInner /></CmsProvider></LangProvider>
     </Suspense>
   );
 }
