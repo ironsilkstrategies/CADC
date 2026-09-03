@@ -60,10 +60,17 @@ export interface TransitBooking {
   notes?: string;
 }
 
+export interface SiteFeatures {
+  transitBooking: boolean;   // online ride request form on Transit → Schedule page
+  intakeLeads: boolean;      // follow-up capture form on eligibility/enrollment pages
+  volunteerLog: boolean;     // public volunteer hour submission form (Head Start)
+}
+
 export interface SiteContent {
   updatedAt: string;
   updatedBy: string;
   announcement: { enabled: boolean; text: string; href?: string; type?: "info" | "urgent" | "closed" };
+  features: SiteFeatures;
   seniorMenu: { month: string; year: number; note: string; meals: Record<string, Meal> };
   marketSchedule: { month: string; year: number; note: string; transportation: string; stops: Record<string, MarketStop[]> };
   staff: StaffMember[];
@@ -80,6 +87,11 @@ export const DEFAULT_CONTENT: SiteContent = {
   updatedAt: "2026-09-01T00:00:00.000Z",
   updatedBy: "seed",
   announcement: { enabled: false, text: "", href: "", type: "info" },
+  features: {
+    transitBooking: false,  // off until amendment signed
+    intakeLeads: false,     // off until amendment signed
+    volunteerLog: false,    // off until amendment signed
+  },
   seniorMenu: {
     month: "September", year: 2026,
     note: "8 oz milk served daily at all congregate sites",
