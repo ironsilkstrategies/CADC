@@ -65,7 +65,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [name, setName] = useState("");
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
-  const [tab, setTab] = useState<Tab>("announce");
+  const [tab, setTab] = useState<Tab>("features");
   const [status, setStatus] = useState("");
   const [dirty, setDirty] = useState(false);
   const [loading, setLoading] = useState(true);
