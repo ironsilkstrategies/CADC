@@ -3370,7 +3370,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
         </g>
       ))}
 
-      {/* Extended-service counties — Transit / Advantage only, lighter tier, clickable */}
+      {/* Extended-service counties — variable programs, lighter tier, clickable */}
       {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC && c.slug && CADC_EXTENDED_COUNTIES.includes(c.slug)).map(c => {
         const isSel = selectedCounty === c.slug;
         const isHov = hovered === c.slug;
@@ -3427,7 +3427,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
         <rect x={72} y={-5} width={10} height={7} rx={1} fill={greyFill} stroke={greyStroke} strokeWidth={0.8}/>
         <text x={85} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Other County</text>
         <rect x={145} y={-5} width={10} height={7} rx={1} fill="rgba(1,1,255,0.05)" stroke="rgba(1,1,255,0.4)" strokeWidth={0.8} strokeDasharray="2 1.5"/>
-        <text x={158} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Transit / Advantage only</text>
+        <text x={158} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Extended service area</text>
         <circle cx={240} cy={-1.5} r={3} fill="#CC0000"/>
         <text x={246} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
       </g>
