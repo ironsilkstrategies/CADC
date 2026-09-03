@@ -1941,6 +1941,452 @@ function BoardDocsSectionGated() {
   return <BoardDocsPanel />;
 }
 
+// ─── Shared form hook ─────────────────────────────────────────────────────────
+async function submitLead(payload: Record<string, string>, program: string, step: string) {
+  return fetch("/api/cms/leads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...payload, program, step }),
+  }).catch(() => null);
+}
+
+// ─── 1. Universal Service Screener ────────────────────────────────────────────
+function ServiceScreenerForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ county: "", householdSize: "", income: "", hasChildren: "", age60plus: "", ownRent: "" });
+  const [results, setResults] = useState<string[] | null>(null);
+  const [state, setState] = useState<"idle"|"done">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formServiceScreener) return null;
+
+  function screen() {
+    const programs: string[] = [];
+    if (form.hasChildren === "yes-0-3") programs.push("Early Head Start");
+    if (form.hasChildren === "yes-3-5") programs.push("Head Start");
+    if (form.hasChildren === "yes-0-3" || form.hasChildren === "yes-3-5") programs.push("Head Start & Early Head Start");
+    if (parseInt(form.householdSize) > 0 && form.ownRent !== "") programs.push("Weatherization Assistance");
+    if (form.age60plus === "yes") programs.push("Senior Nutrition / Congregate Meals");
+    if (form.age60plus === "yes") programs.push("Advantage Home Delivered Meals");
+    if (form.county !== "") programs.push("Red River Transportation");
+    programs.push("VITA Free Tax Help");
+    if (form.income !== "" && parseInt(form.income) < 40000) programs.push("Community Market");
+    const unique = [...new Set(programs)];
+    setResults(unique);
+    submitLead({ ...form, matchedPrograms: unique.join(", ") }, "service-screener", "screener-complete");
+    setState("done");
+  }
+
+  if (state === "done" && results) return (
+    <div className="cadc-light-content">
+      <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669" }}>
+        <p style={{ fontWeight: 800, color: "#059669", fontSize: 15, margin: "0 0 10px" }}>✅ Based on your answers, you may qualify for:</p>
+        {results.map(r => <div key={r} style={{ padding: "8px 0", borderBottom: "1px solid #E5E7EB", fontWeight: 700, fontSize: 14 }}>• {r}</div>)}
+        <p style={{ fontSize: 12, color: "#6B7280", margin: "12px 0 0" }}>Eligibility is determined by CADC staff. Call us to confirm and start the process.</p>
+      </div>
+      <a href="tel:+15803355588" className="cadc-btn" style={{ display: "block", textAlign: "center", marginTop: 12 }}>📞 Call CADC — 580-335-5588</a>
+      <button className="cadc-btn" style={{ width: "100%", marginTop: 8, background: "white", color: T.blue, border: `1px solid ${T.blue}` }} onClick={() => { setState("idle"); setResults(null); }}>Start Over</button>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+      <div className="cadc-card">
+        <p className="cadc-label">Your county</p>
+        <select className="cadc-input" value={form.county} onChange={f("county")}>
+          <option value="">Select county</option>
+          {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label" style={{marginTop:10}}>Household size</p>
+        <select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}>
+          <option value="">Select</option>
+          {["1","2","3","4","5","6","7","8+"].map(n => <option key={n} value={n}>{n} {n === "1" ? "person" : "people"}</option>)}
+        </select>
+        <p className="cadc-label" style={{marginTop:10}}>Approximate annual household income</p>
+        <select className="cadc-input" value={form.income} onChange={f("income")}>
+          <option value="">Select range</option>
+          <option value="15000">Under $15,000</option>
+          <option value="25000">$15,000 – $25,000</option>
+          <option value="35000">$25,000 – $35,000</option>
+          <option value="50000">$35,000 – $50,000</option>
+          <option value="75000">Over $50,000</option>
+        </select>
+        <p className="cadc-label" style={{marginTop:10}}>Do you have children in your household?</p>
+        <select className="cadc-input" value={form.hasChildren} onChange={f("hasChildren")}>
+          <option value="">Select</option>
+          <option value="yes-0-3">Yes — under age 3 (or pregnant)</option>
+          <option value="yes-3-5">Yes — ages 3–5</option>
+          <option value="yes-older">Yes — school age or older</option>
+          <option value="no">No children</option>
+        </select>
+        <p className="cadc-label" style={{marginTop:10}}>Is anyone in your household age 60 or older?</p>
+        <select className="cadc-input" value={form.age60plus} onChange={f("age60plus")}>
+          <option value="">Select</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+        <p className="cadc-label" style={{marginTop:10}}>Do you own or rent your home?</p>
+        <select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}>
+          <option value="">Select</option>
+          <option value="own">Own</option>
+          <option value="rent">Rent</option>
+          <option value="other">Other / not applicable</option>
+        </select>
+        <button className="cadc-btn" style={{ width: "100%", marginTop: 14 }} onClick={screen} disabled={!form.county || !form.householdSize}>See My Results →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 2. Head Start Pre-Enrollment Form ───────────────────────────────────────
+function HeadStartPreEnrollForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ parentName: "", phone: "", county: "", childDob: "", centerPref: "", receiving: "", specialNeeds: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formHeadStartPreEnroll) return null;
+
+  if (state === "done") return (
+    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
+      <p style={{ fontSize: 28, margin: "0 0 8px" }}>✅</p>
+      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>We received your interest!</p>
+      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A Head Start staff member will call you soon. Questions? Call Robin Harris directly at <a href="tel:+15807263343" style={{ color: T.blue, fontWeight: 700 }}>580-726-3343</a>.</p>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Not ready to apply through ChildPlus yet? Let us know you're interested and we'll reach out to walk you through the process.</p>
+      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name and phone number.</p>}
+      <div className="cadc-card">
+        <p className="cadc-label">Your name *</p>
+        <input className="cadc-input" value={form.parentName} onChange={f("parentName")} placeholder="Parent or guardian name" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">Phone number *</p>
+        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">County</p>
+        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+          <option value="">Select county</option>
+          {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label">Child's approximate date of birth</p>
+        <input className="cadc-input" type="date" value={form.childDob} onChange={f("childDob")} style={{ marginBottom: 10 }} />
+        <p className="cadc-label">Preferred center (if known)</p>
+        <select className="cadc-input" value={form.centerPref} onChange={f("centerPref")} style={{ marginBottom: 10 }}>
+          <option value="">No preference / not sure</option>
+          {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label">Does your family receive SNAP, SSI, or TANF?</p>
+        <select className="cadc-input" value={form.receiving} onChange={f("receiving")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+          <option value="unsure">Not sure</option>
+        </select>
+        <p className="cadc-label">Does your child have any special needs or disability services?</p>
+        <select className="cadc-input" value={form.specialNeeds} onChange={f("specialNeeds")} style={{ marginBottom: 14 }}>
+          <option value="">Select</option>
+          <option value="yes">Yes — currently receiving services</option>
+          <option value="suspected">Possibly — not yet evaluated</option>
+          <option value="no">No</option>
+        </select>
+        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+          if (!form.parentName || !form.phone) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "head-start", "pre-enrollment");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Submit Interest →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 3. Weatherization Interest Form ─────────────────────────────────────────
+function WeatherizationInterestForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ name: "", phone: "", address: "", county: "", ownRent: "", householdSize: "", hasElderly: "", hasDisability: "", hasChildren: "", primaryHeat: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formWeatherizationInterest) return null;
+
+  if (state === "done") return (
+    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
+      <p style={{ fontSize: 28, margin: "0 0 8px" }}>✅</p>
+      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>You're on the list!</p>
+      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Robert Meador's team will be in touch to discuss next steps. Questions? Call <a href="tel:+15803050853" style={{ color: T.blue, fontWeight: 700 }}>580-305-0853</a>.</p>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Fill out this form to be added to the Weatherization waitlist. Priority is given to households with elderly members, people with disabilities, and children 18 and under.</p>
+      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name, phone, and county.</p>}
+      <div className="cadc-card">
+        <p className="cadc-label">Your name *</p>
+        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">Phone number *</p>
+        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">Home address</p>
+        <input className="cadc-input" value={form.address} onChange={f("address")} placeholder="Street address" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">County *</p>
+        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+          <option value="">Select county</option>
+          {["Beckham","Caddo","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+          <div>
+            <p className="cadc-label">Own or rent?</p>
+            <select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}>
+              <option value="">Select</option>
+              <option value="own">Own</option>
+              <option value="rent">Rent</option>
+            </select>
+          </div>
+          <div>
+            <p className="cadc-label">Household size</p>
+            <select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}>
+              <option value="">Select</option>
+              {["1","2","3","4","5","6","7","8+"].map(n => <option key={n}>{n}</option>)}
+            </select>
+          </div>
+        </div>
+        <p className="cadc-label">Priority factors (check all that apply)</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 10 }}>
+          {[["hasElderly","Age 60+"],["hasDisability","Disability"],["hasChildren","Children 18 & under"]].map(([key, label]) => (
+            <button key={key} onClick={() => setForm(p => ({ ...p, [key]: p[key as keyof typeof p] === "yes" ? "" : "yes" }))}
+              style={{ padding: "10px 6px", borderRadius: 8, border: `2px solid ${form[key as keyof typeof form] === "yes" ? T.blue : "#E5E7EB"}`, background: form[key as keyof typeof form] === "yes" ? T.blueLight : "white", fontWeight: 700, fontSize: 12, cursor: "pointer", color: T.blue }}>{label}</button>
+          ))}
+        </div>
+        <p className="cadc-label">Primary heating source</p>
+        <select className="cadc-input" value={form.primaryHeat} onChange={f("primaryHeat")} style={{ marginBottom: 14 }}>
+          <option value="">Select</option>
+          <option value="electric">Electric</option>
+          <option value="natural-gas">Natural gas</option>
+          <option value="propane">Propane</option>
+          <option value="oil">Fuel oil</option>
+          <option value="wood">Wood / biomass</option>
+          <option value="other">Other</option>
+        </select>
+        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+          if (!form.name || !form.phone || !form.county) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "weatherization", "interest-form");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Join Waitlist →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 4. VITA Appointment Request ──────────────────────────────────────────────
+function VitaAppointmentForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ name: "", phone: "", county: "", returnType: "", language: "", preferredDate: "", notes: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formVitaAppointment) return null;
+
+  if (state === "done") return (
+    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
+      <p style={{ fontSize: 28, margin: "0 0 8px" }}>✅</p>
+      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Appointment request received!</p>
+      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A VITA tax preparer will call to confirm your appointment. Questions? Call <a href="tel:+15803355588" style={{ color: T.blue, fontWeight: 700 }}>580-335-5588</a>.</p>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Request a free tax preparation appointment. VITA is available to households earning approximately $67,000 or less. Our certified volunteers handle federal and state returns at no cost.</p>
+      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name and phone number.</p>}
+      <div className="cadc-card">
+        <p className="cadc-label">Your name *</p>
+        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">Phone number *</p>
+        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 10 }} />
+        <p className="cadc-label">County</p>
+        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+          <option value="">Select county</option>
+          {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label">Type of tax return</p>
+        <select className="cadc-input" value={form.returnType} onChange={f("returnType")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="single">Single / no dependents</option>
+          <option value="married">Married filing jointly</option>
+          <option value="dependents">With dependents</option>
+          <option value="self-employed">Self-employed / 1099</option>
+          <option value="unsure">Not sure</option>
+        </select>
+        <p className="cadc-label">Preferred language</p>
+        <select className="cadc-input" value={form.language} onChange={f("language")} style={{ marginBottom: 10 }}>
+          <option value="english">English</option>
+          <option value="spanish">Spanish / Español</option>
+        </select>
+        <p className="cadc-label">Preferred appointment date (optional)</p>
+        <input className="cadc-input" type="date" value={form.preferredDate} onChange={f("preferredDate")} style={{ marginBottom: 10 }} />
+        <p className="cadc-label">Anything we should know?</p>
+        <textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Prior year returns, rental income, etc." style={{ minHeight: 64, marginBottom: 14 }} />
+        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+          if (!form.name || !form.phone) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "tax-help", "appointment-request");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Request Appointment →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 5. Volunteer Interest Form ───────────────────────────────────────────────
+function VolunteerInterestForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ name: "", phone: "", email: "", county: "", programs: "", availability: "", skills: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formVolunteerInterest) return null;
+
+  if (state === "done") return (
+    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
+      <p style={{ fontSize: 28, margin: "0 0 8px" }}>🤝</p>
+      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Thank you for volunteering!</p>
+      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A CADC staff member will be in touch to connect you with the right program. We appreciate you.</p>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Every volunteer hour helps keep our programs free for the families who need them. Tell us a little about yourself and we'll connect you with the right opportunity.</p>
+      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name and phone number.</p>}
+      <div className="cadc-card">
+        <p className="cadc-label">Your name *</p>
+        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" style={{ marginBottom: 10 }} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+          <div><p className="cadc-label">Phone *</p><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+          <div><p className="cadc-label">Email (optional)</p><input className="cadc-input" type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" /></div>
+        </div>
+        <p className="cadc-label">Your county</p>
+        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+          <option value="">Select county</option>
+          {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label">Which programs interest you?</p>
+        <select className="cadc-input" value={form.programs} onChange={f("programs")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="head-start">Head Start / Early Head Start</option>
+          <option value="senior-nutrition">Senior Nutrition</option>
+          <option value="community-market">Community Market</option>
+          <option value="weatherization">Weatherization</option>
+          <option value="transit">Red River Transportation</option>
+          <option value="any">Open to anything</option>
+        </select>
+        <p className="cadc-label">Availability</p>
+        <select className="cadc-input" value={form.availability} onChange={f("availability")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="weekday-mornings">Weekday mornings</option>
+          <option value="weekday-afternoons">Weekday afternoons</option>
+          <option value="evenings">Evenings</option>
+          <option value="weekends">Weekends</option>
+          <option value="flexible">Flexible</option>
+        </select>
+        <p className="cadc-label">Skills or certifications (optional)</p>
+        <textarea className="cadc-input" value={form.skills} onChange={f("skills")} placeholder="Teaching, cooking, driving, CPR certified, etc." style={{ minHeight: 64, marginBottom: 14 }} />
+        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+          if (!form.name || !form.phone) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "volunteer", "interest-form");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Submit Volunteer Interest →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 6. Community Needs Survey ────────────────────────────────────────────────
+function CommunityNeedsSurvey() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ county: "", topNeed: "", barrier: "", awareness: "", satisfaction: "", suggestion: "", phone: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formCommunityNeeds) return null;
+
+  if (state === "done") return (
+    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
+      <p style={{ fontSize: 28, margin: "0 0 8px" }}>📊</p>
+      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Thank you for your feedback!</p>
+      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Your responses help CADC serve your community better. We read every submission.</p>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Help us understand what your community needs most. This survey takes less than 2 minutes and directly shapes how CADC plans its programs and services.</p>
+      <div className="cadc-card">
+        <p className="cadc-label">Your county</p>
+        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+          <option value="">Select county</option>
+          {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label">What service does your community need most?</p>
+        <select className="cadc-input" value={form.topNeed} onChange={f("topNeed")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="transportation">Transportation / transit</option>
+          <option value="childcare">Childcare / Head Start</option>
+          <option value="food">Food / groceries</option>
+          <option value="weatherization">Home energy / weatherization</option>
+          <option value="senior-meals">Senior meals / nutrition</option>
+          <option value="tax-help">Free tax help</option>
+          <option value="employment">Employment / job training</option>
+          <option value="healthcare">Healthcare access</option>
+          <option value="housing">Housing assistance</option>
+        </select>
+        <p className="cadc-label">What is the biggest barrier to accessing services in your area?</p>
+        <select className="cadc-input" value={form.barrier} onChange={f("barrier")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="transportation">No transportation to get there</option>
+          <option value="awareness">Didn't know the service existed</option>
+          <option value="hours">Hours don't work with my schedule</option>
+          <option value="language">Language barrier</option>
+          <option value="eligibility">Thought I wouldn't qualify</option>
+          <option value="distance">Too far away</option>
+          <option value="none">No major barriers</option>
+        </select>
+        <p className="cadc-label">How did you hear about CADC?</p>
+        <select className="cadc-input" value={form.awareness} onChange={f("awareness")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="word-of-mouth">Word of mouth / family or friend</option>
+          <option value="school">School or Head Start center</option>
+          <option value="social-media">Social media</option>
+          <option value="internet">Internet search</option>
+          <option value="flyer">Flyer or brochure</option>
+          <option value="other-agency">Another agency or organization</option>
+          <option value="already-client">Already a CADC client</option>
+        </select>
+        <p className="cadc-label">How would you rate CADC services overall?</p>
+        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+          {["⭐","⭐⭐","⭐⭐⭐","⭐⭐⭐⭐","⭐⭐⭐⭐⭐"].map((stars, i) => (
+            <button key={i} onClick={() => setForm(p => ({ ...p, satisfaction: String(i+1) }))}
+              style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: `2px solid ${form.satisfaction === String(i+1) ? T.blue : "#E5E7EB"}`, background: form.satisfaction === String(i+1) ? T.blueLight : "white", cursor: "pointer", fontSize: 12 }}>{i+1}</button>
+          ))}
+        </div>
+        <p className="cadc-label">Any suggestions for how CADC can better serve your community?</p>
+        <textarea className="cadc-input" value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." style={{ minHeight: 72, marginBottom: 10 }} />
+        <p className="cadc-label">Phone (optional — if you'd like a follow-up)</p>
+        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 14 }} />
+        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+          setState("sending");
+          await submitLead({ ...form }, "community-survey", "needs-survey");
+          setState("done");
+        }}>{state === "sending" ? "Sending…" : "Submit Survey →"}</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Board Documents Panel ────────────────────────────────────────────────────
 function BoardDocsPanel() {
   const { boardDocs } = useCms();
@@ -2066,6 +2512,10 @@ const PROGRAMS: ProgramData[] = [
             </div>
           </IntakeLeadSection>
         ),
+      },
+      {
+        id: "hs-pre-enroll", label: "Express Interest", shortLabel: "Interest", icon: "✋",
+        content: <HeadStartPreEnrollForm />,
       },
       {
         id: "ehs-education", label: "EHS Education", shortLabel: "EHS Ed", icon: "🧸",
@@ -2332,10 +2782,12 @@ const PROGRAMS: ProgramData[] = [
           </IntakeLeadSection>
         ),
       },
+      {
+        id: "weath-interest", label: "Join Waitlist", shortLabel: "Waitlist", icon: "📝",
+        content: <WeatherizationInterestForm />,
+      },
     ],
-  },
-
-  // ── 4. SENIOR MEALS ────────────────────────────────────────────────────────
+  }, ────────────────────────────────────────────────────────
   {
     slug: "senior-meals",
     name: "Senior Nutrition",
@@ -2499,6 +2951,10 @@ const PROGRAMS: ProgramData[] = [
             </div>
           </div>
         ),
+      },
+      {
+        id: "vita-appointment", label: "Request Appointment", shortLabel: "Appointment", icon: "📅",
+        content: <VitaAppointmentForm />,
       },
     ],
   },
@@ -2825,6 +3281,18 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "board-docs", label: "Documents & Minutes", shortLabel: "Documents", icon: "📄",
         content: <BoardDocsSectionGated />,
+      },
+      {
+        id: "volunteer-form", label: "Volunteer", shortLabel: "Volunteer", icon: "🤝",
+        content: <VolunteerInterestForm />,
+      },
+      {
+        id: "community-survey", label: "Community Survey", shortLabel: "Survey", icon: "📊",
+        content: <CommunityNeedsSurvey />,
+      },
+      {
+        id: "service-screener", label: "Find My Benefits", shortLabel: "Screener", icon: "🔍",
+        content: <ServiceScreenerForm />,
       },
     ],
   },
