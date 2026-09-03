@@ -33,34 +33,39 @@ export interface TransitBooking {
   notes?: string;
 }
 
-// ─── #7 Content scheduling ────────────────────────────────────────────────────
 export interface ScheduledItem {
-  id: string;
-  title: string;
+  id: string; title: string;
   section: "announcement" | "seniorMenu" | "marketSchedule" | "staff" | "documents" | "boardDocs";
-  publishAt: string;       // ISO — goes live at this datetime
-  expiresAt?: string;      // ISO — optional auto-expiry
-  payload: unknown;        // the content to swap in at publish time
+  publishAt: string; expiresAt?: string; payload: unknown;
   status: "scheduled" | "published" | "expired" | "cancelled";
-  createdBy: string;
-  createdAt: string;
+  createdBy: string; createdAt: string;
 }
 
-// ─── #9 Board document portal ─────────────────────────────────────────────────
 export interface BoardDoc {
-  id: string;
-  title: string;
+  id: string; title: string;
   category: "agenda" | "minutes" | "resolution" | "policy-council" | "annual-report" | "other";
-  date: string;            // YYYY-MM-DD — meeting or document date
-  href: string;            // /documents/board/filename.pdf
-  uploadedBy: string;
-  uploadedAt: string;
+  date: string; href: string; uploadedBy: string; uploadedAt: string;
 }
 
+// ─── Feature flags ────────────────────────────────────────────────────────────
+// All features default OFF. Toggle from /admin → ⚡ Features tab.
+// CONTRACT SCOPE (base $2,995 — always available):
+//   None of the below — base site content is always on.
+// AMENDMENT SCOPE (premium — toggle on when deal signed):
+//   transitBooking, intakeLeads, volunteerLog, spanishToggle,
+//   faqAccordion, boardPortal, contentScheduling, grantPdf
 export interface SiteFeatures {
-  transitBooking: boolean;
-  intakeLeads: boolean;
-  volunteerLog: boolean;
+  // ── Base site features (can be toggled for operational reasons) ──
+  spanishToggle: boolean;      // ES/EN language toggle in header
+
+  // ── Amendment scope — off until contract signed ───────────────
+  transitBooking: boolean;     // online ride request form (Transit → Schedule)
+  intakeLeads: boolean;        // follow-up capture on eligibility pages
+  volunteerLog: boolean;       // public volunteer hour submission (Head Start)
+  faqAccordion: boolean;       // Head Start FAQ section (Robin requested)
+  boardPortal: boolean;        // Board Documents portal (Tiffany uploads)
+  contentScheduling: boolean;  // scheduled content publishing system
+  grantPdf: boolean;           // quarterly grant impact PDF generator
 }
 
 export interface SiteContent {
@@ -86,7 +91,16 @@ export const DEFAULT_CONTENT: SiteContent = {
   updatedAt: "2026-09-01T00:00:00.000Z",
   updatedBy: "seed",
   announcement: { enabled: false, text: "", href: "", type: "info" },
-  features: { transitBooking: false, intakeLeads: false, volunteerLog: false, spanishToggle: false },
+  features: {
+    spanishToggle:     false,
+    transitBooking:    false,
+    intakeLeads:       false,
+    volunteerLog:      false,
+    faqAccordion:      false,
+    boardPortal:       false,
+    contentScheduling: false,
+    grantPdf:          false,
+  },
   boardDocs: [],
   seniorMenu: {
     month: "September", year: 2026,
@@ -166,41 +180,22 @@ export async function fetchContent(): Promise<SiteContent> {
     const r = await fetch("/api/cms", { cache: "no-store" });
     if (!r.ok) return DEFAULT_CONTENT;
     const j = await r.json();
-    return { ...DEFAULT_CONTENT, ...j };
+    return { ...DEFAULT_CONTENT, ...j, features: { ...DEFAULT_CONTENT.features, ...(j.features ?? {}) } };
   } catch { return DEFAULT_CONTENT; }
 }
 
 export async function fetchLeads(adminKey: string): Promise<IntakeLead[]> {
-  try {
-    const r = await fetch("/api/cms/leads", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return []; return r.json();
-  } catch { return []; }
+  try { const r = await fetch("/api/cms/leads", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
 }
-
 export async function fetchStats(adminKey: string): Promise<SiteStats | null> {
-  try {
-    const r = await fetch("/api/cms/stats", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return null; return r.json();
-  } catch { return null; }
+  try { const r = await fetch("/api/cms/stats", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return null; return r.json(); } catch { return null; }
 }
-
 export async function fetchVolunteer(adminKey: string): Promise<VolunteerEntry[]> {
-  try {
-    const r = await fetch("/api/cms/volunteer", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return []; return r.json();
-  } catch { return []; }
+  try { const r = await fetch("/api/cms/volunteer", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
 }
-
 export async function fetchBookings(adminKey: string): Promise<TransitBooking[]> {
-  try {
-    const r = await fetch("/api/cms/bookings", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return []; return r.json();
-  } catch { return []; }
+  try { const r = await fetch("/api/cms/bookings", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
 }
-
 export async function fetchSchedule(adminKey: string): Promise<ScheduledItem[]> {
-  try {
-    const r = await fetch("/api/cms/schedule", { headers: { "x-admin-key": adminKey }, cache: "no-store" });
-    if (!r.ok) return []; return r.json();
-  } catch { return []; }
+  try { const r = await fetch("/api/cms/schedule", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
 }
