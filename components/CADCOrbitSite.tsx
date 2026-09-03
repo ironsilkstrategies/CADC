@@ -1071,7 +1071,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
                 style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
             : isSubLevel
               ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"92%",height:"92%",objectFit:"contain",display:"block",mixBlendMode:"multiply"}} />}
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />}
         </span>
         {/* Only show text label at entry stage — hide when program icon fills hub */}
         {!isSubLevel && (
@@ -3610,7 +3610,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
                 style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
             : (stage === "program" || stage === "content")
               ? activeProgram?.icon
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "85%", height: "85%", objectFit: "contain", display: "block", mixBlendMode: "multiply" }} />}
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "85%", height: "85%", objectFit: "contain", display: "block" }} />}
         </span>
         {!(stage === "program" || stage === "content") && (
           <span style={{
@@ -4374,7 +4374,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
           : (stage === "program" || stage === "content")
               ? <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{activeProgram?.icon}</span>
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block", mixBlendMode: "multiply" }} />}
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />}
         {!(stage === "program" || stage === "content") && (
           <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>CADC</span>
         )}
