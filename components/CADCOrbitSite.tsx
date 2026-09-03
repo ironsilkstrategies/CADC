@@ -3262,7 +3262,7 @@ const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
   tillman:      ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   washita:      ["head-start","transit","weatherization","advantage","community-market"],
   // Transit + Advantage extended counties
-  blaine:       ["transit"], caddo: ["transit","advantage"], custer: ["transit","advantage"],
+  blaine:       ["transit"], caddo: ["transit","weatherization","advantage"], custer: ["transit","weatherization","advantage"],
   dewey:        ["transit"], ellis: ["transit"],
   // Weatherization expanded counties per Robert Meador 9/2/2026
   grady:        ["transit","weatherization","advantage"],
