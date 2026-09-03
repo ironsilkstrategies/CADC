@@ -66,6 +66,14 @@ export interface SiteFeatures {
   boardPortal: boolean;        // Board Documents portal (Tiffany uploads)
   contentScheduling: boolean;  // scheduled content publishing system
   grantPdf: boolean;           // quarterly grant impact PDF generator
+
+  // ── Forms & Intake — off until ready ─────────────────────────────────────
+  formServiceScreener: boolean;        // Universal "Find Your Benefits" screener
+  formHeadStartPreEnroll: boolean;     // Head Start pre-enrollment interest form
+  formWeatherizationInterest: boolean; // Weatherization interest/waitlist form
+  formVitaAppointment: boolean;        // VITA tax appointment request form
+  formVolunteerInterest: boolean;      // Volunteer interest & availability form
+  formCommunityNeeds: boolean;         // Community needs survey (quarterly)
 }
 
 export interface SiteContent {
@@ -100,6 +108,12 @@ export const DEFAULT_CONTENT: SiteContent = {
     boardPortal:       false,
     contentScheduling: false,
     grantPdf:          false,
+    formServiceScreener:        false,
+    formHeadStartPreEnroll:     false,
+    formWeatherizationInterest: false,
+    formVitaAppointment:        false,
+    formVolunteerInterest:      false,
+    formCommunityNeeds:         false,
   },
   boardDocs: [],
   seniorMenu: {
