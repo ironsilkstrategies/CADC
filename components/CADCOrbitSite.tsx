@@ -2163,7 +2163,7 @@ const PROGRAMS: ProgramData[] = [
               <a href="https://www.okcommerce.gov/wp-content/uploads/Attachment-A-DOE-26-DHS-26-Income-Guidelines.pdf" target="_blank" rel="noopener noreferrer" className="cadc-link" style={{display:"block",marginTop:8,fontSize:12}}>Source: Oklahoma Commerce DOE WAP Program Notice 26-6 →</a>
             </div>
             </div>
-          </IntakeLeadForm>
+          </IntakeLeadSection>
         ),
       },
     ],
@@ -2698,7 +2698,7 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-note">Or call 405-522-5050</p>
             </div>
             </div>
-          </IntakeLeadForm>
+          </IntakeLeadSection>
         ),
       },
       {
