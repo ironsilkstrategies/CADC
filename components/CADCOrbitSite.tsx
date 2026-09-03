@@ -1058,21 +1058,20 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         aspectRatio:"1/1",
         transform:`translate(-50%,-50%) scale(${hubS})`,
         borderRadius:"50%",
-        background: "white",
+        background: T.void,
         border:`2.5px solid ${T.blue}`,
         boxShadow:`0 0 0 ${8*hubG}px rgba(1,1,255,${0.04+pulseAlpha*0.08}), 0 0 ${40*hubG}px rgba(1,1,255,${0.2+pulseAlpha*0.15}), inset 0 0 20px rgba(1,1,255,${0.05+pulseAlpha*0.05})`,
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
         overflow:"hidden",
         transition:"transform 0s", // let spring handle it
       }}>
-        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"88%",height:"88%"}}>
-          {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
-            ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
-                style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
-            : isSubLevel
-              ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />}
-        </span>
+        {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+          ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+              style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
+          : isSubLevel
+            ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
+            : <img src="/images/cadc-logo.png" alt="CADC"
+                style={{width:"96%",height:"96%",objectFit:"contain",display:"block",padding:"4px"}} />}
         {/* Only show text label at entry stage — hide when program icon fills hub */}
         {!isSubLevel && (
           <span style={{
