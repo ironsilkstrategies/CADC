@@ -178,6 +178,7 @@ interface ProgramData {
   subAreas: SubArea[];
 }
 
+
 // ─── useIsDesktop hook (hoisted — used by MealCalendarPanel and main component) ─
 
 function useIsDesktop() {
