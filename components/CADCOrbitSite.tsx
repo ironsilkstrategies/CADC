@@ -178,7 +178,6 @@ interface ProgramData {
   subAreas: SubArea[];
 }
 
-
 // ─── useIsDesktop hook (hoisted — used by MealCalendarPanel and main component) ─
 
 function useIsDesktop() {
@@ -4001,7 +4000,6 @@ const PROGRAMS: ProgramData[] = [
         content: <VolunteerHub />,
       },
       {
-      {
         id: "transparency", label: "Transparency Center", shortLabel: "Transparency", icon: "📊",
         content: (
           <div className="cadc-light-content">
@@ -4066,7 +4064,6 @@ const PROGRAMS: ProgramData[] = [
           </div>
         ),
       },
-      {
       {
         id: "community-voice", label: "What You Told Us", shortLabel: "Your Voice", icon: "🗣️",
         content: (
