@@ -1782,28 +1782,28 @@ function TransitBookingForm() {
   }
   if (state === "done") return (
     <div className="cadc-light-content">
-      <div className="form-success">
-        <div className="form-success-icon">✅</div>
-        <div className="form-success-title">Ride request received!</div>
-        <div className="form-success-msg">Gilbert's team will confirm your ride by phone. Questions? Call <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700 }}>(580) 335-2691</a>.</div>
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Ride request received!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>Gilbert's team will confirm your ride by phone. Questions? Call <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700 }}>(580) 335-2691</a>.</div>
       </div>
     </div>
   );
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Request a ride online and Gilbert's team will confirm by phone. You can also call directly at <a href="tel:+15803352691" className="cadc-link">(580) 335-2691</a>.</p>
-      {state === "err" && <div className="form-error">Please fill in all required fields.</div>}
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
-        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-        <div className="form-field"><label className="form-label">Pickup address <span className="form-required">*</span></label><input className="cadc-input" value={form.pickupAddress} onChange={f("pickupAddress")} placeholder="Street address, city" /></div>
-        <div className="form-field"><label className="form-label">Destination <span className="form-required">*</span></label><input className="cadc-input" value={form.destination} onChange={f("destination")} placeholder="Where are you going?" /></div>
-        <div className="form-row">
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Date <span className="form-required">*</span></label><input className="cadc-input" type="date" value={form.requestedDate} onChange={f("requestedDate")} /></div>
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Preferred time</label><input className="cadc-input" type="time" value={form.requestedTime} onChange={f("requestedTime")} /></div>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in all required fields.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Pickup address <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.pickupAddress} onChange={f("pickupAddress")} placeholder="Street address, city" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Destination <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.destination} onChange={f("destination")} placeholder="Where are you going?" /></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Date <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="date" value={form.requestedDate} onChange={f("requestedDate")} /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred time</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="time" value={form.requestedTime} onChange={f("requestedTime")} /></div>
         </div>
-        <div className="form-field" style={{marginTop:14}}><label className="form-label">Accessibility needs</label>
-          <select className="cadc-input" value={form.accessibility} onChange={f("accessibility")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, marginTop: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Accessibility needs</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.accessibility} onChange={f("accessibility")}>
             <option value="none">None needed</option>
             <option value="wheelchair">Wheelchair lift needed</option>
             <option value="walker">Walker / mobility aid</option>
@@ -1811,9 +1811,9 @@ function TransitBookingForm() {
             <option value="other">Other — explain in notes</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Additional notes</label><textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" /></div>
-        <button className="form-submit" onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Submit Ride Request →"}</button>
-        <p className="form-note">Spanish-speaking staff available · ADA vehicles on all routes</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Additional notes</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Submit Ride Request →"}</button>
+        <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5, display: "block" }}>Spanish-speaking staff available · ADA vehicles on all routes</p>
       </div>
     </div>
   );
@@ -1840,24 +1840,24 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
     <div>
       {children}
       {state !== "done" ? (
-        <div className="form-card" style={{ marginTop: 14, background: "#F8F8FF", border: `1.5px solid ${T.blue}` }}>
+        <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }} style={{ marginTop: 14, background: "#F8F8FF", border: `1.5px solid ${T.blue}` }}>
           <p style={{ fontSize: 14, fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>Want us to follow up with you?</p>
           <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Leave your name and number and a CADC staff member will reach out to help.</p>
-          <div className="form-field"><label className="form-label">Your name</label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="First and last name" /></div>
-          <div className="form-field"><label className="form-label">Phone number</label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-          <div className="form-field"><label className="form-label">Your county (optional)</label>
-            <select className="cadc-input" value={form.county} onChange={f("county")}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="First and last name" /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county (optional)</label>
+            <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
               <option value="">Select county</option>
               {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
             </select>
           </div>
-          <button className="form-submit" onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request a Follow-Up Call"}</button>
+          <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request a Follow-Up Call"}</button>
         </div>
       ) : (
-        <div className="form-success" style={{ marginTop: 14 }}>
-          <div className="form-success-icon">✅</div>
-          <div className="form-success-title">Got it — we'll be in touch.</div>
-          <div className="form-success-msg">A CADC staff member will call you soon to help.</div>
+        <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }} style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+          <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Got it — we'll be in touch.</div>
+          <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A CADC staff member will call you soon to help.</div>
         </div>
       )}
     </div>
@@ -1982,9 +1982,9 @@ function ServiceScreenerForm() {
 
   if (state === "done" && results) return (
     <div className="cadc-light-content">
-      <div className="form-success">
-        <div className="form-success-icon">🎯</div>
-        <div className="form-success-title">Based on your answers, you may qualify for:</div>
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>🎯</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Based on your answers, you may qualify for:</div>
         <div style={{ marginTop: 12, textAlign: "left" }}>
           {results.map(r => <div key={r} style={{ padding: "8px 0", borderBottom: "1px solid #D1FAE5", fontWeight: 600, fontSize: 14, color: "#111827" }}>✓ {r}</div>)}
         </div>
@@ -1998,21 +1998,21 @@ function ServiceScreenerForm() {
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your county <span className="form-required">*</span></label>
-          <select className="cadc-input" value={form.county} onChange={f("county")}>
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
             <option value="">Select county</option>
             {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Household size <span className="form-required">*</span></label>
-          <select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Household size <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.householdSize} onChange={f("householdSize")}>
             <option value="">Select</option>
             {["1","2","3","4","5","6","7","8+"].map(n => <option key={n} value={n}>{n} {n === "1" ? "person" : "people"}</option>)}
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Approximate annual household income</label>
-          <select className="cadc-input" value={form.income} onChange={f("income")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Approximate annual household income</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.income} onChange={f("income")}>
             <option value="">Select range</option>
             <option value="15000">Under $15,000</option>
             <option value="25000">$15,000 – $25,000</option>
@@ -2021,8 +2021,8 @@ function ServiceScreenerForm() {
             <option value="75000">Over $50,000</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Children in your household?</label>
-          <select className="cadc-input" value={form.hasChildren} onChange={f("hasChildren")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Children in your household?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.hasChildren} onChange={f("hasChildren")}>
             <option value="">Select</option>
             <option value="yes-0-3">Yes — under age 3 or pregnant</option>
             <option value="yes-3-5">Yes — ages 3 to 5</option>
@@ -2030,22 +2030,22 @@ function ServiceScreenerForm() {
             <option value="no">No children</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Anyone in household age 60 or older?</label>
-          <select className="cadc-input" value={form.age60plus} onChange={f("age60plus")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Anyone in household age 60 or older?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.age60plus} onChange={f("age60plus")}>
             <option value="">Select</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Do you own or rent your home?</label>
-          <select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Do you own or rent your home?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.ownRent} onChange={f("ownRent")}>
             <option value="">Select</option>
             <option value="own">Own</option>
             <option value="rent">Rent</option>
             <option value="other">Other / not applicable</option>
           </select>
         </div>
-        <button className="form-submit" onClick={screen} disabled={!form.county || !form.householdSize}>See My Results →</button>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={screen} disabled={!form.county || !form.householdSize}>See My Results →</button>
       </div>
     </div>
   );
@@ -2062,10 +2062,10 @@ function HeadStartPreEnrollForm() {
 
   if (state === "done") return (
     <div className="cadc-light-content">
-      <div className="form-success">
-        <div className="form-success-icon">✅</div>
-        <div className="form-success-title">We received your interest!</div>
-        <div className="form-success-msg">A Head Start staff member will call you soon. Questions? Call Robin Harris at <a href="tel:+15807263343" style={{ color: T.blue, fontWeight: 700 }}>580-726-3343</a>.</div>
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>We received your interest!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A Head Start staff member will call you soon. Questions? Call Robin Harris at <a href="tel:+15807263343" style={{ color: T.blue, fontWeight: 700 }}>580-726-3343</a>.</div>
       </div>
     </div>
   );
@@ -2073,40 +2073,40 @@ function HeadStartPreEnrollForm() {
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Not ready to apply through ChildPlus yet? Let us know you're interested and we'll reach out to walk you through the process.</p>
-      {state === "err" && <div className="form-error">Please fill in your name and phone number.</div>}
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.parentName} onChange={f("parentName")} placeholder="Parent or guardian name" /></div>
-        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-        <div className="form-field"><label className="form-label">County</label>
-          <select className="cadc-input" value={form.county} onChange={f("county")}>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.parentName} onChange={f("parentName")} placeholder="Parent or guardian name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>County</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
             <option value="">Select county</option>
             {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Child's approximate date of birth</label><input className="cadc-input" type="date" value={form.childDob} onChange={f("childDob")} /></div>
-        <div className="form-field"><label className="form-label">Preferred center (if known)</label>
-          <select className="cadc-input" value={form.centerPref} onChange={f("centerPref")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Child's approximate date of birth</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="date" value={form.childDob} onChange={f("childDob")} /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred center (if known)</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.centerPref} onChange={f("centerPref")}>
             <option value="">No preference / not sure</option>
             {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Does your family receive SNAP, SSI, or TANF?</label>
-          <select className="cadc-input" value={form.receiving} onChange={f("receiving")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Does your family receive SNAP, SSI, or TANF?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.receiving} onChange={f("receiving")}>
             <option value="">Select</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
             <option value="unsure">Not sure</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Special needs or disability services?</label>
-          <select className="cadc-input" value={form.specialNeeds} onChange={f("specialNeeds")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Special needs or disability services?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.specialNeeds} onChange={f("specialNeeds")}>
             <option value="">Select</option>
             <option value="yes">Yes — currently receiving services</option>
             <option value="suspected">Possibly — not yet evaluated</option>
             <option value="no">No</option>
           </select>
         </div>
-        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
           if (!form.parentName || !form.phone) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "head-start", "pre-enrollment");
@@ -2127,37 +2127,37 @@ function WeatherizationInterestForm() {
   if (!features?.formWeatherizationInterest) return null;
 
   if (state === "done") return (
-    <div className="form-success">
-      <div className="form-success-icon">✅</div>
-      <div className="form-success-title">You're on the list!</div>
-      <div className="form-success-msg">Robert Meador's team will be in touch to discuss next steps. Questions? Call <a href="tel:+15803050853" style={{ color: T.blue, fontWeight: 700 }}>580-305-0853</a>.</div>
+    <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+      <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+      <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>You're on the list!</div>
+      <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>Robert Meador's team will be in touch to discuss next steps. Questions? Call <a href="tel:+15803050853" style={{ color: T.blue, fontWeight: 700 }}>580-305-0853</a>.</div>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Fill out this form to be added to the Weatherization waitlist. Priority is given to households with elderly members, people with disabilities, and children 18 and under.</p>
-      {state === "err" && <div className="form-error">Please fill in your name, phone, and county.</div>}
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
-        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-        <div className="form-field"><label className="form-label">Home address</label><input className="cadc-input" value={form.address} onChange={f("address")} placeholder="Street address" /></div>
-        <div className="form-field"><label className="form-label">County <span className="form-required">*</span></label><select className="cadc-input" value={form.county} onChange={f("county")}>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name, phone, and county.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Home address</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.address} onChange={f("address")} placeholder="Street address" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>County <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
           <option value="">Select county</option>
           {["Beckham","Caddo","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
         </select></div>
-        <div className="form-row">
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Own or rent?</label><select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}><option value="">Select</option><option value="own">Own</option><option value="rent">Rent</option></select></div>
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Household size</label><select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}><option value="">Select</option>{["1","2","3","4","5","6","7","8+"].map(n => <option key={n}>{n}</option>)}</select></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Own or rent?</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.ownRent} onChange={f("ownRent")}><option value="">Select</option><option value="own">Own</option><option value="rent">Rent</option></select></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Household size</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.householdSize} onChange={f("householdSize")}><option value="">Select</option>{["1","2","3","4","5","6","7","8+"].map(n => <option key={n}>{n}</option>)}</select></div>
         </div>
-        <div className="form-field"><label className="form-label">Priority factors</label>
-        <div className="form-priority-btns">
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Priority factors</label>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
           {[["hasElderly","Age 60+"],["hasDisability","Disability"],["hasChildren","Under 18"]].map(([key, label]) => (
             <button key={key} onClick={() => setForm(p => ({ ...p, [key]: p[key as keyof typeof p] === "yes" ? "" : "yes" }))}
-              className={`form-priority-btn${form[key as keyof typeof form] === "yes" ? " active" : ""}`}>{label}</button>
+              style={{ flex: 1, padding: "11px 8px", borderRadius: 10, border: `1.5px solid ${form[key as keyof typeof form] === "yes" ? "#0101FF" : "#E5E7EB"}`, background: form[key as keyof typeof form] === "yes" ? "#E4E4FF" : "white", fontWeight: 700, fontSize: 13, cursor: "pointer", color: form[key as keyof typeof form] === "yes" ? "#0101FF" : "#374151", textAlign: "center" as const, minWidth: 90, fontFamily: "inherit" }}>{label}</button>
           ))}
         </div></div>
-        <div className="form-field"><label className="form-label">Primary heating source</label><select className="cadc-input" value={form.primaryHeat} onChange={f("primaryHeat")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Primary heating source</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.primaryHeat} onChange={f("primaryHeat")}>
           <option value="">Select</option>
           <option value="electric">Electric</option>
           <option value="natural-gas">Natural gas</option>
@@ -2166,7 +2166,7 @@ function WeatherizationInterestForm() {
           <option value="wood">Wood / biomass</option>
           <option value="other">Other</option>
         </select></div>
-        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
           if (!form.name || !form.phone || !form.county) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "weatherization", "interest-form");
@@ -2188,10 +2188,10 @@ function VitaAppointmentForm() {
 
   if (state === "done") return (
     <div className="cadc-light-content">
-      <div className="form-success">
-        <div className="form-success-icon">✅</div>
-        <div className="form-success-title">Appointment request received!</div>
-        <div className="form-success-msg">A VITA tax preparer will call to confirm your appointment. Questions? Call <a href="tel:+15803355588" style={{ color: T.blue, fontWeight: 700 }}>580-335-5588</a>.</div>
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Appointment request received!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A VITA tax preparer will call to confirm your appointment. Questions? Call <a href="tel:+15803355588" style={{ color: T.blue, fontWeight: 700 }}>580-335-5588</a>.</div>
       </div>
     </div>
   );
@@ -2199,18 +2199,18 @@ function VitaAppointmentForm() {
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Request a free tax preparation appointment. VITA is available to households earning approximately $67,000 or less. Certified volunteers handle federal and state returns at no cost.</p>
-      {state === "err" && <div className="form-error">Please fill in your name and phone number.</div>}
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
-        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-        <div className="form-field"><label className="form-label">County</label>
-          <select className="cadc-input" value={form.county} onChange={f("county")}>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>County</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
             <option value="">Select county</option>
             {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Type of tax return</label>
-          <select className="cadc-input" value={form.returnType} onChange={f("returnType")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Type of tax return</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.returnType} onChange={f("returnType")}>
             <option value="">Select</option>
             <option value="single">Single / no dependents</option>
             <option value="married">Married filing jointly</option>
@@ -2219,17 +2219,17 @@ function VitaAppointmentForm() {
             <option value="unsure">Not sure</option>
           </select>
         </div>
-        <div className="form-row">
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Preferred language</label>
-            <select className="cadc-input" value={form.language} onChange={f("language")}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred language</label>
+            <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.language} onChange={f("language")}>
               <option value="english">English</option>
               <option value="spanish">Spanish / Español</option>
             </select>
           </div>
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Preferred date (optional)</label><input className="cadc-input" type="date" value={form.preferredDate} onChange={f("preferredDate")} /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred date (optional)</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="date" value={form.preferredDate} onChange={f("preferredDate")} /></div>
         </div>
-        <div className="form-field" style={{marginTop:14}}><label className="form-label">Anything we should know?</label><textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Prior year returns, rental income, etc." /></div>
-        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, marginTop: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Anything we should know?</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.notes} onChange={f("notes")} placeholder="Prior year returns, rental income, etc." /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
           if (!form.name || !form.phone) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "tax-help", "appointment-request");
@@ -2251,10 +2251,10 @@ function VolunteerInterestForm() {
 
   if (state === "done") return (
     <div className="cadc-light-content">
-      <div className="form-success">
-        <div className="form-success-icon">🤝</div>
-        <div className="form-success-title">Thank you for volunteering!</div>
-        <div className="form-success-msg">A CADC staff member will be in touch to connect you with the right program. We appreciate you.</div>
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>🤝</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Thank you for volunteering!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A CADC staff member will be in touch to connect you with the right program. We appreciate you.</div>
       </div>
     </div>
   );
@@ -2262,21 +2262,21 @@ function VolunteerInterestForm() {
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Every volunteer hour helps keep our programs free for the families who need them. Tell us about yourself and we'll connect you with the right opportunity.</p>
-      {state === "err" && <div className="form-error">Please fill in your name and phone number.</div>}
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
-        <div className="form-row">
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Phone <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Email (optional)</label><input className="cadc-input" type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" /></div>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Email (optional)</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" /></div>
         </div>
-        <div className="form-field" style={{marginTop:14}}><label className="form-label">Your county</label>
-          <select className="cadc-input" value={form.county} onChange={f("county")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, marginTop: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
             <option value="">Select county</option>
             {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Programs of interest</label>
-          <select className="cadc-input" value={form.programs} onChange={f("programs")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Programs of interest</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.programs} onChange={f("programs")}>
             <option value="">Select</option>
             <option value="head-start">Head Start / Early Head Start</option>
             <option value="senior-nutrition">Senior Nutrition</option>
@@ -2286,8 +2286,8 @@ function VolunteerInterestForm() {
             <option value="any">Open to anything</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Availability</label>
-          <select className="cadc-input" value={form.availability} onChange={f("availability")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Availability</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.availability} onChange={f("availability")}>
             <option value="">Select</option>
             <option value="weekday-mornings">Weekday mornings</option>
             <option value="weekday-afternoons">Weekday afternoons</option>
@@ -2296,8 +2296,8 @@ function VolunteerInterestForm() {
             <option value="flexible">Flexible</option>
           </select>
         </div>
-        <div className="form-field"><label className="form-label">Skills or certifications (optional)</label><textarea className="cadc-input" value={form.skills} onChange={f("skills")} placeholder="Teaching, cooking, driving, CPR certified, etc." /></div>
-        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Skills or certifications (optional)</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.skills} onChange={f("skills")} placeholder="Teaching, cooking, driving, CPR certified, etc." /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
           if (!form.name || !form.phone) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "volunteer", "interest-form");
@@ -2319,10 +2319,10 @@ function CommunityNeedsSurvey() {
 
   if (state === "done") return (
     <div className="cadc-light-content">
-      <div className="form-success">
-        <div className="form-success-icon">📊</div>
-        <div className="form-success-title">Thank you for your feedback!</div>
-        <div className="form-success-msg">Your responses help CADC serve your community better. We read every submission.</div>
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>📊</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Thank you for your feedback!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>Your responses help CADC serve your community better. We read every submission.</div>
       </div>
     </div>
   );
@@ -2330,13 +2330,13 @@ function CommunityNeedsSurvey() {
   return (
     <div className="cadc-light-content">
       <p style={{marginBottom:16}}>Help us understand what your community needs most. This survey takes less than 2 minutes and directly shapes how CADC plans its programs and services.</p>
-      <div className="form-card">
-        <div className="form-field"><label className="form-label">Your county</label><select className="cadc-input" value={form.county} onChange={f("county")}>
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
           <option value="">Select county</option>
           {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
         </select>
         <p className="cadc-label">What service does your community need most?</p>
-        <select className="cadc-input" value={form.topNeed} onChange={f("topNeed")} style={{ marginBottom: 10 }}>
+        <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.topNeed} onChange={f("topNeed")} style={{ marginBottom: 10 }}>
           <option value="">Select</option>
           <option value="transportation">Transportation / transit</option>
           <option value="childcare">Childcare / Head Start</option>
@@ -2348,7 +2348,7 @@ function CommunityNeedsSurvey() {
           <option value="healthcare">Healthcare access</option>
           <option value="housing">Housing assistance</option>
         </select></div>
-        <div className="form-field"><label className="form-label">Biggest barrier to accessing services?</label><select className="cadc-input" value={form.barrier} onChange={f("barrier")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Biggest barrier to accessing services?</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.barrier} onChange={f("barrier")}>
           <option value="">Select</option>
           <option value="transportation">No transportation to get there</option>
           <option value="awareness">Didn't know the service existed</option>
@@ -2358,7 +2358,7 @@ function CommunityNeedsSurvey() {
           <option value="distance">Too far away</option>
           <option value="none">No major barriers</option>
         </select></div>
-        <div className="form-field"><label className="form-label">How did you hear about CADC?</label><select className="cadc-input" value={form.awareness} onChange={f("awareness")}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>How did you hear about CADC?</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.awareness} onChange={f("awareness")}>
           <option value="">Select</option>
           <option value="word-of-mouth">Word of mouth / family or friend</option>
           <option value="school">School or Head Start center</option>
@@ -2368,16 +2368,16 @@ function CommunityNeedsSurvey() {
           <option value="other-agency">Another agency or organization</option>
           <option value="already-client">Already a CADC client</option>
         </select></div>
-        <div className="form-field"><label className="form-label">How would you rate CADC services overall?</label>
-        <div className="form-star-btns">
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>How would you rate CADC services overall?</label>
+        <div style={{ display: "flex", gap: 8 }}>
           {["1","2","3","4","5"].map((n) => (
             <button key={n} onClick={() => setForm(p => ({ ...p, satisfaction: n }))}
-              className={`form-star-btn${form.satisfaction === n ? " active" : ""}`}>{"⭐".repeat(parseInt(n))}</button>
+              style={{ flex: 1, padding: "10px 4px", borderRadius: 10, border: `1.5px solid ${form.satisfaction === n ? "#0101FF" : "#E5E7EB"}`, background: form.satisfaction === n ? "#E4E4FF" : "white", fontWeight: 800, fontSize: 14, cursor: "pointer", color: form.satisfaction === n ? "#0101FF" : "#374151", textAlign: "center" as const, fontFamily: "inherit" }}>{"⭐".repeat(parseInt(n))}</button>
           ))}
         </div></div>
-        <div className="form-field"><label className="form-label">Suggestions for CADC?</label><textarea className="cadc-input" value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." /></div>
-        <div className="form-field"><label className="form-label">Phone (optional — for follow-up)</label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Suggestions for CADC?</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone (optional — for follow-up)</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
           setState("sending");
           await submitLead({ ...form }, "community-survey", "needs-survey");
           setState("done");
