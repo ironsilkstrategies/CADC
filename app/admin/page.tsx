@@ -178,7 +178,7 @@ export default function AdminPage() {
         {tab === "leads"     && <LeadsPanel       leads={leads}                onUpdateStatus={updateLeadStatus} />}
         {tab === "bookings"  && <BookingsPanel    bookings={bookings}           onUpdateStatus={updateBookingStatus} />}
         {tab === "volunteer" && <VolunteerPanel   entries={volunteer}           adminKey={key} onDelete={deleteVolunteer} onAdd={e => setVolunteer(v => [e, ...v])} />}
-        {tab === "stats"     && <StatsPanel       stats={stats} />}
+        {tab === "stats"     && <StatsPanel       stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} />}
         {tab === "schedule"  && <SchedulePanel    schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
         {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
         {tab === "impact"    && <ImpactPanel      adminKey={key} />}      </div>
@@ -379,50 +379,172 @@ function VolunteerPanel({ entries, adminKey, onDelete, onAdd }: { entries: Volun
 }
 
 // ─── Site Stats Panel ─────────────────────────────────────────────────────────
-function StatsPanel({ stats }: { stats: SiteStats | null }) {
+function StatsPanel({ stats, leads, bookings, volunteer }: { stats: SiteStats | null; leads: IntakeLead[]; bookings: TransitBooking[]; volunteer: VolunteerEntry[] }) {
   if (!stats) return <p style={{ color: MUTED, textAlign: "center", padding: 40 }}>Loading stats…</p>;
-  const topPrograms = Object.entries(stats.programTaps).sort((a,b) => b[1]-a[1]).slice(0,8);
-  const topCounties = Object.entries(stats.countyViews).sort((a,b) => b[1]-a[1]).slice(0,8);
-  const topSearches = Object.entries(stats.searchTerms).sort((a,b) => b[1]-a[1]).slice(0,10);
+
+  const topPrograms = Object.entries(stats.programTaps).sort((a,b) => b[1]-a[1]);
+  const topCounties = Object.entries(stats.countyViews).sort((a,b) => b[1]-a[1]).slice(0,10);
+  const topSearches = Object.entries(stats.searchTerms).sort((a,b) => b[1]-a[1]).slice(0,12);
   const maxP = topPrograms[0]?.[1] ?? 1;
   const maxC = topCounties[0]?.[1] ?? 1;
+  const totalTaps = Object.values(stats.programTaps).reduce((a,b) => a+b, 0);
+  const totalCounty = Object.values(stats.countyViews).reduce((a,b) => a+b, 0);
+  const newLeads = leads.filter(l => l.status === "new").length;
+  const contactedLeads = leads.filter(l => l.status === "contacted").length;
+  const enrolledLeads = leads.filter(l => l.status === "enrolled").length;
+  const pendingBookings = bookings.filter(b => b.status === "new").length;
+  const totalVolHours = volunteer.reduce((s, e) => s + e.hours, 0);
+
+  // Weekly narrative summary
+  const topProgram = topPrograms[0];
+  const topCounty = topCounties[0];
+  const now = new Date();
+  const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+
   return (
     <>
-      <div style={{ ...card, background: "#F0F0FF", border: "none" }}><p style={{ margin: 0, fontSize: 13, color: "#374151" }}>Live engagement data. Use this in grant narratives — it shows what your community is actively looking for.</p></div>
-      <div style={{ ...card, textAlign: "center" }}>
-        <div style={{ fontSize: 32, fontWeight: 800, color: BLUE }}>{stats.weeklyVisits.toLocaleString()}</div>
-        <div style={{ fontSize: 12, color: MUTED, textTransform: "uppercase", letterSpacing: "0.1em" }}>Site visits this week</div>
+      {/* Weekly summary narrative */}
+      <div style={{ ...card, background: "linear-gradient(135deg, #0101FF 0%, #1a1aff 100%)", border: "none", color: "white" }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
+          📅 Weekly Summary — as of {dayName}, {now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+        </div>
+        <p style={{ margin: "0 0 12px", fontSize: 14, color: "white", lineHeight: 1.7 }}>
+          Your site has had <strong style={{ color: "white" }}>{stats.weeklyVisits.toLocaleString()} visits</strong> this week
+          {totalTaps > 0 && <>, with <strong style={{ color: "white" }}>{totalTaps.toLocaleString()} program taps</strong></>}
+          {topProgram && <> — <strong style={{ color: "white" }}>{topProgram[0].replace(/-/g," ")}</strong> leading with {topProgram[1]} taps</>}.
+          {topCounty && <> <strong style={{ color: "white" }}>{topCounty[0].replace(/-/g," ")} County</strong> is your most active service area ({topCounty[1]} views).</>}
+          {newLeads > 0 && <> You have <strong style={{ color: "white" }}>{newLeads} new intake lead{newLeads !== 1 ? "s" : ""}</strong> awaiting follow-up.</>}
+          {pendingBookings > 0 && <> <strong style={{ color: "white" }}>{pendingBookings} ride request{pendingBookings !== 1 ? "s" : ""}</strong> need confirmation.</>}
+        </p>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
+          Check this every Monday morning or Friday afternoon for your weekly pulse.
+        </div>
       </div>
-      <div style={card}>
-        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12 }}>📊 Program Engagement</div>
-        {topPrograms.length === 0 && <p style={{ color: MUTED, fontSize: 13 }}>Data will appear as visitors use the site.</p>}
-        {topPrograms.map(([slug, count]) => (
-          <div key={slug} style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, marginBottom: 4 }}><span style={{ textTransform: "capitalize" }}>{slug.replace(/-/g," ")}</span><span style={{ color: BLUE }}>{count.toLocaleString()}</span></div>
-            <div style={{ background: "#E5E7EB", borderRadius: 6, height: 8 }}><div style={{ height: "100%", width: `${(count/maxP)*100}%`, background: BLUE, borderRadius: 6 }} /></div>
+
+      {/* KPI row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+        {[
+          { icon: "👥", label: "Site Visits", value: stats.weeklyVisits.toLocaleString(), sub: "this week", color: BLUE },
+          { icon: "👆", label: "Program Taps", value: totalTaps.toLocaleString(), sub: "all programs", color: BLUE },
+          { icon: "🗺️", label: "County Views", value: totalCounty.toLocaleString(), sub: "map interactions", color: MAROON },
+          { icon: "📥", label: "Total Leads", value: leads.length.toLocaleString(), sub: `${newLeads} new`, color: GREEN },
+          { icon: "🚌", label: "Ride Requests", value: bookings.length.toLocaleString(), sub: `${pendingBookings} pending`, color: AMBER },
+          { icon: "🤝", label: "Vol. Hours", value: totalVolHours.toFixed(1), sub: "logged total", color: GREEN },
+        ].map(({ icon, label, value, sub, color }) => (
+          <div key={label} style={{ ...card, padding: "12px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color, lineHeight: 1 }}>{value}</div>
+            <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: MUTED, marginTop: 3 }}>{label}</div>
+            <div style={{ fontSize: 10, color: MUTED, marginTop: 2 }}>{sub}</div>
           </div>
         ))}
       </div>
+
+      {/* Program breakdown */}
       <div style={card}>
-        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12 }}>📍 County Interest</div>
-        {topCounties.length === 0 && <p style={{ color: MUTED, fontSize: 13 }}>No county views yet.</p>}
-        {topCounties.map(([county, count]) => (
-          <div key={county} style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, marginBottom: 4 }}><span style={{ textTransform: "capitalize" }}>{county.replace(/-/g," ")} County</span><span style={{ color: MAROON }}>{count.toLocaleString()}</span></div>
-            <div style={{ background: "#E5E7EB", borderRadius: 6, height: 8 }}><div style={{ height: "100%", width: `${(count/maxC)*100}%`, background: MAROON, borderRadius: 6 }} /></div>
-          </div>
-        ))}
+        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>📊 Program Engagement — Full Breakdown</div>
+        <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Every program tap this week, sorted by interest. Use this to prioritize outreach.</div>
+        {topPrograms.length === 0
+          ? <p style={{ color: MUTED, fontSize: 13 }}>Data will appear as visitors use the site.</p>
+          : topPrograms.map(([slug, count]) => {
+            const pct = Math.round((count / totalTaps) * 100);
+            return (
+              <div key={slug} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>{slug.replace(/-/g," ")}</span>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <span style={{ fontSize: 11, color: MUTED }}>{pct}% of taps</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: BLUE }}>{count.toLocaleString()}</span>
+                  </div>
+                </div>
+                <div style={{ background: "#E5E7EB", borderRadius: 6, height: 10 }}>
+                  <div style={{ height: "100%", width: `${(count/maxP)*100}%`, background: BLUE, borderRadius: 6, transition: "width 0.5s ease" }} />
+                </div>
+              </div>
+            );
+          })}
       </div>
+
+      {/* County breakdown */}
+      <div style={card}>
+        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>🗺️ County Interest — Where Your Community Is</div>
+        <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Which counties are actively looking for services. High views = high need in that area.</div>
+        {topCounties.length === 0
+          ? <p style={{ color: MUTED, fontSize: 13 }}>No county views yet.</p>
+          : topCounties.map(([county, count]) => (
+            <div key={county} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                <span style={{ textTransform: "capitalize" }}>{county.replace(/-/g," ")} County</span>
+                <span style={{ color: MAROON }}>{count.toLocaleString()}</span>
+              </div>
+              <div style={{ background: "#E5E7EB", borderRadius: 6, height: 8 }}>
+                <div style={{ height: "100%", width: `${(count/maxC)*100}%`, background: MAROON, borderRadius: 6 }} />
+              </div>
+            </div>
+          ))}
+      </div>
+
+      {/* Intake lead breakdown */}
+      {leads.length > 0 && (
+        <div style={card}>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>📥 Intake Lead Breakdown</div>
+          <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Every person who submitted an interest form. Follow up within 48 hours for best results.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
+            {[
+              { label: "New", value: newLeads, color: BLUE },
+              { label: "Contacted", value: contactedLeads, color: AMBER },
+              { label: "Enrolled", value: enrolledLeads, color: GREEN },
+              { label: "Total", value: leads.length, color: MUTED },
+            ].map(({ label, value, color }) => (
+              <div key={label} style={{ background: "#F9FAFB", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "10px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color }}>{value}</div>
+                <div style={{ fontSize: 10, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+          {/* By program */}
+          {(() => {
+            const byProg = leads.reduce((acc, l) => { acc[l.program] = (acc[l.program] ?? 0) + 1; return acc; }, {} as Record<string,number>);
+            return Object.entries(byProg).sort((a,b) => b[1]-a[1]).map(([prog, count]) => (
+              <div key={prog} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${BORDER}`, fontSize: 13 }}>
+                <span style={{ textTransform: "capitalize", fontWeight: 600 }}>{prog.replace(/-/g," ")}</span>
+                <span style={{ fontWeight: 800, color: BLUE }}>{count} lead{count !== 1 ? "s" : ""}</span>
+              </div>
+            ));
+          })()}
+        </div>
+      )}
+
+      {/* Search terms */}
       {topSearches.length > 0 && (
         <div style={card}>
-          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12 }}>🔍 Top Search Terms</div>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>🔍 What Your Community Is Searching For</div>
+          <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Top search terms from site visitors. Gaps here = services people need but can't find.</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {topSearches.map(([term, count]) => (
-              <div key={term} style={{ background: "#F0F0FF", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "6px 12px", fontSize: 13, display: "flex", gap: 6 }}><span>{term}</span><span style={{ color: BLUE, fontWeight: 800 }}>{count}</span></div>
+              <div key={term} style={{ background: "#F0F0FF", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "6px 14px", fontSize: 13, display: "flex", gap: 8, alignItems: "center" }}>
+                <span style={{ fontWeight: 600 }}>{term}</span>
+                <span style={{ color: BLUE, fontWeight: 800, fontSize: 12 }}>×{count}</span>
+              </div>
             ))}
           </div>
         </div>
       )}
+
+      {/* Grant narrative helper */}
+      <div style={{ ...card, background: "#F0FFF4", border: `1px solid ${GREEN}` }}>
+        <div style={{ fontWeight: 800, fontSize: 13, color: GREEN, marginBottom: 8 }}>📝 Grant Narrative Helper</div>
+        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 8px", lineHeight: 1.6 }}>
+          Copy this language directly into grant reports:
+        </p>
+        <div style={{ background: "white", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#374151", lineHeight: 1.7, fontStyle: "italic" }}>
+          "In the current reporting period, the cadcok.org digital platform recorded {stats.weeklyVisits.toLocaleString()} community site visits
+          {totalTaps > 0 ? `, ${totalTaps.toLocaleString()} program engagement interactions` : ""}
+          {topProgram ? `, with ${topProgram[0].replace(/-/g," ")} generating the highest community interest` : ""}.
+          {leads.length > 0 ? ` ${leads.length} residents submitted program interest forms, ${enrolledLeads} of whom were successfully enrolled in services.` : ""}
+          {totalCounty > 0 ? ` Community members from ${Object.keys(stats.countyViews).length} counties actively searched for CADC services.` : ""}"
+        </div>
+      </div>
     </>
   );
 }
