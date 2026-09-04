@@ -2397,10 +2397,10 @@ function CommunityNeedsSurvey() {
           <option value="already-client">Already a CADC client</option>
         </select></div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>How would you rate CADC services overall?</label>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
           {["1","2","3","4","5"].map((n) => (
             <button key={n} onClick={() => setForm(p => ({ ...p, satisfaction: n }))}
-              style={{ flex: 1, padding: "10px 4px", borderRadius: 10, border: `1.5px solid ${form.satisfaction === n ? "#0101FF" : "#E5E7EB"}`, background: form.satisfaction === n ? "#E4E4FF" : "white", fontWeight: 800, fontSize: 14, cursor: "pointer", color: form.satisfaction === n ? "#0101FF" : "#374151", textAlign: "center" as const, fontFamily: "inherit" }}>{"⭐".repeat(parseInt(n))}</button>
+              style={{ padding: "10px 2px", borderRadius: 10, border: `1.5px solid ${form.satisfaction === n ? "#0101FF" : "#E5E7EB"}`, background: form.satisfaction === n ? "#E4E4FF" : "white", fontWeight: 800, fontSize: 12, cursor: "pointer", color: form.satisfaction === n ? "#0101FF" : "#374151", textAlign: "center" as const, fontFamily: "inherit", overflow: "hidden" }}>{"⭐".repeat(parseInt(n))}</button>
           ))}
         </div></div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Suggestions for CADC?</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." /></div>
