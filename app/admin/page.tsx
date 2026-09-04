@@ -178,7 +178,7 @@ export default function AdminPage() {
         {tab === "leads"     && <LeadsPanel       leads={leads}                onUpdateStatus={updateLeadStatus} />}
         {tab === "bookings"  && <BookingsPanel    bookings={bookings}           onUpdateStatus={updateBookingStatus} />}
         {tab === "volunteer" && <VolunteerPanel   entries={volunteer}           adminKey={key} onDelete={deleteVolunteer} onAdd={e => setVolunteer(v => [e, ...v])} />}
-        {tab === "stats"     && <StatsPanel       stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} />}
+        {tab === "stats"     && <StatsPanel       stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} adminKey={key} onReset={() => { fetchStats(key).then(setStats); fetchLeads(key).then(setLeads); fetchBookings(key).then(setBookings); fetchVolunteer(key).then(setVolunteer); }} />}
         {tab === "schedule"  && <SchedulePanel    schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
         {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
         {tab === "impact"    && <ImpactPanel      adminKey={key} />}      </div>
@@ -379,7 +379,7 @@ function VolunteerPanel({ entries, adminKey, onDelete, onAdd }: { entries: Volun
 }
 
 // ─── Site Stats Panel ─────────────────────────────────────────────────────────
-function StatsPanel({ stats, leads, bookings, volunteer }: { stats: SiteStats | null; leads: IntakeLead[]; bookings: TransitBooking[]; volunteer: VolunteerEntry[] }) {
+function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { stats: SiteStats | null; leads: IntakeLead[]; bookings: TransitBooking[]; volunteer: VolunteerEntry[]; adminKey: string; onReset: () => void }) {
   if (!stats) return <p style={{ color: MUTED, textAlign: "center", padding: 40 }}>Loading stats…</p>;
 
   const topPrograms = Object.entries(stats.programTaps).sort((a,b) => b[1]-a[1]);
@@ -545,6 +545,36 @@ function StatsPanel({ stats, leads, bookings, volunteer }: { stats: SiteStats | 
           {totalCounty > 0 ? ` Community members from ${Object.keys(stats.countyViews).length} counties actively searched for CADC services.` : ""}"
         </div>
       </div>
+
+      {/* Launch reset controls */}
+      <div style={{ ...card, border: `1px solid ${MAROON}`, background: "#FFF8F8" }}>
+        <div style={{ fontWeight: 800, fontSize: 13, color: MAROON, marginBottom: 6 }}>🚀 Launch Reset Controls</div>
+        <p style={{ fontSize: 12, color: "#374151", margin: "0 0 14px", lineHeight: 1.6 }}>
+          Use these when switching from the preview site to cadcok.org. Clears test data so the live site starts clean. Each reset requires confirmation — this cannot be undone.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Site Stats</div><div style={{ fontSize: 11, color: MUTED }}>Visits, program taps, county views, searches</div></div>
+            <ResetButton target="stats" label="Stats" adminKey={adminKey} onReset={onReset} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Intake Leads</div><div style={{ fontSize: 11, color: MUTED }}>All inquiry form submissions</div></div>
+            <ResetButton target="leads" label="Leads" adminKey={adminKey} onReset={onReset} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Transit Ride Requests</div><div style={{ fontSize: 11, color: MUTED }}>All ride booking submissions</div></div>
+            <ResetButton target="bookings" label="Bookings" adminKey={adminKey} onReset={onReset} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Volunteer Hours</div><div style={{ fontSize: 11, color: MUTED }}>All logged volunteer hour entries</div></div>
+            <ResetButton target="volunteer" label="Volunteer Hours" adminKey={adminKey} onReset={onReset} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#FFF0F0", borderRadius: 8, border: `1px solid #FCA5A5` }}>
+            <div><div style={{ fontWeight: 700, fontSize: 13, color: MAROON }}>Reset Everything</div><div style={{ fontSize: 11, color: MUTED }}>Stats + leads + bookings + hours + schedule</div></div>
+            <ResetButton target="all" label="All Data" adminKey={adminKey} onReset={onReset} />
+          </div>
+        </div>
+      </div>
     </>
   );
 }
@@ -672,7 +702,7 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
   const premiumFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
     { key: "transitBooking",    label: "Online Ride Booking",         icon: "🚌", desc: "Online ride request form on Transit → Schedule a Ride. Off = call button only." },
     { key: "intakeLeads",       label: "Follow-Up Capture",           icon: "📥", desc: "Follow-up contact form on eligibility pages. Sends inquiries to the Intake Leads tab." },
-    { key: "volunteerLog",      label: "Volunteer Hour Logger",       icon: "🤝", desc: "Public volunteer hour submission form for Head Start in-kind match tracking." },
+    { key: "volunteerLog",      label: "Public Volunteer Hour Logger",       icon: "🤝", desc: "Shows a 'Log My Hours' form in Head Start → Parent Engagement → Log Hours. Volunteers submit their own hours directly — feeds into the Volunteer Hrs tab. Off = phone-only message shown." },
     { key: "faqAccordion",      label: "Head Start FAQ",              icon: "❓", desc: "FAQ accordion section on Head Start program page. Robin requested — toggle on when content is ready." },
     { key: "boardPortal",       label: "Board Document Portal",       icon: "📁", desc: "Board Documents sub-area in Board & Leadership — Tiffany uploads agendas, minutes, resolutions." },
     { key: "contentScheduling", label: "Content Scheduling",          icon: "🗓️", desc: "Scheduled content publishing system — stage updates to go live automatically on a future date." },
@@ -932,5 +962,43 @@ function ImpactPanel({ adminKey }: { adminKey: string }) {
         </p>
       </div>
     </>
+  );
+}
+
+// ─── Reset Button ─────────────────────────────────────────────────────────────
+function ResetButton({ target, label, adminKey, onReset }: { target: string; label: string; adminKey: string; onReset: () => void }) {
+  const [phase, setPhase] = useState<"idle"|"confirm"|"resetting"|"done"|"err">("idle");
+
+  async function doReset() {
+    setPhase("resetting");
+    const r = await fetch("/api/cms/reset", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
+      body: JSON.stringify({ target, confirm: "RESET_CONFIRMED" }),
+    }).catch(() => null);
+    if (r?.ok) { setPhase("done"); setTimeout(() => { setPhase("idle"); onReset(); }, 2000); }
+    else setPhase("err");
+  }
+
+  if (phase === "confirm") return (
+    <div style={{ background: "#FFF0F0", border: "1px solid #FCA5A5", borderRadius: 10, padding: "12px 14px", marginBottom: 14 }}>
+      <p style={{ fontSize: 13, fontWeight: 700, color: "#CC0000", margin: "0 0 10px" }}>⚠️ Are you sure? This cannot be undone.</p>
+      <p style={{ fontSize: 12, color: "#374151", margin: "0 0 12px" }}>This will permanently delete all {label.toLowerCase()} data. Use this only when switching to the live cadcok.org site.</p>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={doReset} style={{ flex: 1, background: "#CC0000", color: "white", border: "none", borderRadius: 8, padding: "10px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>Yes, Reset {label}</button>
+        <button onClick={() => setPhase("idle")} style={{ flex: 1, background: "white", color: "#374151", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+      </div>
+    </div>
+  );
+
+  if (phase === "resetting") return <div style={{ padding: "10px 0", fontSize: 13, color: MUTED, fontWeight: 600 }}>Resetting…</div>;
+  if (phase === "done") return <div style={{ padding: "10px 0", fontSize: 13, color: GREEN, fontWeight: 700 }}>✅ {label} cleared successfully.</div>;
+  if (phase === "err") return <div style={{ padding: "10px 0", fontSize: 13, color: MAROON, fontWeight: 700 }}>Error resetting. Try again.</div>;
+
+  return (
+    <button onClick={() => setPhase("confirm")}
+      style={{ background: "white", color: MAROON, border: `1px solid ${MAROON}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+      🔄 Reset {label}
+    </button>
   );
 }
