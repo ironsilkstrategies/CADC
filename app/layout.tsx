@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
+import { CADCJsonLd } from "@/components/CADCJsonLd";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -36,11 +37,14 @@ export const metadata: Metadata = {
   },
 };
 
-const VERSION = "v2.33";
+const VERSION = "v2.34";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+      <head>
+        <CADCJsonLd />
+      </head>
       <body style={{ margin: 0, padding: 0 }}>
         {children}
         {/* Build watermark — hidden from users */}
