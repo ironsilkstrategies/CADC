@@ -13,7 +13,11 @@ import {
   type SiteContent, type SiteFeatures, type BoardDoc, type ScheduledItem, type Meal, type MarketStop, type StaffMember,
   type PublicDoc, type IntakeLead, type SiteStats, type VolunteerEntry,
   type TransitBooking, fetchSchedule,
+  fetchMedia, fetchArchive, fetchContentBlocks,
+  type MediaAsset, type ArchivedItem, type ContentBlock,
 } from "@/lib/cms";
+import { UploadPanel, MediaLibraryPanel, ArchivePanel, ContentEditorPanel } from "./panels/site-builder";
+import { markAdminViewerSession, clearAdminViewerSession } from "@/components/InlineEditBar";
 
 const BLUE = "#0101FF", MAROON = "#CC0000", BORDER = "#e5e7eb", MUTED = "#6b7280";
 const GREEN = "#059669", AMBER = "#D97706";
@@ -22,7 +26,7 @@ const input: React.CSSProperties = { width: "100%", fontSize: 16, padding: "12px
 const lbl: React.CSSProperties = { color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", display: "block" };
 const btn = (bg = BLUE, fg = "white"): React.CSSProperties => ({ background: bg, color: fg, border: bg === "white" ? `1px solid ${BLUE}` : "none", borderRadius: 10, padding: "12px 18px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit" });
 
-type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings" | "features" | "schedule" | "board-docs" | "impact";
+type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings" | "features" | "schedule" | "board-docs" | "impact" | "upload" | "media" | "archive" | "content";
 const TABS: { id: Tab; label: string; icon: string; who: string }[] = [
   { id: "features",  label: "Features",      icon: "⚡", who: "Leslea" },
   { id: "announce",  label: "Alert",         icon: "🚨", who: "Leslea" },
@@ -37,6 +41,10 @@ const TABS: { id: Tab; label: string; icon: string; who: string }[] = [
   { id: "schedule",  label: "Scheduled",     icon: "🗓️", who: "Leslea" },
   { id: "board-docs",label: "Board Docs",    icon: "📁", who: "Tiffany" },
   { id: "impact",    label: "Impact PDF",    icon: "📈", who: "Leslea" },
+  { id: "upload",    label: "Upload",        icon: "📤", who: "All" },
+  { id: "media",     label: "Media",         icon: "🖼️", who: "All" },
+  { id: "archive",   label: "Archive",       icon: "🗄️", who: "Leslea" },
+  { id: "content",   label: "Content",       icon: "📝", who: "Leslea" },
 ];
 
 const HS_CENTERS = ["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"];
@@ -78,6 +86,9 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState<TransitBooking[]>([]);
   const [schedule, setSchedule] = useState<ScheduledItem[]>([]);
   const [impactLoading, setImpactLoading] = useState(false);
+  const [media, setMedia] = useState<MediaAsset[]>([]);
+  const [archived, setArchived] = useState<ArchivedItem[]>([]);
+  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
 
   useEffect(() => {
     const k = sessionStorage.getItem("cadc-admin-key");
@@ -94,14 +105,28 @@ export default function AdminPage() {
     fetchVolunteer(key).then(setVolunteer);
     fetchBookings(key).then(setBookings);
     fetchSchedule(key).then(setSchedule);
+    fetchMedia(key).then(setMedia);
+    fetchArchive(key).then(setArchived);
+    fetchContentBlocks(key).then(setBlocks);
   }, [authed, key]);
 
   async function login() {
     const r = await fetch("/api/cms", { method: "HEAD", headers: { "x-admin-key": key } });
-    if (r.status === 204) { sessionStorage.setItem("cadc-admin-key", key); sessionStorage.setItem("cadc-admin-name", name); setAuthed(true); setStatus(""); }
+    if (r.status === 204) {
+      sessionStorage.setItem("cadc-admin-key", key);
+      sessionStorage.setItem("cadc-admin-name", name);
+      localStorage.setItem("cadc_admin_key", key);
+      markAdminViewerSession();
+      setAuthed(true); setStatus("");
+    }
     else setStatus("That password didn't work. Check with Leslea or Chris.");
   }
-  function logout() { sessionStorage.clear(); setAuthed(false); setKey(""); }
+  function logout() {
+    sessionStorage.clear();
+    localStorage.removeItem("cadc_admin_key");
+    clearAdminViewerSession();
+    setAuthed(false); setKey("");
+  }
   function update<K extends keyof SiteContent>(k: K, v: SiteContent[K]) { setContent(c => ({ ...c, [k]: v })); setDirty(true); }
 
   async function save() {
@@ -181,7 +206,20 @@ export default function AdminPage() {
         {tab === "stats"     && <StatsPanel       stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} adminKey={key} onReset={() => { fetchStats(key).then(setStats); fetchLeads(key).then(setLeads); fetchBookings(key).then(setBookings); fetchVolunteer(key).then(setVolunteer); }} />}
         {tab === "schedule"  && <SchedulePanel    schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
         {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
-        {tab === "impact"    && <ImpactPanel      adminKey={key} />}      </div>
+        {tab === "impact"    && <ImpactPanel      adminKey={key} />}
+        {tab === "upload"    && <UploadPanel      adminKey={key} />}
+        {tab === "media"     && <MediaLibraryPanel media={media} adminKey={key} onChange={() => fetchMedia(key).then(setMedia)} />}
+        {tab === "archive"   && <ArchivePanel     archived={archived} adminKey={key} onChange={() => fetchArchive(key).then(setArchived)} />}
+        {tab === "content"   && (
+          <>
+            <div style={{ ...card, background: "#F0F0FF", border: `1px solid ${BLUE}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#374151" }}>✏️ You can also edit content directly on the live site — visit cadcok.org while signed in here and look for pencil icons.</p>
+              <a href="/" target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, marginLeft: 12, background: BLUE, color: "white", borderRadius: 8, padding: "8px 14px", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Open Site →</a>
+            </div>
+            <ContentEditorPanel blocks={blocks} adminKey={key} onChange={() => fetchContentBlocks(key).then(setBlocks)} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
