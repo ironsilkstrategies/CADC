@@ -2723,7 +2723,7 @@ function VolunteerHub() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/cms/volunteer/public")
+    fetch("/api/cms/volunteer-hours")
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data?.totalHours !== undefined) setHours(data.totalHours);
