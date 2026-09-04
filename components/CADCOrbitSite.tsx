@@ -4406,6 +4406,16 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             </div>
           ))}
         </div>
+        {/* Find My Benefits screener CTA */}
+        <div style={{ marginTop: 20, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ fontSize: 32, flexShrink: 0 }}>🔍</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Not sure where to start?</p>
+            <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+            <a href="/?program=board&area=service-screener" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>Find My Benefits →</a>
+          </div>
+        </div>
+
         {/* Survey CTA */}
         <a
           href="https://www.surveymonkey.com/r/26cadcneeds"
@@ -4871,6 +4881,19 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             </div>
             <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
+
+          {/* Universal screener CTA */}
+          <div style={{ marginTop: 32, width: "100%", maxWidth: 320 }}>
+            <div style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+              <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 Not sure where to start?</p>
+              <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+              <a
+                href="/?program=board&area=service-screener"
+                style={{ display: "block", width: "100%", background: T.maroon, color: "white", border: "none", borderRadius: 9, padding: "12px 16px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit", textDecoration: "none", textAlign: "center", boxSizing: "border-box" }}>
+                Find My Benefits →
+              </a>
+            </div>
+          </div>
         </div>
       )}
 
