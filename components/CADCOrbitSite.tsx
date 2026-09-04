@@ -3829,12 +3829,7 @@ const PROGRAMS: ProgramData[] = [
             <p>CADC offers competitive pay, especially for positions that carry community responsibility. Here's what you can expect.</p>
             <div className="cadc-stack">
               {[
-                {t:"Head Start Teacher Pay Scale",d:"$12.50/hr — no CDA or degree
-$14.00/hr — CDA credential
-$15.50/hr — Associate's degree
-$17.23/hr — Bachelor's degree or higher
-
-CDA training reimbursement available. CADC actively supports staff in earning credentials while working."},
+                {t:"Head Start Teacher Pay Scale",d:"$12.50/hr — no CDA or degree\n$14.00/hr — CDA credential\n$15.50/hr — Associate's degree\n$17.23/hr — Bachelor's degree or higher\n\nCDA training reimbursement available. CADC actively supports staff in earning credentials while working."},
                 {t:"Transit Driver",d:"Competitive hourly rate. CDL required or training assistance available. Full benefits included."},
                 {t:"100% Agency-Paid Benefits",d:"Vision insurance · Life insurance · Paid holidays · Paid leave · Retirement plan options. CADC covers 100% of employee premiums for vision and life insurance."},
                 {t:"Professional Development",d:"CADC supports staff training, credential attainment, and career growth. Head Start teachers can move up the pay scale as they earn credentials — on the job."},
