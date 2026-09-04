@@ -1828,10 +1828,12 @@ function IntakeLeadSection({ program, step, children }: { program: string; step:
 
 // ─── Intake Lead Capture Form ─────────────────────────────────────────────────
 function IntakeLeadForm({ program, step, children }: { program: string; step: string; children: React.ReactNode }) {
-  const [form, setForm] = useState({ name: "", phone: "", county: "" });
-  const [state, setState] = useState<"idle"|"sending"|"done">("idle");
+  const [form, setForm] = useState({ name: "", phone: "", email: "", county: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err"|"dismissed">("idle");
   const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
   async function submit() {
+    if (!form.name.trim()) { setState("err"); return; }
+    if (!form.phone.trim() && !form.email.trim()) { setState("err"); return; }
     setState("sending");
     await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, program, step }) }).catch(() => {});
     setState("done");
@@ -1839,25 +1841,51 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
   return (
     <div>
       {children}
-      {state !== "done" ? (
-        <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }} style={{ marginTop: 14, background: "#F8F8FF", border: `1.5px solid ${T.blue}` }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>Want us to follow up with you?</p>
-          <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Leave your name and number and a CADC staff member will reach out to help.</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="First and last name" /></div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county (optional)</label>
-            <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+      {state === "dismissed" ? null : state === "done" ? (
+        <div style={{ marginTop: 16, background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
+          <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+          <div style={{ fontWeight: 800, color: "#059669", fontSize: 16, marginBottom: 6 }}>Got it — we'll be in touch.</div>
+          <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>A CADC staff member will reach out to help you through the process.</div>
+        </div>
+      ) : (
+        <div style={{ marginTop: 16, background: "#F0F4FF", border: "1.5px solid #0101FF", borderRadius: 16, padding: "20px 18px" }}>
+          {/* Header row with dismiss */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+            <p style={{ fontSize: 14, fontWeight: 800, color: "#111827", margin: 0 }}>Want us to follow up with you?</p>
+            <button onClick={() => setState("dismissed")} aria-label="Dismiss" style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: 18, lineHeight: 1, padding: "0 0 0 8px", fontFamily: "inherit" }}>✕</button>
+          </div>
+          <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 16px", lineHeight: 1.5 }}>Leave your name and contact info and a CADC staff member will reach out to help you through the process.</p>
+          {state === "err" && (
+            <div style={{ fontSize: 12, color: "#CC0000", fontWeight: 700, marginBottom: 12, padding: "10px 14px", background: "#FFF0F0", borderRadius: 8, border: "1px solid #FCA5A5" }}>
+              Please enter your name and at least a phone number or email.
+            </div>
+          )}
+          {/* Name — required */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Full name <span style={{ color: "#CC0000" }}>*</span></label>
+            <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="First and last name" />
+          </div>
+          {/* Phone — required if no email */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Phone number <span style={{ color: "#CC0000" }}>*</span></label>
+            <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" />
+          </div>
+          {/* Email — optional but encouraged */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Email <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional)</span></label>
+            <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" />
+          </div>
+          {/* County */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 18 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your county <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional)</span></label>
+            <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
               <option value="">Select county</option>
               {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
             </select>
           </div>
-          <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request a Follow-Up Call"}</button>
-        </div>
-      ) : (
-        <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }} style={{ marginTop: 14 }}>
-          <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
-          <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Got it — we'll be in touch.</div>
-          <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A CADC staff member will call you soon to help.</div>
+          <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "15px 20px", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>
+            {state === "sending" ? "Sending…" : "Request a Follow-Up Call →"}
+          </button>
         </div>
       )}
     </div>
@@ -2441,6 +2469,135 @@ function BoardDocsPanel() {
   );
 }
 
+// ─── Transit Fare Calculator ──────────────────────────────────────────────────
+const TRANSIT_ROUTES: { label: string; from: string; to: string; miles: number }[] = [
+  { label: "Frederick → Lawton", from: "Frederick", to: "Lawton", miles: 68 },
+  { label: "Frederick → Oklahoma City", from: "Frederick", to: "Oklahoma City", miles: 176 },
+  { label: "Hobart → Oklahoma City", from: "Hobart", to: "Oklahoma City", miles: 132 },
+  { label: "Hobart → Lawton", from: "Hobart", to: "Lawton", miles: 98 },
+  { label: "Sayre → Oklahoma City", from: "Sayre", to: "Oklahoma City", miles: 158 },
+  { label: "Elk City → Oklahoma City", from: "Elk City", to: "Oklahoma City", miles: 118 },
+  { label: "Altus → Oklahoma City", from: "Altus", to: "Oklahoma City", miles: 192 },
+  { label: "Altus → Lawton", from: "Altus", to: "Lawton", miles: 58 },
+  { label: "Duncan → Oklahoma City", from: "Duncan", to: "Oklahoma City", miles: 88 },
+  { label: "Duncan → Lawton", from: "Duncan", to: "Lawton", miles: 42 },
+  { label: "Chickasha → Oklahoma City", from: "Chickasha", to: "Oklahoma City", miles: 42 },
+  { label: "Anadarko → Oklahoma City", from: "Anadarko", to: "Oklahoma City", miles: 58 },
+  { label: "Anadarko → Lawton", from: "Anadarko", to: "Lawton", miles: 48 },
+  { label: "Weatherford → Oklahoma City", from: "Weatherford", to: "Oklahoma City", miles: 68 },
+  { label: "Clinton → Oklahoma City", from: "Clinton", to: "Oklahoma City", miles: 88 },
+];
+
+function calcFare(miles: number, reduced: boolean): string {
+  const roundTrip = miles * 2;
+  let fare: number;
+  if (roundTrip <= 10)       fare = 8.00;
+  else if (roundTrip <= 30)  fare = 15.00;
+  else if (roundTrip <= 50)  fare = reduced ? 20.00 : 30.00;
+  else if (roundTrip <= 100) fare = reduced ? 30.00 : 45.00;
+  else if (roundTrip <= 150) fare = reduced ? 40.00 : 60.00;
+  else if (roundTrip <= 249) fare = reduced ? 60.00 : 80.00;
+  else fare = roundTrip * 0.40;
+  return `$${fare.toFixed(2)}`;
+}
+
+function TransitFareCalculator() {
+  const [selectedRoute, setSelectedRoute] = useState("");
+  const [reduced, setReduced] = useState(false);
+  const [customMiles, setCustomMiles] = useState("");
+  const [mode, setMode] = useState<"preset"|"custom">("preset");
+
+  const route = TRANSIT_ROUTES.find(r => r.label === selectedRoute);
+  const miles = mode === "preset" ? (route?.miles ?? 0) : (parseInt(customMiles) || 0);
+  const hasResult = miles > 0;
+  const fareStd = hasResult ? calcFare(miles, false) : null;
+  const fareRed = hasResult ? calcFare(miles, true) : null;
+  const roundTrip = miles * 2;
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Estimate your fare based on round-trip mileage. Reduced fares apply to riders age 55+ and persons with disabilities. Effective October 1, 2022.</p>
+
+      {/* Mode toggle */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        {(["preset","custom"] as const).map(m => (
+          <button key={m} onClick={() => setMode(m)}
+            style={{ flex: 1, padding: "10px 8px", borderRadius: 10, border: `1.5px solid ${mode === m ? T.blue : "#E5E7EB"}`, background: mode === m ? "#E4E4FF" : "white", fontWeight: 700, fontSize: 13, cursor: "pointer", color: mode === m ? T.blue : "#374151", fontFamily: "inherit" }}>
+            {m === "preset" ? "Common Routes" : "Enter Miles"}
+          </button>
+        ))}
+      </div>
+
+      {mode === "preset" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Select a route</label>
+          <select value={selectedRoute} onChange={e => setSelectedRoute(e.target.value)}
+            style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }}>
+            <option value="">Select route...</option>
+            {TRANSIT_ROUTES.map(r => <option key={r.label} value={r.label}>{r.label} ({r.miles} mi one way)</option>)}
+          </select>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>One-way miles</label>
+          <input type="number" value={customMiles} onChange={e => setCustomMiles(e.target.value)} placeholder="e.g. 85"
+            style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} />
+          <p style={{ fontSize: 11, color: "#9CA3AF", margin: "4px 0 0" }}>Fares are calculated on round-trip mileage.</p>
+        </div>
+      )}
+
+      {/* Reduced fare toggle */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, padding: "12px 14px", background: "#F9FAFB", borderRadius: 10, border: "1px solid #E5E7EB" }}>
+        <div onClick={() => setReduced(r => !r)} style={{ width: 44, height: 24, borderRadius: 12, background: reduced ? "#059669" : "#D1D5DB", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background 0.2s" }}>
+          <div style={{ position: "absolute", top: 2, left: reduced ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "white", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+        </div>
+        <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", cursor: "pointer" }} onClick={() => setReduced(r => !r)}>
+          Reduced fare eligible (age 55+ or disability)
+        </label>
+      </div>
+
+      {/* Result */}
+      {hasResult && (
+        <div style={{ background: T.blue, borderRadius: 14, padding: "20px 18px", marginBottom: 16 }}>
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 10px" }}>
+            Estimated Fare · {miles} mi one way · {roundTrip} mi round trip
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "14px 16px", textAlign: "center" as const }}>
+              <div style={{ color: "white", fontSize: 28, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>{reduced ? fareRed : fareStd}</div>
+              <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, marginTop: 4 }}>{reduced ? "Reduced rate" : "Standard rate"}</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "14px 16px", textAlign: "center" as const }}>
+              <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 22, fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif" }}>{reduced ? fareStd : fareRed}</div>
+              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 4 }}>{reduced ? "Standard rate" : "Reduced rate"}</div>
+            </div>
+          </div>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: "12px 0 0", textAlign: "center" as const }}>Estimate only · Final fare confirmed at time of booking</p>
+        </div>
+      )}
+
+      {/* Call CTA */}
+      <div style={{ background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px" }}>
+        <p style={{ fontWeight: 700, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>Ready to schedule?</p>
+        <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px" }}>Call Gilbert's team to book your ride and confirm the exact fare.</p>
+        <a href="tel:+15803352691" style={{ display: "block", background: T.maroon, color: "white", textAlign: "center" as const, padding: "13px", borderRadius: 10, fontWeight: 800, fontSize: 15, textDecoration: "none", letterSpacing: "0.02em" }}>📞 Call (580) 335-2691</a>
+      </div>
+
+      {/* Full fare table */}
+      <details style={{ marginTop: 16 }}>
+        <summary style={{ fontSize: 13, fontWeight: 700, color: T.blue, cursor: "pointer", padding: "8px 0" }}>View full fare table</summary>
+        <div style={{ marginTop: 10 }} className="cadc-fare-table">
+          <div className="cadc-fare-header"><span>Round-Trip Miles</span><span>Standard</span><span>Reduced</span></div>
+          {[["1–10 miles","$8.00","$8.00"],["11–30 miles","$15.00","$15.00"],["31–50 miles","$30.00","$20.00"],["51–100 miles","$45.00","$30.00"],["101–150 miles","$60.00","$40.00"],["151–249 miles","$80.00","$60.00"],["250+ miles","$0.40/mi","$0.40/mi"],["Wait time","$10.00/hr","$10.00/hr"]].map(r =>
+            <div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>
+          )}
+        </div>
+        <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 8 }}>In-town service: $1.00 standard · $0.75 elderly/disabled · per stop</p>
+      </details>
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -2645,36 +2802,7 @@ const PROGRAMS: ProgramData[] = [
       },
       {
         id: "fares", label: "Fare Schedule", shortLabel: "Fares", icon: "💲",
-        content: (
-          <div className="cadc-light-content">
-            <p>Fares are calculated on round-trip mileage. Reduced fares apply to riders age 55+ and persons with disabilities. Effective October 1, 2022.</p>
-            <div className="cadc-fare-table">
-              <div className="cadc-fare-header"><span>Distance</span><span>Standard</span><span>Reduced</span></div>
-              {[
-                ["1–10 miles","$8.00","$8.00"],
-                ["11–30 miles","$15.00","$15.00"],
-                ["31–50 miles","$30.00","$20.00"],
-                ["51–100 miles","$45.00","$30.00"],
-                ["101–150 miles","$60.00","$40.00"],
-                ["151–249 miles","$80.00","$60.00"],
-                ["250+ miles","$0.40/mi","$0.40/mi"],
-                ["Wait time","$10.00/hr","$10.00/hr"],
-              ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
-            </div>
-            <p className="cadc-note">Wait time charged after the first hour. All vehicles are ADA lift or ramp equipped.</p>
-            <div className="cadc-card" style={{marginTop:12}}>
-              <p className="cadc-label">In-Town Service</p>
-              <div className="cadc-fare-table">
-                <div className="cadc-fare-header"><span>Ride Type</span><span>Standard</span><span>Elderly / Disabled</span></div>
-                {[
-                  ["In-town per stop","$1.00","$0.75"],
-                ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
-              </div>
-              <p style={{fontSize:12,margin:"8px 0 4px"}}>In-town service available in: El Reno · Weatherford · Clinton · Elk City · Sayre · Hobart · Frederick · Duncan</p>
-              <p className="cadc-note">In-town rides are scheduled on a first call, first serve basis.</p>
-            </div>
-          </div>
-        ),
+        content: <TransitFareCalculator />,
       },
       {
         id: "offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
