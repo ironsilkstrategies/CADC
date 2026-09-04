@@ -844,6 +844,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
     "service-screener":   "formServiceScreener",
     "board-docs":         "boardPortal",
     "volunteer-log":      "volunteerLog",
+    "volunteer-hub":      "volunteerLog",
   };
   const _filteredSubs = (activeProgram?.subAreas ?? []).filter(a => {
     const gate = _subAreaGates[a.id]; if (!gate) return true;
@@ -2705,6 +2706,217 @@ function PublicVolunteerLogForm() {
   );
 }
 
+// ─── Volunteer Hub ────────────────────────────────────────────────────────────
+// Federal in-kind match: Head Start requires non-federal match = 20% of total grant
+// Federal volunteer rate 2025: $29.51/hr
+// CADC Head Start annual federal award ≈ $4.2M → 20% match needed = $840,000
+// At $29.51/hr → need ≈ 28,464 hours to fully satisfy match via volunteer time
+// We show progress without naming the dollar figure directly
+
+const FEDERAL_RATE = 29.51;
+const MATCH_HOURS_GOAL = 28464; // hours needed for full in-kind match
+const MATCH_VALUE_GOAL = MATCH_HOURS_GOAL * FEDERAL_RATE; // ~$840K
+
+function VolunteerHub() {
+  const [hours, setHours] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/cms/volunteer/public")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.totalHours !== undefined) setHours(data.totalHours);
+        else setHours(0);
+        setLoading(false);
+      })
+      .catch(() => { setHours(0); setLoading(false); });
+  }, []);
+
+  const logged = hours ?? 0;
+  const remaining = Math.max(0, MATCH_HOURS_GOAL - logged);
+  const pct = Math.min(100, Math.round((logged / MATCH_HOURS_GOAL) * 100));
+  const matchValue = Math.round(logged * FEDERAL_RATE);
+  const circumference = 2 * Math.PI * 54;
+  const strokeDash = circumference - (pct / 100) * circumference;
+
+  const WHY = [
+    { icon: "🏫", title: "Your hours fund the program", body: "Head Start is federally funded — but the federal government requires a community match. Every volunteer hour you give is counted as real dollars that help keep Head Start free for every family in Southwest Oklahoma." },
+    { icon: "👶", title: "Children feel it directly", body: "More volunteers means more hands in classrooms, more readers, more mentors, more helpers. Research shows children with more adult engagement have stronger school readiness outcomes." },
+    { icon: "💰", title: "Federal value recognized", body: `The federal government values your time at $${FEDERAL_RATE.toFixed(2)} per hour — the same rate they use to calculate skilled volunteer contributions nationwide. One hour of your time = $${FEDERAL_RATE.toFixed(2)} toward keeping this program running.` },
+    { icon: "🌍", title: "Community accountability", body: "Head Start belongs to the community — not just to CADC. Parent involvement, community hours, and local investment are how a federal program stays rooted in the people it serves." },
+  ];
+
+  const WHO = [
+    "Parents and guardians of enrolled children",
+    "Grandparents, aunts, uncles, and extended family",
+    "Community members — no children required",
+    "High school and college students (great for service hours)",
+    "Local business owners and professionals",
+    "Retired teachers, nurses, and tradespeople",
+    "Anyone who believes in early childhood education",
+  ];
+
+  const WHAT = [
+    { icon: "📚", label: "Read aloud to the class" },
+    { icon: "🍽️", label: "Help serve meals and snacks" },
+    { icon: "🎨", label: "Lead an art or music activity" },
+    { icon: "🔨", label: "Assist with repairs or yard work" },
+    { icon: "🚌", label: "Help with field trips" },
+    { icon: "📋", label: "Cut out and prep classroom materials" },
+    { icon: "🌱", label: "Help with the school garden" },
+    { icon: "💼", label: "Share your professional skills" },
+    { icon: "🎭", label: "Share a cultural tradition or hobby" },
+    { icon: "🧹", label: "Help clean and organize the classroom" },
+    { icon: "📣", label: "Join the Policy Council" },
+    { icon: "✍️", label: "Help staff with paperwork or events" },
+  ];
+
+  const WHEN = [
+    { center: "Frederick", phone: "580-335-5588" },
+    { center: "Hobart", phone: "580-726-3343" },
+    { center: "Sayre", phone: "580-928-2199" },
+    { center: "Erick", phone: "580-335-5588" },
+    { center: "Temple", phone: "580-335-5588" },
+    { center: "Ringling", phone: "580-335-5588" },
+    { center: "Hammon", phone: "580-335-5588" },
+    { center: "Grandfield", phone: "580-335-5588" },
+    { center: "Burns Flat", phone: "580-335-5588" },
+    { center: "Cordell", phone: "580-335-5588" },
+    { center: "Sentinel", phone: "580-335-5588" },
+  ];
+
+  const sectionStyle = (id: string): React.CSSProperties => ({
+    background: activeSection === id ? "#E4E4FF" : "white",
+    border: `1.5px solid ${activeSection === id ? T.blue : "#E5E7EB"}`,
+    borderRadius: 12, padding: "14px 16px", marginBottom: 10, cursor: "pointer",
+    transition: "all 0.2s ease",
+  });
+
+  return (
+    <div className="cadc-light-content">
+
+      {/* ── IMPACT RING ── */}
+      <div style={{ background: `linear-gradient(135deg, ${T.blue} 0%, #1a1aee 100%)`, borderRadius: 18, padding: "28px 20px", marginBottom: 20, textAlign: "center" as const }}>
+        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 20px" }}>Community Impact Tracker</p>
+
+        {/* Animated ring */}
+        <div style={{ position: "relative", width: 140, height: 140, margin: "0 auto 20px" }}>
+          <svg width="140" height="140" viewBox="0 0 140 140" style={{ transform: "rotate(-90deg)" }}>
+            {/* Background ring */}
+            <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="12" />
+            {/* Progress ring */}
+            <circle cx="70" cy="70" r="54" fill="none" stroke="white" strokeWidth="12"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={loading ? circumference : strokeDash}
+              style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)", filter: "drop-shadow(0 0 8px rgba(255,255,255,0.6))" }}
+            />
+          </svg>
+          {/* Center text */}
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ color: "white", fontSize: 28, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
+              {loading ? "…" : `${pct}%`}
+            </span>
+            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em" }}>OF GOAL</span>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+          {[
+            { label: "Hours Logged", value: loading ? "…" : logged.toLocaleString() },
+            { label: "Match Value", value: loading ? "…" : `$${(matchValue/1000).toFixed(1)}K` },
+            { label: "Still Needed", value: loading ? "…" : remaining.toLocaleString() + " hrs" },
+          ].map(({ label, value }) => (
+            <div key={label} style={{ background: "rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 6px" }}>
+              <div style={{ color: "white", fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{value}</div>
+              <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+          Every hour you volunteer is valued at <strong style={{ color: "white" }}>${FEDERAL_RATE}/hr</strong> by the federal government — and counts toward keeping Head Start free for every family in Southwest Oklahoma.
+        </p>
+      </div>
+
+      {/* ── LOG / SIGN UP BUTTONS ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+        <a href="/?program=head-start&area=volunteer-log" style={{ display: "block", background: T.maroon, color: "white", textAlign: "center" as const, padding: "14px 10px", borderRadius: 12, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
+          ⏱️ Log My Hours
+        </a>
+        <a href="/?program=board&area=volunteer-form" style={{ display: "block", background: "white", color: T.blue, textAlign: "center" as const, padding: "14px 10px", borderRadius: 12, fontWeight: 800, fontSize: 14, textDecoration: "none", border: `2px solid ${T.blue}` }}>
+          ✋ Sign Me Up
+        </a>
+      </div>
+
+      {/* ── WHY VOLUNTEER ── */}
+      <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 10px" }}>Why volunteer?</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+        {WHY.map(w => (
+          <div key={w.title} onClick={() => setActiveSection(activeSection === w.title ? null : w.title)} style={sectionStyle(w.title)}>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{w.icon}</span>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 14, color: "#111827", margin: "0 0 2px" }}>{w.title}</p>
+                {activeSection === w.title && <p style={{ fontSize: 13, color: "#6B7280", margin: 0, lineHeight: 1.6 }}>{w.body}</p>}
+              </div>
+              <span style={{ marginLeft: "auto", color: T.blue, fontWeight: 800, fontSize: 16, flexShrink: 0 }}>{activeSection === w.title ? "−" : "+"}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── WHO CAN VOLUNTEER ── */}
+      <div className="cadc-card" style={{ marginBottom: 0 }}>
+        <p className="cadc-label">Who can volunteer?</p>
+        <ul className="cadc-list">
+          {WHO.map(w => <li key={w}>{w}</li>)}
+        </ul>
+        <p style={{ fontSize: 12, color: "#6B7280", marginTop: 10, fontStyle: "italic" }}>No experience necessary. No background check for most activities. Just show up.</p>
+      </div>
+
+      {/* ── WHAT YOU CAN DO ── */}
+      <div className="cadc-card">
+        <p className="cadc-label">What can I do?</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {WHAT.map(w => (
+            <div key={w.label} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12, color: "#374151" }}>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>{w.icon}</span>
+              <span>{w.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── WHEN & WHERE ── */}
+      <div className="cadc-card">
+        <p className="cadc-label">When & where?</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px", lineHeight: 1.6 }}>
+          <strong>No appointment needed.</strong> Walk into any Head Start center during program hours — Monday through Friday. Just tell the teacher or director you'd like to help.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+          {WHEN.map(w => (
+            <a key={w.center} href={`tel:+1${w.phone.replace(/\D/g,"")}`}
+              style={{ display: "flex", flexDirection: "column", background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px 12px", textDecoration: "none" }}>
+              <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{w.center}</span>
+              <span style={{ fontSize: 11, color: T.blue, fontWeight: 600 }}>{w.phone}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ── BOTTOM CTA ── */}
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "20px 18px", textAlign: "center" as const }}>
+        <p style={{ fontWeight: 800, fontSize: 16, color: "#059669", margin: "0 0 8px" }}>Ready to make a difference?</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 14px", lineHeight: 1.6 }}>Questions? Call Robin Harris, Head Start Director, directly.</p>
+        <a href="tel:+15807263343" style={{ display: "inline-block", background: "#059669", color: "white", padding: "13px 24px", borderRadius: 10, fontWeight: 800, fontSize: 15, textDecoration: "none" }}>📞 580-726-3343</a>
+      </div>
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -3480,6 +3692,10 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "volunteer-form", label: "Volunteer", shortLabel: "Volunteer", icon: "🤝",
         content: <VolunteerInterestForm />,
+      },
+      {
+        id: "volunteer-hub", label: "Volunteer Hub", shortLabel: "Vol. Hub", icon: "⭐",
+        content: <VolunteerHub />,
       },
       {
         id: "community-survey", label: "Community Survey", shortLabel: "Survey", icon: "📊",
@@ -4423,6 +4639,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
     "service-screener":   "formServiceScreener",
     "board-docs":         "boardPortal",
     "volunteer-log":      "volunteerLog",
+    "volunteer-hub":      "volunteerLog",
   };
   const _filteredSubs2 = subAreas.filter((a: SubArea) => {
     const gate = _subAreaGates2[a.id]; if (!gate) return true;
@@ -5283,6 +5500,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
     "service-screener":   "formServiceScreener",
     "board-docs":         "boardPortal",
     "volunteer-log":      "volunteerLog",
+    "volunteer-hub":      "volunteerLog",
   };
   const _filteredSubs3 = subAreas.filter((a: SubArea) => {
     const gate = _subAreaGates3[a.id]; if (!gate) return true;
