@@ -834,7 +834,21 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
   isMobile?: boolean;
 }) {
   const isSubLevel = stage === "program" || stage === "content";
-  const items = isSubLevel ? (activeProgram?.subAreas ?? []) : availablePrograms;
+  const { features: _gateFeats } = useCms();
+  const _subAreaGates: Record<string, string> = {
+    "hs-pre-enroll":      "formHeadStartPreEnroll",
+    "weath-interest":     "formWeatherizationInterest",
+    "vita-appointment":   "formVitaAppointment",
+    "volunteer-form":     "formVolunteerInterest",
+    "community-survey":   "formCommunityNeeds",
+    "service-screener":   "formServiceScreener",
+    "board-docs":         "boardPortal",
+  };
+  const _filteredSubs = (activeProgram?.subAreas ?? []).filter(a => {
+    const gate = _subAreaGates[a.id]; if (!gate) return true;
+    return !!(_gateFeats as Record<string,boolean>)?.[gate];
+  });
+  const items = isSubLevel ? _filteredSubs : availablePrograms;
 
   // Spring states for each node (keyed by id/slug)
   const nodeSpringMap = useRef<Map<string, NodeSpring>>(new Map());
@@ -4206,7 +4220,21 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   const subAreas = activeProgram?.subAreas ?? [];
-  const items = (stage === "county") ? availablePrograms : (stage === "program" || stage === "content") ? subAreas : availablePrograms;
+  const { features: _gateFeats2 } = useCms();
+  const _subAreaGates2: Record<string, string> = {
+    "hs-pre-enroll":      "formHeadStartPreEnroll",
+    "weath-interest":     "formWeatherizationInterest",
+    "vita-appointment":   "formVitaAppointment",
+    "volunteer-form":     "formVolunteerInterest",
+    "community-survey":   "formCommunityNeeds",
+    "service-screener":   "formServiceScreener",
+    "board-docs":         "boardPortal",
+  };
+  const _filteredSubs2 = subAreas.filter((a: SubArea) => {
+    const gate = _subAreaGates2[a.id]; if (!gate) return true;
+    return !!(_gateFeats2 as Record<string,boolean>)?.[gate];
+  });
+  const items = (stage === "county") ? availablePrograms : (stage === "program" || stage === "content") ? _filteredSubs2 : availablePrograms;
   const RADIUS = 38;
   const SIZE = "min(80vw,420px)";
 
@@ -5020,7 +5048,21 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   const subAreas = activeProgram?.subAreas ?? [];
-  const items = (stage === "program" || stage === "content") ? subAreas : availablePrograms;
+  const { features: _gateFeats3 } = useCms();
+  const _subAreaGates3: Record<string, string> = {
+    "hs-pre-enroll":      "formHeadStartPreEnroll",
+    "weath-interest":     "formWeatherizationInterest",
+    "vita-appointment":   "formVitaAppointment",
+    "volunteer-form":     "formVolunteerInterest",
+    "community-survey":   "formCommunityNeeds",
+    "service-screener":   "formServiceScreener",
+    "board-docs":         "boardPortal",
+  };
+  const _filteredSubs3 = subAreas.filter((a: SubArea) => {
+    const gate = _subAreaGates3[a.id]; if (!gate) return true;
+    return !!(_gateFeats3 as Record<string,boolean>)?.[gate];
+  });
+  const items = (stage === "program" || stage === "content") ? _filteredSubs3 : availablePrograms;
   const RADIUS = 38;
 
   return (
