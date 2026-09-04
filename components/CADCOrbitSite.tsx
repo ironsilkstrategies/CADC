@@ -25,7 +25,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 type Lang = "en" | "es";
 
 const ES: Record<string, string> = {
-  // Navigation & UI
+  // ── Navigation & UI ──────────────────────────────────────────────────────
   "Home": "Inicio",
   "Back": "Regresar",
   "Call": "Llamar",
@@ -38,9 +38,20 @@ const ES: Record<string, string> = {
   "programs available": "programas disponibles",
   "All Counties": "Todos los Condados",
   "View all services": "Ver todos los servicios",
-  // Programs
+  "Not sure where to start?": "¿No sabe por dónde empezar?",
+  "Find My Benefits →": "Encontrar Mis Beneficios →",
+  "Find My Benefits": "Encontrar Mis Beneficios",
+  "Get Help": "Obtener Ayuda",
+  "Apply": "Aplicar",
+  "Find a Location": "Encontrar Ubicación",
+  "Schedule a Ride": "Programar un Viaje",
+  "Apply for Head Start": "Aplicar para Head Start",
+  "Tap to Explore Your County": "Toque para Explorar su Condado",
+  // ── Programs ──────────────────────────────────────────────────────────────
   "Head Start": "Head Start",
+  "Early Head Start": "Early Head Start",
   "Red River Transit": "Tránsito Red River",
+  "Red River Transportation": "Transporte Red River",
   "Weatherization": "Climatización",
   "Senior Nutrition": "Nutrición para Adultos Mayores",
   "VITA Free Tax Help": "Ayuda Gratuita con Impuestos VITA",
@@ -48,19 +59,68 @@ const ES: Record<string, string> = {
   "Employment & Workforce": "Empleo y Fuerza Laboral",
   "Board & Leadership": "Junta Directiva y Liderazgo",
   "Advantage Home Delivered Meals": "Comidas a Domicilio Advantage",
-  // Common CTA
+  // ── Head Start critical path ───────────────────────────────────────────────
+  "Who Qualifies": "¿Quién Califica?",
+  "How to Apply": "Cómo Aplicar",
+  "Express Interest": "Expresar Interés",
+  "Is my child eligible?": "¿Mi hijo califica?",
+  "Children from birth to age 5": "Niños desde el nacimiento hasta los 5 años",
+  "Free early education": "Educación temprana gratuita",
+  "Apply through ChildPlus": "Aplicar a través de ChildPlus",
+  "Find a center near you": "Encontrar un centro cerca de usted",
+  "Enrollment open": "Inscripción abierta",
+  "Call to apply": "Llame para aplicar",
+  // ── Screener critical path ────────────────────────────────────────────────
+  "Answer 6 quick questions and we'll show you which CADC programs you may qualify for.": "Responda 6 preguntas rápidas y le mostraremos los programas de CADC para los que podría calificar.",
+  "Your county": "Su condado",
+  "Select county": "Seleccionar condado",
+  "Household size": "Tamaño del hogar",
+  "Approximate annual household income": "Ingresos anuales aproximados del hogar",
+  "Children in your household?": "¿Niños en su hogar?",
+  "Anyone in household age 60 or older?": "¿Alguien en el hogar mayor de 60 años?",
+  "Do you own or rent your home?": "¿Es dueño o renta su hogar?",
+  "See My Results →": "Ver Mis Resultados →",
+  "Based on your answers, you may qualify for:": "Según sus respuestas, puede calificar para:",
+  // ── Transit critical path ──────────────────────────────────────────────────
+  "Schedule a ride": "Programar un viaje",
+  "Request a Ride": "Solicitar un Viaje",
+  "Your name": "Su nombre",
+  "Phone number": "Número de teléfono",
+  "Pickup address": "Dirección de recogida",
+  "Destination": "Destino",
+  "Where are you going?": "¿A dónde va?",
+  "Accessibility needs": "Necesidades de accesibilidad",
+  "Submit Ride Request →": "Enviar Solicitud de Viaje →",
+  "Spanish-speaking staff available": "Personal de habla hispana disponible",
+  // ── Alert / emergency ─────────────────────────────────────────────────────
+  "Service Alert": "Alerta de Servicio",
+  "Office closed": "Oficina cerrada",
+  "Emergency": "Emergencia",
+  // ── Common CTA ────────────────────────────────────────────────────────────
   "Apply Now": "Aplicar Ahora",
-  "Schedule a Ride": "Programar un Viaje",
   "View Menu": "Ver Menú",
   "See Schedule": "Ver Horario",
   "Learn More": "Saber Más",
   "Contact Us": "Contáctenos",
-  "Find a Location": "Encontrar Ubicación",
-  // Footer
+  "Call CADC": "Llamar a CADC",
+  "Call Now": "Llamar Ahora",
+  "Submit": "Enviar",
+  "Sending…": "Enviando…",
+  "Full name": "Nombre completo",
+  "First and last name": "Nombre y apellido",
+  "Select": "Seleccionar",
+  "Select range": "Seleccionar rango",
+  "Optional": "Opcional",
+  // ── Footer ────────────────────────────────────────────────────────────────
   "Reducing poverty in communities by empowering people": "Reduciendo la pobreza en las comunidades empoderando a las personas",
   "Helping People. Changing Lives.": "Ayudando a las personas. Cambiando vidas.",
   "Serving": "Sirviendo",
   "counties across Southwest Oklahoma": "condados en el suroeste de Oklahoma",
+  "Get Help": "Obtener Ayuda",
+  "Careers": "Empleos",
+  "Transparency": "Transparencia",
+  "Privacy": "Privacidad",
+  "Your information is kept private": "Su información se mantiene privada",
 };
 
 function t(key: string, lang: Lang): string {
@@ -2536,6 +2596,147 @@ function CADCNow() {
   );
 }
 
+
+
+// ─── Find CADC Near Me ────────────────────────────────────────────────────────
+const CADC_LOCATIONS = [
+  { name: "CADC Main Office", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Head Start","Weatherization","Senior Nutrition","VITA","Administration"] },
+  { name: "Head Start — Hobart Center", city: "Hobart", lat: 35.0212, lng: -99.0912, phone: "580-726-3343", href: "tel:+15807263343", services: ["Head Start","Early Head Start"] },
+  { name: "Head Start — Sayre Center", city: "Sayre", lat: 35.2912, lng: -99.6412, phone: "580-928-2199", href: "tel:+15809282199", services: ["Head Start"] },
+  { name: "Advantage — Sentinel Office", city: "Sentinel", lat: 35.1612, lng: -99.1712, phone: "580-393-2216", href: "tel:+15803932216", services: ["Advantage Meals"] },
+  { name: "Advantage — Temple Office", city: "Temple", lat: 34.2712, lng: -98.2412, phone: "580-342-6967", href: "tel:+15803426967", services: ["Advantage Meals"] },
+  { name: "Advantage — Lawton Office", city: "Lawton", lat: 34.6086, lng: -98.3959, phone: "580-699-8880", href: "tel:+15806998880", services: ["Advantage Meals"] },
+  { name: "Red River Transit Dispatch", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-2691", href: "tel:+15803352691", services: ["Transportation"] },
+];
+
+function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function FindNearMe({ onClose }: { onClose?: () => void }) {
+  const [state, setState] = useState<"idle"|"loading"|"done"|"denied">("idle");
+  const [nearest, setNearest] = useState<typeof CADC_LOCATIONS[0] & { miles: number } | null>(null);
+
+  function locate() {
+    if (!navigator.geolocation) { setState("denied"); return; }
+    setState("loading");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords;
+        let best = null as any;
+        let bestDist = Infinity;
+        for (const loc of CADC_LOCATIONS) {
+          const d = distanceMiles(latitude, longitude, loc.lat, loc.lng);
+          if (d < bestDist) { bestDist = d; best = { ...loc, miles: Math.round(d * 10) / 10 }; }
+        }
+        setNearest(best);
+        setState("done");
+      },
+      () => setState("denied"),
+      { timeout: 8000 }
+    );
+  }
+
+  if (state === "idle") return (
+    <button onClick={locate} style={{ width: "100%", background: "#0101FF", color: "white", border: "none", borderRadius: 12, padding: "14px 16px", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+      📍 Find CADC Near Me
+    </button>
+  );
+
+  if (state === "loading") return (
+    <div style={{ textAlign: "center", padding: "20px", color: "#6B7280", fontSize: 13 }}>📍 Finding nearest location…</div>
+  );
+
+  if (state === "denied") return (
+    <div style={{ background: "#FFF8E7", border: "1px solid #FDE68A", borderRadius: 12, padding: "16px", fontSize: 13, color: "#92400E" }}>
+      Location access was denied. Call CADC at <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700 }}>580-335-5588</a> to find the office nearest you.
+    </div>
+  );
+
+  if (state === "done" && nearest) return (
+    <div style={{ background: "white", border: "1.5px solid #0101FF", borderRadius: 14, padding: "18px", boxShadow: "0 2px 12px rgba(1,1,255,0.1)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: "#111827", marginBottom: 2 }}>{nearest.name}</div>
+          <div style={{ fontSize: 12, color: "#6B7280" }}>{nearest.city}, OK · {nearest.miles} miles away</div>
+        </div>
+        <div style={{ background: "#E4E4FF", color: "#0101FF", fontWeight: 800, fontSize: 13, padding: "4px 10px", borderRadius: 20 }}>{nearest.miles} mi</div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+        {nearest.services.map(s => <span key={s} style={{ background: "#F0F0FF", color: "#0101FF", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>{s}</span>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <a href={nearest.href} style={{ display: "block", background: "#CC0000", color: "white", textAlign: "center" as const, padding: "12px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>📞 Call</a>
+        <a href={`https://maps.google.com/?q=${nearest.name}+${nearest.city}+OK`} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: "white", color: "#0101FF", textAlign: "center" as const, padding: "12px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none", border: "1.5px solid #0101FF" }}>🗺️ Directions</a>
+      </div>
+      {onClose && <button onClick={onClose} style={{ marginTop: 10, width: "100%", background: "none", border: "none", color: "#9CA3AF", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Close</button>}
+    </div>
+  );
+
+  return null;
+}
+
+// ─── Employment Quick Apply Form ──────────────────────────────────────────────
+function QuickApplyForm() {
+  const [form, setForm] = useState({ name: "", phone: "", county: "", position: "", experience: "", message: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (state === "done") return (
+    <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
+      <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+      <div style={{ fontWeight: 800, color: "#059669", fontSize: 16, marginBottom: 6 }}>Application received!</div>
+      <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>CADC HR will be in touch soon. Questions? Call Suzie Fletcher at <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700 }}>580-335-5588</a>.</div>
+    </div>
+  );
+
+  return (
+    <div>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Full name <span style={{ color: "#CC0000" }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="First and last name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Phone number <span style={{ color: "#CC0000" }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your county</label>
+            <select style={{ width: "100%", fontSize: 14, padding: "12px 10px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+              <option value="">Select</option>
+              {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Interested in</label>
+            <select style={{ width: "100%", fontSize: 14, padding: "12px 10px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.position} onChange={f("position")}>
+              <option value="">Select</option>
+              <option value="head-start-teacher">Head Start Teacher</option>
+              <option value="head-start-aide">Head Start Aide</option>
+              <option value="head-start-cook">Head Start Cook</option>
+              <option value="transit-driver">Transit Driver</option>
+              <option value="weatherization">Weatherization Crew</option>
+              <option value="nutrition">Senior Nutrition</option>
+              <option value="admin">Administration</option>
+              <option value="open">Open to anything</option>
+            </select>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Relevant experience (optional)</label><textarea style={{ width: "100%", fontSize: 14, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block", minHeight: 72, resize: "vertical" as const }} value={form.message} onChange={f("message")} placeholder="Teaching, driving, childcare, bilingual, etc." /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }}
+          disabled={state === "sending"}
+          onClick={async () => {
+            if (!form.name || !form.phone) { setState("err"); return; }
+            setState("sending");
+            await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...form, program: "employment", step: "quick-apply", _gotcha: "" }) }).catch(() => {});
+            setState("done");
+          }}>{state === "sending" ? "Sending…" : "Submit Application →"}</button>
+        <p style={{ fontSize: 10, color: "#9CA3AF", textAlign: "center" as const, marginTop: 8, lineHeight: 1.5 }}>🔒 Your information is used only for employment consideration and kept confidential.</p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Transit Fare Calculator ──────────────────────────────────────────────────
 const TRANSIT_ROUTES: { label: string; from: string; to: string; miles: number }[] = [
   { label: "Frederick → Lawton", from: "Frederick", to: "Lawton", miles: 68 },
@@ -3607,15 +3808,47 @@ const PROGRAMS: ProgramData[] = [
         id: "jobs", label: "Open Positions", shortLabel: "Jobs", icon: "📋",
         content: (
           <div className="cadc-light-content">
-            <p>CADC has positions across multiple programs — Head Start, transit, weatherization, administration, and more. We serve 9 counties and our team reflects the communities we're in.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">View current openings</p>
-              <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-btn">CADC on Facebook →</a>
+            <p>CADC employs more than 200 people across 9 counties in Southwest Oklahoma — teachers, drivers, weatherization crews, cooks, caseworkers, and administrators. We hire from the communities we serve.</p>
+            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF"}}>
+              <p style={{fontWeight:800,fontSize:14,color:"#111827",margin:"0 0 4px"}}>📋 View Current Openings</p>
+              <p style={{fontSize:12,color:"#6B7280",margin:"0 0 12px",lineHeight:1.5}}>Current job postings are listed on the CADC Facebook page. New positions are posted regularly.</p>
+              <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-btn">View Jobs on Facebook →</a>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Or call us directly</p>
-              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+              <p className="cadc-label">Or call HR directly</p>
+              <p style={{fontSize:13,margin:"0 0 8px"}}>Suzie Fletcher · Human Resources</p>
+              <a href="tel:+15803355588" className="cadc-btn">📞 580-335-5588</a>
             </div>
+          </div>
+        ),
+      },
+      {
+        id: "pay-benefits", label: "Pay & Benefits", shortLabel: "Pay", icon: "💰",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC offers competitive pay, especially for positions that carry community responsibility. Here's what you can expect.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Head Start Teacher Pay Scale",d:"$12.50/hr — no CDA or degree
+$14.00/hr — CDA credential
+$15.50/hr — Associate's degree
+$17.23/hr — Bachelor's degree or higher
+
+CDA training reimbursement available. CADC actively supports staff in earning credentials while working."},
+                {t:"Transit Driver",d:"Competitive hourly rate. CDL required or training assistance available. Full benefits included."},
+                {t:"100% Agency-Paid Benefits",d:"Vision insurance · Life insurance · Paid holidays · Paid leave · Retirement plan options. CADC covers 100% of employee premiums for vision and life insurance."},
+                {t:"Professional Development",d:"CADC supports staff training, credential attainment, and career growth. Head Start teachers can move up the pay scale as they earn credentials — on the job."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p style={{whiteSpace:"pre-line"}}>{i.d}</p></div>)}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "quick-apply", label: "Quick Apply", shortLabel: "Apply", icon: "✍️",
+        content: (
+          <div className="cadc-light-content">
+            <p style={{marginBottom:16}}>Take 60 seconds to let us know you're interested. CADC HR will reach out to discuss open positions and next steps.</p>
+            <QuickApplyForm />
           </div>
         ),
       },
@@ -3623,9 +3856,18 @@ const PROGRAMS: ProgramData[] = [
         id: "why", label: "Why CADC", shortLabel: "Why CADC", icon: "⭐",
         content: (
           <div className="cadc-light-content">
-            <p>Working at CADC means showing up every day for the people in your community who need it most — children, seniors, families navigating hard times.</p>
-            <div className="cadc-grid-2">
-              {["Mission-driven work","Benefits package","Community impact","Professional development","Stable employment","Regional reach"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+            <p>Working at CADC means showing up every day for the people in your community who need it most — children, seniors, families navigating hard times. Here's what makes it different.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Your work is visible",d:"You don't spend your career wondering if it matters. In Southwest Oklahoma, people know CADC. They know the bus driver who got their grandmother to dialysis. They know the Head Start teacher who helped their kid learn to read."},
+                {t:"Deep community roots since 1966",d:"CADC has been here for 60 years. This isn't a startup. It's a stable organization with a real track record — and a team that stays."},
+                {t:"Growth from within",d:"Many of CADC's senior staff and directors started in entry-level positions. If you want to grow, the path is here."},
+                {t:"Southwest Oklahoma is home",d:"CADC hires locally and intentionally. We believe the best people to serve a community are the people who live there."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+            <div className="cadc-card" style={{marginTop:4}}>
+              <p className="cadc-label">Ready to join the team?</p>
+              <a href="/?program=employment&area=quick-apply" className="cadc-btn">Apply in 60 Seconds →</a>
             </div>
           </div>
         ),
@@ -3761,6 +4003,121 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "volunteer-hub", label: "Volunteer Hub", shortLabel: "Vol. Hub", icon: "⭐",
         content: <VolunteerHub />,
+      },
+      {
+      {
+        id: "transparency", label: "Transparency Center", shortLabel: "Transparency", icon: "📊",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC is publicly funded and publicly accountable. Everything below is available to any member of the community.</p>
+
+            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF",marginBottom:0}}>
+              <p style={{fontWeight:800,fontSize:14,color:"#0101FF",margin:"0 0 12px",textTransform:"uppercase",letterSpacing:"0.08em",fontSize:10}}>📁 Financial & Compliance Documents</p>
+              {[
+                {label:"FY2025 Annual Report",href:"/documents/annual-report-2025.pdf",note:"Program outcomes, financials, board roster"},
+                {label:"Title VI Nondiscrimination Policy",href:"/documents/title-vi-policy.pdf",note:"Red River Transportation — revised Feb 2026"},
+                {label:"Affirmative Action Plan 2023",href:"/documents/affirmative-action-plan-2023.pdf",note:"Equal opportunity employment commitment"},
+              ].map(d=>(
+                <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer"
+                  style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:"1px solid rgba(1,1,255,0.1)",textDecoration:"none"}}>
+                  <span style={{fontSize:20,flexShrink:0}}>📄</span>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{d.label}</div><div style={{fontSize:11,color:"#6B7280"}}>{d.note}</div></div>
+                </a>
+              ))}
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Performance — FY2025 Annual Report</p>
+              {[
+                ["🧒","Head Start","1,200+ children served across 11 centers in 9 counties"],
+                ["🚌","Red River Transit","220,175 passenger trips · 1.56M revenue miles · 12 counties"],
+                ["🍽️","Senior Nutrition","28,827 congregate meals + 24,485 home-delivered meals · 327 clients · 6 sites"],
+                ["🏠","Advantage Meals","340,830 frozen meals delivered · avg 736 clients/month · 13 counties"],
+                ["🏡","Weatherization","17 counties served · Priority: elderly, disabled, children 18 and under"],
+                ["💰","VITA Tax Help","91 returns filed · $67,000 income threshold · 5 counties"],
+              ].map(([icon,prog,stat])=>(
+                <div key={prog} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:"1px solid #F3F4F6"}}>
+                  <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{prog}</div><div style={{fontSize:12,color:"#6B7280",lineHeight:1.5}}>{stat}</div></div>
+                </div>
+              ))}
+              <p style={{fontSize:10,color:"#9CA3AF",marginTop:10}}>Source: CADC FY2025 Annual Report</p>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Governance</p>
+              <p style={{fontSize:13,color:"#374151",margin:"0 0 10px",lineHeight:1.6}}>CADC is governed by a tripartite Board of Directors with 19 members representing public sector, private sector, and low-income community constituents across our 8-county board area.</p>
+              <a href="/?program=board&area=board-members" className="cadc-btn" style={{marginBottom:8}}>View Board of Directors →</a>
+              <a href="/?program=board&area=board-docs" className="cadc-btn" style={{background:"white",color:"#0101FF",border:"1.5px solid #0101FF"}}>Board Documents & Minutes →</a>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Civil Rights</p>
+              {[
+                {title:"Title VI — No discrimination",body:"CADC does not discriminate on the basis of race, color, or national origin in any federally funded program or activity."},
+                {title:"ADA Compliance",body:"All CADC facilities and programs are accessible to persons with disabilities. Transit vehicles are ADA-equipped on all routes."},
+                {title:"Complaint Procedures",body:"To file a civil rights complaint, contact CADC at 580-335-5588 or write to 105 S. Main Street, Frederick, OK 73542. You may also contact the U.S. Department of Health and Human Services."},
+              ].map(i=><div key={i.title} className="cadc-card-sm"><p className="cadc-card-title">{i.title}</p><p>{i.body}</p></div>)}
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Funding Sources</p>
+              <p style={{fontSize:13,color:"#374151",lineHeight:1.6}}>CADC programs are funded through a combination of federal, state, and local sources including:</p>
+              <ul className="cadc-list" style={{marginTop:8}}>
+                {["U.S. Department of Health & Human Services — Head Start","U.S. Department of Energy — Weatherization Assistance Program (WAP)","Oklahoma Department of Human Services — Advantage, Senior Nutrition, LIHEAP","Federal Transit Administration — Red River Transportation","Oklahoma Community Services Block Grant (CSBG)","Local in-kind contributions and volunteer hours"].map(i=><li key={i}>{i}</li>)}
+              </ul>
+            </div>
+          </div>
+        ),
+      },
+      {
+      {
+        id: "community-voice", label: "What You Told Us", shortLabel: "Your Voice", icon: "🗣️",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC conducts a Community Needs Assessment every three years. Here's what Southwest Oklahoma residents are telling us — and what CADC is doing about it.</p>
+
+            <div style={{background:"linear-gradient(135deg,#0101FF 0%,#1a1aee 100%)",borderRadius:14,padding:"20px 18px",marginBottom:16}}>
+              <p style={{color:"rgba(255,255,255,0.65)",fontSize:10,fontWeight:800,letterSpacing:"0.18em",textTransform:"uppercase",margin:"0 0 14px"}}>Top Reported Community Needs</p>
+              {[
+                {need:"Transportation",pct:31,color:"#60A5FA"},
+                {need:"Food Access",pct:27,color:"#34D399"},
+                {need:"Housing",pct:22,color:"#FBBF24"},
+                {need:"Employment",pct:18,color:"#F87171"},
+                {need:"Healthcare Access",pct:14,color:"#A78BFA"},
+              ].map(({need,pct,color})=>(
+                <div key={need} style={{marginBottom:12}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{color:"white",fontSize:13,fontWeight:700}}>{need}</span>
+                    <span style={{color:"rgba(255,255,255,0.7)",fontSize:13,fontWeight:800}}>{pct}%</span>
+                  </div>
+                  <div style={{background:"rgba(255,255,255,0.15)",borderRadius:6,height:8}}>
+                    <div style={{height:"100%",width:`${pct}%`,background:color,borderRadius:6,transition:"width 1s ease"}} />
+                  </div>
+                </div>
+              ))}
+              <p style={{color:"rgba(255,255,255,0.45)",fontSize:10,margin:"12px 0 0"}}>Source: CADC Community Needs Assessment · Southwest Oklahoma</p>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">What CADC is doing about it</p>
+              <div className="cadc-stack">
+                {[
+                  {need:"Transportation",action:"Red River Transit expanded to 12 counties in 2026 after MAGB transition. Online ride requests now available at cadcok.org."},
+                  {need:"Food Access",action:"Community Market mobile food program operating across Southwest Oklahoma. Senior Nutrition serving 327+ clients across 6 sites. Advantage delivering 340K+ frozen meals annually."},
+                  {need:"Housing & Energy",action:"Weatherization Assistance Program operating in 17 counties. Priority given to households with elderly, disabled, or children 18 and under."},
+                  {need:"Employment",action:"CADC employs 200+ staff across 9 counties. Head Start offers CDA training reimbursement and a career ladder for teaching staff."},
+                ].map(i=><div key={i.need} className="cadc-card-sm"><p className="cadc-card-title">✅ {i.need}</p><p>{i.action}</p></div>)}
+              </div>
+            </div>
+
+            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF"}}>
+              <p style={{fontWeight:800,fontSize:14,color:"#111827",margin:"0 0 6px"}}>Have your say</p>
+              <p style={{fontSize:13,color:"#6B7280",margin:"0 0 14px",lineHeight:1.5}}>Your input directly shapes how CADC plans programs and allocates resources. Take the 2026 Community Needs Survey.</p>
+              <a href="/?program=board&area=community-survey" className="cadc-btn">Take the Survey →</a>
+            </div>
+          </div>
+        ),
       },
       {
         id: "community-survey", label: "Community Survey", shortLabel: "Survey", icon: "📊",
@@ -5213,6 +5570,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
         <a href="/?program=board&area=service-screener" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>🔍 Find My Benefits</a>
         <a href="tel:+15803355588" style={linkStyle}>📞 Call CADC — 580-335-5588</a>
         <a href="/contact" style={linkStyle}>📍 Find a Location</a>
+        <div style={{ margin: "6px 0" }}><FindNearMe /></div>
         <a href="/?program=transit&area=rides" style={linkStyle}>🚌 Schedule a Ride</a>
         <a href="/?program=head-start&area=apply" style={linkStyle}>📝 Apply for Head Start</a>
 
