@@ -702,7 +702,7 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
   const premiumFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
     { key: "transitBooking",    label: "Online Ride Booking",         icon: "🚌", desc: "Online ride request form on Transit → Schedule a Ride. Off = call button only." },
     { key: "intakeLeads",       label: "Follow-Up Capture",           icon: "📥", desc: "Follow-up contact form on eligibility pages. Sends inquiries to the Intake Leads tab." },
-    { key: "volunteerLog",      label: "Public Volunteer Hour Logger",       icon: "🤝", desc: "Shows a 'Log My Hours' form in Head Start → Parent Engagement → Log Hours. Volunteers submit their own hours directly — feeds into the Volunteer Hrs tab. Off = phone-only message shown." },
+    { key: "volunteerLog",      label: "Public Volunteer Hour Logger",       icon: "🤝", desc: "Shows 'Log My Hours' in Head Start → Log Hours AND the full Volunteer Hub (⭐) in Board & Leadership — with live progress ring, federal match tracker, why/who/what/when. Off = both nodes hidden." },
     { key: "faqAccordion",      label: "Head Start FAQ",              icon: "❓", desc: "FAQ accordion section on Head Start program page. Robin requested — toggle on when content is ready." },
     { key: "boardPortal",       label: "Board Document Portal",       icon: "📁", desc: "Board Documents sub-area in Board & Leadership — Tiffany uploads agendas, minutes, resolutions." },
     { key: "contentScheduling", label: "Content Scheduling",          icon: "🗓️", desc: "Scheduled content publishing system — stage updates to go live automatically on a future date." },
