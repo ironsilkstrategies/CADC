@@ -88,12 +88,18 @@ export interface SiteContent {
   boardDocs: BoardDoc[];
 }
 
-export const CMS_KEY        = "cadc:content";
-export const LEADS_KEY      = "cadc:leads";
-export const STATS_KEY      = "cadc:stats";
-export const VOLUNTEER_KEY  = "cadc:volunteer";
-export const BOOKINGS_KEY   = "cadc:bookings";
-export const SCHEDULE_KEY   = "cadc:schedule";
+// ─── KV Keys ─────────────────────────────────────────────────────────────────
+export const CMS_KEY             = "cadc:content";
+export const CMS_KEY_ES          = "cadc:content:es";          // Gemini-translated Spanish version
+export const CONTENT_BLOCKS_KEY  = "cadc:content-blocks";
+export const CONTENT_BLOCKS_KEY_ES = "cadc:content-blocks:es"; // Spanish content block overrides
+export const LEADS_KEY           = "cadc:leads";
+export const STATS_KEY           = "cadc:stats";
+export const VOLUNTEER_KEY       = "cadc:volunteer";
+export const BOOKINGS_KEY        = "cadc:bookings";
+export const SCHEDULE_KEY        = "cadc:schedule";
+export const MEDIA_KEY           = "cadc:media";
+export const ARCHIVE_KEY         = "cadc:archive";
 
 export const DEFAULT_CONTENT: SiteContent = {
   updatedAt: "2026-09-01T00:00:00.000Z",
@@ -189,6 +195,8 @@ export const DEFAULT_CONTENT: SiteContent = {
   ],
 };
 
+// ─── Fetch helpers ────────────────────────────────────────────────────────────
+
 export async function fetchContent(): Promise<SiteContent> {
   try {
     const r = await fetch("/api/cms", { cache: "no-store" });
@@ -196,6 +204,21 @@ export async function fetchContent(): Promise<SiteContent> {
     const j = await r.json();
     return { ...DEFAULT_CONTENT, ...j, features: { ...DEFAULT_CONTENT.features, ...(j.features ?? {}) } };
   } catch { return DEFAULT_CONTENT; }
+}
+
+// Fetches the Gemini-translated Spanish version from KV.
+// Returns null if no Spanish version has been generated yet
+// (admin hasn't saved with spanishToggle on, or Gemini hasn't run).
+// The public site falls back to English in that case — never breaks.
+export async function fetchContentEs(): Promise<SiteContent | null> {
+  try {
+    const r = await fetch("/api/cms?lang=es", { cache: "no-store" });
+    if (!r.ok) return null;
+    const j = await r.json();
+    // API returns { es: false } when KV has no Spanish version yet
+    if (j?.es === false) return null;
+    return { ...DEFAULT_CONTENT, ...j, features: { ...DEFAULT_CONTENT.features, ...(j.features ?? {}) } };
+  } catch { return null; }
 }
 
 export async function fetchLeads(adminKey: string): Promise<IntakeLead[]> {
@@ -249,9 +272,6 @@ export interface ArchivedItem {
   archivedBy: string;
 }
 
-export const MEDIA_KEY   = "cadc:media";
-export const ARCHIVE_KEY = "cadc:archive";
-
 export interface ContentBlock {
   id: string;
   section: string;
@@ -261,8 +281,6 @@ export interface ContentBlock {
   updatedAt: string;
   updatedBy: string;
 }
-
-export const CONTENT_BLOCKS_KEY = "cadc:content-blocks";
 
 export async function fetchMedia(adminKey: string): Promise<MediaAsset[]> {
   try { const r = await fetch("/api/cms/media", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
