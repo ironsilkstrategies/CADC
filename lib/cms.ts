@@ -213,3 +213,63 @@ export async function fetchBookings(adminKey: string): Promise<TransitBooking[]>
 export async function fetchSchedule(adminKey: string): Promise<ScheduledItem[]> {
   try { const r = await fetch("/api/cms/schedule", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ─── MEDIA LIBRARY & ARCHIVE SYSTEM (site-builder admin) ───────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface MediaAsset {
+  id: string;
+  url: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  kind: "image" | "document" | "other";
+  tags: string[];
+  altText?: string;
+  uploadedBy: string;
+  uploadedAt: string;
+  aiSuggestion?: {
+    contentType: string;
+    targetSection: string;
+    confidence: "high" | "medium" | "low";
+    reasoning: string;
+    extractedData?: Record<string, unknown>;
+  };
+  archivedAt?: string;
+}
+
+export interface ArchivedItem {
+  id: string;
+  section: string;
+  originalId: string;
+  label: string;
+  payload: unknown;
+  archivedAt: string;
+  archivedBy: string;
+}
+
+export const MEDIA_KEY   = "cadc:media";
+export const ARCHIVE_KEY = "cadc:archive";
+
+export interface ContentBlock {
+  id: string;
+  section: string;
+  label: string;
+  type: "text" | "richtext" | "image" | "stat";
+  value: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export const CONTENT_BLOCKS_KEY = "cadc:content-blocks";
+
+export async function fetchMedia(adminKey: string): Promise<MediaAsset[]> {
+  try { const r = await fetch("/api/cms/media", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
+}
+export async function fetchArchive(adminKey: string): Promise<ArchivedItem[]> {
+  try { const r = await fetch("/api/cms/archive", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
+}
+export async function fetchContentBlocks(adminKey: string): Promise<ContentBlock[]> {
+  try { const r = await fetch("/api/cms/content-blocks", { headers: { "x-admin-key": adminKey }, cache: "no-store" }); if (!r.ok) return []; return r.json(); } catch { return []; }
+}
