@@ -1768,50 +1768,38 @@ function TransitBookingForm() {
   }
   if (state === "done") return (
     <div className="cadc-light-content">
-      <div className="cadc-card" style={{ textAlign: "center", background: "#F0FFF4", border: "1px solid #059669" }}>
-        <p style={{ fontSize: 32, margin: "0 0 8px" }}>✅</p>
-        <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Ride request received!</p>
-        <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Gilbert's team will confirm your ride by phone. Questions? Call <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700 }}>(580) 335-2691</a>.</p>
+      <div className="form-success">
+        <div className="form-success-icon">✅</div>
+        <div className="form-success-title">Ride request received!</div>
+        <div className="form-success-msg">Gilbert's team will confirm your ride by phone. Questions? Call <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700 }}>(580) 335-2691</a>.</div>
       </div>
     </div>
   );
   return (
     <div className="cadc-light-content">
-      <p>Request a ride online and Gilbert's team will confirm by phone. You can also call directly at <a href="tel:+15803352691" className="cadc-link">(580) 335-2691</a>.</p>
-      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in all required fields.</p>}
-      <div className="cadc-card">
-        <p className="cadc-label">Your name *</p>
-        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" />
-        <p className="cadc-label" style={{marginTop:10}}>Phone number *</p>
-        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" />
-        <p className="cadc-label" style={{marginTop:10}}>Pickup address *</p>
-        <input className="cadc-input" value={form.pickupAddress} onChange={f("pickupAddress")} placeholder="Street address, city" />
-        <p className="cadc-label" style={{marginTop:10}}>Destination *</p>
-        <input className="cadc-input" value={form.destination} onChange={f("destination")} placeholder="Where are you going?" />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 10 }}>
-          <div>
-            <p className="cadc-label">Date *</p>
-            <input className="cadc-input" type="date" value={form.requestedDate} onChange={f("requestedDate")} />
-          </div>
-          <div>
-            <p className="cadc-label">Preferred time</p>
-            <input className="cadc-input" type="time" value={form.requestedTime} onChange={f("requestedTime")} />
-          </div>
+      <p style={{marginBottom:16}}>Request a ride online and Gilbert's team will confirm by phone. You can also call directly at <a href="tel:+15803352691" className="cadc-link">(580) 335-2691</a>.</p>
+      {state === "err" && <div className="form-error">Please fill in all required fields.</div>}
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div className="form-field"><label className="form-label">Pickup address <span className="form-required">*</span></label><input className="cadc-input" value={form.pickupAddress} onChange={f("pickupAddress")} placeholder="Street address, city" /></div>
+        <div className="form-field"><label className="form-label">Destination <span className="form-required">*</span></label><input className="cadc-input" value={form.destination} onChange={f("destination")} placeholder="Where are you going?" /></div>
+        <div className="form-row">
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Date <span className="form-required">*</span></label><input className="cadc-input" type="date" value={form.requestedDate} onChange={f("requestedDate")} /></div>
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Preferred time</label><input className="cadc-input" type="time" value={form.requestedTime} onChange={f("requestedTime")} /></div>
         </div>
-        <p className="cadc-label" style={{marginTop:10}}>Accessibility needs</p>
-        <select className="cadc-input" value={form.accessibility} onChange={f("accessibility")}>
-          <option value="none">None</option>
-          <option value="wheelchair">Wheelchair lift needed</option>
-          <option value="walker">Walker / mobility aid</option>
-          <option value="oxygen">Oxygen equipment</option>
-          <option value="other">Other — I'll explain in notes</option>
-        </select>
-        <p className="cadc-label" style={{marginTop:10}}>Additional notes</p>
-        <textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" style={{ minHeight: 72, resize: "vertical" }} />
-        <button className="cadc-btn" style={{ marginTop: 14, width: "100%", opacity: state === "sending" ? 0.6 : 1 }} onClick={submit} disabled={state === "sending"}>
-          {state === "sending" ? "Sending…" : "Submit Ride Request →"}
-        </button>
-        <p className="cadc-note" style={{marginTop:8}}>Spanish-speaking staff available. ADA vehicles on all routes.</p>
+        <div className="form-field" style={{marginTop:14}}><label className="form-label">Accessibility needs</label>
+          <select className="cadc-input" value={form.accessibility} onChange={f("accessibility")}>
+            <option value="none">None needed</option>
+            <option value="wheelchair">Wheelchair lift needed</option>
+            <option value="walker">Walker / mobility aid</option>
+            <option value="oxygen">Oxygen equipment</option>
+            <option value="other">Other — explain in notes</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Additional notes</label><textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" /></div>
+        <button className="form-submit" onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Submit Ride Request →"}</button>
+        <p className="form-note">Spanish-speaking staff available · ADA vehicles on all routes</p>
       </div>
     </div>
   );
@@ -1838,23 +1826,24 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
     <div>
       {children}
       {state !== "done" ? (
-        <div className="cadc-card" style={{ marginTop: 14, background: "#F0F0FF", border: `1px solid ${T.blue}` }}>
-          <p className="cadc-label">Want us to follow up with you?</p>
-          <p style={{ fontSize: 13, color: "#374151", margin: "0 0 10px" }}>Leave your name and number and a CADC staff member will reach out to help you through the process.</p>
-          <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Your name" style={{ marginBottom: 8 }} />
-          <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="Phone number" style={{ marginBottom: 8 }} />
-          <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
-            <option value="">Your county (optional)</option>
-            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
-          </select>
-          <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} onClick={submit} disabled={state === "sending"}>
-            {state === "sending" ? "Sending…" : "Request a Follow-Up Call"}
-          </button>
+        <div className="form-card" style={{ marginTop: 14, background: "#F8F8FF", border: `1.5px solid ${T.blue}` }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>Want us to follow up with you?</p>
+          <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Leave your name and number and a CADC staff member will reach out to help.</p>
+          <div className="form-field"><label className="form-label">Your name</label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="First and last name" /></div>
+          <div className="form-field"><label className="form-label">Phone number</label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+          <div className="form-field"><label className="form-label">Your county (optional)</label>
+            <select className="cadc-input" value={form.county} onChange={f("county")}>
+              <option value="">Select county</option>
+              {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+          <button className="form-submit" onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request a Follow-Up Call"}</button>
         </div>
       ) : (
-        <div className="cadc-card" style={{ marginTop: 14, background: "#F0FFF4", border: "1px solid #059669", textAlign: "center" }}>
-          <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 4px" }}>Got it — we'll be in touch.</p>
-          <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A CADC staff member will call you soon to help.</p>
+        <div className="form-success" style={{ marginTop: 14 }}>
+          <div className="form-success-icon">✅</div>
+          <div className="form-success-title">Got it — we'll be in touch.</div>
+          <div className="form-success-msg">A CADC staff member will call you soon to help.</div>
         </div>
       )}
     </div>
@@ -1979,61 +1968,70 @@ function ServiceScreenerForm() {
 
   if (state === "done" && results) return (
     <div className="cadc-light-content">
-      <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669" }}>
-        <p style={{ fontWeight: 800, color: "#059669", fontSize: 15, margin: "0 0 10px" }}>✅ Based on your answers, you may qualify for:</p>
-        {results.map(r => <div key={r} style={{ padding: "8px 0", borderBottom: "1px solid #E5E7EB", fontWeight: 700, fontSize: 14 }}>• {r}</div>)}
-        <p style={{ fontSize: 12, color: "#6B7280", margin: "12px 0 0" }}>Eligibility is determined by CADC staff. Call us to confirm and start the process.</p>
+      <div className="form-success">
+        <div className="form-success-icon">🎯</div>
+        <div className="form-success-title">Based on your answers, you may qualify for:</div>
+        <div style={{ marginTop: 12, textAlign: "left" }}>
+          {results.map(r => <div key={r} style={{ padding: "8px 0", borderBottom: "1px solid #D1FAE5", fontWeight: 600, fontSize: 14, color: "#111827" }}>✓ {r}</div>)}
+        </div>
+        <p style={{ fontSize: 12, color: "#6B7280", margin: "14px 0 0", textAlign: "left" }}>Eligibility is determined by CADC staff. Call to confirm and start the process.</p>
       </div>
-      <a href="tel:+15803355588" className="cadc-btn" style={{ display: "block", textAlign: "center", marginTop: 12 }}>📞 Call CADC — 580-335-5588</a>
-      <button className="cadc-btn" style={{ width: "100%", marginTop: 8, background: "white", color: T.blue, border: `1px solid ${T.blue}` }} onClick={() => { setState("idle"); setResults(null); }}>Start Over</button>
+      <a href="tel:+15803355588" className="cadc-btn" style={{ display: "block", textAlign: "center", marginTop: 14 }}>📞 Call CADC — 580-335-5588</a>
+      <button style={{ width: "100%", marginTop: 10, background: "white", color: T.blue, border: `1.5px solid ${T.blue}`, borderRadius: 10, padding: "12px", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }} onClick={() => { setState("idle"); setResults(null); }}>Start Over</button>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
-      <p>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
-      <div className="cadc-card">
-        <p className="cadc-label">Your county</p>
-        <select className="cadc-input" value={form.county} onChange={f("county")}>
-          <option value="">Select county</option>
-          {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <p className="cadc-label" style={{marginTop:10}}>Household size</p>
-        <select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}>
-          <option value="">Select</option>
-          {["1","2","3","4","5","6","7","8+"].map(n => <option key={n} value={n}>{n} {n === "1" ? "person" : "people"}</option>)}
-        </select>
-        <p className="cadc-label" style={{marginTop:10}}>Approximate annual household income</p>
-        <select className="cadc-input" value={form.income} onChange={f("income")}>
-          <option value="">Select range</option>
-          <option value="15000">Under $15,000</option>
-          <option value="25000">$15,000 – $25,000</option>
-          <option value="35000">$25,000 – $35,000</option>
-          <option value="50000">$35,000 – $50,000</option>
-          <option value="75000">Over $50,000</option>
-        </select>
-        <p className="cadc-label" style={{marginTop:10}}>Do you have children in your household?</p>
-        <select className="cadc-input" value={form.hasChildren} onChange={f("hasChildren")}>
-          <option value="">Select</option>
-          <option value="yes-0-3">Yes — under age 3 (or pregnant)</option>
-          <option value="yes-3-5">Yes — ages 3–5</option>
-          <option value="yes-older">Yes — school age or older</option>
-          <option value="no">No children</option>
-        </select>
-        <p className="cadc-label" style={{marginTop:10}}>Is anyone in your household age 60 or older?</p>
-        <select className="cadc-input" value={form.age60plus} onChange={f("age60plus")}>
-          <option value="">Select</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-        <p className="cadc-label" style={{marginTop:10}}>Do you own or rent your home?</p>
-        <select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}>
-          <option value="">Select</option>
-          <option value="own">Own</option>
-          <option value="rent">Rent</option>
-          <option value="other">Other / not applicable</option>
-        </select>
-        <button className="cadc-btn" style={{ width: "100%", marginTop: 14 }} onClick={screen} disabled={!form.county || !form.householdSize}>See My Results →</button>
+      <p style={{marginBottom:16}}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your county <span className="form-required">*</span></label>
+          <select className="cadc-input" value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Household size <span className="form-required">*</span></label>
+          <select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}>
+            <option value="">Select</option>
+            {["1","2","3","4","5","6","7","8+"].map(n => <option key={n} value={n}>{n} {n === "1" ? "person" : "people"}</option>)}
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Approximate annual household income</label>
+          <select className="cadc-input" value={form.income} onChange={f("income")}>
+            <option value="">Select range</option>
+            <option value="15000">Under $15,000</option>
+            <option value="25000">$15,000 – $25,000</option>
+            <option value="35000">$25,000 – $35,000</option>
+            <option value="50000">$35,000 – $50,000</option>
+            <option value="75000">Over $50,000</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Children in your household?</label>
+          <select className="cadc-input" value={form.hasChildren} onChange={f("hasChildren")}>
+            <option value="">Select</option>
+            <option value="yes-0-3">Yes — under age 3 or pregnant</option>
+            <option value="yes-3-5">Yes — ages 3 to 5</option>
+            <option value="yes-older">Yes — school age or older</option>
+            <option value="no">No children</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Anyone in household age 60 or older?</label>
+          <select className="cadc-input" value={form.age60plus} onChange={f("age60plus")}>
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Do you own or rent your home?</label>
+          <select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}>
+            <option value="">Select</option>
+            <option value="own">Own</option>
+            <option value="rent">Rent</option>
+            <option value="other">Other / not applicable</option>
+          </select>
+        </div>
+        <button className="form-submit" onClick={screen} disabled={!form.county || !form.householdSize}>See My Results →</button>
       </div>
     </div>
   );
@@ -2049,49 +2047,52 @@ function HeadStartPreEnrollForm() {
   if (!features?.formHeadStartPreEnroll) return null;
 
   if (state === "done") return (
-    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
-      <p style={{ fontSize: 28, margin: "0 0 8px" }}>✅</p>
-      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>We received your interest!</p>
-      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A Head Start staff member will call you soon. Questions? Call Robin Harris directly at <a href="tel:+15807263343" style={{ color: T.blue, fontWeight: 700 }}>580-726-3343</a>.</p>
+    <div className="cadc-light-content">
+      <div className="form-success">
+        <div className="form-success-icon">✅</div>
+        <div className="form-success-title">We received your interest!</div>
+        <div className="form-success-msg">A Head Start staff member will call you soon. Questions? Call Robin Harris at <a href="tel:+15807263343" style={{ color: T.blue, fontWeight: 700 }}>580-726-3343</a>.</div>
+      </div>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
-      <p>Not ready to apply through ChildPlus yet? Let us know you're interested and we'll reach out to walk you through the process.</p>
-      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name and phone number.</p>}
-      <div className="cadc-card">
-        <p className="cadc-label">Your name *</p>
-        <input className="cadc-input" value={form.parentName} onChange={f("parentName")} placeholder="Parent or guardian name" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">Phone number *</p>
-        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">County</p>
-        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
-          <option value="">Select county</option>
-          {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
-        </select>
-        <p className="cadc-label">Child's approximate date of birth</p>
-        <input className="cadc-input" type="date" value={form.childDob} onChange={f("childDob")} style={{ marginBottom: 10 }} />
-        <p className="cadc-label">Preferred center (if known)</p>
-        <select className="cadc-input" value={form.centerPref} onChange={f("centerPref")} style={{ marginBottom: 10 }}>
-          <option value="">No preference / not sure</option>
-          {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
-        </select>
-        <p className="cadc-label">Does your family receive SNAP, SSI, or TANF?</p>
-        <select className="cadc-input" value={form.receiving} onChange={f("receiving")} style={{ marginBottom: 10 }}>
-          <option value="">Select</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-          <option value="unsure">Not sure</option>
-        </select>
-        <p className="cadc-label">Does your child have any special needs or disability services?</p>
-        <select className="cadc-input" value={form.specialNeeds} onChange={f("specialNeeds")} style={{ marginBottom: 14 }}>
-          <option value="">Select</option>
-          <option value="yes">Yes — currently receiving services</option>
-          <option value="suspected">Possibly — not yet evaluated</option>
-          <option value="no">No</option>
-        </select>
-        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+      <p style={{marginBottom:16}}>Not ready to apply through ChildPlus yet? Let us know you're interested and we'll reach out to walk you through the process.</p>
+      {state === "err" && <div className="form-error">Please fill in your name and phone number.</div>}
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.parentName} onChange={f("parentName")} placeholder="Parent or guardian name" /></div>
+        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div className="form-field"><label className="form-label">County</label>
+          <select className="cadc-input" value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Child's approximate date of birth</label><input className="cadc-input" type="date" value={form.childDob} onChange={f("childDob")} /></div>
+        <div className="form-field"><label className="form-label">Preferred center (if known)</label>
+          <select className="cadc-input" value={form.centerPref} onChange={f("centerPref")}>
+            <option value="">No preference / not sure</option>
+            {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Does your family receive SNAP, SSI, or TANF?</label>
+          <select className="cadc-input" value={form.receiving} onChange={f("receiving")}>
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Special needs or disability services?</label>
+          <select className="cadc-input" value={form.specialNeeds} onChange={f("specialNeeds")}>
+            <option value="">Select</option>
+            <option value="yes">Yes — currently receiving services</option>
+            <option value="suspected">Possibly — not yet evaluated</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
           if (!form.parentName || !form.phone) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "head-start", "pre-enrollment");
@@ -2112,55 +2113,37 @@ function WeatherizationInterestForm() {
   if (!features?.formWeatherizationInterest) return null;
 
   if (state === "done") return (
-    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
-      <p style={{ fontSize: 28, margin: "0 0 8px" }}>✅</p>
-      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>You're on the list!</p>
-      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Robert Meador's team will be in touch to discuss next steps. Questions? Call <a href="tel:+15803050853" style={{ color: T.blue, fontWeight: 700 }}>580-305-0853</a>.</p>
+    <div className="form-success">
+      <div className="form-success-icon">✅</div>
+      <div className="form-success-title">You're on the list!</div>
+      <div className="form-success-msg">Robert Meador's team will be in touch to discuss next steps. Questions? Call <a href="tel:+15803050853" style={{ color: T.blue, fontWeight: 700 }}>580-305-0853</a>.</div>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
-      <p>Fill out this form to be added to the Weatherization waitlist. Priority is given to households with elderly members, people with disabilities, and children 18 and under.</p>
-      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name, phone, and county.</p>}
-      <div className="cadc-card">
-        <p className="cadc-label">Your name *</p>
-        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">Phone number *</p>
-        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">Home address</p>
-        <input className="cadc-input" value={form.address} onChange={f("address")} placeholder="Street address" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">County *</p>
-        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+      <p style={{marginBottom:16}}>Fill out this form to be added to the Weatherization waitlist. Priority is given to households with elderly members, people with disabilities, and children 18 and under.</p>
+      {state === "err" && <div className="form-error">Please fill in your name, phone, and county.</div>}
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div className="form-field"><label className="form-label">Home address</label><input className="cadc-input" value={form.address} onChange={f("address")} placeholder="Street address" /></div>
+        <div className="form-field"><label className="form-label">County <span className="form-required">*</span></label><select className="cadc-input" value={form.county} onChange={f("county")}>
           <option value="">Select county</option>
           {["Beckham","Caddo","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
-        </select>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-          <div>
-            <p className="cadc-label">Own or rent?</p>
-            <select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}>
-              <option value="">Select</option>
-              <option value="own">Own</option>
-              <option value="rent">Rent</option>
-            </select>
-          </div>
-          <div>
-            <p className="cadc-label">Household size</p>
-            <select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}>
-              <option value="">Select</option>
-              {["1","2","3","4","5","6","7","8+"].map(n => <option key={n}>{n}</option>)}
-            </select>
-          </div>
+        </select></div>
+        <div className="form-row">
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Own or rent?</label><select className="cadc-input" value={form.ownRent} onChange={f("ownRent")}><option value="">Select</option><option value="own">Own</option><option value="rent">Rent</option></select></div>
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Household size</label><select className="cadc-input" value={form.householdSize} onChange={f("householdSize")}><option value="">Select</option>{["1","2","3","4","5","6","7","8+"].map(n => <option key={n}>{n}</option>)}</select></div>
         </div>
-        <p className="cadc-label">Priority factors (check all that apply)</p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 10 }}>
-          {[["hasElderly","Age 60+"],["hasDisability","Disability"],["hasChildren","Children 18 & under"]].map(([key, label]) => (
+        <div className="form-field"><label className="form-label">Priority factors</label>
+        <div className="form-priority-btns">
+          {[["hasElderly","Age 60+"],["hasDisability","Disability"],["hasChildren","Under 18"]].map(([key, label]) => (
             <button key={key} onClick={() => setForm(p => ({ ...p, [key]: p[key as keyof typeof p] === "yes" ? "" : "yes" }))}
-              style={{ padding: "10px 6px", borderRadius: 8, border: `2px solid ${form[key as keyof typeof form] === "yes" ? T.blue : "#E5E7EB"}`, background: form[key as keyof typeof form] === "yes" ? T.blueLight : "white", fontWeight: 700, fontSize: 12, cursor: "pointer", color: T.blue }}>{label}</button>
+              className={`form-priority-btn${form[key as keyof typeof form] === "yes" ? " active" : ""}`}>{label}</button>
           ))}
-        </div>
-        <p className="cadc-label">Primary heating source</p>
-        <select className="cadc-input" value={form.primaryHeat} onChange={f("primaryHeat")} style={{ marginBottom: 14 }}>
+        </div></div>
+        <div className="form-field"><label className="form-label">Primary heating source</label><select className="cadc-input" value={form.primaryHeat} onChange={f("primaryHeat")}>
           <option value="">Select</option>
           <option value="electric">Electric</option>
           <option value="natural-gas">Natural gas</option>
@@ -2168,8 +2151,8 @@ function WeatherizationInterestForm() {
           <option value="oil">Fuel oil</option>
           <option value="wood">Wood / biomass</option>
           <option value="other">Other</option>
-        </select>
-        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+        </select></div>
+        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
           if (!form.name || !form.phone || !form.county) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "weatherization", "interest-form");
@@ -2190,46 +2173,49 @@ function VitaAppointmentForm() {
   if (!features?.formVitaAppointment) return null;
 
   if (state === "done") return (
-    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
-      <p style={{ fontSize: 28, margin: "0 0 8px" }}>✅</p>
-      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Appointment request received!</p>
-      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A VITA tax preparer will call to confirm your appointment. Questions? Call <a href="tel:+15803355588" style={{ color: T.blue, fontWeight: 700 }}>580-335-5588</a>.</p>
+    <div className="cadc-light-content">
+      <div className="form-success">
+        <div className="form-success-icon">✅</div>
+        <div className="form-success-title">Appointment request received!</div>
+        <div className="form-success-msg">A VITA tax preparer will call to confirm your appointment. Questions? Call <a href="tel:+15803355588" style={{ color: T.blue, fontWeight: 700 }}>580-335-5588</a>.</div>
+      </div>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
-      <p>Request a free tax preparation appointment. VITA is available to households earning approximately $67,000 or less. Our certified volunteers handle federal and state returns at no cost.</p>
-      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name and phone number.</p>}
-      <div className="cadc-card">
-        <p className="cadc-label">Your name *</p>
-        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">Phone number *</p>
-        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 10 }} />
-        <p className="cadc-label">County</p>
-        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
-          <option value="">Select county</option>
-          {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
-        </select>
-        <p className="cadc-label">Type of tax return</p>
-        <select className="cadc-input" value={form.returnType} onChange={f("returnType")} style={{ marginBottom: 10 }}>
-          <option value="">Select</option>
-          <option value="single">Single / no dependents</option>
-          <option value="married">Married filing jointly</option>
-          <option value="dependents">With dependents</option>
-          <option value="self-employed">Self-employed / 1099</option>
-          <option value="unsure">Not sure</option>
-        </select>
-        <p className="cadc-label">Preferred language</p>
-        <select className="cadc-input" value={form.language} onChange={f("language")} style={{ marginBottom: 10 }}>
-          <option value="english">English</option>
-          <option value="spanish">Spanish / Español</option>
-        </select>
-        <p className="cadc-label">Preferred appointment date (optional)</p>
-        <input className="cadc-input" type="date" value={form.preferredDate} onChange={f("preferredDate")} style={{ marginBottom: 10 }} />
-        <p className="cadc-label">Anything we should know?</p>
-        <textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Prior year returns, rental income, etc." style={{ minHeight: 64, marginBottom: 14 }} />
-        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+      <p style={{marginBottom:16}}>Request a free tax preparation appointment. VITA is available to households earning approximately $67,000 or less. Certified volunteers handle federal and state returns at no cost.</p>
+      {state === "err" && <div className="form-error">Please fill in your name and phone number.</div>}
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div className="form-field"><label className="form-label">Phone number <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div className="form-field"><label className="form-label">County</label>
+          <select className="cadc-input" value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Type of tax return</label>
+          <select className="cadc-input" value={form.returnType} onChange={f("returnType")}>
+            <option value="">Select</option>
+            <option value="single">Single / no dependents</option>
+            <option value="married">Married filing jointly</option>
+            <option value="dependents">With dependents</option>
+            <option value="self-employed">Self-employed / 1099</option>
+            <option value="unsure">Not sure</option>
+          </select>
+        </div>
+        <div className="form-row">
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Preferred language</label>
+            <select className="cadc-input" value={form.language} onChange={f("language")}>
+              <option value="english">English</option>
+              <option value="spanish">Spanish / Español</option>
+            </select>
+          </div>
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Preferred date (optional)</label><input className="cadc-input" type="date" value={form.preferredDate} onChange={f("preferredDate")} /></div>
+        </div>
+        <div className="form-field" style={{marginTop:14}}><label className="form-label">Anything we should know?</label><textarea className="cadc-input" value={form.notes} onChange={f("notes")} placeholder="Prior year returns, rental income, etc." /></div>
+        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
           if (!form.name || !form.phone) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "tax-help", "appointment-request");
@@ -2250,51 +2236,54 @@ function VolunteerInterestForm() {
   if (!features?.formVolunteerInterest) return null;
 
   if (state === "done") return (
-    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
-      <p style={{ fontSize: 28, margin: "0 0 8px" }}>🤝</p>
-      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Thank you for volunteering!</p>
-      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>A CADC staff member will be in touch to connect you with the right program. We appreciate you.</p>
+    <div className="cadc-light-content">
+      <div className="form-success">
+        <div className="form-success-icon">🤝</div>
+        <div className="form-success-title">Thank you for volunteering!</div>
+        <div className="form-success-msg">A CADC staff member will be in touch to connect you with the right program. We appreciate you.</div>
+      </div>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
-      <p>Every volunteer hour helps keep our programs free for the families who need them. Tell us a little about yourself and we'll connect you with the right opportunity.</p>
-      {state === "err" && <p style={{ color: T.maroon, fontWeight: 700, fontSize: 13 }}>Please fill in your name and phone number.</p>}
-      <div className="cadc-card">
-        <p className="cadc-label">Your name *</p>
-        <input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" style={{ marginBottom: 10 }} />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-          <div><p className="cadc-label">Phone *</p><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
-          <div><p className="cadc-label">Email (optional)</p><input className="cadc-input" type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" /></div>
+      <p style={{marginBottom:16}}>Every volunteer hour helps keep our programs free for the families who need them. Tell us about yourself and we'll connect you with the right opportunity.</p>
+      {state === "err" && <div className="form-error">Please fill in your name and phone number.</div>}
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your name <span className="form-required">*</span></label><input className="cadc-input" value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div className="form-row">
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Phone <span className="form-required">*</span></label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+          <div className="form-field" style={{marginBottom:0}}><label className="form-label">Email (optional)</label><input className="cadc-input" type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" /></div>
         </div>
-        <p className="cadc-label">Your county</p>
-        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
-          <option value="">Select county</option>
-          {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
-        </select>
-        <p className="cadc-label">Which programs interest you?</p>
-        <select className="cadc-input" value={form.programs} onChange={f("programs")} style={{ marginBottom: 10 }}>
-          <option value="">Select</option>
-          <option value="head-start">Head Start / Early Head Start</option>
-          <option value="senior-nutrition">Senior Nutrition</option>
-          <option value="community-market">Community Market</option>
-          <option value="weatherization">Weatherization</option>
-          <option value="transit">Red River Transportation</option>
-          <option value="any">Open to anything</option>
-        </select>
-        <p className="cadc-label">Availability</p>
-        <select className="cadc-input" value={form.availability} onChange={f("availability")} style={{ marginBottom: 10 }}>
-          <option value="">Select</option>
-          <option value="weekday-mornings">Weekday mornings</option>
-          <option value="weekday-afternoons">Weekday afternoons</option>
-          <option value="evenings">Evenings</option>
-          <option value="weekends">Weekends</option>
-          <option value="flexible">Flexible</option>
-        </select>
-        <p className="cadc-label">Skills or certifications (optional)</p>
-        <textarea className="cadc-input" value={form.skills} onChange={f("skills")} placeholder="Teaching, cooking, driving, CPR certified, etc." style={{ minHeight: 64, marginBottom: 14 }} />
-        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+        <div className="form-field" style={{marginTop:14}}><label className="form-label">Your county</label>
+          <select className="cadc-input" value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Programs of interest</label>
+          <select className="cadc-input" value={form.programs} onChange={f("programs")}>
+            <option value="">Select</option>
+            <option value="head-start">Head Start / Early Head Start</option>
+            <option value="senior-nutrition">Senior Nutrition</option>
+            <option value="community-market">Community Market</option>
+            <option value="weatherization">Weatherization</option>
+            <option value="transit">Red River Transportation</option>
+            <option value="any">Open to anything</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Availability</label>
+          <select className="cadc-input" value={form.availability} onChange={f("availability")}>
+            <option value="">Select</option>
+            <option value="weekday-mornings">Weekday mornings</option>
+            <option value="weekday-afternoons">Weekday afternoons</option>
+            <option value="evenings">Evenings</option>
+            <option value="weekends">Weekends</option>
+            <option value="flexible">Flexible</option>
+          </select>
+        </div>
+        <div className="form-field"><label className="form-label">Skills or certifications (optional)</label><textarea className="cadc-input" value={form.skills} onChange={f("skills")} placeholder="Teaching, cooking, driving, CPR certified, etc." /></div>
+        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
           if (!form.name || !form.phone) { setState("err"); return; }
           setState("sending");
           const r = await submitLead({ ...form }, "volunteer", "interest-form");
@@ -2315,19 +2304,20 @@ function CommunityNeedsSurvey() {
   if (!features?.formCommunityNeeds) return null;
 
   if (state === "done") return (
-    <div className="cadc-card" style={{ background: "#F0FFF4", border: "1px solid #059669", textAlign: "center", padding: 24 }}>
-      <p style={{ fontSize: 28, margin: "0 0 8px" }}>📊</p>
-      <p style={{ fontWeight: 800, color: "#059669", margin: "0 0 6px" }}>Thank you for your feedback!</p>
-      <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Your responses help CADC serve your community better. We read every submission.</p>
+    <div className="cadc-light-content">
+      <div className="form-success">
+        <div className="form-success-icon">📊</div>
+        <div className="form-success-title">Thank you for your feedback!</div>
+        <div className="form-success-msg">Your responses help CADC serve your community better. We read every submission.</div>
+      </div>
     </div>
   );
 
   return (
     <div className="cadc-light-content">
-      <p>Help us understand what your community needs most. This survey takes less than 2 minutes and directly shapes how CADC plans its programs and services.</p>
-      <div className="cadc-card">
-        <p className="cadc-label">Your county</p>
-        <select className="cadc-input" value={form.county} onChange={f("county")} style={{ marginBottom: 10 }}>
+      <p style={{marginBottom:16}}>Help us understand what your community needs most. This survey takes less than 2 minutes and directly shapes how CADC plans its programs and services.</p>
+      <div className="form-card">
+        <div className="form-field"><label className="form-label">Your county</label><select className="cadc-input" value={form.county} onChange={f("county")}>
           <option value="">Select county</option>
           {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
         </select>
@@ -2343,9 +2333,8 @@ function CommunityNeedsSurvey() {
           <option value="employment">Employment / job training</option>
           <option value="healthcare">Healthcare access</option>
           <option value="housing">Housing assistance</option>
-        </select>
-        <p className="cadc-label">What is the biggest barrier to accessing services in your area?</p>
-        <select className="cadc-input" value={form.barrier} onChange={f("barrier")} style={{ marginBottom: 10 }}>
+        </select></div>
+        <div className="form-field"><label className="form-label">Biggest barrier to accessing services?</label><select className="cadc-input" value={form.barrier} onChange={f("barrier")}>
           <option value="">Select</option>
           <option value="transportation">No transportation to get there</option>
           <option value="awareness">Didn't know the service existed</option>
@@ -2354,9 +2343,8 @@ function CommunityNeedsSurvey() {
           <option value="eligibility">Thought I wouldn't qualify</option>
           <option value="distance">Too far away</option>
           <option value="none">No major barriers</option>
-        </select>
-        <p className="cadc-label">How did you hear about CADC?</p>
-        <select className="cadc-input" value={form.awareness} onChange={f("awareness")} style={{ marginBottom: 10 }}>
+        </select></div>
+        <div className="form-field"><label className="form-label">How did you hear about CADC?</label><select className="cadc-input" value={form.awareness} onChange={f("awareness")}>
           <option value="">Select</option>
           <option value="word-of-mouth">Word of mouth / family or friend</option>
           <option value="school">School or Head Start center</option>
@@ -2365,19 +2353,17 @@ function CommunityNeedsSurvey() {
           <option value="flyer">Flyer or brochure</option>
           <option value="other-agency">Another agency or organization</option>
           <option value="already-client">Already a CADC client</option>
-        </select>
-        <p className="cadc-label">How would you rate CADC services overall?</p>
-        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-          {["⭐","⭐⭐","⭐⭐⭐","⭐⭐⭐⭐","⭐⭐⭐⭐⭐"].map((stars, i) => (
-            <button key={i} onClick={() => setForm(p => ({ ...p, satisfaction: String(i+1) }))}
-              style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: `2px solid ${form.satisfaction === String(i+1) ? T.blue : "#E5E7EB"}`, background: form.satisfaction === String(i+1) ? T.blueLight : "white", cursor: "pointer", fontSize: 12 }}>{i+1}</button>
+        </select></div>
+        <div className="form-field"><label className="form-label">How would you rate CADC services overall?</label>
+        <div className="form-star-btns">
+          {["1","2","3","4","5"].map((n) => (
+            <button key={n} onClick={() => setForm(p => ({ ...p, satisfaction: n }))}
+              className={`form-star-btn${form.satisfaction === n ? " active" : ""}`}>{"⭐".repeat(parseInt(n))}</button>
           ))}
-        </div>
-        <p className="cadc-label">Any suggestions for how CADC can better serve your community?</p>
-        <textarea className="cadc-input" value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." style={{ minHeight: 72, marginBottom: 10 }} />
-        <p className="cadc-label">Phone (optional — if you'd like a follow-up)</p>
-        <input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" style={{ marginBottom: 14 }} />
-        <button className="cadc-btn" style={{ width: "100%", opacity: state === "sending" ? 0.6 : 1 }} disabled={state === "sending"} onClick={async () => {
+        </div></div>
+        <div className="form-field"><label className="form-label">Suggestions for CADC?</label><textarea className="cadc-input" value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." /></div>
+        <div className="form-field"><label className="form-label">Phone (optional — for follow-up)</label><input className="cadc-input" type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <button className="form-submit" disabled={state === "sending"} onClick={async () => {
           setState("sending");
           await submitLead({ ...form }, "community-survey", "needs-survey");
           setState("done");
@@ -5304,10 +5290,32 @@ function DesktopStyles() {
       .cadc-light-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 9px 14px; border-top: 1px solid #e5e7eb; }
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 13px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; gap: 4px; }
-      .cadc-input { width: 100%; font-size: 15px; padding: 11px 12px; border: 1px solid #e5e7eb; border-radius: 10px; box-sizing: border-box; font-family: inherit; color: #111827; background: white; outline: none; transition: border-color 0.15s ease; }
-      .cadc-input:focus { border-color: #0101FF; box-shadow: 0 0 0 3px rgba(1,1,255,0.08); }
-      select.cadc-input { appearance: auto; }
+      .cadc-input { width: 100%; font-size: 14px; padding: 10px 14px; border: 1.5px solid #E5E7EB; border-radius: 8px; box-sizing: border-box; font-family: inherit; color: #111827; background: #FAFAFA; outline: none; transition: all 0.15s ease; }
+      .cadc-input:focus { border-color: #0101FF; background: white; box-shadow: 0 0 0 3px rgba(1,1,255,0.08); }
+      select.cadc-input { appearance: auto; cursor: pointer; }
       textarea.cadc-input { resize: vertical; }
+      /* ── Form layout helpers ── */
+      .form-card { background: white; border: 1px solid #E5E7EB; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+      .form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+      .form-field:last-of-type { margin-bottom: 0; }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+      .form-label { font-size: 12px; font-weight: 700; color: #374151; letter-spacing: 0.01em; }
+      .form-required { color: #CC0000; margin-left: 2px; }
+      .form-submit { width: 100%; background: #CC0000; color: white; border: none; border-radius: 10px; padding: 14px 20px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 18px; transition: background 0.15s ease, transform 0.1s ease; letter-spacing: 0.02em; }
+      .form-submit:hover { background: #AA0000; transform: translateY(-1px); }
+      .form-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+      .form-note { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 10px; line-height: 1.5; }
+      .form-success { background: #F0FFF4; border: 1.5px solid #059669; border-radius: 12px; padding: 24px; text-align: center; }
+      .form-success-icon { font-size: 36px; margin-bottom: 10px; }
+      .form-success-title { font-weight: 800; color: #059669; font-size: 16px; margin-bottom: 6px; }
+      .form-success-msg { font-size: 13px; color: #374151; line-height: 1.6; }
+      .form-error { font-size: 12px; color: #CC0000; font-weight: 700; margin-bottom: 12px; padding: 10px 14px; background: #FFF0F0; border-radius: 8px; border: 1px solid #FCA5A5; }
+      .form-priority-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+      .form-priority-btn { flex: 1; padding: 9px 8px; border-radius: 8px; border: 1.5px solid #E5E7EB; background: white; font-weight: 700; font-size: 12px; cursor: pointer; color: #374151; transition: all 0.15s ease; text-align: center; min-width: 80px; font-family: inherit; }
+      .form-priority-btn.active { border-color: #0101FF; background: #E4E4FF; color: #0101FF; }
+      .form-star-btns { display: flex; gap: 6px; }
+      .form-star-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1.5px solid #E5E7EB; background: white; font-weight: 800; font-size: 13px; cursor: pointer; color: #374151; transition: all 0.15s ease; text-align: center; font-family: inherit; }
+      .form-star-btn.active { border-color: #0101FF; background: #E4E4FF; color: #0101FF; }
     `}</style>
   );
 }
