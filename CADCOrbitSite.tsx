@@ -16,8 +16,116 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense, createContext, useContext } from "react";
+import { DEFAULT_CONTENT, fetchContent, type SiteContent } from "@/lib/cms";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+
+// ─── #8 Spanish / English translation map ────────────────────────────────────
+type Lang = "en" | "es";
+
+const ES: Record<string, string> = {
+  // ── Navigation & UI ──────────────────────────────────────────────────────
+  "Home": "Inicio",
+  "Back": "Regresar",
+  "Call": "Llamar",
+  "Search programs, services, counties...": "Buscar programas, servicios, condados...",
+  "About CADC": "Acerca de CADC",
+  "Contact & Locations": "Contacto y Ubicaciones",
+  "Programs & Services": "Programas y Servicios",
+  "Find Services by County": "Buscar Servicios por Condado",
+  "Tap a program node to explore": "Toque un nodo para explorar",
+  "programs available": "programas disponibles",
+  "All Counties": "Todos los Condados",
+  "View all services": "Ver todos los servicios",
+  "Not sure where to start?": "¿No sabe por dónde empezar?",
+  "Find My Benefits →": "Encontrar Mis Beneficios →",
+  "Find My Benefits": "Encontrar Mis Beneficios",
+  "Get Help": "Obtener Ayuda",
+  "Apply": "Aplicar",
+  "Find a Location": "Encontrar Ubicación",
+  "Schedule a Ride": "Programar un Viaje",
+  "Apply for Head Start": "Aplicar para Head Start",
+  "Tap to Explore Your County": "Toque para Explorar su Condado",
+  // ── Programs ──────────────────────────────────────────────────────────────
+  "Head Start": "Head Start",
+  "Early Head Start": "Early Head Start",
+  "Red River Transit": "Tránsito Red River",
+  "Red River Transportation": "Transporte Red River",
+  "Weatherization": "Climatización",
+  "Senior Nutrition": "Nutrición para Adultos Mayores",
+  "VITA Free Tax Help": "Ayuda Gratuita con Impuestos VITA",
+  "Community Market": "Mercado Comunitario",
+  "Employment & Workforce": "Empleo y Fuerza Laboral",
+  "Board & Leadership": "Junta Directiva y Liderazgo",
+  "Advantage Home Delivered Meals": "Comidas a Domicilio Advantage",
+  // ── Head Start critical path ───────────────────────────────────────────────
+  "Who Qualifies": "¿Quién Califica?",
+  "How to Apply": "Cómo Aplicar",
+  "Express Interest": "Expresar Interés",
+  "Is my child eligible?": "¿Mi hijo califica?",
+  "Children from birth to age 5": "Niños desde el nacimiento hasta los 5 años",
+  "Free early education": "Educación temprana gratuita",
+  "Apply through ChildPlus": "Aplicar a través de ChildPlus",
+  "Find a center near you": "Encontrar un centro cerca de usted",
+  "Enrollment open": "Inscripción abierta",
+  "Call to apply": "Llame para aplicar",
+  // ── Screener critical path ────────────────────────────────────────────────
+  "Answer 6 quick questions and we'll show you which CADC programs you may qualify for.": "Responda 6 preguntas rápidas y le mostraremos los programas de CADC para los que podría calificar.",
+  "Your county": "Su condado",
+  "Select county": "Seleccionar condado",
+  "Household size": "Tamaño del hogar",
+  "Approximate annual household income": "Ingresos anuales aproximados del hogar",
+  "Children in your household?": "¿Niños en su hogar?",
+  "Anyone in household age 60 or older?": "¿Alguien en el hogar mayor de 60 años?",
+  "Do you own or rent your home?": "¿Es dueño o renta su hogar?",
+  "See My Results →": "Ver Mis Resultados →",
+  "Based on your answers, you may qualify for:": "Según sus respuestas, puede calificar para:",
+  // ── Transit critical path ──────────────────────────────────────────────────
+  "Schedule a ride": "Programar un viaje",
+  "Request a Ride": "Solicitar un Viaje",
+  "Your name": "Su nombre",
+  "Phone number": "Número de teléfono",
+  "Pickup address": "Dirección de recogida",
+  "Destination": "Destino",
+  "Where are you going?": "¿A dónde va?",
+  "Accessibility needs": "Necesidades de accesibilidad",
+  "Submit Ride Request →": "Enviar Solicitud de Viaje →",
+  "Spanish-speaking staff available": "Personal de habla hispana disponible",
+  // ── Alert / emergency ─────────────────────────────────────────────────────
+  "Service Alert": "Alerta de Servicio",
+  "Office closed": "Oficina cerrada",
+  "Emergency": "Emergencia",
+  // ── Common CTA ────────────────────────────────────────────────────────────
+  "Apply Now": "Aplicar Ahora",
+  "View Menu": "Ver Menú",
+  "See Schedule": "Ver Horario",
+  "Learn More": "Saber Más",
+  "Contact Us": "Contáctenos",
+  "Call CADC": "Llamar a CADC",
+  "Call Now": "Llamar Ahora",
+  "Submit": "Enviar",
+  "Sending…": "Enviando…",
+  "Full name": "Nombre completo",
+  "First and last name": "Nombre y apellido",
+  "Select": "Seleccionar",
+  "Select range": "Seleccionar rango",
+  "Optional": "Opcional",
+  // ── Footer ────────────────────────────────────────────────────────────────
+  "Reducing poverty in communities by empowering people": "Reduciendo la pobreza en las comunidades empoderando a las personas",
+  "Helping People. Changing Lives.": "Ayudando a las personas. Cambiando vidas.",
+  "Serving": "Sirviendo",
+  "counties across Southwest Oklahoma": "condados en el suroeste de Oklahoma",
+  "Get Help": "Obtener Ayuda",
+  "Careers": "Empleos",
+  "Transparency": "Transparencia",
+  "Privacy": "Privacidad",
+  "Your information is kept private": "Su información se mantiene privada",
+};
+
+function t(key: string, lang: Lang): string {
+  return lang === "es" ? (ES[key] ?? key) : key;
+}
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -33,6 +141,21 @@ const T = {
   border:      "#e5e7eb",
   textPrimary: "#111827",
   textMuted:   "#6b7280",
+};
+
+// ─── Program icon images (replaces emoji on program-level orbit nodes) ────────
+// Each value is the public path to the individual icon PNG.
+// Sub-area nodes still use emoji — only top-level program nodes use these.
+const PROGRAM_ICONS: Record<string, string> = {
+  "head-start":        "/images/icons/head-start.png",
+  "transit":           "/images/icons/transit.png",
+  "weatherization":    "/images/icons/weatherization.png",
+  "senior-meals":      "/images/icons/senior-nutrition.png",
+  "tax-help":          "/images/icons/vita.png",
+  "community-market":  "/images/icons/community-market.png",
+  "employment":        "/images/icons/employment.png",
+  "board":             "/images/icons/board-leadership.png",
+  "advantage":         "/images/icons/advantage.png",
 };
 
 // ─── All program content ──────────────────────────────────────────────────────
@@ -67,6 +190,34 @@ function useIsDesktop() {
     return () => mq.removeEventListener("change", handler);
   }, []);
   return isDesktop;
+}
+
+// ─── Live content (Vercel KV via /api/cms) ────────────────────────────────────
+// Directors edit at /admin. Falls back to DEFAULT_CONTENT / hardcoded data.
+const CmsContext = createContext<SiteContent>(DEFAULT_CONTENT);
+export function useCms() { return useContext(CmsContext); }
+export function CmsProvider({ children }: { children: React.ReactNode }) {
+  const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  useEffect(() => { fetchContent().then(setContent); }, []);
+  return <CmsContext.Provider value={content}>{children}</CmsContext.Provider>;
+}
+
+// ─── Lang context — shared across orbit + about + contact pages ───────────────
+const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: "en", setLang: () => {} });
+export function useLang() { return useContext(LangContext); }
+export function LangProvider({ children }: { children: React.ReactNode }) {
+  const [lang, setLang] = useState<Lang>("en");
+  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>;
+}
+
+
+// ─── Stat tracking helpers ────────────────────────────────────────────────────
+function trackStat(type: "program" | "county" | "search" | "visit", key?: string) {
+  fetch("/api/cms/stats", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, key }),
+  }).catch(() => {}); // fire-and-forget, never throws
 }
 
 // ─── Senior Nutrition Menu Data ───────────────────────────────────────────────
@@ -136,12 +287,84 @@ const MARKET_SCHEDULE_DATA = {
   } as Record<string, { time: string; location: string }[]>,
 };
 
+function generateMealICS(data: typeof MENU_DATA = MENU_DATA): string {
+  const { month, year, meals } = data;
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//CADC//Senior Nutrition Menu//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:CADC Senior Meals — ${month} ${year}`,
+    "X-WR-CALDESC:CADC Senior Nutrition congregate meal menu",
+  ];
+  Object.entries(meals).forEach(([date, meal]) => {
+    const d = date.replace(/-/g, "");
+    lines.push(
+      "BEGIN:VEVENT",
+      `DTSTART;VALUE=DATE:${d}`,
+      `DTEND;VALUE=DATE:${d}`,
+      `SUMMARY:🍽️ CADC Meal: ${meal.headline}`,
+      `DESCRIPTION:${meal.full.join("\\n")}\\n\\nCADC Senior Nutrition | 580-335-5588 | cadcok.org`,
+      `LOCATION:CADC Senior Meal Sites — Frederick\\, Ringling\\, Cache\\, Temple\\, Walters\\, Ryan`,
+      "END:VEVENT"
+    );
+  });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function generateMarketICS(data: typeof MARKET_SCHEDULE_DATA = MARKET_SCHEDULE_DATA): string {
+  const { month, year, stops } = data;
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//CADC//Community Market Schedule//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:CADC Community Market — ${month} ${year}`,
+    "X-WR-CALDESC:CADC Community Market stop schedule",
+  ];
+  Object.entries(stops).forEach(([date, dayStops]) => {
+    const d = date.replace(/-/g, "");
+    dayStops.forEach(stop => {
+      const [start, end] = stop.time.split("–");
+      const toTime = (t: string, base: string) => {
+        const clean = t?.trim() || base.trim();
+        const [h, m] = clean.replace(/[ap]m/i,"").split(":").map(Number);
+        const isPM = clean.toLowerCase().includes("p") || (h !== 12 && h < 8);
+        return `${String(isPM ? (h === 12 ? 12 : h + 12) : (h === 12 ? 0 : h)).padStart(2,"0")}${String(m||0).padStart(2,"0")}00`;
+      };
+      lines.push(
+        "BEGIN:VEVENT",
+        `DTSTART:${d}T${toTime(start, "09")}`,
+        `DTEND:${d}T${toTime(end||start, "11")}`,
+        `SUMMARY:🛒 CADC Market: ${stop.location}`,
+        `DESCRIPTION:CADC Community Market stop\\nTime: ${stop.time}\\nLocation: ${stop.location}\\n\\nNeed a ride? Call/text 580-374-5518\\ncadcok.org`,
+        `LOCATION:${stop.location}\\, Southwest Oklahoma`,
+        "END:VEVENT"
+      );
+    });
+  });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function downloadICS(content: string, filename: string) {
+  const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── Market Schedule Component ────────────────────────────────────────────────
 
 function MarketSchedule({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const { month, year, note, transportation, stops } = MARKET_SCHEDULE_DATA;
+  const cms = useCms();
+  const { month, year, note, stops } = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
 
   const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
   const lastDay = new Date(year, firstDay.getMonth() + 1, 0);
@@ -283,16 +506,24 @@ function MarketSchedule({ dark }: { dark: boolean }) {
 }
 
 function MarketSchedulePanel() {
-  const isDesktop = useIsDesktop();
+  const cms = useCms(); const md = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
   return (
     <div className="cadc-light-content">
-      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
         Tap any market day to see stop locations and times. Schedule updates monthly.
       </p>
-      <MarketSchedule dark={isDesktop} />
-      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#EEF0FF", borderRadius: 10 }}>
+      <MarketSchedule dark={false} />
+      <button
+        onClick={() => downloadICS(generateMarketICS(md), `cadc-community-market-${md.month.toLowerCase()}-${md.year}.ics`)}
+        aria-label={`Download ${md.month} ${md.year} market schedule as ICS file`}
+        style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 4, background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "10px 16px", fontSize: 12, fontWeight: 700, color: "#0101FF", cursor: "pointer", letterSpacing: "0.04em" }}
+      >
+        📅 Save Schedule to Calendar (.ics)
+      </button>
+      <p style={{ fontSize: 10, color: "#9ca3af", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <div style={{ marginTop: 4, padding: "10px 14px", background: "#EEF0FF", borderRadius: 10 }}>
         <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: T.blue, margin: "0 0 6px" }}>Need a ride to the market?</p>
-        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Call or text 580-374-5518</a>
+        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call or text for a ride at 580-374-5518">Call or text 580-374-5518</a>
       </div>
     </div>
   );
@@ -305,7 +536,8 @@ function MarketSchedulePanel() {
 function MealCalendar({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const { month, year, note, meals } = MENU_DATA;
+  const cms = useCms();
+  const { month, year, note, meals } = cms.seniorMenu ?? MENU_DATA;
 
   // Build calendar grid — full weeks containing the month
   const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
@@ -474,20 +706,28 @@ function MealCalendar({ dark }: { dark: boolean }) {
 
 // MealCalendarPanel detects desktop (dark) vs mobile (light) context
 function MealCalendarPanel() {
-  const isDesktop = useIsDesktop();
+  const cms = useCms(); const mn = cms.seniorMenu ?? MENU_DATA;
   return (
     <div className="cadc-light-content">
-      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151" }}>
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
         Tap any day to see the full meal. Menu rotates monthly — check back for updates.
       </p>
-      <MealCalendar dark={isDesktop} />
-      <div style={{ marginTop: 14, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(204,0,0,0.9)" : "#CC0000", margin: "0 0 6px" }}>About our menus</p>
-        <p style={{ fontSize: 12, color: isDesktop ? "rgba(255,255,255,0.7)" : "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers. Each menu cycle covers three months.</p>
+      <MealCalendar dark={false} />
+      <button
+        onClick={() => downloadICS(generateMealICS(mn), `cadc-senior-meals-${mn.month.toLowerCase()}-${mn.year}.ics`)}
+        aria-label={`Download ${mn.month} ${mn.year} senior meal calendar as ICS file`}
+        style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 4, background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.25)", borderRadius: 8, padding: "10px 16px", fontSize: 12, fontWeight: 700, color: "#0101FF", cursor: "pointer", letterSpacing: "0.04em" }}
+      >
+        📅 Save to Calendar (.ics)
+      </button>
+      <p style={{ fontSize: 10, color: "#9ca3af", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <div style={{ marginTop: 4, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>About our menus</p>
+        <p style={{ fontSize: 12, color: "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers.</p>
       </div>
-      <div style={{ marginTop: 10, padding: "10px 14px", background: isDesktop ? "rgba(1,1,255,0.1)" : "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: isDesktop ? "rgba(204,0,0,0.9)" : "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
-        <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-335-5588</a>
+      <div style={{ marginTop: 10, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
+        <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">580-335-5588</a>
       </div>
     </div>
   );
@@ -654,7 +894,23 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
   isMobile?: boolean;
 }) {
   const isSubLevel = stage === "program" || stage === "content";
-  const items = isSubLevel ? (activeProgram?.subAreas ?? []) : availablePrograms;
+  const { features: _gateFeats } = useCms();
+  const _subAreaGates: Record<string, string> = {
+    "hs-pre-enroll":      "formHeadStartPreEnroll",
+    "weath-interest":     "formWeatherizationInterest",
+    "vita-appointment":   "formVitaAppointment",
+    "volunteer-form":     "formVolunteerInterest",
+    "community-survey":   "formCommunityNeeds",
+    "service-screener":   "formServiceScreener",
+    "board-docs":         "boardPortal",
+    "volunteer-log":      "volunteerLog",
+    "volunteer-hub":      "volunteerLog",
+  };
+  const _filteredSubs = (activeProgram?.subAreas ?? []).filter(a => {
+    const gate = _subAreaGates[a.id]; if (!gate) return true;
+    return !!(_gateFeats as Record<string,boolean>)?.[gate];
+  });
+  const items = isSubLevel ? _filteredSubs : availablePrograms;
 
   // Spring states for each node (keyed by id/slug)
   const nodeSpringMap = useRef<Map<string, NodeSpring>>(new Map());
@@ -928,29 +1184,34 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       {/* Hub center */}
       <div style={{
         position:"absolute", left:"50%", top:"50%",
-        width: isMobile ? "clamp(60px,18vw,80px)" : "clamp(72px,16%,88px)",
+        width: isMobile ? "clamp(60px,18vw,80px)" : "clamp(96px,18%,116px)",
         aspectRatio:"1/1",
         transform:`translate(-50%,-50%) scale(${hubS})`,
         borderRadius:"50%",
-        background: isMobile ? "white" : T.void,
+        background: "#F8F9FF",
         border:`2.5px solid ${T.blue}`,
         boxShadow:`0 0 0 ${8*hubG}px rgba(1,1,255,${0.04+pulseAlpha*0.08}), 0 0 ${40*hubG}px rgba(1,1,255,${0.2+pulseAlpha*0.15}), inset 0 0 20px rgba(1,1,255,${0.05+pulseAlpha*0.05})`,
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
+        overflow:"hidden",
         transition:"transform 0s", // let spring handle it
       }}>
-        <span style={{fontSize: isMobile ? "clamp(1rem,5vw,1.4rem)" : "clamp(1rem,2.5vw,1.4rem)"}}>
-          {isSubLevel ? activeProgram?.icon : "🏛️"}
-        </span>
-        <span style={{
-          color:T.blue,
-          fontSize: isMobile ? "clamp(0.35rem,1.8vw,0.5rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
-          fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase",
-          textAlign:"center", padding:"0 4px", lineHeight:1.2,
-          opacity: orbitTx === "out" ? 0 : 1,
-          transition:"opacity 0.2s ease",
-        }}>
-          {isSubLevel ? activeProgram?.shortName : "CADC"}
-        </span>
+        {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+          ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+              style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
+          : isSubLevel
+            ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
+            : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"88%",height:"auto",objectFit:"contain",display:"block"}} />}
+        {/* Only show text label at entry stage — hide when program icon fills hub */}
+        {!isSubLevel && (
+          <span style={{
+            color:T.blue,
+            fontSize: isMobile ? "clamp(0.35rem,1.8vw,0.5rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
+            fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase",
+            textAlign:"center", padding:"0 4px", lineHeight:1.2,
+            opacity: orbitTx === "out" ? 0 : 1,
+            transition:"opacity 0.2s ease",
+          }}>CADC</span>
+        )}
       </div>
 
       {/* Orbit nodes */}
@@ -958,6 +1219,8 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         const id = isSubLevel ? (item as SubArea).id : (item as ProgramData).slug;
         const label = isSubLevel ? (item as SubArea).shortLabel : (item as ProgramData).shortName;
         const icon = isSubLevel ? (item as SubArea).icon : (item as ProgramData).icon;
+        const progSlug = !isSubLevel ? (item as ProgramData).slug : null;
+        const customIcon = progSlug ? PROGRAM_ICONS[progSlug] : null;
         const spring = nodeSpringMap.current.get(id) ?? createNodeSpring(0);
 
         const baseAngle = (i / items.length) * Math.PI * 2;
@@ -980,7 +1243,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             style={{
               position:"absolute",
               left:`${x}%`, top:`${y}%`,
-              width: isMobile ? "clamp(48px,13vw,64px)" : "clamp(52px,11%,68px)",
+              width: isMobile ? "clamp(60px,16vw,80px)" : "clamp(80px,14%,110px)",
               transform:`translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(${sc})`,
               display:"flex",flexDirection:"column",alignItems:"center",gap: isMobile?3:5,
               background:"none",border:"none",cursor:"pointer",padding:0,
@@ -999,28 +1262,33 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             )}
             {/* Node disc */}
             <div className="node-disc" style={{
-              width: isMobile ? "clamp(34px,10vw,48px)" : "clamp(44px,9.5%,60px)",
-              aspectRatio:"1/1", borderRadius:"50%",
-              background: isActive ? "#E4E4FF" : isMobile ? "white" : "rgba(1,5,30,0.9)",
+              width: isMobile ? "clamp(44px,12vw,58px)" : 64,
+              height: isMobile ? "clamp(44px,12vw,58px)" : 64,
+              borderRadius:"50%",
+              background: isActive ? "#E4E4FF" : "white",
               border:`${isActive?3:2}px solid ${T.blue}`,
               display:"flex",alignItems:"center",justifyContent:"center",
               fontSize: isMobile ? "clamp(0.85rem,4vw,1.1rem)" : "clamp(1rem,2vw,1.3rem)",
+              overflow:"hidden", flexShrink:0,
               boxShadow: isActive
-                ? `0 0 24px rgba(1,1,255,0.7), 0 0 48px rgba(1,1,255,0.3), inset 0 0 12px rgba(1,1,255,0.1)`
-                : `0 0 ${8+glow*20}px rgba(1,1,255,${0.15+glow*0.3}), 0 4px 16px rgba(0,0,0,0.3)`,
+                ? `0 0 20px rgba(1,1,255,0.35), 0 4px 16px rgba(1,1,255,0.15)`
+                : `0 3px 12px rgba(1,1,255,0.12), 0 1px 4px rgba(0,0,0,0.08)`,
               transition:"box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease",
             }}>
-              {icon}
+              {customIcon
+                ? <img src={customIcon} alt={label}
+                    style={{width:"90%",height:"90%",objectFit:"contain",display:"block"}} />
+                : icon}
             </div>
             <span style={{
               color: T.blue,
-              fontSize: isMobile ? "clamp(0.36rem,1.6vw,0.48rem)" : "clamp(0.38rem,0.85vw,0.52rem)",
+              fontSize: isMobile ? "clamp(0.40rem,1.6vw,0.52rem)" : "clamp(0.42rem,0.85vw,0.58rem)",
               fontWeight: isActive ? 800 : 700,
-              textTransform:"uppercase", letterSpacing:"0.05em",
+              textTransform:"uppercase", letterSpacing:"0.02em",
               textAlign:"center", lineHeight:1.2,
-              width: isMobile ? "clamp(48px,13vw,64px)" : "clamp(52px,11%,68px)",
-              overflowWrap:"break-word",
-              textShadow: isMobile ? "none" : isActive ? "0 0 12px rgba(1,1,255,0.8)" : "0 0 8px rgba(1,1,255,0.3)",
+              width: isMobile ? "clamp(60px,16vw,80px)" : "clamp(80px,14%,110px)",
+              whiteSpace: "nowrap",
+              textShadow: "none",
             }}>
               {label}
             </span>
@@ -1136,6 +1404,119 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
   );
 }
 
+// ─── Sub-Area Photo Carousel ──────────────────────────────────────────────────
+// Auto-cycles through program photos every 3.5s with crossfade.
+// Shown at top of sub-area content panels when the program has photos.
+
+const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
+  "head-start": [
+    { src: "/images/hero/hero-1.jpg",  alt: "Head Start Civil Rights training, CADC banner" },
+    { src: "/images/hero/hero-8.jpg",  alt: "Head Start CPR and First Aid training" },
+    { src: "/images/hero/hero-10.jpg", alt: "Large Head Start staff training" },
+    { src: "/images/hero/hero-13.jpg", alt: "Child doing math manipulatives activity" },
+    { src: "/images/hero/hero-15.jpg", alt: "Head Start classroom visit with legislators" },
+    { src: "/images/hero/hero-25.jpg", alt: "Large Head Start staff meeting" },
+  ],
+  "senior-meals": [
+    { src: "/images/senior-dining-1.JPG",  alt: "Seniors dining together at a CADC meal site" },
+    { src: "/images/senior-dining-2.JPG",  alt: "Frederick senior nutrition congregate dining" },
+    { src: "/images/senior-dining-3.JPG",  alt: "Community dining room at CADC senior site" },
+    { src: "/images/senior-dining-6.JPG",  alt: "Wide view of community dining room" },
+    { src: "/images/senior-kitchen-staff.JPG", alt: "CADC senior nutrition kitchen staff" },
+    { src: "/images/hero/hero-19.jpg", alt: "Senior Easter kitchen crew" },
+    { src: "/images/hero/hero-20.jpg", alt: "Senior serving line, Easter decorations" },
+  ],
+  "advantage": [
+    { src: "/images/hero/hero-2.jpg",  alt: "Advantage meal prep, freezer loading" },
+    { src: "/images/hero/hero-24.jpg", alt: "Advantage freezer stocking" },
+  ],
+  "community-market": [
+    { src: "/images/community-market-1.PNG", alt: "CADC Community Market 42-foot mobile grocery trailer" },
+    { src: "/images/community-market-3.PNG", alt: "Fresh produce at the Community Market" },
+    { src: "/images/community-market-4.PNG", alt: "Dairy and refrigerated items" },
+    { src: "/images/community-market-6.PNG", alt: "Frozen foods section" },
+    { src: "/images/community-market-7.PNG", alt: "Refrigerated produce" },
+    { src: "/images/community-market-9.PNG", alt: "Pantry aisle" },
+  ],
+  "transit": [
+    { src: "/images/hero/hero-14.jpg", alt: "Transit mechanics with diagnostic equipment" },
+  ],
+  "weatherization": [
+    { src: "/images/hero/hero-17.jpg", alt: "Weatherization field crew in hi-vis vests" },
+  ],
+};
+
+function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
+  const photos = SUB_AREA_PHOTOS[programSlug];
+  const [current, setCurrent] = useState(0);
+  const [next, setNext] = useState(1);
+  const [transitioning, setTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (!photos || photos.length <= 1) return;
+    const interval = setInterval(() => {
+      const nextIdx = (current + 1) % photos.length;
+      setNext(nextIdx);
+      setTransitioning(true);
+      setTimeout(() => {
+        setCurrent(nextIdx);
+        setTransitioning(false);
+      }, 700);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [current, photos?.length]);
+
+  if (!photos || photos.length === 0) return null;
+  const idx = current;
+
+  return (
+    <div style={{
+      width: "100%", height: 160, borderRadius: 12, overflow: "hidden",
+      marginBottom: 16, position: "relative",
+      background: "#e8eaff",
+    }}>
+      {/* Bottom layer — current photo, always fully visible */}
+      <img
+        src={photos[current]?.src}
+        alt={photos[current]?.alt}
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%", objectFit: "cover",
+          opacity: 1,
+        }}
+      />
+      {/* Top layer — next photo, fades in over the current */}
+      <img
+        key={next}
+        src={photos[next]?.src}
+        alt={photos[next]?.alt}
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%", objectFit: "cover",
+          opacity: transitioning ? 1 : 0,
+          transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
+        }}
+      />
+      {photos.length > 1 && (
+        <div style={{
+          position: "absolute", bottom: 8, right: 10,
+          display: "flex", gap: 4,
+        }}>
+          {photos.map((_, i) => (
+            <div key={i} style={{
+              width: i === current ? 16 : 5, height: 5, borderRadius: 3,
+              background: i === idx ? "white" : "rgba(255,255,255,0.45)",
+              transition: "width 0.3s ease, background 0.3s ease",
+            }} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Inline Photo Strip ───────────────────────────────────────────────────────
 // Used inside sub-area content — horizontal scrollable photo row
 // Place anywhere inside a cadc-content div
@@ -1144,34 +1525,37 @@ function PhotoStrip({ photos, dark }: {
   photos: { src: string; alt: string }[];
   dark: boolean;
 }) {
+  const [failed, setFailed] = useState<Set<number>>(new Set());
+  const visible = photos.filter((_, i) => !failed.has(i));
+
   return (
     <div style={{
       display: "flex", gap: 8,
-      overflowX: "scroll",
-      overflowY: "visible",
-      margin: "14px -12px",
-      padding: "0 12px 8px",
+      overflowX: "auto",
+      margin: "14px 0",
+      paddingBottom: 8,
+      // Hide scrollbar cross-browser
       scrollbarWidth: "none",
-      WebkitOverflowScrolling: "touch",
-      isolation: "isolate",
     }}>
-      {photos.map((photo, i) => (
-        <div key={i} style={{
-          flex: "0 0 auto", width: 160, height: 115,
-          borderRadius: 10, overflow: "hidden",
-          background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
-          border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
-        }}>
-          <img
-            src={photo.src}
-            alt={photo.alt}
-            onError={(e) => {
-              const el = e.target as HTMLImageElement;
-              if (el.parentElement) el.parentElement.style.display = "none";
-            }}
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          />
-        </div>
+      <style>{`.photo-strip::-webkit-scrollbar { display: none; }`}</style>
+      {visible.map((photo, i) => (
+        <img
+          key={photo.src}
+          src={photo.src}
+          alt={photo.alt}
+          onError={() => {
+            const idx = photos.findIndex(p => p.src === photo.src);
+            setFailed(prev => new Set([...prev, idx]));
+          }}
+          style={{
+            flex: "0 0 auto",
+            width: 130, height: 100,
+            borderRadius: 10,
+            objectFit: "cover",
+            border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
+            display: "block",
+          }}
+        />
       ))}
     </div>
   );
@@ -1184,30 +1568,33 @@ function PhotoGrid({ photos, dark }: {
   photos: { src: string; alt: string }[];
   dark: boolean;
 }) {
+  const [failed, setFailed] = useState<Set<number>>(new Set());
+  const visible = photos.slice(0, 6).filter((_, i) => !failed.has(i));
+  // If first photo spans full width and remaining count is odd, drop the last to avoid orphan cell
+  const hasSpan = visible.length >= 3;
+  const remaining = hasSpan ? visible.slice(1) : visible;
+  const evenRemaining = remaining.length % 2 !== 0 ? remaining.slice(0, -1) : remaining;
+  const display = hasSpan ? [visible[0], ...evenRemaining] : evenRemaining;
+
   return (
     <div style={{
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
-      gridAutoRows: "auto",
       gap: 8, margin: "14px 0",
     }}>
-      {photos.slice(0, 6).map((photo, i) => (
-        <div key={i} style={{
+      {display.map((photo, i) => (
+        <div key={photo.src} style={{
           borderRadius: 10, overflow: "hidden", aspectRatio: "4/3",
           background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
           border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
-          gridColumn: i === 0 && photos.length >= 3 ? "1 / span 2" : "auto",
+          gridColumn: i === 0 && hasSpan ? "1 / span 2" : "auto",
         }}>
           <img
             src={photo.src}
             alt={photo.alt}
-            onError={(e) => {
-              const el = e.target as HTMLImageElement;
-              const parent = el.parentElement;
-              if (parent) {
-                parent.style.display = "none";
-                parent.style.gridColumn = "unset";
-              }
+            onError={() => {
+              const originalIndex = photos.findIndex(p => p.src === photo.src);
+              setFailed(prev => new Set([...prev, originalIndex]));
             }}
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
@@ -1218,6 +1605,1583 @@ function PhotoGrid({ photos, dark }: {
 }
 
 
+
+
+// ─── County Detail Popup ──────────────────────────────────────────────────────
+// Simple, one-tap deeper info. Used by Market "Communities we serve" and reusable elsewhere.
+function marketStopsForCounty(countyName: string, cities: string[]): { city: string; times: string[] }[] {
+  return cities.map(city => {
+    const times = new Set<string>();
+    Object.entries(MARKET_SCHEDULE_DATA.stops).forEach(([date, stops]) => {
+      stops.forEach(st => {
+        const loc = st.location.split("—")[0].trim().replace("Mt. View","Mountain View");
+        if (loc.toLowerCase().startsWith(city.toLowerCase())) {
+          const d = new Date(date + "T12:00:00");
+          times.add(`${d.toLocaleDateString("en-US",{weekday:"short"})} ${d.getDate()} · ${st.time}`);
+        }
+      });
+    });
+    return { city, times: [...times] };
+  });
+}
+
+function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; slug: string; cities: string[]; onClose: () => void }) {
+  const programs = PROGRAMS.filter(p => (COUNTY_PROGRAM_MAP[slug] ?? []).includes(p.slug));
+  const stops = marketStopsForCounty(county, cities);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div onClick={onClose} role="dialog" aria-modal="true" aria-label={`${county} details`}
+      style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(10,22,40,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 16, padding: 22, maxWidth: 420, width: "100%", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div>
+            <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>Community Market</p>
+            <h4 style={{ color: T.textPrimary, fontWeight: 800, fontSize: 20, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>{county}</h4>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{ background: T.void, border: `1px solid ${T.border}`, borderRadius: 8, width: 36, height: 36, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
+        </div>
+        <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "12px 0 8px" }}>Market stops this month</p>
+        {stops.map(st => (
+          <div key={st.city} style={{ background: "#F5F5FF", border: `1px solid #dcdcf5`, borderRadius: 10, padding: "10px 12px", marginBottom: 6 }}>
+            <p style={{ color: T.blue, fontWeight: 800, fontSize: 14, margin: "0 0 4px" }}>{st.city}</p>
+            {st.times.length > 0
+              ? st.times.map(t => <p key={t} style={{ color: "#374151", fontSize: 12, margin: "2px 0" }}>{t}</p>)
+              : <p style={{ color: T.textMuted, fontSize: 12, margin: 0, fontStyle: "italic" }}>Check the schedule for upcoming dates</p>}
+          </div>
+        ))}
+        <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "14px 0 8px" }}>Other CADC services in {county}</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {programs.map(p => <a key={p.slug} href={`/?county=${slug}&program=${p.slug}`} style={{ background: T.blueLight, color: T.blue, padding: "6px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{p.icon} {p.shortName}</a>)}
+        </div>
+        <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
+          <a href="tel:+15803051964" style={{ flex: 1, textAlign: "center", background: T.maroon, color: "white", padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>📞 Call the Market</a>
+          <a href={`/?county=${slug}`} style={{ flex: 1, textAlign: "center", background: "white", border: `1px solid ${T.blue}`, color: T.blue, padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>See county →</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const MARKET_COUNTIES: { county: string; slug: string; cities: string[] }[] = [
+  { county: "Beckham County",     slug: "beckham",     cities: ["Erick"] },
+  { county: "Comanche County",    slug: "comanche",    cities: ["Cache","Chattanooga","Fletcher","Geronimo","Lawton","Sterling"] },
+  { county: "Cotton County",      slug: "cotton",      cities: ["Randlett","Temple"] },
+  { county: "Jefferson County",   slug: "jefferson",   cities: ["Ringling","Ryan"] },
+  { county: "Kiowa County",       slug: "kiowa",       cities: ["Lone Wolf","Mountain View"] },
+  { county: "Roger Mills County", slug: "roger-mills", cities: ["Hammon"] },
+  { county: "Tillman County",     slug: "tillman",     cities: ["Grandfield","Tipton"] },
+  { county: "Washita County",     slug: "washita",     cities: ["Burns Flat","Canute","Corn","Sentinel"] },
+];
+
+function MarketCommunities() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const close = useCallback(() => setOpenIdx(null), []);
+  return (
+    <>
+      <p className="cadc-note" style={{ margin: "0 0 8px" }}>Tap a county for stop days, times, and other services nearby.</p>
+      <div className="cadc-stack">
+        {MARKET_COUNTIES.map((r, i) => (
+          <button key={r.county} onClick={() => setOpenIdx(i)} className="cadc-card-sm"
+            style={{ textAlign: "left", cursor: "pointer", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}
+            aria-label={`${r.county} — see market stop details`}>
+            <span>
+              <span className="cadc-card-title" style={{ display: "block", margin: "0 0 2px" }}>{r.county}</span>
+              <span style={{ fontSize: 12, color: "#374151" }}>{r.cities.join(" · ")}</span>
+            </span>
+            <span aria-hidden="true" style={{ color: T.blue, fontWeight: 800, fontSize: 18 }}>›</span>
+          </button>
+        ))}
+      </div>
+      {openIdx !== null && <CountyDetailPopup {...MARKET_COUNTIES[openIdx]} onClose={close} />}
+    </>
+  );
+}
+
+
+// Staff & Leadership — editable from /admin
+function StaffList() {
+  const { staff } = useCms();
+  return (
+    <div className="cadc-stack">
+      {staff.map(p => (
+        <div key={p.name + p.title} className="cadc-card-sm">
+          <p className="cadc-card-title">{p.name}</p>
+          <p>{p.title}</p>
+          {p.phone && <a href={`tel:+1${p.phone.replace(/\D/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.phone}</a>}
+          {p.email && <a href={`mailto:${p.email}`} className="cadc-link" style={{display:"block"}}>{p.email}</a>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+// ─── Program Quick-Action CTAs ────────────────────────────────────────────────
+// The single most important action a visitor wants from each program landing.
+// Shows as a prominent button strip at the top of the program content panel.
+
+const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string; areaId?: string; desc: string }[]> = {
+  "head-start": [
+    { label: "Apply Now", icon: "📝", href: "https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447", desc: "Start your child's application" },
+    { label: "Who Qualifies", icon: "✅", areaId: "enrollment", desc: "Check eligibility" },
+  ],
+  "transit": [
+    { label: "Schedule a Ride", icon: "📞", href: "tel:+15803352691", desc: "Call (580) 335-2691" },
+    { label: "View Fares", icon: "💲", areaId: "fares", desc: "See pricing" },
+  ],
+  "weatherization": [
+    { label: "Apply Online", icon: "🏠", href: "https://ok.mywaplink.org", desc: "Oklahoma WAP Portal" },
+    { label: "Check Eligibility", icon: "✅", areaId: "eligibility-weath", desc: "Income guidelines" },
+  ],
+  "senior-meals": [
+    { label: "View Menu", icon: "📋", areaId: "sn-menu", desc: "September meal calendar" },
+    { label: "Find a Site", icon: "📍", areaId: "congregate", desc: "6 dining locations" },
+  ],
+  "community-market": [
+    { label: "See Schedule", icon: "📅", areaId: "market-schedule", desc: "September stop times" },
+    { label: "Call Scott", icon: "📞", href: "tel:+15803051964", desc: "580-305-1964" },
+  ],
+  "tax-help": [
+    { label: "What to Bring", icon: "📎", areaId: "vita-bring", desc: "Required documents" },
+    { label: "Call to Schedule", icon: "📞", href: "tel:+15803355588", desc: "580-335-5588" },
+  ],
+  "employment": [
+    { label: "View Openings", icon: "💼", href: "https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr", desc: "CADC on Facebook" },
+  ],
+  "advantage": [
+    { label: "Check Eligibility", icon: "✅", areaId: "adv-eligibility", desc: "SoonerCare required" },
+    { label: "Call to Apply", icon: "📞", href: "tel:+18009877767", desc: "1-800-987-7767" },
+  ],
+  "board": [
+    { label: "Staff Directory", icon: "👤", areaId: "leadership", desc: "All program directors" },
+    { label: "Policy Council", icon: "📋", areaId: "policy-council", desc: "Get involved" },
+  ],
+};
+
+function ProgramCTABar({ slug, onSelectArea }: { slug: string; onSelectArea: (id: string) => void }) {
+  const ctas = PROGRAM_CTAS[slug];
+  if (!ctas || ctas.length === 0) return null;
+  return (
+    <div style={{
+      display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20,
+    }}>
+      {ctas.map(cta => (
+        cta.href
+          ? <a key={cta.label} href={cta.href}
+              target={cta.href.startsWith("http") ? "_blank" : undefined}
+              rel={cta.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              style={{
+                flex: "1 1 auto", display: "flex", flexDirection: "column", alignItems: "center",
+                gap: 4, padding: "12px 16px", borderRadius: 12, textDecoration: "none",
+                background: T.blue, color: "white",
+                fontWeight: 800, fontSize: 14, letterSpacing: "0.02em",
+                boxShadow: "0 4px 16px rgba(1,1,255,0.25)",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(1,1,255,0.35)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 16px rgba(1,1,255,0.25)"; }}
+            >
+              <span style={{ fontSize: 22 }}>{cta.icon}</span>
+              <span>{cta.label}</span>
+              <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.8 }}>{cta.desc}</span>
+            </a>
+          : <button key={cta.label} onClick={() => onSelectArea(cta.areaId!)}
+              style={{
+                flex: "1 1 auto", display: "flex", flexDirection: "column", alignItems: "center",
+                gap: 4, padding: "12px 16px", borderRadius: 12, border: `2px solid ${T.blue}`,
+                background: "white", color: T.blue, cursor: "pointer",
+                fontWeight: 800, fontSize: 14, letterSpacing: "0.02em",
+                boxShadow: "0 4px 16px rgba(1,1,255,0.1)",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease",
+                fontFamily: "inherit",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = T.blueLight; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = ""; }}
+            >
+              <span style={{ fontSize: 22 }}>{cta.icon}</span>
+              <span>{cta.label}</span>
+              <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6 }}>{cta.desc}</span>
+            </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Transit Ride Section — shows booking form or simple CTA based on feature flag
+function TransitRideSection() {
+  const { features } = useCms();
+  if (features?.transitBooking) return <TransitBookingForm />;
+  return (
+    <div className="cadc-light-content">
+      <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
+      <div className="cadc-card">
+        <p className="cadc-label">Schedule a ride</p>
+        <a href="tel:+15803352691" className="cadc-btn">📞 (580) 335-2691</a>
+        <p className="cadc-note">Spanish-speaking staff available. ADA equipped vehicles.</p>
+        <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
+      </div>
+      <div className="cadc-card">
+        <p className="cadc-label">Counties served</p>
+        <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Jefferson · Kiowa · Roger Mills · Stephens · Tillman · Washita</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Transit Booking Form ─────────────────────────────────────────────────────
+function TransitBookingForm() {
+  const [form, setForm] = useState({ name: "", phone: "", pickupAddress: "", destination: "", requestedDate: "", requestedTime: "", accessibility: "none", notes: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+  async function submit() {
+    if (!form.name || !form.phone || !form.pickupAddress || !form.destination || !form.requestedDate) { setState("err"); return; }
+    setState("sending");
+    const r = await fetch("/api/cms/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }).catch(() => null);
+    setState(r?.ok ? "done" : "err");
+  }
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Ride request received!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>Gilbert's team will confirm your ride by phone. Questions? Call <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700 }}>(580) 335-2691</a>.</div>
+      </div>
+    </div>
+  );
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Request a ride online and Gilbert's team will confirm by phone. You can also call directly at <a href="tel:+15803352691" className="cadc-link">(580) 335-2691</a>.</p>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in all required fields.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Pickup address <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.pickupAddress} onChange={f("pickupAddress")} placeholder="Street address, city" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Destination <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.destination} onChange={f("destination")} placeholder="Where are you going?" /></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Date <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="date" value={form.requestedDate} onChange={f("requestedDate")} /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred time</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="time" value={form.requestedTime} onChange={f("requestedTime")} /></div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, marginTop: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Accessibility needs</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.accessibility} onChange={f("accessibility")}>
+            <option value="none">None needed</option>
+            <option value="wheelchair">Wheelchair lift needed</option>
+            <option value="walker">Walker / mobility aid</option>
+            <option value="oxygen">Oxygen equipment</option>
+            <option value="other">Other — explain in notes</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Additional notes</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Submit Ride Request →"}</button>
+        <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5, display: "block" }}>Spanish-speaking staff available · ADA vehicles on all routes</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Intake Lead Section — shows follow-up form or just content based on feature flag
+function IntakeLeadSection({ program, step, children }: { program: string; step: string; children: React.ReactNode }) {
+  const { features } = useCms();
+  if (features?.intakeLeads) return <IntakeLeadForm program={program} step={step}>{children}</IntakeLeadForm>;
+  return <>{children}</>;
+}
+
+// ─── Intake Lead Capture Form ─────────────────────────────────────────────────
+function IntakeLeadForm({ program, step, children }: { program: string; step: string; children: React.ReactNode }) {
+  const [form, setForm] = useState({ name: "", phone: "", email: "", county: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err"|"dismissed">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+  async function submit() {
+    if (!form.name.trim()) { setState("err"); return; }
+    if (!form.phone.trim() && !form.email.trim()) { setState("err"); return; }
+    setState("sending");
+    await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, program, step, _gotcha: "" }) }).catch(() => {});
+    setState("done");
+  }
+  return (
+    <div>
+      {children}
+      {state === "dismissed" ? null : state === "done" ? (
+        <div style={{ marginTop: 16, background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
+          <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+          <div style={{ fontWeight: 800, color: "#059669", fontSize: 16, marginBottom: 6 }}>Got it — we'll be in touch.</div>
+          <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>A CADC staff member will reach out to help you through the process.</div>
+        </div>
+      ) : (
+        <div style={{ marginTop: 16, background: "#F0F4FF", border: "1.5px solid #0101FF", borderRadius: 16, padding: "20px 18px" }}>
+          {/* Header row with dismiss */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+            <p style={{ fontSize: 14, fontWeight: 800, color: "#111827", margin: 0 }}>Want us to follow up with you?</p>
+            <button onClick={() => setState("dismissed")} aria-label="Dismiss" style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: 18, lineHeight: 1, padding: "0 0 0 8px", fontFamily: "inherit" }}>✕</button>
+          </div>
+          <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 16px", lineHeight: 1.5 }}>Leave your name and contact info and a CADC staff member will reach out to help you through the process.</p>
+          {state === "err" && (
+            <div style={{ fontSize: 12, color: "#CC0000", fontWeight: 700, marginBottom: 12, padding: "10px 14px", background: "#FFF0F0", borderRadius: 8, border: "1px solid #FCA5A5" }}>
+              Please enter your name and at least a phone number or email.
+            </div>
+          )}
+          {/* Name — required */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Full name <span style={{ color: "#CC0000" }}>*</span></label>
+            <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="First and last name" />
+          </div>
+          {/* Phone — required if no email */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Phone number <span style={{ color: "#CC0000" }}>*</span></label>
+            <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" />
+          </div>
+          {/* Email — optional but encouraged */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Email <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional)</span></label>
+            <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" />
+          </div>
+          {/* County */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 18 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your county <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional)</span></label>
+            <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+              <option value="">Select county</option>
+              {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+          <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "15px 20px", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>
+            {state === "sending" ? "Sending…" : "Request a Follow-Up Call →"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Head Start FAQ Accordion ─────────────────────────────────────────────────
+const HS_FAQS = [
+  { q: "Who qualifies for Early Head Start and Head Start?", a: "EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5. Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF). Enrollment is based on a points system — all families are encouraged to apply." },
+  { q: "What do I need to bring to apply?", a: "Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable." },
+  { q: "Are children with disabilities or special needs accepted?", a: "Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP." },
+  { q: "Can parents apply to work at CADC Head Start?", a: "Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588." },
+  { q: "How can parents or community members get involved?", a: "Just show up at any center — no call or appointment needed. Parents, grandparents, neighbors, and local volunteers are all welcome. Every hour you contribute counts as an in-kind donation that helps keep the program free for families." },
+  { q: "What should I expect during a home visit?", a: "CADC attempts two home visits per year per family. Your Center Staff will work with you on goals, connect you to resources, and discuss your child's development. If a home visit isn't possible, an alternative location can be arranged." },
+  { q: "How does Head Start support my child's health?", a: "CADC provides vision, hearing, and mental health screenings. Other screenings — including dental exams — are the parent's responsibility, though we will help direct you to the right resources. Children with conditions such as asthma must have an inhaler on-site." },
+  { q: "What if my child has allergies or special dietary needs?", a: "A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program." },
+  { q: "I need a new parent handbook or school calendar. What do I do?", a: "Contact your child's center directly. Each center can provide current handbooks and calendars. You can also find updates through your classroom's private Facebook page." },
+];
+
+function HeadStartFAQ() {
+  const { features } = useCms();
+  const [open, setOpen] = useState<number | null>(null);
+
+  if (!features?.faqAccordion) return (
+    <div className="cadc-light-content">
+      <p>Answers to the questions families ask us every day.</p>
+      <div className="cadc-stack">
+        {HS_FAQS.map(item => (
+          <div key={item.q} className="cadc-card-sm">
+            <p className="cadc-card-title">{item.q}</p>
+            <p>{item.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p>Answers to the questions families ask us every day. Tap a question to expand it.</p>
+      <div style={{ marginTop: 12 }}>
+        {HS_FAQS.map((item, i) => (
+          <div key={i} style={{ borderBottom: `1px solid ${T.border}`, overflow: "hidden" }}>
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: "14px 4px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, fontFamily: "inherit" }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: T.textPrimary, lineHeight: 1.4, flex: 1 }}>{item.q}</span>
+              <span style={{ color: T.blue, fontWeight: 800, fontSize: 18, flexShrink: 0, transform: open === i ? "rotate(45deg)" : "none", transition: "transform 0.2s ease" }}>+</span>
+            </button>
+            {open === i && (
+              <div style={{ padding: "0 4px 14px", fontSize: 14, color: T.textMuted, lineHeight: 1.6 }}>
+                {item.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="cadc-card" style={{ marginTop: 16 }}>
+        <p className="cadc-label">Still have questions?</p>
+        <a href="tel:+15803355588" className="cadc-link">Call us at 580-335-5588</a>
+        <a href="tel:+15807263343" className="cadc-link" style={{ display: "block", marginTop: 6 }}>Head Start direct: 580-726-3343</a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Board Docs Section (gated behind boardPortal feature) ────────────────────
+function BoardDocsSectionGated() {
+  const { features } = useCms();
+  if (!features?.boardPortal) return (
+    <div className="cadc-light-content">
+      <div className="cadc-card" style={{ textAlign: "center", padding: 28 }}>
+        <p style={{ fontSize: 28, margin: "0 0 8px" }}>📄</p>
+        <p style={{ fontWeight: 700, margin: "0 0 6px" }}>Board documents coming soon.</p>
+        <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Agendas, minutes, and resolutions will be posted here.</p>
+      </div>
+      <div className="cadc-card">
+        <p className="cadc-label">Questions about board documents</p>
+        <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+        <a href="mailto:tcamero@cadcok.org" className="cadc-link" style={{ display: "block", marginTop: 6 }}>tcamero@cadcok.org</a>
+      </div>
+    </div>
+  );
+  return <BoardDocsPanel />;
+}
+
+// ─── Shared form hook ─────────────────────────────────────────────────────────
+async function submitLead(payload: Record<string, string>, program: string, step: string) {
+  return fetch("/api/cms/leads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...payload, program, step, _gotcha: "" }),
+  }).catch(() => null);
+}
+
+// ─── 1. Universal Service Screener ────────────────────────────────────────────
+function ServiceScreenerForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ county: "", householdSize: "", income: "", hasChildren: "", age60plus: "", ownRent: "" });
+  const [results, setResults] = useState<string[] | null>(null);
+  const [state, setState] = useState<"idle"|"done">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formServiceScreener) return null;
+
+  function screen() {
+    const programs: string[] = [];
+    if (form.hasChildren === "yes-0-3") programs.push("Early Head Start");
+    if (form.hasChildren === "yes-3-5") programs.push("Head Start");
+    if (form.hasChildren === "yes-0-3" || form.hasChildren === "yes-3-5") programs.push("Head Start & Early Head Start");
+    if (parseInt(form.householdSize) > 0 && form.ownRent !== "") programs.push("Weatherization Assistance");
+    if (form.age60plus === "yes") programs.push("Senior Nutrition / Congregate Meals");
+    if (form.age60plus === "yes") programs.push("Advantage Home Delivered Meals");
+    if (form.county !== "") programs.push("Red River Transportation");
+    programs.push("VITA Free Tax Help");
+    if (form.income !== "" && parseInt(form.income) < 40000) programs.push("Community Market");
+    const unique = [...new Set(programs)];
+    setResults(unique);
+    submitLead({ ...form, matchedPrograms: unique.join(", ") }, "service-screener", "screener-complete");
+    setState("done");
+  }
+
+  if (state === "done" && results) return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>🎯</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Based on your answers, you may qualify for:</div>
+        <div style={{ marginTop: 12, textAlign: "left" }}>
+          {results.map(r => <div key={r} style={{ padding: "8px 0", borderBottom: "1px solid #D1FAE5", fontWeight: 600, fontSize: 14, color: "#111827" }}>✓ {r}</div>)}
+        </div>
+        <p style={{ fontSize: 12, color: "#6B7280", margin: "14px 0 0", textAlign: "left" }}>Eligibility is determined by CADC staff. Call to confirm and start the process.</p>
+      </div>
+      <a href="tel:+15803355588" className="cadc-btn" style={{ display: "block", textAlign: "center", marginTop: 14 }}>📞 Call CADC — 580-335-5588</a>
+      <button style={{ width: "100%", marginTop: 10, background: "white", color: T.blue, border: `1.5px solid ${T.blue}`, borderRadius: 10, padding: "12px", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }} onClick={() => { setState("idle"); setResults(null); }}>Start Over</button>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Household size <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.householdSize} onChange={f("householdSize")}>
+            <option value="">Select</option>
+            {["1","2","3","4","5","6","7","8+"].map(n => <option key={n} value={n}>{n} {n === "1" ? "person" : "people"}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Approximate annual household income</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.income} onChange={f("income")}>
+            <option value="">Select range</option>
+            <option value="15000">Under $15,000</option>
+            <option value="25000">$15,000 – $25,000</option>
+            <option value="35000">$25,000 – $35,000</option>
+            <option value="50000">$35,000 – $50,000</option>
+            <option value="75000">Over $50,000</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Children in your household?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.hasChildren} onChange={f("hasChildren")}>
+            <option value="">Select</option>
+            <option value="yes-0-3">Yes — under age 3 or pregnant</option>
+            <option value="yes-3-5">Yes — ages 3 to 5</option>
+            <option value="yes-older">Yes — school age or older</option>
+            <option value="no">No children</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Anyone in household age 60 or older?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.age60plus} onChange={f("age60plus")}>
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Do you own or rent your home?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.ownRent} onChange={f("ownRent")}>
+            <option value="">Select</option>
+            <option value="own">Own</option>
+            <option value="rent">Rent</option>
+            <option value="other">Other / not applicable</option>
+          </select>
+        </div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={screen} disabled={!form.county || !form.householdSize}>See My Results →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 2. Head Start Pre-Enrollment Form ───────────────────────────────────────
+function HeadStartPreEnrollForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ parentName: "", phone: "", county: "", childDob: "", centerPref: "", receiving: "", specialNeeds: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formHeadStartPreEnroll) return null;
+
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>We received your interest!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A Head Start staff member will call you soon. Questions? Call Robin Harris at <a href="tel:+15807263343" style={{ color: T.blue, fontWeight: 700 }}>580-726-3343</a>.</div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Not ready to apply through ChildPlus yet? Let us know you're interested and we'll reach out to walk you through the process.</p>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.parentName} onChange={f("parentName")} placeholder="Parent or guardian name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>County</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Child's approximate date of birth</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="date" value={form.childDob} onChange={f("childDob")} /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred center (if known)</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.centerPref} onChange={f("centerPref")}>
+            <option value="">No preference / not sure</option>
+            {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Does your family receive SNAP, SSI, or TANF?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.receiving} onChange={f("receiving")}>
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Special needs or disability services?</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.specialNeeds} onChange={f("specialNeeds")}>
+            <option value="">Select</option>
+            <option value="yes">Yes — currently receiving services</option>
+            <option value="suspected">Possibly — not yet evaluated</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
+          if (!form.parentName || !form.phone) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "head-start", "pre-enrollment");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Submit Interest →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 3. Weatherization Interest Form ─────────────────────────────────────────
+function WeatherizationInterestForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ name: "", phone: "", address: "", county: "", ownRent: "", householdSize: "", hasElderly: "", hasDisability: "", hasChildren: "", primaryHeat: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formWeatherizationInterest) return null;
+
+  if (state === "done") return (
+    <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+      <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+      <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>You're on the list!</div>
+      <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>Robert Meador's team will be in touch to discuss next steps. Questions? Call <a href="tel:+15803050853" style={{ color: T.blue, fontWeight: 700 }}>580-305-0853</a>.</div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Fill out this form to be added to the Weatherization waitlist. Priority is given to households with elderly members, people with disabilities, and children 18 and under.</p>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name, phone, and county.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Home address</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.address} onChange={f("address")} placeholder="Street address" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>County <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+          <option value="">Select county</option>
+          {["Beckham","Caddo","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Own or rent?</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.ownRent} onChange={f("ownRent")}><option value="">Select</option><option value="own">Own</option><option value="rent">Rent</option></select></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Household size</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.householdSize} onChange={f("householdSize")}><option value="">Select</option>{["1","2","3","4","5","6","7","8+"].map(n => <option key={n}>{n}</option>)}</select></div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Priority factors</label>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
+          {[["hasElderly","Age 60+"],["hasDisability","Disability"],["hasChildren","Under 18"]].map(([key, label]) => (
+            <button key={key} onClick={() => setForm(p => ({ ...p, [key]: p[key as keyof typeof p] === "yes" ? "" : "yes" }))}
+              style={{ flex: 1, padding: "11px 8px", borderRadius: 10, border: `1.5px solid ${form[key as keyof typeof form] === "yes" ? "#0101FF" : "#E5E7EB"}`, background: form[key as keyof typeof form] === "yes" ? "#E4E4FF" : "white", fontWeight: 700, fontSize: 13, cursor: "pointer", color: form[key as keyof typeof form] === "yes" ? "#0101FF" : "#374151", textAlign: "center" as const, minWidth: 90, fontFamily: "inherit" }}>{label}</button>
+          ))}
+        </div></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Primary heating source</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.primaryHeat} onChange={f("primaryHeat")}>
+          <option value="">Select</option>
+          <option value="electric">Electric</option>
+          <option value="natural-gas">Natural gas</option>
+          <option value="propane">Propane</option>
+          <option value="oil">Fuel oil</option>
+          <option value="wood">Wood / biomass</option>
+          <option value="other">Other</option>
+        </select></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
+          if (!form.name || !form.phone || !form.county) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "weatherization", "interest-form");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Join Waitlist →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 4. VITA Appointment Request ──────────────────────────────────────────────
+function VitaAppointmentForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ name: "", phone: "", county: "", returnType: "", language: "", preferredDate: "", notes: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formVitaAppointment) return null;
+
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Appointment request received!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A VITA tax preparer will call to confirm your appointment. Questions? Call <a href="tel:+15803355588" style={{ color: T.blue, fontWeight: 700 }}>580-335-5588</a>.</div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Request a free tax preparation appointment. VITA is available to households earning approximately $67,000 or less. Certified volunteers handle federal and state returns at no cost.</p>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone number <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>County</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Type of tax return</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.returnType} onChange={f("returnType")}>
+            <option value="">Select</option>
+            <option value="single">Single / no dependents</option>
+            <option value="married">Married filing jointly</option>
+            <option value="dependents">With dependents</option>
+            <option value="self-employed">Self-employed / 1099</option>
+            <option value="unsure">Not sure</option>
+          </select>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred language</label>
+            <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.language} onChange={f("language")}>
+              <option value="english">English</option>
+              <option value="spanish">Spanish / Español</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Preferred date (optional)</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="date" value={form.preferredDate} onChange={f("preferredDate")} /></div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, marginTop: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Anything we should know?</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.notes} onChange={f("notes")} placeholder="Prior year returns, rental income, etc." /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
+          if (!form.name || !form.phone) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "tax-help", "appointment-request");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Request Appointment →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 5. Volunteer Interest Form ───────────────────────────────────────────────
+function VolunteerInterestForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ name: "", phone: "", email: "", county: "", programs: "", availability: "", skills: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formVolunteerInterest) return null;
+
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>🤝</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Thank you for volunteering!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>A CADC staff member will be in touch to connect you with the right program. We appreciate you.</div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Every volunteer hour helps keep our programs free for the families who need them. Tell us about yourself and we'll connect you with the right opportunity.</p>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your name <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="Full name" /></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone <span style={{ color: "#CC0000", marginLeft: 2 }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 0 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Email (optional)</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" /></div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, marginTop: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+            <option value="">Select county</option>
+            {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Programs of interest</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.programs} onChange={f("programs")}>
+            <option value="">Select</option>
+            <option value="head-start">Head Start / Early Head Start</option>
+            <option value="senior-nutrition">Senior Nutrition</option>
+            <option value="community-market">Community Market</option>
+            <option value="weatherization">Weatherization</option>
+            <option value="transit">Red River Transportation</option>
+            <option value="any">Open to anything</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Availability</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.availability} onChange={f("availability")}>
+            <option value="">Select</option>
+            <option value="weekday-mornings">Weekday mornings</option>
+            <option value="weekday-afternoons">Weekday afternoons</option>
+            <option value="evenings">Evenings</option>
+            <option value="weekends">Weekends</option>
+            <option value="flexible">Flexible</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Skills or certifications (optional)</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.skills} onChange={f("skills")} placeholder="Teaching, cooking, driving, CPR certified, etc." /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
+          if (!form.name || !form.phone) { setState("err"); return; }
+          setState("sending");
+          const r = await submitLead({ ...form }, "volunteer", "interest-form");
+          setState(r?.ok ? "done" : "err");
+        }}>{state === "sending" ? "Sending…" : "Submit Volunteer Interest →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 6. Community Needs Survey ────────────────────────────────────────────────
+function CommunityNeedsSurvey() {
+  const { features } = useCms();
+  const [form, setForm] = useState({ county: "", topNeed: "", barrier: "", awareness: "", satisfaction: "", suggestion: "", phone: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.formCommunityNeeds) return null;
+
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12, lineHeight: 1, display: "block" }}>📊</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8, display: "block" }}>Thank you for your feedback!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, display: "block" }}>Your responses help CADC serve your community better. We read every submission.</div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Help us understand what your community needs most. This survey takes less than 2 minutes and directly shapes how CADC plans its programs and services.</p>
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Your county</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+          <option value="">Select county</option>
+          {["Beckham","Caddo","Canadian","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c => <option key={c}>{c}</option>)}
+        </select>
+        <p className="cadc-label">What service does your community need most?</p>
+        <select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.topNeed} onChange={f("topNeed")} style={{ marginBottom: 10 }}>
+          <option value="">Select</option>
+          <option value="transportation">Transportation / transit</option>
+          <option value="childcare">Childcare / Head Start</option>
+          <option value="food">Food / groceries</option>
+          <option value="weatherization">Home energy / weatherization</option>
+          <option value="senior-meals">Senior meals / nutrition</option>
+          <option value="tax-help">Free tax help</option>
+          <option value="employment">Employment / job training</option>
+          <option value="healthcare">Healthcare access</option>
+          <option value="housing">Housing assistance</option>
+        </select></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Biggest barrier to accessing services?</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.barrier} onChange={f("barrier")}>
+          <option value="">Select</option>
+          <option value="transportation">No transportation to get there</option>
+          <option value="awareness">Didn't know the service existed</option>
+          <option value="hours">Hours don't work with my schedule</option>
+          <option value="language">Language barrier</option>
+          <option value="eligibility">Thought I wouldn't qualify</option>
+          <option value="distance">Too far away</option>
+          <option value="none">No major barriers</option>
+        </select></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>How did you hear about CADC?</label><select style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.awareness} onChange={f("awareness")}>
+          <option value="">Select</option>
+          <option value="word-of-mouth">Word of mouth / family or friend</option>
+          <option value="school">School or Head Start center</option>
+          <option value="social-media">Social media</option>
+          <option value="internet">Internet search</option>
+          <option value="flyer">Flyer or brochure</option>
+          <option value="other-agency">Another agency or organization</option>
+          <option value="already-client">Already a CADC client</option>
+        </select></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>How would you rate CADC services overall?</label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
+          {["1","2","3","4","5"].map((n) => (
+            <button key={n} onClick={() => setForm(p => ({ ...p, satisfaction: n }))}
+              style={{ padding: "10px 2px", borderRadius: 10, border: `1.5px solid ${form.satisfaction === n ? "#0101FF" : "#E5E7EB"}`, background: form.satisfaction === n ? "#E4E4FF" : "white", fontWeight: 800, fontSize: 12, cursor: "pointer", color: form.satisfaction === n ? "#0101FF" : "#374151", textAlign: "center" as const, fontFamily: "inherit", overflow: "hidden" }}>{"⭐".repeat(parseInt(n))}</button>
+          ))}
+        </div></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Suggestions for CADC?</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.suggestion} onChange={f("suggestion")} placeholder="Your ideas matter to us..." /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Phone (optional — for follow-up)</label><input style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} disabled={state === "sending"} onClick={async () => {
+          setState("sending");
+          await submitLead({ ...form }, "community-survey", "needs-survey");
+          setState("done");
+        }}>{state === "sending" ? "Sending…" : "Submit Survey →"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Board Documents Panel ────────────────────────────────────────────────────
+function BoardDocsPanel() {
+  const { boardDocs } = useCms();
+  const docs = boardDocs ?? [];
+  const categories = [
+    { key: "agenda",         label: "Meeting Agendas",    icon: "📋" },
+    { key: "minutes",        label: "Meeting Minutes",    icon: "📝" },
+    { key: "resolution",     label: "Resolutions",        icon: "⚖️" },
+    { key: "policy-council", label: "Policy Council",     icon: "👥" },
+    { key: "annual-report",  label: "Annual Reports",     icon: "📊" },
+    { key: "other",          label: "Other Documents",    icon: "📄" },
+  ] as const;
+
+  const byCategory = (cat: string) => docs.filter(d => d.category === cat).sort((a, b) => b.date.localeCompare(a.date));
+
+  if (docs.length === 0) return (
+    <div className="cadc-light-content">
+      <div className="cadc-card" style={{ textAlign: "center", padding: 32 }}>
+        <p style={{ fontSize: 28, margin: "0 0 10px" }}>📄</p>
+        <p style={{ fontWeight: 700, margin: "0 0 6px" }}>No documents posted yet.</p>
+        <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Board agendas, minutes, and resolutions will appear here when uploaded by CADC staff.</p>
+      </div>
+      <div className="cadc-card">
+        <p className="cadc-label">Questions about board documents</p>
+        <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+        <a href="mailto:tcamero@cadcok.org" className="cadc-link" style={{ display: "block", marginTop: 6 }}>tcamero@cadcok.org</a>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      {categories.map(({ key, label, icon }) => {
+        const items = byCategory(key);
+        if (items.length === 0) return null;
+        return (
+          <div key={key} className="cadc-card">
+            <p className="cadc-label">{icon} {label}</p>
+            <div className="cadc-stack">
+              {items.map(doc => (
+                <a key={doc.id} href={doc.href} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f3f4f6", textDecoration: "none", color: T.blue, fontWeight: 700, fontSize: 13, gap: 12 }}>
+                  <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.title}</span>
+                  <span style={{ fontSize: 11, color: "#6B7280", fontWeight: 400, flexShrink: 0 }}>{new Date(doc.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+
+// ─── CADC Now Widget ─────────────────────────────────────────────────────────
+function CADCNow() {
+  const cms = useCms();
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...5=Fri, 6=Sat
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+  const todayStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+
+  // Today's senior meal
+  const menu = cms.seniorMenu ?? MENU_DATA;
+  const monthMeals = menu.meals ?? {};
+  const todayDate = now.getDate();
+  const todayMeal = isWeekday ? (monthMeals[todayDate] ?? null) : null;
+
+  // Next community market stop
+  const market = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
+  const allStops = Object.values(market.stops ?? {}).flat() as Array<{location:string;time:string;day?:string}>;
+  const todayStops = allStops.filter(s => {
+    if (!s.day) return false;
+    const d = s.day.toLowerCase();
+    return ["sun","mon","tue","wed","thu","fri","sat"][dayOfWeek] === d.slice(0,3);
+  });
+  const nextStop = todayStops[0] ?? allStops[0] ?? null;
+
+  // Active alert
+  const alert = cms.announcement;
+  const hasAlert = alert?.enabled && alert?.text;
+
+  const items: Array<{icon:string; label:string; value:string; sub?:string; href?:string; color?:string}> = [];
+
+  if (hasAlert) items.push({ icon: "⚠️", label: "Service Alert", value: alert!.text!, href: alert!.href || undefined, color: "#CC0000" });
+  if (todayMeal) items.push({ icon: "🍽️", label: "Today's Senior Meal", value: todayMeal.main || "See menu", sub: todayMeal.sides?.join(" · ") });
+  if (nextStop) items.push({ icon: "🚚", label: "Community Market", value: nextStop.location, sub: nextStop.time });
+  items.push({ icon: "🚌", label: "Red River Transit", value: "Schedule a ride", sub: "(580) 335-2691", href: "tel:+15803352691" });
+  if (!todayMeal && isWeekday) items.push({ icon: "🧒", label: "Head Start", value: "Enrollment open", sub: "Call 580-726-3343", href: "tel:+15807263343" });
+
+  if (items.length === 0) return null;
+
+  return (
+    <div style={{ width: "100%", maxWidth: 360, margin: "0 auto" }}>
+      <div style={{ background: T.blue, borderRadius: 14, overflow: "hidden", boxShadow: "0 4px 20px rgba(1,1,255,0.25)" }}>
+        <div style={{ padding: "10px 16px", background: "rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ADE80", boxShadow: "0 0 6px #4ADE80", animation: "pulse 2s infinite" }} />
+          <span style={{ color: "white", fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>CADC Now · {todayStr}</span>
+        </div>
+        {items.map((item, i) => (
+          <a key={i} href={item.href || undefined}
+            style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "12px 16px",
+              borderTop: i > 0 ? "1px solid rgba(255,255,255,0.1)" : "none",
+              textDecoration: "none", background: "transparent" }}>
+            <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1.3 }}>{item.icon}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 2 }}>{item.label}</div>
+              <div style={{ color: item.color ? "white" : "white", fontSize: 14, fontWeight: 800, lineHeight: 1.3 }}>{item.value}</div>
+              {item.sub && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{item.sub}</div>}
+            </div>
+            {item.href && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 16, flexShrink: 0, marginTop: 4 }}>›</span>}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+
+// ─── Find CADC Near Me ────────────────────────────────────────────────────────
+const CADC_LOCATIONS = [
+  { name: "CADC Main Office", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Head Start","Weatherization","Senior Nutrition","VITA","Administration"] },
+  { name: "Head Start — Hobart Center", city: "Hobart", lat: 35.0212, lng: -99.0912, phone: "580-726-3343", href: "tel:+15807263343", services: ["Head Start","Early Head Start"] },
+  { name: "Head Start — Sayre Center", city: "Sayre", lat: 35.2912, lng: -99.6412, phone: "580-928-2199", href: "tel:+15809282199", services: ["Head Start"] },
+  { name: "Advantage — Sentinel Office", city: "Sentinel", lat: 35.1612, lng: -99.1712, phone: "580-393-2216", href: "tel:+15803932216", services: ["Advantage Meals"] },
+  { name: "Advantage — Temple Office", city: "Temple", lat: 34.2712, lng: -98.2412, phone: "580-342-6967", href: "tel:+15803426967", services: ["Advantage Meals"] },
+  { name: "Advantage — Lawton Office", city: "Lawton", lat: 34.6086, lng: -98.3959, phone: "580-699-8880", href: "tel:+15806998880", services: ["Advantage Meals"] },
+  { name: "Red River Transit Dispatch", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-2691", href: "tel:+15803352691", services: ["Transportation"] },
+];
+
+function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function FindNearMe({ onClose }: { onClose?: () => void }) {
+  const [state, setState] = useState<"idle"|"loading"|"done"|"denied">("idle");
+  const [nearest, setNearest] = useState<typeof CADC_LOCATIONS[0] & { miles: number } | null>(null);
+
+  function locate() {
+    if (!navigator.geolocation) { setState("denied"); return; }
+    setState("loading");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords;
+        let best = null as any;
+        let bestDist = Infinity;
+        for (const loc of CADC_LOCATIONS) {
+          const d = distanceMiles(latitude, longitude, loc.lat, loc.lng);
+          if (d < bestDist) { bestDist = d; best = { ...loc, miles: Math.round(d * 10) / 10 }; }
+        }
+        setNearest(best);
+        setState("done");
+      },
+      () => setState("denied"),
+      { timeout: 8000 }
+    );
+  }
+
+  if (state === "idle") return (
+    <button onClick={locate} style={{ width: "100%", background: "#0101FF", color: "white", border: "none", borderRadius: 12, padding: "14px 16px", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+      📍 Find CADC Near Me
+    </button>
+  );
+
+  if (state === "loading") return (
+    <div style={{ textAlign: "center", padding: "20px", color: "#6B7280", fontSize: 13 }}>📍 Finding nearest location…</div>
+  );
+
+  if (state === "denied") return (
+    <div style={{ background: "#FFF8E7", border: "1px solid #FDE68A", borderRadius: 12, padding: "16px", fontSize: 13, color: "#92400E" }}>
+      Location access was denied. Call CADC at <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700 }}>580-335-5588</a> to find the office nearest you.
+    </div>
+  );
+
+  if (state === "done" && nearest) return (
+    <div style={{ background: "white", border: "1.5px solid #0101FF", borderRadius: 14, padding: "18px", boxShadow: "0 2px 12px rgba(1,1,255,0.1)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: "#111827", marginBottom: 2 }}>{nearest.name}</div>
+          <div style={{ fontSize: 12, color: "#6B7280" }}>{nearest.city}, OK · {nearest.miles} miles away</div>
+        </div>
+        <div style={{ background: "#E4E4FF", color: "#0101FF", fontWeight: 800, fontSize: 13, padding: "4px 10px", borderRadius: 20 }}>{nearest.miles} mi</div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+        {nearest.services.map(s => <span key={s} style={{ background: "#F0F0FF", color: "#0101FF", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>{s}</span>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <a href={nearest.href} style={{ display: "block", background: "#CC0000", color: "white", textAlign: "center" as const, padding: "12px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>📞 Call</a>
+        <a href={`https://maps.google.com/?q=${nearest.name}+${nearest.city}+OK`} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: "white", color: "#0101FF", textAlign: "center" as const, padding: "12px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none", border: "1.5px solid #0101FF" }}>🗺️ Directions</a>
+      </div>
+      {onClose && <button onClick={onClose} style={{ marginTop: 10, width: "100%", background: "none", border: "none", color: "#9CA3AF", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Close</button>}
+    </div>
+  );
+
+  return null;
+}
+
+// ─── Employment Quick Apply Form ──────────────────────────────────────────────
+function QuickApplyForm() {
+  const [form, setForm] = useState({ name: "", phone: "", county: "", position: "", experience: "", message: "" });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (state === "done") return (
+    <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
+      <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+      <div style={{ fontWeight: 800, color: "#059669", fontSize: 16, marginBottom: 6 }}>Application received!</div>
+      <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>CADC HR will be in touch soon. Questions? Call Suzie Fletcher at <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700 }}>580-335-5588</a>.</div>
+    </div>
+  );
+
+  return (
+    <div>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name and phone number.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Full name <span style={{ color: "#CC0000" }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.name} onChange={f("name")} placeholder="First and last name" /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Phone number <span style={{ color: "#CC0000" }}>*</span></label><input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} type="tel" value={form.phone} onChange={f("phone")} placeholder="(580) 000-0000" /></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your county</label>
+            <select style={{ width: "100%", fontSize: 14, padding: "12px 10px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
+              <option value="">Select</option>
+              {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita"].map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Interested in</label>
+            <select style={{ width: "100%", fontSize: 14, padding: "12px 10px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.position} onChange={f("position")}>
+              <option value="">Select</option>
+              <option value="head-start-teacher">Head Start Teacher</option>
+              <option value="head-start-aide">Head Start Aide</option>
+              <option value="head-start-cook">Head Start Cook</option>
+              <option value="transit-driver">Transit Driver</option>
+              <option value="weatherization">Weatherization Crew</option>
+              <option value="nutrition">Senior Nutrition</option>
+              <option value="admin">Administration</option>
+              <option value="open">Open to anything</option>
+            </select>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Relevant experience (optional)</label><textarea style={{ width: "100%", fontSize: 14, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block", minHeight: 72, resize: "vertical" as const }} value={form.message} onChange={f("message")} placeholder="Teaching, driving, childcare, bilingual, etc." /></div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }}
+          disabled={state === "sending"}
+          onClick={async () => {
+            if (!form.name || !form.phone) { setState("err"); return; }
+            setState("sending");
+            await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...form, program: "employment", step: "quick-apply", _gotcha: "" }) }).catch(() => {});
+            setState("done");
+          }}>{state === "sending" ? "Sending…" : "Submit Application →"}</button>
+        <p style={{ fontSize: 10, color: "#9CA3AF", textAlign: "center" as const, marginTop: 8, lineHeight: 1.5 }}>🔒 Your information is used only for employment consideration and kept confidential.</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Transit Fare Calculator ──────────────────────────────────────────────────
+const TRANSIT_ROUTES: { label: string; from: string; to: string; miles: number }[] = [
+  { label: "Frederick → Lawton", from: "Frederick", to: "Lawton", miles: 68 },
+  { label: "Frederick → Oklahoma City", from: "Frederick", to: "Oklahoma City", miles: 176 },
+  { label: "Hobart → Oklahoma City", from: "Hobart", to: "Oklahoma City", miles: 132 },
+  { label: "Hobart → Lawton", from: "Hobart", to: "Lawton", miles: 98 },
+  { label: "Sayre → Oklahoma City", from: "Sayre", to: "Oklahoma City", miles: 158 },
+  { label: "Elk City → Oklahoma City", from: "Elk City", to: "Oklahoma City", miles: 118 },
+  { label: "Altus → Oklahoma City", from: "Altus", to: "Oklahoma City", miles: 192 },
+  { label: "Altus → Lawton", from: "Altus", to: "Lawton", miles: 58 },
+  { label: "Duncan → Oklahoma City", from: "Duncan", to: "Oklahoma City", miles: 88 },
+  { label: "Duncan → Lawton", from: "Duncan", to: "Lawton", miles: 42 },
+  { label: "Chickasha → Oklahoma City", from: "Chickasha", to: "Oklahoma City", miles: 42 },
+  { label: "Anadarko → Oklahoma City", from: "Anadarko", to: "Oklahoma City", miles: 58 },
+  { label: "Anadarko → Lawton", from: "Anadarko", to: "Lawton", miles: 48 },
+  { label: "Weatherford → Oklahoma City", from: "Weatherford", to: "Oklahoma City", miles: 68 },
+  { label: "Clinton → Oklahoma City", from: "Clinton", to: "Oklahoma City", miles: 88 },
+];
+
+function calcFare(miles: number, reduced: boolean): string {
+  const roundTrip = miles * 2;
+  let fare: number;
+  if (roundTrip <= 10)       fare = 8.00;
+  else if (roundTrip <= 30)  fare = 15.00;
+  else if (roundTrip <= 50)  fare = reduced ? 20.00 : 30.00;
+  else if (roundTrip <= 100) fare = reduced ? 30.00 : 45.00;
+  else if (roundTrip <= 150) fare = reduced ? 40.00 : 60.00;
+  else if (roundTrip <= 249) fare = reduced ? 60.00 : 80.00;
+  else fare = roundTrip * 0.40;
+  return `$${fare.toFixed(2)}`;
+}
+
+function TransitFareCalculator() {
+  const [selectedRoute, setSelectedRoute] = useState("");
+  const [reduced, setReduced] = useState(false);
+  const [customMiles, setCustomMiles] = useState("");
+  const [mode, setMode] = useState<"preset"|"custom">("preset");
+
+  const route = TRANSIT_ROUTES.find(r => r.label === selectedRoute);
+  const miles = mode === "preset" ? (route?.miles ?? 0) : (parseInt(customMiles) || 0);
+  const hasResult = miles > 0;
+  const fareStd = hasResult ? calcFare(miles, false) : null;
+  const fareRed = hasResult ? calcFare(miles, true) : null;
+  const roundTrip = miles * 2;
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{marginBottom:16}}>Estimate your fare based on round-trip mileage. Reduced fares apply to riders age 55+ and persons with disabilities. Effective October 1, 2022.</p>
+
+      {/* Mode toggle */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        {(["preset","custom"] as const).map(m => (
+          <button key={m} onClick={() => setMode(m)}
+            style={{ flex: 1, padding: "10px 8px", borderRadius: 10, border: `1.5px solid ${mode === m ? T.blue : "#E5E7EB"}`, background: mode === m ? "#E4E4FF" : "white", fontWeight: 700, fontSize: 13, cursor: "pointer", color: mode === m ? T.blue : "#374151", fontFamily: "inherit" }}>
+            {m === "preset" ? "Common Routes" : "Enter Miles"}
+          </button>
+        ))}
+      </div>
+
+      {mode === "preset" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Select a route</label>
+          <select value={selectedRoute} onChange={e => setSelectedRoute(e.target.value)}
+            style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }}>
+            <option value="">Select route...</option>
+            {TRANSIT_ROUTES.map(r => <option key={r.label} value={r.label}>{r.label} ({r.miles} mi one way)</option>)}
+          </select>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>One-way miles</label>
+          <input type="number" value={customMiles} onChange={e => setCustomMiles(e.target.value)} placeholder="e.g. 85"
+            style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} />
+          <p style={{ fontSize: 11, color: "#9CA3AF", margin: "4px 0 0" }}>Fares are calculated on round-trip mileage.</p>
+        </div>
+      )}
+
+      {/* Reduced fare toggle */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, padding: "12px 14px", background: "#F9FAFB", borderRadius: 10, border: "1px solid #E5E7EB" }}>
+        <div onClick={() => setReduced(r => !r)} style={{ width: 44, height: 24, borderRadius: 12, background: reduced ? "#059669" : "#D1D5DB", position: "relative", cursor: "pointer", flexShrink: 0, transition: "background 0.2s" }}>
+          <div style={{ position: "absolute", top: 2, left: reduced ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "white", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+        </div>
+        <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", cursor: "pointer" }} onClick={() => setReduced(r => !r)}>
+          Reduced fare eligible (age 55+ or disability)
+        </label>
+      </div>
+
+      {/* Result */}
+      {hasResult && (
+        <div style={{ background: T.blue, borderRadius: 14, padding: "20px 18px", marginBottom: 16 }}>
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 10px" }}>
+            Estimated Fare · {miles} mi one way · {roundTrip} mi round trip
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "14px 16px", textAlign: "center" as const }}>
+              <div style={{ color: "white", fontSize: 28, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>{reduced ? fareRed : fareStd}</div>
+              <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, marginTop: 4 }}>{reduced ? "Reduced rate" : "Standard rate"}</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "14px 16px", textAlign: "center" as const }}>
+              <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 22, fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif" }}>{reduced ? fareStd : fareRed}</div>
+              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 4 }}>{reduced ? "Standard rate" : "Reduced rate"}</div>
+            </div>
+          </div>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: "12px 0 0", textAlign: "center" as const }}>Estimate only · Final fare confirmed at time of booking</p>
+        </div>
+      )}
+
+      {/* Call CTA */}
+      <div style={{ background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px" }}>
+        <p style={{ fontWeight: 700, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>Ready to schedule?</p>
+        <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px" }}>Call Gilbert's team to book your ride and confirm the exact fare.</p>
+        <a href="tel:+15803352691" style={{ display: "block", background: T.maroon, color: "white", textAlign: "center" as const, padding: "13px", borderRadius: 10, fontWeight: 800, fontSize: 15, textDecoration: "none", letterSpacing: "0.02em" }}>📞 Call (580) 335-2691</a>
+      </div>
+
+      {/* Full fare table */}
+      <details style={{ marginTop: 16 }}>
+        <summary style={{ fontSize: 13, fontWeight: 700, color: T.blue, cursor: "pointer", padding: "8px 0" }}>View full fare table</summary>
+        <div style={{ marginTop: 10 }} className="cadc-fare-table">
+          <div className="cadc-fare-header"><span>Round-Trip Miles</span><span>Standard</span><span>Reduced</span></div>
+          {[["1–10 miles","$8.00","$8.00"],["11–30 miles","$15.00","$15.00"],["31–50 miles","$30.00","$20.00"],["51–100 miles","$45.00","$30.00"],["101–150 miles","$60.00","$40.00"],["151–249 miles","$80.00","$60.00"],["250+ miles","$0.40/mi","$0.40/mi"],["Wait time","$10.00/hr","$10.00/hr"]].map(r =>
+            <div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>
+          )}
+        </div>
+        <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 8 }}>In-town service: $1.00 standard · $0.75 elderly/disabled · per stop</p>
+      </details>
+    </div>
+  );
+}
+
+// ─── Public Volunteer Hour Log Form ──────────────────────────────────────────
+function PublicVolunteerLogForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({
+    volunteerName: "", supervisorName: "", center: "",
+    date: new Date().toISOString().slice(0,10),
+    hours: "", type: "volunteer", description: "",
+  });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.volunteerLog) return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0F0FF", border: `1.5px solid ${T.blue}`, borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
+        <p style={{ fontSize: 28, margin: "0 0 10px" }}>🤝</p>
+        <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 6px" }}>Want to log your volunteer hours?</p>
+        <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 16px", lineHeight: 1.6 }}>Online hour logging is coming soon. For now, please submit your hours directly to your center supervisor.</p>
+        <a href="tel:+15807263343" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "12px 20px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>📞 Call Robin — 580-726-3343</a>
+      </div>
+    </div>
+  );
+
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8 }}>Hours logged!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          Thank you for contributing to Head Start. Your {form.hours} hour{parseFloat(form.hours) !== 1 ? "s" : ""} have been recorded and will count toward CADC's federal in-kind match.
+        </div>
+        <button onClick={() => { setForm(p => ({ ...p, volunteerName: p.volunteerName, supervisorName: p.supervisorName, center: p.center, date: new Date().toISOString().slice(0,10), hours: "", description: "" })); setState("idle"); }}
+          style={{ marginTop: 16, background: "white", color: T.blue, border: `1.5px solid ${T.blue}`, borderRadius: 10, padding: "10px 20px", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>
+          Log More Hours
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{ marginBottom: 8 }}>Log your volunteer or in-kind hours for Head Start. Every hour you contribute counts toward CADC's federal match requirement and helps keep the program free for families.</p>
+      <div style={{ background: "#FFF8E7", border: "1px solid #FDE68A", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: "#92400E" }}>
+        💡 Not sure what to log? Any time spent at a center, donating supplies, or supporting Head Start activities counts. When in doubt, log it.
+      </div>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name, supervisor, center, and hours.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your name <span style={{ color: "#CC0000" }}>*</span></label>
+          <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.volunteerName} onChange={f("volunteerName")} placeholder="First and last name" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Center supervisor <span style={{ color: "#CC0000" }}>*</span></label>
+          <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.supervisorName} onChange={f("supervisorName")} placeholder="Name of your center supervisor" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Center <span style={{ color: "#CC0000" }}>*</span></label>
+          <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.center} onChange={f("center")}>
+            <option value="">Select your center</option>
+            {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Date <span style={{ color: "#CC0000" }}>*</span></label>
+            <input type="date" style={{ width: "100%", fontSize: 14, padding: "12px 10px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.date} onChange={f("date")} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Hours <span style={{ color: "#CC0000" }}>*</span></label>
+            <input type="number" min="0.5" max="24" step="0.5" style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.hours} onChange={f("hours")} placeholder="e.g. 2.5" />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Type of contribution</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.type} onChange={f("type")}>
+            <option value="volunteer">Volunteer time (in-person at center)</option>
+            <option value="in-kind-services">In-kind services (professional skills donated)</option>
+            <option value="in-kind-space">In-kind space (facility or space donated)</option>
+            <option value="public-school-collab">Public school collaboration</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 20 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>What did you do? <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional but helpful)</span></label>
+          <textarea style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block", minHeight: 80, resize: "vertical" as const }} value={form.description} onChange={f("description")} placeholder="e.g. Helped with lunch service and read to the class" />
+        </div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }}
+          disabled={state === "sending"}
+          onClick={async () => {
+            if (!form.volunteerName || !form.supervisorName || !form.center || !form.hours) { setState("err"); return; }
+            setState("sending");
+            const r = await fetch("/api/cms/volunteer", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...form, hours: parseFloat(form.hours), program: "head-start", source: "public" }),
+            }).catch(() => null);
+            setState(r?.ok ? "done" : "err");
+          }}>
+          {state === "sending" ? "Logging…" : "Submit My Hours →"}
+        </button>
+        <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5 }}>
+          Hours are reviewed by Robin Harris and count toward CADC's Head Start federal in-kind match requirement.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Volunteer Hub ────────────────────────────────────────────────────────────
+// Federal in-kind match: Head Start requires non-federal match = 20% of total grant
+// Federal volunteer rate 2025: $29.51/hr
+// CADC Head Start annual federal award ≈ $4.2M → 20% match needed = $840,000
+// At $29.51/hr → need ≈ 28,464 hours to fully satisfy match via volunteer time
+// We show progress without naming the dollar figure directly
+
+const FEDERAL_RATE = 29.51;
+const MATCH_HOURS_GOAL = 28464; // hours needed for full in-kind match
+const MATCH_VALUE_GOAL = MATCH_HOURS_GOAL * FEDERAL_RATE; // ~$840K
+
+function VolunteerHub() {
+  const [hours, setHours] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/cms/volunteer-hours")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.totalHours !== undefined) setHours(data.totalHours);
+        else setHours(0);
+        setLoading(false);
+      })
+      .catch(() => { setHours(0); setLoading(false); });
+  }, []);
+
+  const logged = hours ?? 0;
+  const remaining = Math.max(0, MATCH_HOURS_GOAL - logged);
+  const pct = Math.min(100, Math.round((logged / MATCH_HOURS_GOAL) * 100));
+  const matchValue = Math.round(logged * FEDERAL_RATE);
+  const circumference = 2 * Math.PI * 54;
+  const strokeDash = circumference - (pct / 100) * circumference;
+
+  const WHY = [
+    { icon: "🏫", title: "Your hours fund the program", body: "Head Start is federally funded — but the federal government requires a community match. Every volunteer hour you give is counted as real dollars that help keep Head Start free for every family in Southwest Oklahoma." },
+    { icon: "👶", title: "Children feel it directly", body: "More volunteers means more hands in classrooms, more readers, more mentors, more helpers. Research shows children with more adult engagement have stronger school readiness outcomes." },
+    { icon: "💰", title: "Federal value recognized", body: `The federal government values your time at $${FEDERAL_RATE.toFixed(2)} per hour — the same rate they use to calculate skilled volunteer contributions nationwide. One hour of your time = $${FEDERAL_RATE.toFixed(2)} toward keeping this program running.` },
+    { icon: "🌍", title: "Community accountability", body: "Head Start belongs to the community — not just to CADC. Parent involvement, community hours, and local investment are how a federal program stays rooted in the people it serves." },
+  ];
+
+  const WHO = [
+    "Parents and guardians of enrolled children",
+    "Grandparents, aunts, uncles, and extended family",
+    "Community members — no children required",
+    "High school and college students (great for service hours)",
+    "Local business owners and professionals",
+    "Retired teachers, nurses, and tradespeople",
+    "Anyone who believes in early childhood education",
+  ];
+
+  const WHAT = [
+    { icon: "📚", label: "Read aloud to the class" },
+    { icon: "🍽️", label: "Help serve meals and snacks" },
+    { icon: "🎨", label: "Lead an art or music activity" },
+    { icon: "🔨", label: "Assist with repairs or yard work" },
+    { icon: "🚌", label: "Help with field trips" },
+    { icon: "📋", label: "Cut out and prep classroom materials" },
+    { icon: "🌱", label: "Help with the school garden" },
+    { icon: "💼", label: "Share your professional skills" },
+    { icon: "🎭", label: "Share a cultural tradition or hobby" },
+    { icon: "🧹", label: "Help clean and organize the classroom" },
+    { icon: "📣", label: "Join the Policy Council" },
+    { icon: "✍️", label: "Help staff with paperwork or events" },
+  ];
+
+  const WHEN = [
+    { center: "Frederick", phone: "580-335-5588" },
+    { center: "Hobart", phone: "580-726-3343" },
+    { center: "Sayre", phone: "580-928-2199" },
+    { center: "Erick", phone: "580-335-5588" },
+    { center: "Temple", phone: "580-335-5588" },
+    { center: "Ringling", phone: "580-335-5588" },
+    { center: "Hammon", phone: "580-335-5588" },
+    { center: "Grandfield", phone: "580-335-5588" },
+    { center: "Burns Flat", phone: "580-335-5588" },
+    { center: "Cordell", phone: "580-335-5588" },
+    { center: "Sentinel", phone: "580-335-5588" },
+  ];
+
+  const sectionStyle = (id: string): React.CSSProperties => ({
+    background: activeSection === id ? "#E4E4FF" : "white",
+    border: `1.5px solid ${activeSection === id ? T.blue : "#E5E7EB"}`,
+    borderRadius: 12, padding: "14px 16px", marginBottom: 10, cursor: "pointer",
+    transition: "all 0.2s ease",
+  });
+
+  return (
+    <div className="cadc-light-content">
+
+      {/* ── IMPACT RING ── */}
+      <div style={{ background: `linear-gradient(135deg, ${T.blue} 0%, #1a1aee 100%)`, borderRadius: 18, padding: "28px 20px", marginBottom: 20, textAlign: "center" as const }}>
+        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 20px" }}>Community Impact Tracker</p>
+
+        {/* Animated ring */}
+        <div style={{ position: "relative", width: 140, height: 140, margin: "0 auto 20px" }}>
+          <svg width="140" height="140" viewBox="0 0 140 140" style={{ transform: "rotate(-90deg)" }}>
+            {/* Background ring */}
+            <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="12" />
+            {/* Progress ring */}
+            <circle cx="70" cy="70" r="54" fill="none" stroke="white" strokeWidth="12"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={loading ? circumference : strokeDash}
+              style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)", filter: "drop-shadow(0 0 8px rgba(255,255,255,0.6))" }}
+            />
+          </svg>
+          {/* Center text */}
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ color: "white", fontSize: 28, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
+              {loading ? "…" : `${pct}%`}
+            </span>
+            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em" }}>OF GOAL</span>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+          {[
+            { label: "Hours Logged", value: loading ? "…" : logged.toLocaleString() },
+            { label: "Match Value", value: loading ? "…" : `$${(matchValue/1000).toFixed(1)}K` },
+            { label: "Still Needed", value: loading ? "…" : remaining.toLocaleString() + " hrs" },
+          ].map(({ label, value }) => (
+            <div key={label} style={{ background: "rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 6px" }}>
+              <div style={{ color: "white", fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{value}</div>
+              <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+          Every hour you volunteer is valued at <strong style={{ color: "white" }}>${FEDERAL_RATE}/hr</strong> by the federal government — and counts toward keeping Head Start free for every family in Southwest Oklahoma.
+        </p>
+      </div>
+
+      {/* ── LOG / SIGN UP BUTTONS ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+        <a href="/?program=head-start&area=volunteer-log" style={{ display: "block", background: T.maroon, color: "white", textAlign: "center" as const, padding: "14px 10px", borderRadius: 12, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
+          ⏱️ Log My Hours
+        </a>
+        <a href="/?program=board&area=volunteer-form" style={{ display: "block", background: "white", color: T.blue, textAlign: "center" as const, padding: "14px 10px", borderRadius: 12, fontWeight: 800, fontSize: 14, textDecoration: "none", border: `2px solid ${T.blue}` }}>
+          ✋ Sign Me Up
+        </a>
+      </div>
+
+      {/* ── WHY VOLUNTEER ── */}
+      <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 10px" }}>Why volunteer?</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+        {WHY.map(w => (
+          <div key={w.title} onClick={() => setActiveSection(activeSection === w.title ? null : w.title)} style={sectionStyle(w.title)}>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{w.icon}</span>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 14, color: "#111827", margin: "0 0 2px" }}>{w.title}</p>
+                {activeSection === w.title && <p style={{ fontSize: 13, color: "#6B7280", margin: 0, lineHeight: 1.6 }}>{w.body}</p>}
+              </div>
+              <span style={{ marginLeft: "auto", color: T.blue, fontWeight: 800, fontSize: 16, flexShrink: 0 }}>{activeSection === w.title ? "−" : "+"}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── WHO CAN VOLUNTEER ── */}
+      <div className="cadc-card" style={{ marginBottom: 0 }}>
+        <p className="cadc-label">Who can volunteer?</p>
+        <ul className="cadc-list">
+          {WHO.map(w => <li key={w}>{w}</li>)}
+        </ul>
+        <p style={{ fontSize: 12, color: "#6B7280", marginTop: 10, fontStyle: "italic" }}>No experience necessary. No background check for most activities. Just show up.</p>
+      </div>
+
+      {/* ── WHAT YOU CAN DO ── */}
+      <div className="cadc-card">
+        <p className="cadc-label">What can I do?</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {WHAT.map(w => (
+            <div key={w.label} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12, color: "#374151" }}>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>{w.icon}</span>
+              <span>{w.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── WHEN & WHERE ── */}
+      <div className="cadc-card">
+        <p className="cadc-label">When & where?</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px", lineHeight: 1.6 }}>
+          <strong>No appointment needed.</strong> Walk into any Head Start center during program hours — Monday through Friday. Just tell the teacher or director you'd like to help.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+          {WHEN.map(w => (
+            <a key={w.center} href={`tel:+1${w.phone.replace(/\D/g,"")}`}
+              style={{ display: "flex", flexDirection: "column", background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px 12px", textDecoration: "none" }}>
+              <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{w.center}</span>
+              <span style={{ fontSize: 11, color: T.blue, fontWeight: 600 }}>{w.phone}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ── BOTTOM CTA ── */}
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "20px 18px", textAlign: "center" as const }}>
+        <p style={{ fontWeight: 800, fontSize: 16, color: "#059669", margin: "0 0 8px" }}>Ready to make a difference?</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 14px", lineHeight: 1.6 }}>Questions? Call Robin Harris, Head Start Director, directly.</p>
+        <a href="tel:+15807263343" style={{ display: "inline-block", background: "#059669", color: "white", padding: "13px 24px", borderRadius: 10, fontWeight: 800, fontSize: 15, textDecoration: "none" }}>📞 580-726-3343</a>
+      </div>
+    </div>
+  );
+}
 
 const PROGRAMS: ProgramData[] = [
 
@@ -1231,29 +3195,22 @@ const PROGRAMS: ProgramData[] = [
     tagline: "Free early childhood education across 11 centers",
     subAreas: [
       {
-        id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
+        id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
         content: (
-          <div className="cadc-light-content">
-            <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
-            <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
+          <IntakeLeadSection program="head-start" step="enrollment">
+            <div className="cadc-light-content">
+            <p>EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5.</p>
             <div className="cadc-card">
-              <p className="cadc-label">Provided at no cost while children are in care</p>
-              <ul className="cadc-list">
-                {["Formula for infants","Diapers","Wipes","Nutritious meals and snacks","Developmental screenings and individualized support"].map(i=><li key={i}>{i}</li>)}
-              </ul>
+              <p className="cadc-label">Automatically eligible</p>
+              <p>Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF).</p>
             </div>
-          </div>
-        ),
-      },
-      {
-        id: "hs", label: "Head Start Preschool", shortLabel: "Preschool", icon: "📖",
-        content: (
-          <div className="cadc-light-content">
-            <p>Head Start serves children ages 3–5 with full-day, full-year preschool at no cost to income-eligible families. Every child receives education, health, nutrition, and family support — all in one place.</p>
-            <div className="cadc-grid-2">
-              {["Full-day preschool at no cost","Health screenings","Nutritious meals daily","Family engagement","School readiness goals","Individualized learning plans"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+            <div className="cadc-card">
+              <p className="cadc-label">All families are encouraged to apply</p>
+              <p>Enrollment is based on a points system that considers many circumstances beyond the automatic eligibility categories above. We serve all children — don't count yourself out before you apply.</p>
             </div>
-          </div>
+            <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
+            </div>
+          </IntakeLeadSection>
         ),
       },
       {
@@ -1268,59 +3225,25 @@ const PROGRAMS: ProgramData[] = [
               </ul>
             </div>
             <p className="cadc-note">This program is provided at no cost to the parent or guardian.</p>
-            <a href="https://childplus.com" target="_blank" rel="noopener noreferrer" className="cadc-btn">Start Application (ChildPlus) →</a>
+            <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Start Application (ChildPlus) →</a>
           </div>
         ),
       },
       {
-        id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
+        id: "hs-pre-enroll", label: "Express Interest", shortLabel: "Interest", icon: "✋",
+        content: <HeadStartPreEnrollForm />,
+      },
+      {
+        id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
         content: (
           <div className="cadc-light-content">
-            <p>EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5.</p>
+            <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
+            <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
             <div className="cadc-card">
-              <p className="cadc-label">Automatically eligible</p>
-              <p>Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF).</p>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">All families are encouraged to apply</p>
-              <p>Enrollment is based on a points system that considers many circumstances beyond the automatic eligibility categories above. We serve all children — don't count yourself out before you apply.</p>
-            </div>
-            <a href="https://childplus.com" target="_blank" rel="noopener noreferrer" className="cadc-btn">Apply Now →</a>
-          </div>
-        ),
-      },
-      {
-        id: "ehs-education", label: "EHS Education", shortLabel: "EHS Ed", icon: "🧸",
-        content: (
-          <div className="cadc-light-content">
-            <p>Our Early Head Start education approach supports infants and toddlers across all developmental domains using evidence-based tools and individualized instruction.</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Brigance Developmental Screening",d:"Every child is screened within the first 45 days using the Brigance Early Childhood Screener — a standardized tool identifying strengths and areas for support across all developmental domains. Aligned with 45 CFR §1302.33."},
-                {t:"Individualized Goals",d:"Lesson plans and learning goals are created for each child based on Brigance results, DRDP assessment data, daily observations, and family input. No two children receive the same plan. Standards §1302.33 and §1302.32."},
-                {t:"Frog Street Infant/Toddler Curriculum",d:"A nationally recognized, credential-based curriculum supporting language & early literacy, cognitive development, social-emotional skills, approaches to learning, and physical development. Standards §1302.33 and §1302.32."},
-                {t:"DRDP Assessment",d:"A strength-based assessment tool measuring what children can do — not comparing against age norms. Completed three times per year (Fall, Winter, Spring). Staff document approximately 15% of each child's measures weekly through observations. Standards §1302.33 and §1302.32."},
-                {t:"Conscious Discipline — Baby Doll Circle Time",d:"A Conscious Discipline strategy using baby dolls to model nurturing interactions, build attachment, and teach self-regulation. Children develop empathy, connection, and emotional awareness through consistent rituals and predictable routines. Standard 45 CFR §1302.32 and §1302.33."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "hs-education", label: "HS Education", shortLabel: "HS Ed", icon: "📚",
-        content: (
-          <div className="cadc-light-content">
-            <p>Our Head Start Preschool education program supports 3 and 4-year-old children across all developmental domains through evidence-based curriculum, individualized instruction, and rigorous assessment.</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Brigance Developmental Screening",d:"Every child is screened within the first 45 days using the Brigance Early Childhood Screener — identifying strengths and areas for support early. Aligned with 45 CFR §1302.33."},
-                {t:"Individualized Goals",d:"Lesson plans are built from Brigance results, DRDP data, daily observations, and family input — ensuring instruction is never one-size-fits-all. Standards §1302.33 and §1302.32."},
-                {t:"Frog Street Curriculum",d:"A nationally recognized, credential-based curriculum aligned to Oklahoma Early Learning Guidelines, Head Start ELOF, and DRDP developmental domains. Covers language, literacy, math, social-emotional development, and approaches to learning. Standards §1302.33 and §1302.32."},
-                {t:"DRDP Assessment",d:"Strength-based assessment completed three times per year — Fall, Winter, and Spring. Staff document approximately 15% of each child's measures weekly using observations from routines, play, and group activities. Standards §1302.33 and §1302.32."},
-                {t:"School Readiness Goals",d:"Goals aligned with ELOF, DRDP, and Frog Street — covering social-emotional skills, early literacy and language, early math and science, cognitive flexibility, physical development, and approaches to learning. Required under 45 CFR §1302.102."},
-                {t:"Conscious Discipline",d:"A nationally recognized, evidence-based social-emotional learning framework. Builds safety, connection, and problem-solving skills in the classroom. Reduces challenging behaviors, strengthens teacher confidence, and supports long-term school readiness. Standards §1302.32, §1302.33, §1302.102."},
-                {t:"CLASS — Classroom Assessment Scoring System",d:"A nationally recognized observation tool measuring the quality of teacher-child interactions across three domains: Emotional Support, Classroom Organization, and Instructional Support. CLASS data guides professional development and aligns practices with Head Start ELOF. Standard §1302.33."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+              <p className="cadc-label">Provided at no cost while children are in care</p>
+              <ul className="cadc-list">
+                {["Formula for infants","Diapers","Wipes","Nutritious meals and snacks","Developmental screenings and individualized support"].map(i=><li key={i}>{i}</li>)}
+              </ul>
             </div>
           </div>
         ),
@@ -1381,6 +3304,10 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
+        id: "volunteer-log", label: "Log My Hours", shortLabel: "Log Hours", icon: "⏱️",
+        content: <PublicVolunteerLogForm />,
+      },
+      {
         id: "safety", label: "Safety & Training", shortLabel: "Safety", icon: "🛡️",
         content: (
           <div className="cadc-light-content">
@@ -1397,30 +3324,9 @@ const PROGRAMS: ProgramData[] = [
       },
       {
         id: "faq", label: "FAQs", shortLabel: "FAQ", icon: "❓",
-        content: (
-          <div className="cadc-light-content">
-            <p>Answers to the questions families ask us every day.</p>
-            <div className="cadc-stack">
-              {[
-                {q:"Who qualifies for Early Head Start and Head Start?",a:"EHS serves pregnant mothers and children from birth to age 3. Head Start serves children ages 3–5. Children are automatically eligible if they are in foster care, unhoused, or from families who receive Public Assistance (SNAP, SSI, or TANF). Enrollment is based on a points system that considers many circumstances — all families are encouraged to apply."},
-                {q:"What do I need to bring to apply?",a:"Birth certificate or proof of birth, proof of residency, proof of SNAP/SSI/TANF if applicable, SoonerCare or insurance info, proof of income if no SNAP, immunization record, proof of disability or special services if applicable, and foster care documents if applicable."},
-                {q:"Are children with disabilities or special needs accepted?",a:"Yes. Up to 10% of enrollment is reserved for children with disabilities regardless of income. We coordinate with school districts and specialists to provide appropriate services through an IEP or IFSP."},
-                {q:"Can parents apply to work at CADC Head Start?",a:"Yes. CADC actively hires from the communities we serve. View open positions on the CADC Facebook page or call 580-335-5588."},
-                {q:"How can parents or community members get involved?",a:"Just show up at any center — no call or appointment needed. Parents, grandparents, neighbors, and local volunteers are all welcome. Every hour you contribute counts as an in-kind donation that helps keep the program free for families."},
-                {q:"What should I expect during a home visit?",a:"CADC attempts two home visits per year per family. Your Center Staff will work with you on goals, connect you to resources, and discuss your child's development. If a home visit isn't possible due to safety concerns or family preference, an alternative location can be arranged to maintain confidentiality."},
-                {q:"How does Head Start support my child's health?",a:"CADC provides vision, hearing, and mental health screenings. Other screenings — including dental exams — are the parent's responsibility, though we will help direct you to the right resources. Health needs are documented and monitored by our Health Coordinator. Children with conditions such as asthma must have an inhaler on-site."},
-                {q:"What if my child has allergies or special dietary needs?",a:"A doctor's note is required specifying the allergy and approved food substitutes. Centers maintain allergy records for every enrolled child and accommodate needs through our CACFP-compliant meal program."},
-                {q:"I need a new parent handbook or school calendar. What do I do?",a:"Contact your child's center directly. Each center can provide current handbooks and calendars. You can also find updates through your classroom's private Facebook page."},
-              ].map(item => (
-                <div key={item.q} className="cadc-card-sm">
-                  <p className="cadc-card-title">{item.q}</p>
-                  <p>{item.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ),
-      },
+        content: <HeadStartFAQ />,
+      }
+    
     ],
   },
 
@@ -1431,46 +3337,15 @@ const PROGRAMS: ProgramData[] = [
     shortName: "Transit",
     icon: "🚌",
     color: T.blue,
-    tagline: "110 vehicles · ADA equipped · 12 counties",
+    tagline: "220,175 passenger trips · 1.5M revenue miles · 12 counties",
     subAreas: [
       {
         id: "rides", label: "Schedule a Ride", shortLabel: "Schedule", icon: "📅",
-        content: (
-          <div className="cadc-light-content">
-            <p>Red River Transportation provides rural public transit across Southwest Oklahoma. Call to schedule rides to medical appointments, dialysis, work, shopping, and more.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Toll-free scheduling</p>
-              <a href="tel:+18005245552" className="cadc-btn">📞 1-800-524-5552</a>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Counties served</p>
-              <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Jefferson · Kiowa · Roger Mills · Stephens · Tillman · Washita</p>
-              <p className="cadc-note">Canadian County: no in-town service for Mustang or Yukon. Comanche County: no in-town service for Lawton.</p>
-            </div>
-          </div>
-        ),
+        content: <TransitRideSection />,
       },
       {
         id: "fares", label: "Fare Schedule", shortLabel: "Fares", icon: "💲",
-        content: (
-          <div className="cadc-light-content">
-            <p>Fares are calculated on round-trip mileage. Reduced fares apply to riders age 55+ and persons with disabilities. Effective October 1, 2022.</p>
-            <div className="cadc-fare-table">
-              <div className="cadc-fare-header"><span>Distance</span><span>Standard</span><span>Reduced</span></div>
-              {[
-                ["1–10 miles","$8.00","$8.00"],
-                ["11–30 miles","$15.00","$15.00"],
-                ["31–50 miles","$30.00","$20.00"],
-                ["51–100 miles","$45.00","$30.00"],
-                ["101–150 miles","$60.00","$40.00"],
-                ["151–249 miles","$80.00","$60.00"],
-                ["250+ miles","$0.40/mi","$0.40/mi"],
-                ["Wait time","$10.00/hr","$10.00/hr"],
-              ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
-            </div>
-            <p className="cadc-note">Wait time charged after the first hour. All vehicles are ADA lift or ramp equipped.</p>
-          </div>
-        ),
+        content: <TransitFareCalculator />,
       },
       {
         id: "offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
@@ -1546,16 +3421,41 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "eligibility-weath", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <div className="cadc-light-content">
+          <IntakeLeadSection program="weatherization" step="eligibility">
+            <div className="cadc-light-content">
             <p>Eligibility is based on household income. Priority is given to elderly residents, people with disabilities, and families with young children.</p>
             <div className="cadc-card">
               <p className="cadc-label">General eligibility</p>
               <ul className="cadc-list">
-                {["Income at or below 200% of federal poverty guidelines","Own or rent your primary residence","Priority for households with elderly members 60+","Priority for households with children under 6","Priority for persons with disabilities"].map(i=><li key={i}>{i}</li>)}
+                {["Income at or below 200% of federal poverty guidelines","Own or rent your primary residence","Priority for households with elderly members 60+","Priority for households with children 18 and under","Priority for persons with disabilities"].map(i=><li key={i}>{i}</li>)}
               </ul>
             </div>
-          </div>
+            <div className="cadc-card">
+              <p className="cadc-label">2026–2027 Income eligibility guidelines</p>
+              <p style={{fontSize:11,margin:"0 0 10px",color:"#374151"}}>DOE WAP, DOE BIL &amp; DHS LIHEAP · Effective April 1, 2026 – March 30, 2027 · 200% of Federal Poverty Level</p>
+              <div className="cadc-fare-table">
+                <div className="cadc-fare-header"><span>Household Size</span><span>100% FPL</span><span>200% FPL</span></div>
+                {[
+                  ["1 person","$15,960","$31,920"],
+                  ["2 people","$21,640","$43,280"],
+                  ["3 people","$27,320","$54,640"],
+                  ["4 people","$33,000","$66,000"],
+                  ["5 people","$38,680","$77,360"],
+                  ["6 people","$44,360","$88,720"],
+                  ["7 people","$50,040","$100,080"],
+                  ["8 people","$55,720","$111,440"],
+                ].map(r=><div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>)}
+              </div>
+              <p className="cadc-note">For households exceeding 8 persons, add $10,760 per additional member at 200% FPL.</p>
+              <a href="https://www.okcommerce.gov/wp-content/uploads/Attachment-A-DOE-26-DHS-26-Income-Guidelines.pdf" target="_blank" rel="noopener noreferrer" className="cadc-link" style={{display:"block",marginTop:8,fontSize:12}}>Source: Oklahoma Commerce DOE WAP Program Notice 26-6 →</a>
+            </div>
+            </div>
+          </IntakeLeadSection>
         ),
+      },
+      {
+        id: "weath-interest", label: "Join Waitlist", shortLabel: "Waitlist", icon: "📝",
+        content: <WeatherizationInterestForm />,
       },
     ],
   },
@@ -1567,7 +3467,7 @@ const PROGRAMS: ProgramData[] = [
     shortName: "Senior Meals",
     icon: "🍽️",
     color: T.blue,
-    tagline: "More than a meal — nutrition, connection, and dignity",
+    tagline: "28,827 congregate meals · 24,485 home-delivered · 327 clients served in 2025",
     subAreas: [
       {
         id: "sn-about", label: "About the Program", shortLabel: "About", icon: "ℹ️",
@@ -1586,7 +3486,7 @@ const PROGRAMS: ProgramData[] = [
               <p>Available to individuals age 60 and older. Spouses and caregivers may also be eligible — contact us for details.</p>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Staff training & safety</p>
+              <p className="cadc-label">Staff training &amp; safety</p>
               <div className="cadc-stack">
                 {[
                   {t:"Food Handlers Certification",d:"All nutrition staff are required to complete a Food Handlers class prior to working in our kitchens."},
@@ -1701,7 +3601,7 @@ const PROGRAMS: ProgramData[] = [
         id: "vita-what", label: "About VITA", shortLabel: "About", icon: "ℹ️",
         content: (
           <div className="cadc-light-content">
-            <p>The Volunteer Income Tax Assistance (VITA) program offers free tax preparation by IRS-certified volunteers to individuals and families who generally make $67,000 or less.</p>
+            <p>The Volunteer Income Tax Assistance (VITA) program offers free tax preparation by IRS-certified volunteers to individuals and families who generally make $55,000 or less. In 2025, CADC completed 91 tax returns. VITA has been available in Beckham, Cotton, Kiowa, Washita, and Tillman counties for 18 years.</p>
             <div className="cadc-grid-2">
               {["$0 filing cost","IRS-certified volunteers","Federal and state returns","EITC maximization","No hidden fees","Secure and confidential"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
             </div>
@@ -1724,6 +3624,10 @@ const PROGRAMS: ProgramData[] = [
             </div>
           </div>
         ),
+      },
+      {
+        id: "vita-appointment", label: "Request Appointment", shortLabel: "Appointment", icon: "📅",
+        content: <VitaAppointmentForm />,
       },
     ],
   },
@@ -1756,8 +3660,12 @@ const PROGRAMS: ProgramData[] = [
             <div className="cadc-card">
               <p className="cadc-label">By the numbers</p>
               <div className="cadc-grid-2">
-                {["8 counties served","22 communities","42-foot mobile trailer","400+ SKUs on board","EBT/SNAP accepted","5-star customer rating"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+                {["8 counties served","20 communities","42-foot mobile trailer","400+ SKUs on board","EBT/SNAP accepted","5-star customer rating"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
               </div>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Communities we serve</p>
+              <MarketCommunities />
             </div>
             <div className="cadc-card">
               <p className="cadc-label">Payment accepted</p>
@@ -1819,7 +3727,7 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "market-schedule", label: "September Schedule", shortLabel: "Schedule", icon: "📅",
+        id: "market-schedule", label: "Monthly Schedule", shortLabel: "Schedule", icon: "📅",
         content: <MarketSchedulePanel />,
       },
       {
@@ -1900,15 +3808,42 @@ const PROGRAMS: ProgramData[] = [
         id: "jobs", label: "Open Positions", shortLabel: "Jobs", icon: "📋",
         content: (
           <div className="cadc-light-content">
-            <p>CADC has positions across multiple programs — Head Start, transit, weatherization, administration, and more. We serve 9 counties and our team reflects the communities we're in.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">View current openings</p>
-              <a href="https://www.facebook.com/cadcok" target="_blank" rel="noopener noreferrer" className="cadc-btn">CADC on Facebook →</a>
+            <p>CADC employs more than 200 people across 9 counties in Southwest Oklahoma — teachers, drivers, weatherization crews, cooks, caseworkers, and administrators. We hire from the communities we serve.</p>
+            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF"}}>
+              <p style={{fontWeight:800,fontSize:14,color:"#111827",margin:"0 0 4px"}}>📋 View Current Openings</p>
+              <p style={{fontSize:12,color:"#6B7280",margin:"0 0 12px",lineHeight:1.5}}>Current job postings are listed on the CADC Facebook page. New positions are posted regularly.</p>
+              <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-btn">View Jobs on Facebook →</a>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Or call us directly</p>
-              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+              <p className="cadc-label">Or call HR directly</p>
+              <p style={{fontSize:13,margin:"0 0 8px"}}>Suzie Fletcher · Human Resources</p>
+              <a href="tel:+15803355588" className="cadc-btn">📞 580-335-5588</a>
             </div>
+          </div>
+        ),
+      },
+      {
+        id: "pay-benefits", label: "Pay & Benefits", shortLabel: "Pay", icon: "💰",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC offers competitive pay, especially for positions that carry community responsibility. Here's what you can expect.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Head Start Teacher Pay Scale",d:"$12.50/hr — no CDA or degree\n$14.00/hr — CDA credential\n$15.50/hr — Associate's degree\n$17.23/hr — Bachelor's degree or higher\n\nCDA training reimbursement available. CADC actively supports staff in earning credentials while working."},
+                {t:"Transit Driver",d:"Competitive hourly rate. CDL required or training assistance available. Full benefits included."},
+                {t:"100% Agency-Paid Benefits",d:"Vision insurance · Life insurance · Paid holidays · Paid leave · Retirement plan options. CADC covers 100% of employee premiums for vision and life insurance."},
+                {t:"Professional Development",d:"CADC supports staff training, credential attainment, and career growth. Head Start teachers can move up the pay scale as they earn credentials — on the job."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p style={{whiteSpace:"pre-line"}}>{i.d}</p></div>)}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "quick-apply", label: "Quick Apply", shortLabel: "Apply", icon: "✍️",
+        content: (
+          <div className="cadc-light-content">
+            <p style={{marginBottom:16}}>Take 60 seconds to let us know you're interested. CADC HR will reach out to discuss open positions and next steps.</p>
+            <QuickApplyForm />
           </div>
         ),
       },
@@ -1916,9 +3851,18 @@ const PROGRAMS: ProgramData[] = [
         id: "why", label: "Why CADC", shortLabel: "Why CADC", icon: "⭐",
         content: (
           <div className="cadc-light-content">
-            <p>Working at CADC means showing up every day for the people in your community who need it most — children, seniors, families navigating hard times.</p>
-            <div className="cadc-grid-2">
-              {["Mission-driven work","Benefits package","Community impact","Professional development","Stable employment","Regional reach"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
+            <p>Working at CADC means showing up every day for the people in your community who need it most — children, seniors, families navigating hard times. Here's what makes it different.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Your work is visible",d:"You don't spend your career wondering if it matters. In Southwest Oklahoma, people know CADC. They know the bus driver who got their grandmother to dialysis. They know the Head Start teacher who helped their kid learn to read."},
+                {t:"Deep community roots since 1966",d:"CADC has been here for 60 years. This isn't a startup. It's a stable organization with a real track record — and a team that stays."},
+                {t:"Growth from within",d:"Many of CADC's senior staff and directors started in entry-level positions. If you want to grow, the path is here."},
+                {t:"Southwest Oklahoma is home",d:"CADC hires locally and intentionally. We believe the best people to serve a community are the people who live there."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+            <div className="cadc-card" style={{marginTop:4}}>
+              <p className="cadc-label">Ready to join the team?</p>
+              <a href="/?program=employment&area=quick-apply" className="cadc-btn">Apply in 60 Seconds →</a>
             </div>
           </div>
         ),
@@ -1936,16 +3880,10 @@ const PROGRAMS: ProgramData[] = [
     tagline: "Governance, Policy Council, and agency leadership",
     subAreas: [
       {
-        id: "leadership", label: "Agency Leadership", shortLabel: "Leadership", icon: "👤",
+        id: "leadership", label: "Staff & Leadership", shortLabel: "Staff", icon: "👤",
         content: (
           <div className="cadc-light-content">
-            <div className="cadc-stack">
-              {[
-                {n:"Leslea Hixson",t:"Executive Director"},
-                {n:"Robin Harris",t:"Director, Head Start & Early Head Start"},
-                {n:"Kristie Jackson",t:"Advantage Director"},
-              ].map(p=><div key={p.n} className="cadc-card-sm"><p className="cadc-card-title">{p.n}</p><p>{p.t}</p></div>)}
-            </div>
+            <StaffList />
           </div>
         ),
       },
@@ -1953,10 +3891,62 @@ const PROGRAMS: ProgramData[] = [
         id: "board-members", label: "Board of Directors", shortLabel: "Board", icon: "🏛️",
         content: (
           <div className="cadc-light-content">
-            <p>CADC is governed by a Board of Directors representing the communities we serve across Southwest Oklahoma.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Board information coming soon</p>
-              <p>Contact us for board meeting schedules and governance documents.</p>
+            <p>CADC is governed by a tripartite Board of Directors — public sector, private sector, and low-income community representatives — from each county we serve. Members serve 3-year terms. Source: FY '25 CSBG Board Membership Roster, August 18, 2025.</p>
+            <p style={{fontSize:11,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Chairman: Eddie Whitworth · Frederick, OK</p>
+            <div className="cadc-stack">
+              {[
+                {county:"Beckham County",members:[
+                  {name:"Purcy Walker",addr:"Box 461, Elk City, OK 73648",phone:"580-821-0303",sector:"Low Income",group:"Sayre Senior Citizens Group",term:"4/2025–4/2028"},
+                  {name:"Tate Finnell",addr:"P.O. Box 67, Sayre, OK 73662",phone:"928-2457 / Cell: 580-243-8612",sector:"Public",group:"Beckham County Commissioners (Exec. Committee)",term:"4/2023–4/2026"},
+                  {name:"Jackie Anderson",addr:"1208 S. Washington, Elk City, OK 73644",phone:"580-309-7887",sector:"Private",group:"Elk City Chamber of Commerce",term:"6/2025–6/2028"},
+                ]},
+                {county:"Cotton County",members:[
+                  {name:"Dave Johnson",addr:"508 S. Broadway, Walters, OK 73572",phone:"580-458-1524 / Cell: 580-755-0551",sector:"Private",group:"Walters Chamber of Commerce (Vice-Chairman Exec. Committee)",term:"6/2023–6/2026"},
+                  {name:"Milton Honeycutt",addr:"P.O. Box 10, Randlett, OK",phone:"940-642-5020",sector:"Public",group:"Cotton County Commissioners",term:"1/2023–1/2026"},
+                  {name:"Paul Metcalfe",addr:"211 E. Colorado St., Walters, OK 73572",phone:"580-512-9005",sector:"Low Income",group:"Walters Church of the Nazarene",term:"3/2023–3/2026"},
+                ]},
+                {county:"Comanche County",members:[
+                  {name:"Jo Peters",addr:"6306 SW Brookline Ave., Lawton, OK 73505",phone:"580-512-2006",sector:"Private",group:"NAACP Chapter 6131",term:"9/2024–9/2027"},
+                  {name:"Chandra Barnett",addr:"2213 SW Edinburough Dr., Lawton, OK 73505",phone:"",sector:"Low Income",group:"Cache Sr. Citizens Group",term:"11/2024–11/2027"},
+                ]},
+                {county:"Jefferson County",members:[
+                  {name:"Bryce Bohot",addr:"",phone:"",sector:"",group:"Jefferson County",term:""},
+                ]},
+                {county:"Kiowa County",members:[
+                  {name:"Gary Jennings",addr:"300 16th St., Snyder, OK 73566",phone:"580-682-0288",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"9/2022–9/2025"},
+                  {name:"Chris Block",addr:"14070 N. 2180 Rd., Hobart, OK 73651",phone:"",sector:"Low Income",group:"",term:"11/2024–11/2027"},
+                ]},
+                {county:"Roger Mills County",members:[
+                  {name:"Monty Denny",addr:"9071 US 283, Cheyenne, OK 73628",phone:"580-497-7773",sector:"Public",group:"Roger Mills County Commissioners / Cheyenne & Arapaho Tribes",term:"1/2023–1/2026"},
+                  {name:"Rector Candy",addr:"202 S. 7th St., Hammon, OK 73650",phone:"",sector:"Private",group:"",term:"1/2024–1/2027"},
+                ]},
+                {county:"Tillman County",members:[
+                  {name:"Roger Heap",addr:"P.O. Box 796, Frederick, OK 73542",phone:"580-770-1405",sector:"Public",group:"Frederick Lions Club",term:"1/2024–1/2027"},
+                  {name:"Eddie Whitworth",addr:"520 N. 18th, Frederick, OK 73542",phone:"335-1175",sector:"Public",group:"Frederick Head Start Parents' Committee (Chairman)",term:"2/2024–2/2027"},
+                  {name:"Araceli Rodriguez",addr:"819 Willard, Frederick, OK 73542",phone:"305-7260",sector:"Private",group:"Frederick Chamber of Commerce",term:"5/2025–5/2028"},
+                ]},
+                {county:"Washita County",members:[
+                  {name:"Bruce Mayfield",addr:"11246 N. 2420 Rd., Colony, OK 73021",phone:"580-393-1129",sector:"Private",group:"Town of Sentinel (Sec Exec Committee)",term:"7/2024–7/2027"},
+                  {name:"Betty Mayfield",addr:"11246 N. 2420 Rd., Colony, OK 73021",phone:"",sector:"Low Income",group:"Head Start",term:"5/2025–5/2028"},
+                  {name:"Greg Chandler",addr:"P.O. Box 93, Sentinel, OK 73664",phone:"C: 580-821-0467 / Shop: 580-674-3392",sector:"Public",group:"Washita County Commissioners",term:"1/2023–1/2026"},
+                ]},
+              ].map(({county,members})=>(
+                <div key={county} className="cadc-card-sm">
+                  <p className="cadc-card-title">{county}</p>
+                  {members.map(m=>(
+                    <div key={m.name} style={{marginBottom:10,paddingBottom:10,borderBottom:"1px solid #e5e7eb"}}>
+                      <p style={{fontWeight:700,fontSize:13,margin:"0 0 2px"}}>{m.name}</p>
+                      {m.sector && <p style={{fontSize:10,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 2px"}}>{m.sector} Sector{m.group ? ` — ${m.group}` : ""}</p>}
+                      {m.addr && <p style={{fontSize:11,color:"#6b7280",margin:"0 0 2px"}}>{m.addr}</p>}
+                      {m.phone && <a href={"tel:+1" + m.phone.split("/")[0].replace(/\D/g,"")} style={{fontSize:11,color:"#0101FF",fontWeight:700,textDecoration:"none",display:"block"}}>{m.phone}</a>}
+                      {m.term && <p style={{fontSize:10,color:"#9ca3af",margin:"4px 0 0"}}>Term: {m.term}</p>}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="cadc-card" style={{marginTop:12}}>
+              <p className="cadc-label">Board questions</p>
               <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
             </div>
           </div>
@@ -1997,6 +3987,139 @@ const PROGRAMS: ProgramData[] = [
         id: "service-map", label: "Service Area Map", shortLabel: "Map", icon: "🗺️",
         content: <ServiceMapPanel />,
       },
+      {
+        id: "board-docs", label: "Documents & Minutes", shortLabel: "Documents", icon: "📄",
+        content: <BoardDocsSectionGated />,
+      },
+      {
+        id: "volunteer-form", label: "Volunteer", shortLabel: "Volunteer", icon: "🤝",
+        content: <VolunteerInterestForm />,
+      },
+      {
+        id: "volunteer-hub", label: "Volunteer Hub", shortLabel: "Vol. Hub", icon: "⭐",
+        content: <VolunteerHub />,
+      },
+      {
+        id: "transparency", label: "Transparency Center", shortLabel: "Transparency", icon: "📊",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC is publicly funded and publicly accountable. Everything below is available to any member of the community.</p>
+
+            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF",marginBottom:0}}>
+              <p style={{fontWeight:800,fontSize:14,color:"#0101FF",margin:"0 0 12px",textTransform:"uppercase",letterSpacing:"0.08em",fontSize:10}}>📁 Financial & Compliance Documents</p>
+              {[
+                {label:"FY2025 Annual Report",href:"/documents/annual-report-2025.pdf",note:"Program outcomes, financials, board roster"},
+                {label:"Title VI Nondiscrimination Policy",href:"/documents/title-vi-policy.pdf",note:"Red River Transportation — revised Feb 2026"},
+                {label:"Affirmative Action Plan 2023",href:"/documents/affirmative-action-plan-2023.pdf",note:"Equal opportunity employment commitment"},
+              ].map(d=>(
+                <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer"
+                  style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:"1px solid rgba(1,1,255,0.1)",textDecoration:"none"}}>
+                  <span style={{fontSize:20,flexShrink:0}}>📄</span>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{d.label}</div><div style={{fontSize:11,color:"#6B7280"}}>{d.note}</div></div>
+                </a>
+              ))}
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Performance — FY2025 Annual Report</p>
+              {[
+                ["🧒","Head Start","1,200+ children served across 11 centers in 9 counties"],
+                ["🚌","Red River Transit","220,175 passenger trips · 1.56M revenue miles · 12 counties"],
+                ["🍽️","Senior Nutrition","28,827 congregate meals + 24,485 home-delivered meals · 327 clients · 6 sites"],
+                ["🏠","Advantage Meals","340,830 frozen meals delivered · avg 736 clients/month · 13 counties"],
+                ["🏡","Weatherization","17 counties served · Priority: elderly, disabled, children 18 and under"],
+                ["💰","VITA Tax Help","91 returns filed · $67,000 income threshold · 5 counties"],
+              ].map(([icon,prog,stat])=>(
+                <div key={prog} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:"1px solid #F3F4F6"}}>
+                  <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{prog}</div><div style={{fontSize:12,color:"#6B7280",lineHeight:1.5}}>{stat}</div></div>
+                </div>
+              ))}
+              <p style={{fontSize:10,color:"#9CA3AF",marginTop:10}}>Source: CADC FY2025 Annual Report</p>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Governance</p>
+              <p style={{fontSize:13,color:"#374151",margin:"0 0 10px",lineHeight:1.6}}>CADC is governed by a tripartite Board of Directors with 19 members representing public sector, private sector, and low-income community constituents across our 8-county board area.</p>
+              <a href="/?program=board&area=board-members" className="cadc-btn" style={{marginBottom:8}}>View Board of Directors →</a>
+              <a href="/?program=board&area=board-docs" className="cadc-btn" style={{background:"white",color:"#0101FF",border:"1.5px solid #0101FF"}}>Board Documents & Minutes →</a>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Civil Rights</p>
+              {[
+                {title:"Title VI — No discrimination",body:"CADC does not discriminate on the basis of race, color, or national origin in any federally funded program or activity."},
+                {title:"ADA Compliance",body:"All CADC facilities and programs are accessible to persons with disabilities. Transit vehicles are ADA-equipped on all routes."},
+                {title:"Complaint Procedures",body:"To file a civil rights complaint, contact CADC at 580-335-5588 or write to 105 S. Main Street, Frederick, OK 73542. You may also contact the U.S. Department of Health and Human Services."},
+              ].map(i=><div key={i.title} className="cadc-card-sm"><p className="cadc-card-title">{i.title}</p><p>{i.body}</p></div>)}
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Funding Sources</p>
+              <p style={{fontSize:13,color:"#374151",lineHeight:1.6}}>CADC programs are funded through a combination of federal, state, and local sources including:</p>
+              <ul className="cadc-list" style={{marginTop:8}}>
+                {["U.S. Department of Health & Human Services — Head Start","U.S. Department of Energy — Weatherization Assistance Program (WAP)","Oklahoma Department of Human Services — Advantage, Senior Nutrition, LIHEAP","Federal Transit Administration — Red River Transportation","Oklahoma Community Services Block Grant (CSBG)","Local in-kind contributions and volunteer hours"].map(i=><li key={i}>{i}</li>)}
+              </ul>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "community-voice", label: "What You Told Us", shortLabel: "Your Voice", icon: "🗣️",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC conducts a Community Needs Assessment every three years. Here's what Southwest Oklahoma residents are telling us — and what CADC is doing about it.</p>
+
+            <div style={{background:"linear-gradient(135deg,#0101FF 0%,#1a1aee 100%)",borderRadius:14,padding:"20px 18px",marginBottom:16}}>
+              <p style={{color:"rgba(255,255,255,0.65)",fontSize:10,fontWeight:800,letterSpacing:"0.18em",textTransform:"uppercase",margin:"0 0 14px"}}>Top Reported Community Needs</p>
+              {[
+                {need:"Transportation",pct:31,color:"#60A5FA"},
+                {need:"Food Access",pct:27,color:"#34D399"},
+                {need:"Housing",pct:22,color:"#FBBF24"},
+                {need:"Employment",pct:18,color:"#F87171"},
+                {need:"Healthcare Access",pct:14,color:"#A78BFA"},
+              ].map(({need,pct,color})=>(
+                <div key={need} style={{marginBottom:12}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{color:"white",fontSize:13,fontWeight:700}}>{need}</span>
+                    <span style={{color:"rgba(255,255,255,0.7)",fontSize:13,fontWeight:800}}>{pct}%</span>
+                  </div>
+                  <div style={{background:"rgba(255,255,255,0.15)",borderRadius:6,height:8}}>
+                    <div style={{height:"100%",width:`${pct}%`,background:color,borderRadius:6,transition:"width 1s ease"}} />
+                  </div>
+                </div>
+              ))}
+              <p style={{color:"rgba(255,255,255,0.45)",fontSize:10,margin:"12px 0 0"}}>Source: CADC Community Needs Assessment · Southwest Oklahoma</p>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">What CADC is doing about it</p>
+              <div className="cadc-stack">
+                {[
+                  {need:"Transportation",action:"Red River Transit expanded to 12 counties in 2026 after MAGB transition. Online ride requests now available at cadcok.org."},
+                  {need:"Food Access",action:"Community Market mobile food program operating across Southwest Oklahoma. Senior Nutrition serving 327+ clients across 6 sites. Advantage delivering 340K+ frozen meals annually."},
+                  {need:"Housing & Energy",action:"Weatherization Assistance Program operating in 17 counties. Priority given to households with elderly, disabled, or children 18 and under."},
+                  {need:"Employment",action:"CADC employs 200+ staff across 9 counties. Head Start offers CDA training reimbursement and a career ladder for teaching staff."},
+                ].map(i=><div key={i.need} className="cadc-card-sm"><p className="cadc-card-title">✅ {i.need}</p><p>{i.action}</p></div>)}
+              </div>
+            </div>
+
+            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF"}}>
+              <p style={{fontWeight:800,fontSize:14,color:"#111827",margin:"0 0 6px"}}>Have your say</p>
+              <p style={{fontSize:13,color:"#6B7280",margin:"0 0 14px",lineHeight:1.5}}>Your input directly shapes how CADC plans programs and allocates resources. Take the 2026 Community Needs Survey.</p>
+              <a href="/?program=board&area=community-survey" className="cadc-btn">Take the Survey →</a>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "community-survey", label: "Community Survey", shortLabel: "Survey", icon: "📊",
+        content: <CommunityNeedsSurvey />,
+      },
+      {
+        id: "service-screener", label: "Find My Benefits", shortLabel: "Screener", icon: "🔍",
+        content: <ServiceScreenerForm />,
+      },
     ],
   },
 // ── 9. ADVANTAGE HOME DELIVERED MEALS ─────────────────────────────────────
@@ -2015,8 +4138,9 @@ const PROGRAMS: ProgramData[] = [
             <p>CADC Advantage provides home-delivered meals to older adults and individuals with disabilities through Oklahoma Medicaid waiver programs — Advantage, Living Choice, and Medically Fragile.</p>
             <p>Meals are delivered every two weeks. Members may receive 14 or 28 meals per delivery, plus fresh milk and juice. Both frozen and shelf-stable meal options are available.</p>
             <div className="cadc-card">
-              <p className="cadc-label">17 counties served</p>
-              <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Grady · Greer · Harmon · Jackson · Jefferson · Kiowa · McClain · Roger Mills · Stephens · Tillman · Washita</p>
+              <p className="cadc-label">13 counties served</p>
+              <p>Beckham · Caddo · Comanche · Cotton · Custer · Greer · Harmon · Jackson · Jefferson · Kiowa · Roger Mills · Tillman · Washita</p>
+              <p className="cadc-note">Service area per Annual Report 2025. Contact CADC for eligibility confirmation in your county.</p>
             </div>
           </div>
         ),
@@ -2024,7 +4148,8 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "adv-eligibility", label: "Eligibility", shortLabel: "Eligible?", icon: "✅",
         content: (
-          <div className="cadc-light-content">
+          <IntakeLeadSection program="advantage" step="eligibility">
+            <div className="cadc-light-content">
             <p>To receive Advantage Home Delivered Meals, applicants must meet all of the following criteria:</p>
             <div className="cadc-card">
               <ul className="cadc-list">
@@ -2036,7 +4161,8 @@ const PROGRAMS: ProgramData[] = [
               <a href="tel:+18009877767" className="cadc-btn">📞 1-800-987-7767</a>
               <p className="cadc-note">Or call 405-522-5050</p>
             </div>
-          </div>
+            </div>
+          </IntakeLeadSection>
         ),
       },
       {
@@ -2051,9 +4177,67 @@ const PROGRAMS: ProgramData[] = [
               </ul>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Milk & juice options</p>
+              <p className="cadc-label">Milk &amp; juice options</p>
               <p>Whole milk, 2% milk, chocolate milk, buttermilk, almond milk (sweet, unsweetened, vanilla), orange juice, apple juice. Purchased through Braum's where available; local grocery partners used in other areas.</p>
             </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-apply", label: "How to Apply", shortLabel: "Apply", icon: "📝",
+        content: (
+          <div className="cadc-light-content">
+            <p>Advantage is an Oklahoma Medicaid program. CADC does not enroll members directly — enrollment goes through the Oklahoma Department of Human Services. Here's how to get started:</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Step 1 — Apply for SoonerCare (Medicaid)</p>
+              <p>You must have an active SoonerCare case to be eligible. Apply online or call DHS.</p>
+              <a href="https://okdhslive.org" target="_blank" rel="noopener noreferrer" className="cadc-btn" style={{marginTop:10}}>Apply Online at okdhslive.org →</a>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Step 2 — Request Advantage Waiver Services</p>
+              <p>Tell your SoonerCare case manager you need home-delivered meals. They will conduct a Level of Care assessment and refer you to CADC if eligible.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Step 3 — CADC Contacts You</p>
+              <p>Once approved and referred, CADC's Advantage team will contact you to set up delivery, select your meal plan, and confirm your milk and juice preferences.</p>
+              <a href="tel:+15803355588" className="cadc-btn" style={{marginTop:10}}>📞 Questions? Call CADC — 580-335-5588</a>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Need help navigating the process?</p>
+              <p>Call CADC directly. Our Advantage staff can walk you through the SoonerCare application and what to expect.</p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-wellness", label: "More Than a Meal", shortLabel: "Wellness", icon: "💙",
+        content: (
+          <div className="cadc-light-content">
+            <p>Advantage is not just a food delivery program. Each meal delivery is also a wellness check — a human connection for members who may not see many people during the week.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Personal service",d:"CADC staff know their members by name. Deliveries are consistent, personal, and designed to feel like a neighbor stopping by — not a box drop."},
+                {t:"Wellness connection",d:"Staff are trained to watch for signs that a member may need additional support — and to connect families with the right resources when something seems off."},
+                {t:"Referrals when needed",d:"If a member needs more than meals — additional Medicaid services, transportation, weatherization, or other CADC programs — our team connects them directly."},
+                {t:"340,830 meals delivered in 2024",d:"CADC's Advantage program delivered 340,830 frozen meals to an average of 736 members per month across 13 counties in the 2024 program year. Source: CADC FY2025 Annual Report."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-support", label: "Support & Donate", shortLabel: "Support", icon: "❤️",
+        content: (
+          <div className="cadc-light-content">
+            <p>Advantage is funded through Oklahoma Medicaid — but community support makes the program stronger. Here's how you can help:</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Donate to CADC",d:"Financial contributions help CADC enhance services beyond what Medicaid covers — extra deliveries, holiday meals, and emergency support for members in crisis."},
+                {t:"Spread the word",d:"Many eligible seniors and adults with disabilities don't know Advantage exists. If you know someone who is homebound and food-insecure, tell them about CADC Advantage."},
+                {t:"Volunteer",d:"CADC welcomes volunteers who can assist with meal packaging, outreach, and administrative support. Contact us to learn how you can get involved."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+            <a href="tel:+15803355588" className="cadc-btn" style={{marginTop:16}}>📞 Contact CADC — 580-335-5588</a>
           </div>
         ),
       },
@@ -2108,7 +4292,164 @@ function orbitPos(i: number, total: number, radiusPct: number) {
 
 // ─── Particle field (desktop) ─────────────────────────────────────────────────
 
-function ParticleField() {
+// ─── Sketch Field (desktop background) ───────────────────────────────────────
+// Hand-drawn-style silhouettes of CADC program icons floating like particles.
+// Blues Clues sketch energy — stroke only, wobbly paths, warm + professional.
+
+const SKETCHES = [
+  // School bus (Transit)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-22,-8); ctx.lineTo(-22,6); ctx.lineTo(-18,10); ctx.lineTo(18,10);
+    ctx.lineTo(22,6); ctx.lineTo(22,-8); ctx.lineTo(-22,-8);
+    ctx.moveTo(-22,0); ctx.lineTo(22,0);
+    ctx.moveTo(-14,-8); ctx.lineTo(-14,0);
+    ctx.moveTo(-5,-8); ctx.lineTo(-5,0);
+    ctx.moveTo(5,-8); ctx.lineTo(5,0);
+    ctx.moveTo(14,-8); ctx.lineTo(14,0);
+    ctx.moveTo(-16,10); ctx.arc(-16,10,4,0,Math.PI*2);
+    ctx.moveTo(16,10); ctx.arc(16,10,4,0,Math.PI*2);
+    ctx.stroke();
+  }},
+  // House (Weatherization)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,-18); ctx.lineTo(20,0); ctx.lineTo(20,18);
+    ctx.lineTo(-20,18); ctx.lineTo(-20,0); ctx.closePath();
+    ctx.moveTo(0,-18); ctx.lineTo(-20,0);
+    ctx.moveTo(-6,18); ctx.lineTo(-6,6); ctx.lineTo(6,6); ctx.lineTo(6,18);
+    ctx.moveTo(-14,4); ctx.lineTo(-8,4); ctx.lineTo(-8,10); ctx.lineTo(-14,10); ctx.closePath();
+    ctx.stroke();
+  }},
+  // Grocery cart (Community Market)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-20,-10); ctx.lineTo(-14,-10); ctx.lineTo(-10,8); ctx.lineTo(14,8);
+    ctx.lineTo(16,-2); ctx.lineTo(-10,-2);
+    ctx.moveTo(-10,8); ctx.lineTo(-12,14);
+    ctx.moveTo(-8,14); ctx.arc(-8,14,3,0,Math.PI*2);
+    ctx.moveTo(12,14); ctx.arc(12,14,3,0,Math.PI*2);
+    ctx.stroke();
+  }},
+  // Fork + plate (Senior Meals)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.arc(0,0,16,0,Math.PI*2);
+    ctx.moveTo(-4,-12); ctx.lineTo(-4,12);
+    ctx.moveTo(-7,-12); ctx.lineTo(-7,-6); ctx.arc(-5.5,-6,1.5,Math.PI,0); ctx.lineTo(-4,-12);
+    ctx.moveTo(6,-12); ctx.lineTo(6,-4); ctx.bezierCurveTo(6,2,9,6,9,12);
+    ctx.moveTo(6,-4); ctx.bezierCurveTo(6,2,3,6,3,12);
+    ctx.stroke();
+  }},
+  // Child figure (Head Start)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.arc(0,-14,5,0,Math.PI*2);
+    ctx.moveTo(0,-9); ctx.lineTo(0,4);
+    ctx.moveTo(-10,0); ctx.lineTo(10,0);
+    ctx.moveTo(0,4); ctx.lineTo(-7,18);
+    ctx.moveTo(0,4); ctx.lineTo(7,18);
+    ctx.stroke();
+  }},
+  // Wheelchair (ADA/Transit)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.arc(2,-14,4,0,Math.PI*2);
+    ctx.moveTo(2,-10); ctx.lineTo(0,0); ctx.lineTo(10,0); ctx.lineTo(12,8);
+    ctx.moveTo(0,0); ctx.lineTo(-4,14);
+    ctx.arc(-4,18,4,0,Math.PI*2);
+    ctx.arc(12,12,5,0,Math.PI*2);
+    ctx.stroke();
+  }},
+  // Star / sun (general warmth)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    for (let i=0;i<8;i++) {
+      const a = (i/8)*Math.PI*2;
+      const r1=5,r2=14;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*r1, Math.sin(a)*r1);
+      ctx.lineTo(Math.cos(a)*r2, Math.sin(a)*r2);
+      ctx.stroke();
+    }
+  }},
+  // Heart (community care)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,14);
+    ctx.bezierCurveTo(-20,-2,-20,-18,0,-10);
+    ctx.bezierCurveTo(20,-18,20,-2,0,14);
+    ctx.stroke();
+  }},
+  // Leaf (weatherization/environment)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,16); ctx.bezierCurveTo(-18,8,-18,-14,0,-18);
+    ctx.bezierCurveTo(18,-14,18,8,0,16);
+    ctx.moveTo(0,16); ctx.lineTo(0,-18);
+    ctx.stroke();
+  }},
+  // Open hand (helping)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-10,18); ctx.lineTo(-10,-4); ctx.lineTo(-8,-14); ctx.lineTo(-6,-4);
+    ctx.moveTo(-6,-4); ctx.lineTo(-6,-16); ctx.lineTo(-4,-4);
+    ctx.moveTo(-4,-4); ctx.lineTo(-4,-16); ctx.lineTo(-2,-4);
+    ctx.moveTo(-2,-4); ctx.lineTo(-2,-14); ctx.lineTo(0,-4);
+    ctx.moveTo(-10,-4); ctx.bezierCurveTo(-18,-4,-18,10,-10,18);
+    ctx.lineTo(8,18); ctx.bezierCurveTo(14,18,14,10,8,10);
+    ctx.lineTo(0,-4);
+    ctx.stroke();
+  }},
+  // Book (education)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(0,-14); ctx.lineTo(0,14);
+    ctx.moveTo(0,-14); ctx.lineTo(-16,-10); ctx.lineTo(-16,18); ctx.lineTo(0,14);
+    ctx.moveTo(0,-14); ctx.lineTo(16,-10); ctx.lineTo(16,18); ctx.lineTo(0,14);
+    ctx.moveTo(-14,-4); ctx.lineTo(-4,-4);
+    ctx.moveTo(-14,2); ctx.lineTo(-4,2);
+    ctx.moveTo(4,-4); ctx.lineTo(14,-4);
+    ctx.moveTo(4,2); ctx.lineTo(14,2);
+    ctx.stroke();
+  }},
+  // Crayon (Head Start / kids)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    ctx.moveTo(-5,-18); ctx.lineTo(-5,12); ctx.lineTo(5,12); ctx.lineTo(5,-18);
+    ctx.closePath();
+    ctx.moveTo(-5,12); ctx.lineTo(0,20); ctx.lineTo(5,12);
+    ctx.moveTo(-5,-12); ctx.lineTo(5,-12);
+    ctx.stroke();
+  }},
+  // CADC logo mark — heart with person embracing (brand icon)
+  { color: "#CC0000", draw: (ctx: CanvasRenderingContext2D) => {
+    // Heart shape
+    ctx.beginPath();
+    ctx.moveTo(0,18);
+    ctx.bezierCurveTo(-22,4,-22,-16,0,-8);
+    ctx.bezierCurveTo(22,-16,22,4,0,18);
+    // Person figure inside
+    ctx.moveTo(4,-16); ctx.arc(4,-16,5,0,Math.PI*2);
+    ctx.moveTo(4,-11); ctx.lineTo(2,0);
+    ctx.moveTo(2,-4); ctx.bezierCurveTo(-8,0,-14,6,-12,10);
+    ctx.stroke();
+  }},
+  // Simple family (2 adults + child)
+  { color: "#0101FF", draw: (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath(); ctx.arc(-12,-14,4,0,Math.PI*2);
+    ctx.moveTo(-12,-10); ctx.lineTo(-12,2); ctx.moveTo(-18,-2); ctx.lineTo(-6,-2);
+    ctx.moveTo(-12,2); ctx.lineTo(-16,14); ctx.moveTo(-12,2); ctx.lineTo(-8,14);
+    ctx.moveTo(0,-10); ctx.arc(0,-10,3,0,Math.PI*2);
+    ctx.moveTo(0,-7); ctx.lineTo(0,2); ctx.moveTo(-4,0); ctx.lineTo(4,0);
+    ctx.moveTo(0,2); ctx.lineTo(-3,10); ctx.moveTo(0,2); ctx.lineTo(3,10);
+    ctx.moveTo(12,-14); ctx.arc(12,-14,4,0,Math.PI*2);
+    ctx.moveTo(12,-10); ctx.lineTo(12,2); ctx.moveTo(6,-2); ctx.lineTo(18,-2);
+    ctx.moveTo(12,2); ctx.lineTo(8,14); ctx.moveTo(12,2); ctx.lineTo(16,14);
+    ctx.stroke();
+  }},
+];
+
+function SketchField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -2122,34 +4463,63 @@ function ParticleField() {
     canvas.width = W;
     canvas.height = H;
 
-    const PARTICLE_COUNT = 120;
-    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 1.5 + 0.3,
-      alpha: Math.random() * 0.5 + 0.1,
-    }));
+    // 22 floating sketch instances — varied sizes, speeds, rotation
+    const instances = Array.from({ length: 22 }, (_, i) => {
+      const sketch = SKETCHES[i % SKETCHES.length];
+      const scale = 0.5 + Math.random() * 1.4; // 0.5x–1.9x
+      const speed = 0.08 + Math.random() * 0.18;
+      return {
+        sketch,
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * speed,
+        vy: (Math.random() - 0.5) * speed,
+        scale,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.004, // slow drift rotation
+        alpha: 0.04 + Math.random() * 0.08, // 4–12% opacity
+      };
+    });
 
     let raf: number;
     function draw() {
       if (!ctx) return;
       ctx.clearRect(0, 0, W, H);
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0) p.x = W;
-        if (p.x > W) p.x = 0;
-        if (p.y < 0) p.y = H;
-        if (p.y > H) p.y = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(1,1,255,${p.alpha})`;
-        ctx.fill();
+
+      for (const inst of instances) {
+        // Move
+        inst.x += inst.vx;
+        inst.y += inst.vy;
+        inst.rotation += inst.rotSpeed;
+
+        // Wrap at edges
+        if (inst.x < -60) inst.x = W + 60;
+        if (inst.x > W + 60) inst.x = -60;
+        if (inst.y < -60) inst.y = H + 60;
+        if (inst.y > H + 60) inst.y = -60;
+
+        // Draw sketch
+        ctx.save();
+        ctx.translate(inst.x, inst.y);
+        ctx.rotate(inst.rotation);
+        ctx.scale(inst.scale, inst.scale);
+        ctx.globalAlpha = inst.alpha;
+
+        // Parse color for stroke
+        const isMaroon = inst.sketch.color === "#CC0000";
+        ctx.strokeStyle = isMaroon ? "rgba(204,0,0,1)" : "rgba(1,1,255,1)";
+        ctx.lineWidth = 1.8 / inst.scale;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        inst.sketch.draw(ctx);
+
+        ctx.restore();
       }
+
       raf = requestAnimationFrame(draw);
     }
+
     draw();
     return () => cancelAnimationFrame(raf);
   }, []);
@@ -2163,29 +4533,97 @@ function ParticleField() {
   );
 }
 
-// ─── County service data for county-first flow ───────────────────────────────
+// ─── Hero Photo Rotation System ──────────────────────────────────────────────
+// Category-locked crossfade — orbit panel only, daily random seed (resets at midnight CST)
+
+const HERO_POOLS: Record<string, string[]> = {
+  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/images/hero/hero-${n}.jpg`),
+  "senior-meals":    [12,19,20,21].map(n=>`/images/hero/hero-${n}.jpg`),
+  "advantage":       [2,24].map(n=>`/images/hero/hero-${n}.jpg`),
+  "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
+  "transit":         [14].map(n=>`/images/hero/hero-${n}.jpg`),
+  "weatherization":  [17].map(n=>`/images/hero/hero-${n}.jpg`),
+  "general":         [6,7,15,16,18,5].map(n=>`/images/hero/hero-${n}.jpg`),
+};
+
+// Daily seed — resets at midnight CST (UTC-6). Same visitor gets same photo order all day.
+function getDailySeed(): number {
+  const now = new Date();
+  // CST offset: UTC-6
+  const cst = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+  return cst.getFullYear() * 10000 + (cst.getMonth() + 1) * 100 + cst.getDate();
+}
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const a = [...arr];
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(s) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
+  const rawPool = programSlug && HERO_POOLS[programSlug]
+    ? HERO_POOLS[programSlug]
+    : HERO_POOLS["general"];
+
+  // Pick one photo for the day — same photo all day, changes at midnight CST
+  const photo = useMemo(() => {
+    const seed = getDailySeed() + (programSlug ? programSlug.split("").reduce((a,c)=>a+c.charCodeAt(0),0) : 0);
+    const idx = Math.abs(seed) % rawPool.length;
+    return rawPool[idx];
+  }, [programSlug]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!photo) return null;
+
+  return (
+    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }} aria-hidden="true">
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: `url(${photo})`,
+        backgroundSize: "cover", backgroundPosition: "center",
+        opacity: 0.13,
+        filter: "saturate(0.5)",
+      }} />
+    </div>
+  );
+}
+
+
 
 const CADC_BASE_COUNTIES = [
   "beckham","canadian","comanche","cotton","jefferson","kiowa","roger-mills","tillman","washita"
 ];
+// Extended-service counties (Transit and/or Advantage only) — shown on map in a lighter tier.
+// Per Gilbert Nuncio 9/1/2026: Caddo, Custer, Stephens must appear on service area maps.
+// Per Robert Meador 9/2/2026: Garvin added to expansion counties.
+const CADC_EXTENDED_COUNTIES = ["caddo","custer","stephens","grady","jackson","harmon","greer","mcclain","garvin"];
 
 // Which programs are available per county
 const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
-  beckham:      ["head-start","transit","weatherization","advantage"],
-  canadian:     ["head-start","transit","weatherization","advantage"],
+  beckham:      ["head-start","transit","weatherization","advantage","community-market"],
+  canadian:     ["head-start","transit","advantage"], // Weatherization not yet active per Robert Meador 9/1/2026
   comanche:     ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
-  cotton:       ["head-start","transit","weatherization","senior-meals","advantage"],
-  jefferson:    ["head-start","transit","weatherization","senior-meals","advantage"],
+  cotton:       ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
+  jefferson:    ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   kiowa:        ["head-start","transit","weatherization","advantage","community-market"],
-  "roger-mills":["head-start","transit","weatherization","advantage"],
-  tillman:      ["head-start","transit","weatherization","senior-meals","advantage"],
-  washita:      ["head-start","transit","weatherization","advantage"],
-  // Transit extended
-  blaine:       ["transit"], caddo: ["transit","advantage"], custer: ["transit","advantage"],
-  dewey:        ["transit"], ellis: ["transit"], grady: ["transit","advantage"],
-  harmon:       ["transit","advantage"], jackson: ["transit","advantage"],
-  mcclain:      ["transit","advantage"], stephens: ["transit","advantage"],
-  greer:        ["transit","advantage"],
+  "roger-mills":["head-start","transit","weatherization","advantage","community-market"],
+  tillman:      ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
+  washita:      ["head-start","transit","weatherization","advantage","community-market"],
+  // Transit + Advantage extended counties
+  blaine:       ["transit"], caddo: ["transit","weatherization","advantage"], custer: ["transit","weatherization","advantage"],
+  dewey:        ["transit"], ellis: ["transit"],
+  // Weatherization expanded counties per Robert Meador 9/2/2026
+  grady:        ["transit","weatherization","advantage"],
+  harmon:       ["transit","weatherization","advantage"],
+  jackson:      ["transit","weatherization","advantage"],
+  mcclain:      ["transit","weatherization","advantage"],
+  stephens:     ["transit","weatherization","advantage"],
+  greer:        ["weatherization","advantage"],
+  garvin:       ["weatherization"], // expansion county per Robert Meador 9/2/2026
 };
 
 // Geographic county shapes — approximate SW Oklahoma positions
@@ -2215,34 +4653,34 @@ const SW_OK_ALL_COUNTIES: {fips:string;name:string;slug:string|null;isCADC:boole
   {fips:"40007",name:"Beaver",slug:null,isCADC:false,path:"M 204.6,66.5 L 172.6,66.5 L 173.3,12.4 L 176.5,12.4 L 180.3,12.4 L 183.5,12.3 L 187.4,12.3 L 194.4,12.3 L 197.7,12.2 L 201.0,12.2 L 204.1,12.2 L 231.6,12.0 L 238.3,12.0 L 240.4,12.0 L 246.9,12.1 L 247.2,12.2 L 247.1,56.3 L 247.1,66.5 L 233.2,66.5 L 223.0,66.5 L 215.0,66.5 L 206.4,66.5 L 204.6,66.5 Z",lx:209.9,ly:39.3},
   {fips:"40009",name:"Beckham",slug:"beckham",isCADC:true,path:"M 247.3,209.2 L 247.3,183.2 L 280.6,183.3 L 280.6,173.8 L 297.2,173.8 L 297.2,178.6 L 297.5,216.3 L 293.7,216.4 L 293.7,216.6 L 264.4,216.3 L 264.4,225.7 L 256.1,225.7 L 247.3,225.7 L 247.3,209.2 Z",lx:272.4,ly:199.8},
   {fips:"40011",name:"Blaine",slug:null,isCADC:false,path:"M 354.2,102.7 L 357.0,102.6 L 387.7,102.7 L 387.9,150.4 L 379.6,150.4 L 379.6,169.2 L 355.3,169.2 L 354.6,169.2 L 354.6,140.9 L 354.2,102.7 Z",lx:371.1,ly:135.9},
-  {fips:"40015",name:"Caddo",slug:null,isCADC:false,path:"M 355.6,244.7 L 355.5,218.4 L 355.3,178.7 L 355.3,169.2 L 379.6,169.2 L 380.2,188.1 L 396.6,188.0 L 396.9,244.7 L 355.6,244.7 Z",lx:376.1,ly:207.0},
+  {fips:"40015",name:"Caddo",slug:"caddo",isCADC:false,path:"M 355.6,244.7 L 355.5,218.4 L 355.3,178.7 L 355.3,169.2 L 379.6,169.2 L 380.2,188.1 L 396.6,188.0 L 396.9,244.7 L 355.6,244.7 Z",lx:376.1,ly:207.0},
   {fips:"40017",name:"Canadian",slug:"canadian",isCADC:true,path:"M 429.9,178.7 L 429.9,192.6 L 428.9,192.8 L 428.0,193.5 L 427.2,193.8 L 426.1,193.4 L 425.7,193.7 L 424.8,193.9 L 422.1,191.5 L 421.6,192.4 L 420.8,192.5 L 420.5,192.9 L 420.1,192.2 L 419.3,192.0 L 418.9,192.8 L 417.2,192.6 L 396.6,188.0 L 380.2,188.1 L 379.6,169.2 L 379.6,150.4 L 387.9,150.4 L 429.7,150.3 L 429.9,178.7 Z",lx:404.8,ly:172.1},
   {fips:"40019",name:"Carter",slug:null,isCADC:false,path:"M 487.8,318.7 L 484.9,329.7 L 438.6,329.6 L 438.5,306.0 L 438.5,282.4 L 455.0,282.4 L 455.0,296.6 L 479.7,296.7 L 487.8,301.3 L 487.8,318.7 Z",lx:463.1,ly:306.0},
   {fips:"40025",name:"Cimarron",slug:null,isCADC:false,path:"M 77.9,66.4 L 12.0,66.4 L 12.0,12.2 L 13.2,12.4 L 22.0,12.3 L 45.8,12.8 L 62.7,12.8 L 74.3,12.9 L 76.1,12.9 L 86.3,13.0 L 88.4,13.0 L 88.1,66.4 L 77.9,66.4 Z",lx:50.2,ly:39.3},
   {fips:"40027",name:"Cleveland",slug:null,isCADC:false,path:"M 429.9,188.1 L 449.4,188.1 L 461.8,188.1 L 471.4,188.1 L 471.4,236.8 L 455.8,232.9 L 454.8,220.7 L 440.1,205.8 L 438.9,197.7 L 429.9,192.4 L 429.9,188.1 Z",lx:450.7,ly:212.4},
   {fips:"40031",name:"Comanche",slug:"comanche",isCADC:true,path:"M 393.0,282.4 L 385.0,282.4 L 381.0,288.7 L 364.6,288.6 L 364.6,291.8 L 352.3,293.4 L 352.3,282.4 L 339.4,282.4 L 339.4,244.6 L 355.6,244.7 L 396.9,244.7 L 397.2,263.5 L 393.0,263.5 L 393.0,282.4 Z",lx:368.3,ly:269.0},
   {fips:"40033",name:"Cotton",slug:"cotton",isCADC:true,path:"M 390.9,325.0 L 388.5,324.7 L 381.1,322.9 L 378.7,321.0 L 375.6,320.3 L 374.1,321.3 L 372.9,323.4 L 372.8,324.2 L 370.2,326.9 L 366.9,330.4 L 364.6,329.5 L 360.8,322.9 L 357.1,319.9 L 356.3,319.9 L 356.4,301.2 L 352.3,293.4 L 364.6,291.8 L 364.6,288.6 L 381.0,288.7 L 385.0,282.4 L 393.0,282.4 L 393.3,282.4 L 393.3,305.9 L 393.3,322.0 L 390.9,325.0 Z",lx:372.8,ly:306.4},
-  {fips:"40039",name:"Custer",slug:null,isCADC:false,path:"M 296.3,141.0 L 354.6,140.9 L 354.6,169.2 L 355.3,169.2 L 355.3,178.7 L 297.2,178.6 L 297.2,173.8 L 296.3,141.0 Z",lx:325.8,ly:159.8},
+  {fips:"40039",name:"Custer",slug:"custer",isCADC:false,path:"M 296.3,141.0 L 354.6,140.9 L 354.6,169.2 L 355.3,169.2 L 355.3,178.7 L 297.2,178.6 L 297.2,173.8 L 296.3,141.0 Z",lx:325.8,ly:159.8},
   {fips:"40043",name:"Dewey",slug:null,isCADC:false,path:"M 295.9,119.2 L 295.8,102.8 L 329.2,103.1 L 354.2,102.7 L 354.6,140.9 L 296.3,141.0 L 295.9,119.2 Z",lx:325.2,ly:121.9},
   {fips:"40045",name:"Ellis",slug:null,isCADC:false,path:"M 247.3,114.6 L 247.3,66.5 L 247.1,56.3 L 278.3,56.4 L 279.0,102.8 L 295.8,102.8 L 295.9,119.2 L 286.9,122.9 L 282.0,135.1 L 269.6,135.8 L 262.9,130.3 L 262.3,120.6 L 256.1,121.9 L 253.2,130.0 L 247.3,133.5 L 247.3,114.6 Z",lx:271.5,ly:96.1},
   {fips:"40047",name:"Garfield",slug:null,isCADC:false,path:"M 446.3,56.3 L 446.4,56.3 L 446.4,102.8 L 429.6,102.8 L 396.0,102.7 L 396.0,56.3 L 446.3,56.3 Z",lx:421.2,ly:79.5},
-  {fips:"40049",name:"Garvin",slug:null,isCADC:false,path:"M 438.5,282.4 L 438.4,263.5 L 430.2,263.5 L 430.2,244.7 L 487.9,244.8 L 487.9,268.3 L 466.9,269.9 L 471.3,282.5 L 455.0,282.4 L 438.5,282.4 Z",lx:459.0,ly:263.6},
-  {fips:"40051",name:"Grady",slug:null,isCADC:false,path:"M 396.6,188.0 L 417.2,192.6 L 418.9,192.8 L 419.3,192.0 L 420.1,192.2 L 420.5,192.9 L 420.8,192.5 L 421.6,192.4 L 422.1,191.5 L 424.8,193.9 L 425.7,193.7 L 426.1,193.4 L 427.2,193.8 L 428.0,193.5 L 428.9,192.8 L 429.9,192.6 L 430.2,244.7 L 430.2,263.5 L 397.3,263.5 L 397.2,263.5 L 397.1,244.7 L 396.9,244.7 L 396.6,188.0 Z",lx:413.4,ly:225.8},
+  {fips:"40049",name:"Garvin",slug:"garvin",isCADC:false,path:"M 438.5,282.4 L 438.4,263.5 L 430.2,263.5 L 430.2,244.7 L 487.9,244.8 L 487.9,268.3 L 466.9,269.9 L 471.3,282.5 L 455.0,282.4 L 438.5,282.4 Z",lx:459.0,ly:263.6},
+  {fips:"40051",name:"Grady",slug:"grady",isCADC:false,path:"M 396.6,188.0 L 417.2,192.6 L 418.9,192.8 L 419.3,192.0 L 420.1,192.2 L 420.5,192.9 L 420.8,192.5 L 421.6,192.4 L 422.1,191.5 L 424.8,193.9 L 425.7,193.7 L 426.1,193.4 L 427.2,193.8 L 428.0,193.5 L 428.9,192.8 L 429.9,192.6 L 430.2,244.7 L 430.2,263.5 L 397.3,263.5 L 397.2,263.5 L 397.1,244.7 L 396.9,244.7 L 396.6,188.0 Z",lx:413.4,ly:225.8},
   {fips:"40053",name:"Grant",slug:null,isCADC:false,path:"M 446.3,56.3 L 396.0,56.3 L 395.4,12.4 L 400.6,12.4 L 419.7,12.4 L 421.1,12.4 L 422.3,12.4 L 427.9,12.4 L 431.6,12.3 L 435.0,12.4 L 438.3,12.4 L 445.5,12.4 L 446.3,12.4 L 446.3,56.3 Z",lx:420.9,ly:34.3},
-  {fips:"40055",name:"Greer",slug:null,isCADC:false,path:"M 293.7,216.6 L 300.1,224.5 L 301.8,244.4 L 306.5,248.3 L 294.0,249.2 L 292.6,258.8 L 273.5,258.8 L 269.3,254.1 L 268.5,235.0 L 256.1,235.1 L 256.1,225.7 L 264.4,225.7 L 264.4,216.3 L 293.7,216.6 Z",lx:281.3,ly:237.6},
-  {fips:"40057",name:"Harmon",slug:null,isCADC:false,path:"M 247.3,256.5 L 247.3,225.7 L 256.1,225.7 L 256.1,235.1 L 268.5,235.0 L 269.3,254.1 L 273.5,258.8 L 273.5,282.4 L 259.4,282.6 L 253.4,275.1 L 247.5,276.5 L 247.3,276.6 L 247.3,256.5 Z",lx:260.4,ly:254.2},
+  {fips:"40055",name:"Greer",slug:"greer",isCADC:false,path:"M 293.7,216.6 L 300.1,224.5 L 301.8,244.4 L 306.5,248.3 L 294.0,249.2 L 292.6,258.8 L 273.5,258.8 L 269.3,254.1 L 268.5,235.0 L 256.1,235.1 L 256.1,225.7 L 264.4,225.7 L 264.4,216.3 L 293.7,216.6 Z",lx:281.3,ly:237.6},
+  {fips:"40057",name:"Harmon",slug:"harmon",isCADC:false,path:"M 247.3,256.5 L 247.3,225.7 L 256.1,225.7 L 256.1,235.1 L 268.5,235.0 L 269.3,254.1 L 273.5,258.8 L 273.5,282.4 L 259.4,282.6 L 253.4,275.1 L 247.5,276.5 L 247.3,276.6 L 247.3,256.5 Z",lx:260.4,ly:254.2},
   {fips:"40059",name:"Harper",slug:null,isCADC:false,path:"M 247.2,12.1 L 264.2,12.1 L 274.2,12.2 L 282.0,12.3 L 286.5,12.3 L 290.0,12.3 L 296.5,25.4 L 302.6,31.8 L 302.6,56.1 L 278.3,56.4 L 247.1,56.3 L 247.2,12.1 Z",lx:274.9,ly:34.2},
-  {fips:"40065",name:"Jackson",slug:null,isCADC:false,path:"M 309.2,300.7 L 305.3,293.6 L 297.8,289.4 L 294.5,296.6 L 291.2,296.8 L 290.2,295.2 L 285.4,292.4 L 280.7,292.0 L 277.4,296.7 L 271.3,296.3 L 265.6,290.7 L 259.4,282.6 L 273.5,282.4 L 273.5,258.8 L 292.6,258.8 L 294.0,249.2 L 306.5,248.3 L 314.2,245.2 L 314.1,261.2 L 321.7,261.3 L 317.7,268.2 L 308.5,283.8 L 309.2,300.7 Z",lx:290.5,ly:273.0},
+  {fips:"40065",name:"Jackson",slug:"jackson",isCADC:false,path:"M 309.2,300.7 L 305.3,293.6 L 297.8,289.4 L 294.5,296.6 L 291.2,296.8 L 290.2,295.2 L 285.4,292.4 L 280.7,292.0 L 277.4,296.7 L 271.3,296.3 L 265.6,290.7 L 259.4,282.6 L 273.5,282.4 L 273.5,258.8 L 292.6,258.8 L 294.0,249.2 L 306.5,248.3 L 314.2,245.2 L 314.1,261.2 L 321.7,261.3 L 317.7,268.2 L 308.5,283.8 L 309.2,300.7 Z",lx:290.5,ly:273.0},
   {fips:"40067",name:"Jefferson",slug:"jefferson",isCADC:true,path:"M 405.9,349.3 L 407.8,344.2 L 408.4,338.5 L 405.5,337.2 L 402.6,338.0 L 400.9,338.1 L 397.5,337.0 L 395.8,333.7 L 390.9,325.0 L 393.3,322.0 L 393.3,305.9 L 438.5,306.0 L 438.5,328.4 L 438.6,348.4 L 437.0,348.1 L 435.8,346.7 L 436.4,342.6 L 434.8,340.8 L 431.1,338.5 L 429.9,338.3 L 428.6,338.8 L 427.6,340.4 L 425.0,344.2 L 421.0,349.2 L 417.2,352.8 L 414.7,353.7 L 413.8,353.6 L 406.8,350.1 L 405.9,349.3 Z",lx:414.8,ly:329.8},
   {fips:"40073",name:"Kingfisher",slug:null,isCADC:false,path:"M 396.0,102.7 L 429.6,102.8 L 429.7,150.3 L 387.9,150.4 L 387.7,102.7 L 396.0,102.7 Z",lx:408.7,ly:126.6},
   {fips:"40075",name:"Kiowa",slug:"kiowa",isCADC:true,path:"M 355.5,218.4 L 355.6,244.7 L 339.4,244.6 L 339.4,272.9 L 325.7,272.9 L 325.7,268.2 L 317.7,268.2 L 321.7,261.3 L 314.1,261.2 L 314.2,245.2 L 306.5,248.3 L 301.8,244.4 L 300.1,224.5 L 293.7,216.6 L 293.7,216.4 L 297.5,216.3 L 345.3,216.4 L 355.5,218.4 Z",lx:324.6,ly:244.6},
   {fips:"40083",name:"Logan",slug:null,isCADC:false,path:"M 471.5,126.9 L 471.5,150.5 L 429.7,150.3 L 429.6,102.8 L 446.4,102.8 L 454.8,103.4 L 454.8,122.2 L 457.2,119.4 L 471.5,126.9 Z",lx:450.6,ly:126.6},
   {fips:"40085",name:"Love",slug:null,isCADC:false,path:"M 484.7,344.3 L 483.7,349.6 L 475.3,366.3 L 471.8,367.8 L 469.8,366.7 L 466.5,359.0 L 466.5,357.0 L 458.2,351.2 L 453.3,356.9 L 449.1,356.9 L 446.3,354.5 L 447.2,351.3 L 447.2,349.1 L 444.6,346.5 L 443.3,346.1 L 441.9,346.7 L 439.8,348.1 L 438.6,348.4 L 438.6,329.6 L 484.9,329.7 L 487.7,342.4 L 484.7,344.3 Z",lx:463.1,ly:348.8},
   {fips:"40093",name:"Major",slug:null,isCADC:false,path:"M 354.2,102.7 L 329.2,103.1 L 328.9,65.7 L 338.0,65.7 L 340.8,70.7 L 355.1,78.1 L 362.3,77.5 L 362.3,70.4 L 396.0,70.4 L 396.0,102.7 L 354.2,102.7 Z",lx:362.5,ly:84.4},
-  {fips:"40087",name:"McClain",slug:null,isCADC:false,path:"M 429.9,192.6 L 438.9,197.7 L 440.1,205.8 L 454.8,220.7 L 455.8,232.9 L 471.4,236.8 L 488.0,232.8 L 488.0,244.7 L 487.9,244.8 L 430.2,244.7 L 429.9,192.6 Z",lx:459.0,ly:218.6},
+  {fips:"40087",name:"McClain",slug:"mcclain",isCADC:false,path:"M 429.9,192.6 L 438.9,197.7 L 440.1,205.8 L 454.8,220.7 L 455.8,232.9 L 471.4,236.8 L 488.0,232.8 L 488.0,244.7 L 487.9,244.8 L 430.2,244.7 L 429.9,192.6 Z",lx:459.0,ly:218.6},
   {fips:"40109",name:"Oklahoma",slug:null,isCADC:false,path:"M 461.8,188.1 L 449.4,188.1 L 429.9,188.1 L 429.9,178.7 L 429.7,150.3 L 471.5,150.5 L 471.5,178.7 L 471.4,188.1 L 461.8,188.1 Z",lx:450.6,ly:169.2},
   {fips:"40129",name:"Roger Mills",slug:"roger-mills",isCADC:true,path:"M 247.3,161.9 L 247.3,133.5 L 253.2,130.0 L 256.1,121.9 L 262.3,120.6 L 262.9,130.3 L 269.6,135.8 L 282.0,135.1 L 286.9,122.9 L 295.9,119.2 L 296.3,141.0 L 297.2,173.8 L 280.6,173.8 L 280.6,183.3 L 247.3,183.2 L 247.3,161.9 Z",lx:272.3,ly:151.2},
-  {fips:"40137",name:"Stephens",slug:null,isCADC:false,path:"M 393.0,282.4 L 393.0,263.5 L 430.2,263.5 L 438.4,263.5 L 438.5,282.4 L 438.5,306.0 L 393.3,305.9 L 393.3,282.4 L 393.0,282.4 Z",lx:415.7,ly:284.8},
+  {fips:"40137",name:"Stephens",slug:"stephens",isCADC:false,path:"M 393.0,282.4 L 393.0,263.5 L 430.2,263.5 L 438.4,263.5 L 438.5,282.4 L 438.5,306.0 L 393.3,305.9 L 393.3,282.4 L 393.0,282.4 Z",lx:415.7,ly:284.8},
   {fips:"40139",name:"Texas",slug:null,isCADC:false,path:"M 170.8,66.5 L 88.1,66.4 L 88.4,13.0 L 98.2,12.9 L 121.8,12.8 L 130.9,12.7 L 136.5,12.7 L 140.8,12.6 L 152.3,12.6 L 163.8,12.5 L 164.8,12.5 L 168.0,12.4 L 173.3,12.4 L 172.6,66.5 L 170.8,66.5 Z",lx:130.7,ly:39.5},
   {fips:"40141",name:"Tillman",slug:"tillman",isCADC:true,path:"M 329.5,316.2 L 321.0,315.2 L 316.4,315.5 L 313.5,314.9 L 310.8,314.0 L 309.2,305.7 L 309.2,300.8 L 308.5,283.8 L 317.7,268.2 L 325.7,268.2 L 325.7,272.9 L 339.4,272.9 L 339.4,282.4 L 352.3,282.4 L 352.3,293.4 L 356.4,301.2 L 356.3,319.9 L 354.2,319.8 L 349.3,322.6 L 344.2,322.6 L 336.9,320.8 L 332.0,317.5 L 329.5,316.2 Z",lx:332.4,ly:295.4},
   {fips:"40149",name:"Washita",slug:"washita",isCADC:true,path:"M 355.5,218.4 L 345.3,216.4 L 297.5,216.3 L 297.2,178.6 L 355.3,178.7 L 355.5,218.4 Z",lx:326.3,ly:198.5},
@@ -2269,12 +4707,12 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
   const selectedLabel = "white";
 
   return (
-    <svg viewBox="0 60 500 320" style={{ width: "100%", display: "block" }}
+    <svg viewBox="150 60 360 310" style={{ width: "100%", display: "block" }}
       aria-label="SW Oklahoma county map — CADC service counties highlighted in blue">
       <rect x={0} y={0} width={500} height={380} fill={bg} rx={8} />
 
       {/* Grey background counties first */}
-      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC).map(c => (
+      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC && !(c.slug && CADC_EXTENDED_COUNTIES.includes(c.slug))).map(c => (
         <g key={c.fips}>
           <path d={c.path} fill={greyFill} stroke={greyStroke} strokeWidth={0.6} strokeLinejoin="round" />
           <text x={c.lx} y={c.ly} textAnchor="middle" dominantBaseline="middle"
@@ -2283,6 +4721,24 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
           </text>
         </g>
       ))}
+
+      {/* Extended-service counties — variable programs, lighter tier, clickable */}
+      {SW_OK_ALL_COUNTIES.filter(c => !c.isCADC && c.slug && CADC_EXTENDED_COUNTIES.includes(c.slug)).map(c => {
+        const isSel = selectedCounty === c.slug;
+        const isHov = hovered === c.slug;
+        return (
+          <g key={c.fips} style={{ cursor: "pointer" }}>
+            <path d={c.path}
+              fill={isSel ? selectedFill : isHov ? "rgba(1,1,255,0.14)" : "rgba(1,1,255,0.05)"}
+              stroke={isSel ? selectedFill : "rgba(1,1,255,0.4)"} strokeWidth={1} strokeDasharray="3 2" strokeLinejoin="round"
+              style={{ transition: "fill 0.18s ease" }}
+              onMouseEnter={() => setHovered(c.slug)} onMouseLeave={() => setHovered(null)}
+              onClick={() => c.slug && onSelectCounty(c.slug)} />
+            <text x={c.lx} y={c.ly + 2} textAnchor="middle" dominantBaseline="middle" fontSize={5.5} fontWeight="700"
+              fill={isSel ? selectedLabel : dark ? "rgba(255,255,255,0.6)" : "#3b3b8a"} style={{ pointerEvents:"none", userSelect:"none" }}>{c.name}</text>
+          </g>
+        );
+      })}
 
       {/* CADC counties on top — interactive */}
       {SW_OK_ALL_COUNTIES.filter(c => c.isCADC).map(c => {
@@ -2317,13 +4773,15 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
       })}
 
       {/* Legend */}
-      <g transform="translate(12,370)">
+      <g transform="translate(12,348)">
         <rect x={0} y={-5} width={10} height={7} rx={1} fill={cadcFill} stroke={cadcStroke} strokeWidth={0.8}/>
         <text x={13} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>CADC County</text>
         <rect x={72} y={-5} width={10} height={7} rx={1} fill={greyFill} stroke={greyStroke} strokeWidth={0.8}/>
         <text x={85} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Other County</text>
-        <circle cx={145} cy={-1.5} r={3} fill="#CC0000"/>
-        <text x={151} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
+        <rect x={145} y={-5} width={10} height={7} rx={1} fill="rgba(1,1,255,0.05)" stroke="rgba(1,1,255,0.4)" strokeWidth={0.8} strokeDasharray="2 1.5"/>
+        <text x={158} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Extended service area</text>
+        <circle cx={240} cy={-1.5} r={3} fill="#CC0000"/>
+        <text x={246} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
       </g>
     </svg>
   );
@@ -2335,7 +4793,10 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
 type Stage = "entry" | "map" | "county" | "program" | "content";
 type TransitionState = "idle" | "out" | "in";
 
-export default function CADCOrbitSite() {
+function CADCOrbitSiteInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [stage, setStage] = useState<Stage>("entry");
   const [activeCounty, setActiveCounty] = useState<string | null>(null);
   const [activeProgram, setActiveProgram] = useState<ProgramData | null>(null);
@@ -2345,7 +4806,69 @@ export default function CADCOrbitSite() {
   const [beamNode, setBeamNode] = useState<string | null>(null);
   const [orbitTx, setOrbitTx] = useState<TransitionState>("idle");
   const [assembled, setAssembled] = useState(false);
+  const { lang, setLang } = useLang();
   const isDesktop = useIsDesktop();
+
+  // ── Visit counter — fire once on mount ──────────────────────────────────
+  useEffect(() => { trackStat("visit"); }, []);
+
+  // ── URL hydration — run once on mount and whenever URL params change ──────
+  useEffect(() => {
+    const programSlug = searchParams.get("program");
+    const areaId      = searchParams.get("area");
+    const countyId    = searchParams.get("county");
+    const isMap       = searchParams.get("map") === "1";
+
+    if (programSlug) {
+      const prog = PROGRAMS.find(p => p.slug === programSlug);
+      if (prog) {
+        setActiveProgram(prog);
+        if (areaId) {
+          const area = prog.subAreas.find(a => a.id === areaId);
+          if (area) {
+            setActiveSubArea(area);
+            setStage("content");
+          } else {
+            setActiveSubArea(null);
+            setStage("program");
+          }
+        } else {
+          setActiveSubArea(null);
+          setStage("program");
+        }
+        if (countyId) setActiveCounty(countyId);
+        return;
+      }
+    }
+
+    if (countyId) {
+      setActiveCounty(countyId);
+      setActiveProgram(null);
+      setActiveSubArea(null);
+      setStage("county");
+      return;
+    }
+
+    // No params — entry screen
+    setStage("entry");
+    setActiveProgram(null);
+    setActiveSubArea(null);
+    setActiveCounty(null);
+
+    if (isMap) {
+      setStage("map");
+    }
+  }, [searchParams]);
+
+  // ── URL builder ────────────────────────────────────────────────────────────
+  function buildUrl(opts: { program?: string; area?: string; county?: string }): string {
+    const p = new URLSearchParams();
+    if (opts.county)  p.set("county", opts.county);
+    if (opts.program) p.set("program", opts.program);
+    if (opts.area)    p.set("area", opts.area);
+    const qs = p.toString();
+    return qs ? `/?${qs}` : "/";
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setAssembled(true), 400);
@@ -2358,12 +4881,15 @@ export default function CADCOrbitSite() {
     : PROGRAMS;
 
   function tapLogo() {
+    router.push("/?map=1");
     setStage("map");
   }
 
   function tapCounty(countyId: string) {
+    trackStat("county", countyId); // stat tracking
     setActiveCounty(countyId);
     setOrbitTx("out");
+    router.push(buildUrl({ county: countyId }));
     setTimeout(() => {
       setStage("county");
       setOrbitTx("in");
@@ -2372,6 +4898,7 @@ export default function CADCOrbitSite() {
   }
 
   function tapProgram(prog: ProgramData) {
+    trackStat("program", prog.slug); // stat tracking
     setPopNode(prog.slug);
     setBeamNode(prog.slug);
     setGlowNode(prog.slug);
@@ -2383,6 +4910,7 @@ export default function CADCOrbitSite() {
       setOrbitTx("in");
       setGlowNode(null);
       setBeamNode(null);
+      router.push(buildUrl({ county: activeCounty ?? undefined, program: prog.slug }));
     }, 480);
     setTimeout(() => {
       setOrbitTx("idle");
@@ -2398,6 +4926,7 @@ export default function CADCOrbitSite() {
       setStage("content");
       setGlowNode(null);
       setPopNode(null);
+      router.push(buildUrl({ county: activeCounty ?? undefined, program: activeProgram?.slug, area: area.id }));
     }, 300);
   }
 
@@ -2407,14 +4936,18 @@ export default function CADCOrbitSite() {
       if (stage === "content") {
         setActiveSubArea(null);
         setStage("program");
+        router.push(buildUrl({ county: activeCounty ?? undefined, program: activeProgram?.slug }));
       } else if (stage === "program") {
         setActiveProgram(null);
         setStage(activeCounty ? "county" : "map");
+        router.push(activeCounty ? buildUrl({ county: activeCounty }) : "/?map=1");
       } else if (stage === "county") {
         setActiveCounty(null);
         setStage("map");
+        router.push("/?map=1");
       } else if (stage === "map") {
         setStage("entry");
+        router.push("/");
       }
       setOrbitTx("in");
     }, 300);
@@ -2422,7 +4955,9 @@ export default function CADCOrbitSite() {
   }
 
   const activeCountyName = activeCounty
-    ? SW_OK_COUNTIES.find(c => c.id === activeCounty)?.name ?? activeCounty
+    ? SW_OK_COUNTIES.find(c => c.id === activeCounty)?.name
+      ?? SW_OK_ALL_COUNTIES.find(c => c.slug === activeCounty)?.name
+      ?? activeCounty
     : null;
 
   if (isDesktop) {
@@ -2476,56 +5011,35 @@ interface LayoutProps {
 
 function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
-    <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
-      <ParticleField />
+    <div style={{ background: T.void, minHeight: "100vh", fontFamily: "'Space Grotesk', 'Inter', sans-serif", position: "relative", overflowX: "hidden" }}>
+      {/* Skip to main content — AAA requirement */}
+      <a href="#main-content" style={{
+        position: "absolute", left: "-9999px", top: "auto", width: 1, height: 1, overflow: "hidden",
+        zIndex: 9999, background: T.blue, color: "white", padding: "12px 20px",
+        fontWeight: 700, fontSize: 14, textDecoration: "none", borderRadius: "0 0 8px 0",
+      }}
+        onFocus={e => { e.currentTarget.style.left = "0"; e.currentTarget.style.width = "auto"; e.currentTarget.style.height = "auto"; }}
+        onBlur={e => { e.currentTarget.style.left = "-9999px"; e.currentTarget.style.width = "1px"; e.currentTarget.style.height = "1px"; }}
+      >Skip to main content</a>
+      <SketchField />
 
-      {/* Utility nav */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: `1px solid ${T.border}`, background: "white", boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
-          <div>
-            <div style={{ color: T.blue, fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>CADC</div>
-            <div style={{ color: T.textMuted, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase" }}>Community Action Development Corporation</div>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 32 }}>
-          {["About", "Contact", "580-335-5588"].map((item, i) => (
-            <a key={item} href={i === 2 ? "tel:+15803355588" : `/${item.toLowerCase()}`}
-              style={{ color: T.textMuted, fontSize: 13, fontWeight: 600, textDecoration: "none", letterSpacing: "0.05em", transition: "color 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = T.blue)}
-              onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}
-            >{item}</a>
-          ))}
-        </div>
-      </nav>
+      <CADCHeader
+        crumbs={
+          stage === "entry" ? undefined
+          : stage === "map" ? ["Select County"]
+          : [activeCountyName ? `${activeCountyName} County` : "All Counties",
+             ...(activeProgram ? [activeProgram.shortName] : []),
+             ...(activeSubArea ? [activeSubArea.shortLabel] : [])]
+        }
+        onBack={stage !== "entry" ? goBack : undefined}
+      />
 
       {/* Main split layout */}
-      <div style={{ display: "flex", height: "100vh", paddingTop: 64 }}>
+      <div style={{ display: "flex", minHeight: "calc(100vh - 64px)" }}>
 
         {/* LEFT — Orbit / Map panel */}
         <div style={{ width: "42%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
-
-          {/* Back button */}
-          {stage !== "entry" && (
-            <button onClick={goBack} style={{
-              position: "absolute", top: 24, left: 48, zIndex: 10,
-              background: "white", border: `1px solid ${T.border}`,
-              color: T.blue, padding: "8px 18px", borderRadius: 8,
-              fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", cursor: "pointer",
-              textTransform: "uppercase", transition: "all 0.2s",
-              boxShadow: "0 2px 8px rgba(1,1,255,0.08)",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#E4E4FF"; e.currentTarget.style.borderColor = T.blue; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = T.border; }}
-            >← Back</button>
-          )}
-
-          {/* County label breadcrumb */}
-          {activeCountyName && (stage === "county" || stage === "program" || stage === "content") && (
-            <div style={{ position: "absolute", top: 24, right: 24, color: T.maroon, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em" }}>
-              {activeCountyName} County
-            </div>
-          )}
+          <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
 
           {/* Entry state — large tappable logo */}
           {stage === "entry" && (
@@ -2534,15 +5048,14 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
               style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}
             >
               <div style={{
-                width: 200, height: 200, borderRadius: "50%", background: "white",
+                width: 220, height: 220, borderRadius: "50%", background: "white",
                 border: `4px solid ${T.blue}`,
                 boxShadow: `0 0 0 12px rgba(1,1,255,0.08), 0 0 60px rgba(1,1,255,0.2)`,
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: 20,
                 animation: "logoAssemble 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards, logoFloat 3.5s ease-in-out 0.8s infinite",
               }}>
-                <span style={{ color: T.blue, fontWeight: 900, fontSize: 42, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
-                <div style={{ width: 48, height: 3, background: T.maroon, borderRadius: 2 }} />
-                <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", lineHeight: 1.3 }}>Community Action<br />Development Corp.</span>
+                <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
               </div>
               <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
             </button>
@@ -2572,11 +5085,12 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         </div>
 
         {/* RIGHT — Content panel */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
-          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} />
-        </div>
+        <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
+          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} tapSubArea={tapSubArea} />
+        </main>
       </div>
 
+      <CADCFooter />
       <DesktopStyles />
     </div>
   );
@@ -2588,7 +5102,23 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   const subAreas = activeProgram?.subAreas ?? [];
-  const items = (stage === "county") ? availablePrograms : (stage === "program" || stage === "content") ? subAreas : availablePrograms;
+  const { features: _gateFeats2 } = useCms();
+  const _subAreaGates2: Record<string, string> = {
+    "hs-pre-enroll":      "formHeadStartPreEnroll",
+    "weath-interest":     "formWeatherizationInterest",
+    "vita-appointment":   "formVitaAppointment",
+    "volunteer-form":     "formVolunteerInterest",
+    "community-survey":   "formCommunityNeeds",
+    "service-screener":   "formServiceScreener",
+    "board-docs":         "boardPortal",
+    "volunteer-log":      "volunteerLog",
+    "volunteer-hub":      "volunteerLog",
+  };
+  const _filteredSubs2 = subAreas.filter((a: SubArea) => {
+    const gate = _subAreaGates2[a.id]; if (!gate) return true;
+    return !!(_gateFeats2 as Record<string,boolean>)?.[gate];
+  });
+  const items = (stage === "county") ? availablePrograms : (stage === "program" || stage === "content") ? _filteredSubs2 : availablePrograms;
   const RADIUS = 38;
   const SIZE = "min(80vw,420px)";
 
@@ -2637,19 +5167,26 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
         <span style={{
           fontSize: "clamp(1rem,2.5vw,1.4rem)",
           animation: orbitTx !== "idle" ? "hubSpin 0.45s ease-in-out" : "none",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          width: "75%", height: "75%",
         }}>
-          {(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}
+          {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+            ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+                style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
+            : (stage === "program" || stage === "content")
+              ? activeProgram?.icon
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "88%", height: "auto", objectFit: "contain", display: "block" }} />}
         </span>
-        <span style={{
-          color: T.blue,
-          fontSize: (stage === "program" || stage === "content") ? "clamp(0.32rem,0.7vw,0.42rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
-          fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
-          textAlign: "center", padding: "0 4px", lineHeight: 1.2,
-          transition: "opacity 0.2s ease",
-          opacity: orbitTx === "out" ? 0 : 1,
-        }}>
-          {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
-        </span>
+        {!(stage === "program" || stage === "content") && (
+          <span style={{
+            color: T.blue,
+            fontSize: "clamp(0.35rem,0.8vw,0.5rem)",
+            fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
+            textAlign: "center", padding: "0 4px", lineHeight: 1.2,
+            transition: "opacity 0.2s ease",
+            opacity: orbitTx === "out" ? 0 : 1,
+          }}>CADC</span>
+        )}
       </div>
 
       {/* Nodes */}
@@ -2677,11 +5214,12 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
           <button
             key={id}
             onClick={() => (stage === "program" || stage === "content") ? tapSubArea(sub) : tapProgram(prog)}
+            aria-label={(stage === "program" || stage === "content") ? `Go to ${(sub as SubArea).label}` : `Explore ${prog.name}`}
             aria-label={(stage === "program" || stage === "content") ? sub.label : prog.name}
             style={{
               position: "absolute",
               left: `${x}%`, top: `${y}%`,
-              width: "clamp(72px,14%,90px)",
+              width: "clamp(80px,15%,110px)",
               transform: `translate(calc(-50% + ${exitX}px), calc(-50% + ${exitY}px)) scale(${isPopped ? 1.28 : entryScale})`,
               display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
               background: "none", border: "none", cursor: "pointer", padding: 0,
@@ -2717,26 +5255,30 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               }} />
             )}
             <div className="node-disc" style={{
-              width: "clamp(40px,8.5%,54px)", aspectRatio: "1/1",
+              width: 64, height: 64,
               borderRadius: "50%",
               background: isPopped ? "#E4E4FF" : "white",
               border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.9rem,2vw,1.2rem)",
+              overflow: "hidden",
+              flexShrink: 0,
               boxShadow: isPopped
                 ? `0 0 24px rgba(1,1,255,0.3), 0 4px 16px rgba(1,1,255,0.15)`
                 : `0 3px 12px rgba(1,1,255,0.12)`,
               transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-width 0.15s ease",
             }}>
-              {icon}
+              {isProgLevel && PROGRAM_ICONS[prog.slug]
+                ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
+                    style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
+                : icon}
             </div>
             <span style={{
               color: T.blue,
-              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-              textAlign: "center", lineHeight: 1.25,
-              whiteSpace: "normal", wordBreak: "break-word",
-              width: "clamp(64px,12vw,84px)",
-              fontSize: "clamp(0.34rem,0.78vw,0.48rem)",
+              fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.03em",
+              textAlign: "center", lineHeight: 1.2,
+              whiteSpace: "nowrap",
+              fontSize: "clamp(0.42rem,0.85vw,0.58rem)",
               transition: "color 0.2s ease",
             }}>
               {label}
@@ -2748,10 +5290,10 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
   );
 }
 
-function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty }: {
+function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty, tapSubArea }: {
   stage: Stage; activeCountyName: string | null; activeProgram: ProgramData | null;
   activeSubArea: SubArea | null; availablePrograms: ProgramData[];
-  tapCounty: (id: string) => void;
+  tapCounty: (id: string) => void; tapSubArea: (a: SubArea) => void;
 }) {
   if (stage === "entry") {
     return (
@@ -2770,13 +5312,47 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[["9","Programs"],["11","Head Start Centers"],["110","Transit Vehicles"],["6","Senior Meal Sites"],["17","Advantage Counties"],["1966","Est."]].map(([n,l])=>(
+          {[["9","Programs",""],["11","Head Start Centers","†"],["220,175","Transit Trips/Yr","†"],["6","Senior Meal Sites","†"],["340,830","Advantage Meals/Yr","†"],["1966","Est.",""]].map(([n,l,src])=>(
             <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
               <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
               <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
             </div>
           ))}
         </div>
+        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: "8px 0 0", lineHeight: 1.6 }}>* CADC internal program count · † Source: CADC FY2025 Annual Report</p>
+        {/* CADC Now */}
+        <div style={{ marginTop: 20 }}><CADCNow /></div>
+
+        {/* Find My Benefits screener CTA */}
+        <div style={{ marginTop: 16, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ fontSize: 32, flexShrink: 0 }}>🔍</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Not sure where to start?</p>
+            <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+            <a href="/?program=board&area=service-screener" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>Find My Benefits →</a>
+          </div>
+        </div>
+
+        {/* Survey CTA */}
+        <a
+          href="https://www.surveymonkey.com/r/26cadcneeds"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Take the 2026 CADC Community Needs Survey — your feedback shapes our programs (opens in new tab)"
+          style={{
+            display: "flex", alignItems: "center", gap: 14, marginTop: 20,
+            background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)",
+            borderRadius: 12, padding: "16px 20px", textDecoration: "none",
+            boxShadow: "0 4px 20px rgba(204,0,0,0.25)",
+          }}
+        >
+          <span style={{ fontSize: 28 }}>📋</span>
+          <div>
+            <p style={{ color: "white", fontWeight: 800, fontSize: 13, margin: 0, letterSpacing: "0.02em" }}>2026 CADC Community Needs Survey</p>
+            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>Your input directly shapes which programs we fund and expand.</p>
+          </div>
+          <span style={{ color: "white", fontSize: 18, marginLeft: "auto" }}>→</span>
+        </a>
       </div>
     );
   }
@@ -2811,14 +5387,17 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "county" && activeCountyName) {
     const firstProg = availablePrograms[0];
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 12, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Programs available in your area
         </h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
           {availablePrograms.map(p => (
-            <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600 }}>
-              {p.icon} {p.shortName}
+            <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600, display:"flex", alignItems:"center", gap: 6 }}>
+              {PROGRAM_ICONS[p.slug]
+                ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:22,height:22,objectFit:"contain"}} />
+                : p.icon}
+              {p.shortName}
             </div>
           ))}
         </div>
@@ -2827,7 +5406,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             {firstProg.subAreas[0]?.content}
           </div>
         )}
-        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 16, fontStyle: "italic" }}>Tap a program node in the orbit for more detail.</p>
+        <BackToTop />
       </div>
     );
   }
@@ -2835,12 +5414,15 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "program" && activeProgram) {
     const firstSub = activeProgram.subAreas[0];
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 12, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
-          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
-            {activeProgram.icon} {activeProgram.name}
+          <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary, display:"flex", alignItems:"center", gap: 12 }}>
+            {PROGRAM_ICONS[activeProgram.slug]
+              ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:48,height:48,objectFit:"contain",flexShrink:0}} />
+              : <span>{activeProgram.icon}</span>}
+            {activeProgram.name}
           </h2>
         </div>
         {firstSub && (
@@ -2848,20 +5430,22 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             {firstSub.content}
           </div>
         )}
-        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 20, fontStyle: "italic" }}>Select any node in the orbit for more detail.</p>
+        <BackToTop />
       </div>
     );
   }
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 540, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 12, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
+        {activeProgram && <SubAreaPhotoCarousel programSlug={activeProgram.slug} />}
         <div className="cadc-light-content">
           {activeSubArea.content}
         </div>
+        <BackToTop />
       </div>
     );
   }
@@ -2871,37 +5455,358 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
 // ─── MOBILE LAYOUT ────────────────────────────────────────────────────────────
 
+// ─── Search Components ────────────────────────────────────────────────────────
+
+const SEARCH_INDEX = [
+  ...PROGRAMS.map(p => ({ type: "program" as const, label: p.name, shortLabel: p.shortName, icon: p.icon, slug: p.slug })),
+  ...PROGRAMS.flatMap(p => p.subAreas.map(s => ({ type: "subarea" as const, label: s.label, shortLabel: s.shortLabel, icon: s.icon, slug: p.slug, subareaId: s.id }))),
+  ...SW_OK_COUNTIES.map(c => ({ type: "county" as const, label: `${c.name} County`, shortLabel: c.name, icon: "📍", id: c.id })),
+];
+
+
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SHARED SITE CHROME — header, menu drawer, breadcrumb, footer, back-to-top
+// Used by the orbit (mobile + desktop) AND by CADCShell (about/contact),
+// so every page has the identical header. Exported for CADCShell.
+// ═════════════════════════════════════════════════════════════════════════════
+
+export const SURVEY_URL = "https://www.surveymonkey.com/r/26cadcneeds";
+
+// Public / compliance documents. Replace href values with real PDF paths under /public/documents/
+export const PUBLIC_DOCUMENTS: { label: string; href: string; note?: string }[] = [
+  { label: "Title VI Policy (Red River Transportation)", href: "/documents/title-vi-policy.pdf" },
+  { label: "Affirmative Action Plan 2023",               href: "/documents/affirmative-action-plan-2023.pdf" },
+  { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
+  { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
+];
+
+// Unified header search — navigates by URL so it works on every page
+function HeaderSearch({ compact = false }: { compact?: boolean }) {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const results = query.trim().length > 0
+    ? SEARCH_INDEX.filter(item =>
+        item.label.toLowerCase().includes(query.toLowerCase()) ||
+        item.shortLabel.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 7)
+    : [];
+  function go(item: typeof SEARCH_INDEX[0]) {
+    setQuery(""); setOpen(false);
+    if (item.type === "county") router.push(`/?county=${item.id}`);
+    else if (item.type === "subarea") router.push(`/?program=${item.slug}&area=${(item as {subareaId:string}).subareaId}`);
+    else router.push(`/?program=${item.slug}`);
+  }
+  const id = compact ? "cadc-search-m" : "cadc-search-d";
+  return (
+    <div style={{ position: "relative", width: compact ? "100%" : 300 }} role="search">
+      <label htmlFor={id} style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Search CADC programs, services, and counties</label>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F0F0FF", border: `1px solid ${open ? T.blue : T.border}`, borderRadius: 10, padding: compact ? "9px 12px" : "7px 12px", transition: "border-color 0.2s" }}>
+        <span aria-hidden="true" style={{ fontSize: 13, opacity: 0.5 }}>🔍</span>
+        <input id={id} type="search" value={query} autoComplete="off"
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 150)}
+          placeholder="Search programs, services, counties…"
+          aria-autocomplete="list" aria-expanded={open && results.length > 0}
+          style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: T.textPrimary, outline: "none" }} />
+        {query && <button onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>}
+      </div>
+      {open && results.length > 0 && (
+        <ul role="listbox" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 300, margin: 0, padding: "6px 0", listStyle: "none" }}>
+          {results.map((item, i) => (
+            <li key={i} role="option" aria-selected={false}>
+              <button onMouseDown={() => go(item)} style={{ width: "100%", background: "none", border: "none", padding: "9px 14px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+                onMouseEnter={e => e.currentTarget.style.background = "#F0F0FF"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                <span aria-hidden="true">{item.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{item.label}</div>
+                  <div style={{ fontSize: 10, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.type === "county" ? "County" : item.type === "program" ? "Program" : "Service"}</div>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// Slide-out site menu — every feature reachable without the orbit
+function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const { documents } = useCms();
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [open, onClose]);
+  if (!open) return null;
+  const sectionLabel = (t: string) => <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "22px 0 8px" }}>{t}</p>;
+  const linkStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, padding: "11px 12px", borderRadius: 10, color: T.textPrimary, textDecoration: "none", fontSize: 15, fontWeight: 600, background: "white", border: `1px solid ${T.border}`, marginBottom: 6 };
+  return (
+    <div onClick={onClose} role="dialog" aria-modal="true" aria-label="Site menu"
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(10,22,40,0.55)", backdropFilter: "blur(2px)" }}>
+      <div onClick={e => e.stopPropagation()}
+        style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "min(88vw, 380px)", background: T.void, overflowY: "auto", padding: "16px 18px 40px", boxShadow: "8px 0 32px rgba(0,0,0,0.25)", animation: "drawerIn 0.25s ease" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 34 }} />
+          <button onClick={onClose} aria-label="Close menu" style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 8, width: 38, height: 38, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
+        </div>
+
+        <a href="/" style={{ ...linkStyle, background: T.blue, color: "white", border: "none", marginTop: 12 }}>🏠 Home</a>
+
+        {sectionLabel("Get Help")}
+        <a href="/?program=board&area=service-screener" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>🔍 Find My Benefits</a>
+        <a href="tel:+15803355588" style={linkStyle}>📞 Call CADC — 580-335-5588</a>
+        <a href="/contact" style={linkStyle}>📍 Find a Location</a>
+        <div style={{ margin: "6px 0" }}><FindNearMe /></div>
+        <a href="/?program=transit&area=rides" style={linkStyle}>🚌 Schedule a Ride</a>
+        <a href="/?program=head-start&area=apply" style={linkStyle}>📝 Apply for Head Start</a>
+
+        {sectionLabel("Programs & Services")}
+        {PROGRAMS.map(p => (
+          <div key={p.slug} style={{ marginBottom: 6 }}>
+            <div style={{ display: "flex", gap: 6 }}>
+              <a href={`/?program=${p.slug}`} style={{ ...linkStyle, flex: 1, marginBottom: 0 }}>
+                {PROGRAM_ICONS[p.slug]
+                  ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true"
+                      style={{width:32,height:32,objectFit:"contain",flexShrink:0}} />
+                  : <span aria-hidden="true">{p.icon}</span>}
+                {p.name}
+              </a>
+              <button onClick={() => setExpanded(expanded === p.slug ? null : p.slug)}
+                aria-label={`${expanded === p.slug ? "Hide" : "Show"} ${p.shortName} sections`} aria-expanded={expanded === p.slug}
+                style={{ width: 44, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, cursor: "pointer", color: T.blue, fontSize: 14, fontWeight: 800 }}>
+                {expanded === p.slug ? "−" : "+"}
+              </button>
+            </div>
+            {expanded === p.slug && (
+              <div style={{ padding: "6px 0 4px 14px", borderLeft: `2px solid ${T.blueLight}`, marginLeft: 10, marginTop: 4 }}>
+                {p.subAreas.map(a => (
+                  <a key={a.id} href={`/?program=${p.slug}&area=${a.id}`} style={{ display: "block", padding: "8px 10px", color: T.textPrimary, textDecoration: "none", fontSize: 14, borderRadius: 8 }}>
+                    <span aria-hidden="true" style={{ marginRight: 8 }}>{a.icon}</span>{a.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {sectionLabel("Find Services by County")}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {SW_OK_COUNTIES.map(c => (
+            <a key={c.id} href={`/?county=${c.id}`} style={{ background: "white", border: `1.5px solid ${T.blue}`, color: T.blue, padding: "7px 13px", borderRadius: 20, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{c.name}</a>
+          ))}
+        </div>
+
+        {sectionLabel("About & Transparency")}
+        <a href="/about" style={linkStyle}>🏢 About CADC</a>
+        <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 Community Needs Survey</a>
+        {documents.map(d => (
+          <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export interface CADCHeaderProps {
+  crumbs?: string[];           // e.g. ["Kiowa County","Transit","Fares"] — orbit only
+  onBack?: () => void;         // orbit only
+}
+
+// THE header. Identical on orbit, about, contact.
+export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
+  const isDesktop = useIsDesktop();
+  const { announcement, features } = useCms();
+  const { lang, setLang } = useLang();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const close = useCallback(() => setMenuOpen(false), []);
+  const btn: React.CSSProperties = { background: "white", border: `1px solid ${T.border}`, borderRadius: 8, cursor: "pointer", color: T.blue, display: "flex", alignItems: "center", justifyContent: "center" };
+  return (
+    <>
+      {announcement?.enabled && announcement.text && (
+        <a href={announcement.href || undefined} role="status" aria-live="polite"
+          style={{ display: "block", background: T.blue, color: "white", padding: "10px 16px", textAlign: "center", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+          📣 {announcement.text}{announcement.href ? " →" : ""}
+        </a>
+      )}
+      <header role="banner" style={{ position: "sticky", top: 0, zIndex: 400, background: "white", borderBottom: `1px solid ${T.border}`, boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
+        <nav role="navigation" aria-label="Main navigation"
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: isDesktop ? "10px 32px" : "10px 14px" }}>
+          {/* LEFT — menu, logo/home */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+            <button onClick={() => setMenuOpen(true)} aria-label="Open site menu" aria-expanded={menuOpen} style={{ ...btn, width: 42, height: 42, fontSize: 20 }}>☰</button>
+            <a href="/" aria-label="CADC home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+              <img src="/images/cadc-logo.png" alt="CADC" style={{ height: isDesktop ? 40 : 32, width: "auto", display: "block" }} />
+              <span style={{ display: "flex", alignItems: "center", gap: 5, color: T.blue, fontWeight: 800, fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase", background: T.blueLight, padding: "6px 11px", borderRadius: 8 }}>🏠 Home</span>
+            </a>
+          </div>
+          {/* CENTER — desktop search */}
+          {isDesktop && <HeaderSearch />}
+          {/* RIGHT — links + call */}
+          <div style={{ display: "flex", alignItems: "center", gap: isDesktop ? 18 : 8 }}>
+            {isDesktop && [["About","/about"],["Contact","/contact"]].map(([l,h]) => (
+              <a key={l} href={h} style={{ color: T.textMuted, fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em" }}
+                onMouseEnter={e => (e.currentTarget.style.color = T.blue)} onMouseLeave={e => (e.currentTarget.style.color = T.textMuted)}>{l}</a>
+            ))}
+            {/* Language toggle — only shows when spanishToggle feature is on */}
+            {features?.spanishToggle && (
+              <button onClick={() => setLang(lang === "en" ? "es" : "en")}
+                aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
+                style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.06em" }}>
+                {lang === "en" ? "ES" : "EN"}
+              </button>
+            )}
+            <a href="tel:+15803355588" aria-label="Call CADC at 580-335-5588"
+              style={{ background: T.maroon, color: "white", padding: isDesktop ? "9px 16px" : "9px 13px", borderRadius: 8, fontSize: 12, fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}>
+              📞 {isDesktop ? "580-335-5588" : t("Call", lang)}
+            </a>
+          </div>
+        </nav>
+        {/* Mobile search row */}
+        {!isDesktop && <div style={{ padding: "0 14px 10px" }}><HeaderSearch compact /></div>}
+        {/* Breadcrumb strip — single clean row, only when navigating the orbit */}
+        {crumbs && crumbs.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: isDesktop ? "7px 32px" : "7px 14px", background: T.void, borderTop: `1px solid ${T.border}` }}>
+            {onBack && <button onClick={onBack} aria-label="Go back one step" style={{ ...btn, height: 28, padding: "0 10px", fontSize: 12, fontWeight: 700 }}>{`← ${t("Back", lang)}`}</button>}
+            <div aria-label="You are here" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.textMuted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
+              {crumbs.map((c, i) => (
+                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                  {i > 0 && <span aria-hidden="true" style={{ opacity: 0.5 }}>›</span>}
+                  <span style={{ fontWeight: i === crumbs.length - 1 ? 800 : 600, color: i === crumbs.length - 1 ? T.textPrimary : T.textMuted, overflow: "hidden", textOverflow: "ellipsis" }}>{c}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </header>
+      <SiteMenuDrawer open={menuOpen} onClose={close} />
+      <style>{`@keyframes drawerIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }`}</style>
+    </>
+  );
+}
+
+// Survey band + footer — survey lives here now (not in the header)
+export function CADCFooter() {
+  const { documents } = useCms();
+  const router = useRouter();
+  // Hidden staff door — tap the © line 5 times within 3 seconds → /admin
+  const taps = useRef<number[]>([]);
+  function secretTap() {
+    const now = Date.now();
+    taps.current = [...taps.current.filter(t => now - t < 3000), now];
+    if (taps.current.length >= 5) { taps.current = []; router.push("/admin"); }
+  }
+  return (
+    <>
+      <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
+        aria-label="Take the 2026 CADC Community Needs Survey (opens in new tab)"
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: T.maroon, color: "white", padding: "14px 20px", textDecoration: "none", fontSize: 13, fontWeight: 800, letterSpacing: "0.03em", textAlign: "center" }}>
+        📋 2026 Community Needs Survey — <span style={{ fontWeight: 500 }}>Make Your Voice Heard →</span>
+      </a>
+      <footer role="contentinfo" style={{ background: "#0A1628", color: "white", padding: "40px 24px 28px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
+          <div>
+            <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 48, width: "auto", marginBottom: 12, filter: "brightness(0) invert(1)" }} />
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: "0 0 16px" }}>Helping People. Changing Lives.<br />Serving Southwest Oklahoma since 1966.</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px" }}>Get Help</p>
+            <a href="/?program=board&area=service-screener" style={{ display: "block", color: "rgba(255,255,255,0.8)", fontSize: 13, textDecoration: "none", marginBottom: 7, fontWeight: 700 }}>🔍 Find My Benefits</a>
+            <a href="tel:+15803355588" style={{ display: "block", color: "white", fontWeight: 800, fontSize: 15, textDecoration: "none", marginBottom: 7 }}>📞 580-335-5588</a>
+            <a href="/contact" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>📍 Find a Location</a>
+            <a href="/?program=transit&area=rides" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>🚌 Schedule a Ride</a>
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Programs</p>
+            {PROGRAMS.map(p => (
+              <a key={p.slug} href={`/?program=${p.slug}`} style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>{p.name}</a>
+            ))}
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact & Location</p>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8, margin: "0 0 10px" }}>105 S. Main Street · P.O. Box 989<br />Frederick, OK 73542</p>
+            <a href="/contact" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Contact &amp; Locations →</a>
+            <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>About CADC →</a>
+            <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Facebook →</a>
+            <a href="https://www.instagram.com/wearecadc" target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>Instagram →</a>
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
+            {documents.map(d => (
+              <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
+            ))}
+            <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📋 <span>2026 Community Needs Survey</span></a>
+          </div>
+        </div>
+        <div style={{ maxWidth: 960, margin: "28px auto 0", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 18, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <p onClick={secretTap} style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0, lineHeight: 1.6, userSelect: "none", cursor: "default" }}>
+            © {new Date().getFullYear()} Community Action Development Corporation · cadcok.org · An Equal Opportunity Employer and Provider · Title VI Compliant
+          </p>
+          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+            <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer"
+              aria-label="CADC on Facebook"
+              style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6, transition: "color 0.15s ease" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "white")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Facebook
+            </a>
+            <a href="https://www.instagram.com/wearecadc" target="_blank" rel="noopener noreferrer"
+              aria-label="CADC on Instagram"
+              style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6, transition: "color 0.15s ease" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "white")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}
+
+// Back-to-top — scrolls the window and the nearest scrollable panel
+export function BackToTop({ label = "↑ Back to top of page" }: { label?: string }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  function go() {
+    let el: HTMLElement | null = ref.current?.parentElement ?? null;
+    while (el) {
+      const oy = getComputedStyle(el).overflowY;
+      if ((oy === "auto" || oy === "scroll") && el.scrollHeight > el.clientHeight) { el.scrollTo({ top: 0, behavior: "smooth" }); }
+      el = el.parentElement;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  return (
+    <button ref={ref} onClick={go}
+      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", marginTop: 16, background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 20px", color: T.blue, fontWeight: 700, fontSize: 12, cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+      {label}
+    </button>
+  );
+}
+
 function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, activeSubArea, availablePrograms, glowNode, popNode, beamNode, orbitTx, assembled, tapLogo, tapCounty, tapProgram, tapSubArea, goBack, isDesktop }: LayoutProps) {
   return (
     <div style={{ background: T.ghost, minHeight: "100svh", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
 
-      {/* RESTORED: Blue utility bar */}
-      <div style={{ background: T.blue, padding: "9px 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <a href="tel:+18005245552" style={{ color: "white", fontWeight: 700, fontSize: 13, textDecoration: "none", letterSpacing: "0.03em" }}>
-          📞 Ride the River: 1-800-524-5552
-        </a>
-      </div>
-
-      {/* Mobile header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 40, background: "white", borderBottom: `1px solid ${T.border}`, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {stage !== "entry" && (
-            <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: T.blue, fontSize: 18, marginRight: 4, padding: 0 }} aria-label="Back">←</button>
-          )}
-          {/* CADC logo circle */}
-          <div style={{ width: 38, height: 38, borderRadius: "50%", border: `2px solid ${T.blue}`, display: "flex", alignItems: "center", justifyContent: "center", background: "white" }}>
-            <span style={{ color: T.blue, fontWeight: 900, fontSize: 10, letterSpacing: "0.05em" }}>CADC</span>
-          </div>
-          {stage === "map" && <span style={{ color: T.textMuted, fontSize: 12 }}>/ Select County</span>}
-          {activeCountyName && stage !== "entry" && stage !== "map" && <span style={{ color: T.maroon, fontSize: 12, fontWeight: 700 }}>/ {activeCountyName}</span>}
-          {stage === "program" && activeProgram && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeProgram.shortName}</span>}
-          {stage === "content" && activeSubArea && <span style={{ color: T.textMuted, fontSize: 12 }}>/ {activeSubArea.shortLabel}</span>}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <a href="/about" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>About</a>
-          <a href="/contact" style={{ color: T.blue, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Contact</a>
-          <a href="tel:+15803355588" style={{ background: T.maroon, color: "white", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>📞 Call</a>
-        </div>
+      <CADCHeader
+        crumbs={
+          stage === "entry" ? undefined
+          : stage === "map" ? ["Select County"]
+          : [activeCountyName ? `${activeCountyName} County` : "All Counties",
+             ...(activeProgram ? [activeProgram.shortName] : []),
+             ...(activeSubArea ? [activeSubArea.shortLabel] : [])]
+        }
+        onBack={stage !== "entry" ? goBack : undefined}
+      />
+      {/* Ride the River quick line */}
+      <div style={{ background: T.blueLight, padding: "7px 20px", textAlign: "center" }}>
+        <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🚌 Ride the River: (580) 335-2691</a>
       </div>
 
       {/* ENTRY — Large tappable logo, centered */}
@@ -2912,17 +5817,34 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}
           >
             <div style={{
-              width: 200, height: 200, borderRadius: "50%", background: "white",
+              width: 220, height: 220, borderRadius: "50%", background: "white",
               border: `4px solid ${T.blue}`,
               boxShadow: `0 0 0 10px rgba(1,1,255,0.06), 0 8px 40px rgba(1,1,255,0.15)`,
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: 20,
             }}>
-              <span style={{ color: T.blue, fontWeight: 900, fontSize: 40, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.02em" }}>CADC</span>
-              <div style={{ width: 44, height: 3, background: T.maroon, borderRadius: 2 }} />
-              <span style={{ color: "#555", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", lineHeight: 1.4 }}>Community Action<br />Development Corp.</span>
+              <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
             <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
+
+          {/* CADC Now */}
+          <div style={{ marginTop: 24, width: "100%", maxWidth: 360 }}>
+            <CADCNow />
+          </div>
+
+          {/* Universal screener CTA */}
+          <div style={{ marginTop: 16, width: "100%", maxWidth: 360 }}>
+            <div style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+              <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 Not sure where to start?</p>
+              <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+              <a
+                href="/?program=board&area=service-screener"
+                style={{ display: "block", width: "100%", background: T.maroon, color: "white", border: "none", borderRadius: 9, padding: "12px 16px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit", textDecoration: "none", textAlign: "center" as const, boxSizing: "border-box" as const }}>
+                Find My Benefits →
+              </a>
+            </div>
+          </div>
         </div>
       )}
 
@@ -2933,7 +5855,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <p style={{ color: T.maroon, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 6px" }}>Select Your County</p>
             <h2 style={{ color: T.blue, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>Where do you need help?</h2>
           </div>
-          <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, overflow: "hidden", padding: 12 }}>
+          <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, overflow: "hidden", padding: 8 }}>
             <OklahomaCountyMap selectedCounty={null} onSelectCounty={tapCounty} dark={false} />
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16, justifyContent: "center" }}>
@@ -2979,17 +5901,24 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
             <div style={{ background: T.blue, padding: "14px 20px" }}>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
-              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
-                {activeProgram.icon} {activeProgram.name}
+              <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif", display:"flex", alignItems:"center", gap: 10 }}>
+                {PROGRAM_ICONS[activeProgram.slug]
+                  ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:36,height:36,objectFit:"contain",flexShrink:0}} />
+                  : <span>{activeProgram.icon}</span>}
+                {activeProgram.name}
               </h2>
             </div>
-            <div style={{ padding: 20 }} className="cadc-light-content">
+            <div style={{ padding: "16px 20px 0" }}>
+              <ProgramCTABar slug={activeProgram.slug} onSelectArea={(areaId) => {
+                const area = activeProgram.subAreas.find(a => a.id === areaId);
+                if (area) tapSubArea(area);
+              }} />
+            </div>
+            <div style={{ padding: "0 20px 20px" }} className="cadc-light-content">
               {activeProgram.subAreas[0]?.content}
             </div>
-            <div style={{ padding: "0 20px 16px" }}>
-              <p style={{ color: T.textMuted, fontSize: 11, fontStyle: "italic", margin: 0 }}>Tap any node above to explore more.</p>
-            </div>
           </div>
+          <BackToTop />
         </div>
       )}
 
@@ -3003,9 +5932,11 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               </h3>
             </div>
             <div style={{ padding: 20 }} className="cadc-light-content">
+              {activeProgram && <SubAreaPhotoCarousel programSlug={activeProgram.slug} />}
               {activeSubArea.content}
             </div>
           </div>
+          <BackToTop />
         </div>
       )}
 
@@ -3015,8 +5946,12 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {availablePrograms.map(p => (
               <button key={p.slug} onClick={() => tapProgram(p)}
+                aria-label={`Explore ${p.name}`}
                 style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 12, padding: 16, textAlign: "left", cursor: "pointer" }}>
-                <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>
+                {PROGRAM_ICONS[p.slug]
+                  ? <img src={PROGRAM_ICONS[p.slug]} alt={p.shortName}
+                      style={{ width: 44, height: 44, objectFit: "contain", display: "block", marginBottom: 6 }} />
+                  : <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>}
                 <span style={{ color: T.blue, fontWeight: 700, fontSize: 12, display: "block" }}>{p.shortName}</span>
                 <span style={{ color: T.textMuted, fontSize: 10 }}>{p.tagline}</span>
               </button>
@@ -3025,6 +5960,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
         </div>
       )}
 
+      <CADCFooter />
       <MobileStyles />
     </div>
   );
@@ -3036,7 +5972,23 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
   assembled: boolean; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   const subAreas = activeProgram?.subAreas ?? [];
-  const items = (stage === "program" || stage === "content") ? subAreas : availablePrograms;
+  const { features: _gateFeats3 } = useCms();
+  const _subAreaGates3: Record<string, string> = {
+    "hs-pre-enroll":      "formHeadStartPreEnroll",
+    "weath-interest":     "formWeatherizationInterest",
+    "vita-appointment":   "formVitaAppointment",
+    "volunteer-form":     "formVolunteerInterest",
+    "community-survey":   "formCommunityNeeds",
+    "service-screener":   "formServiceScreener",
+    "board-docs":         "boardPortal",
+    "volunteer-log":      "volunteerLog",
+    "volunteer-hub":      "volunteerLog",
+  };
+  const _filteredSubs3 = subAreas.filter((a: SubArea) => {
+    const gate = _subAreaGates3[a.id]; if (!gate) return true;
+    return !!(_gateFeats3 as Record<string,boolean>)?.[gate];
+  });
+  const items = (stage === "program" || stage === "content") ? _filteredSubs3 : availablePrograms;
   const RADIUS = 38;
 
   return (
@@ -3070,10 +6022,15 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         boxShadow: `0 0 0 5px rgba(1,1,255,0.08), 0 4px 20px rgba(1,1,255,0.18)`,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
       }}>
-        <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{(stage === "program" || stage === "content") ? activeProgram?.icon : "🏛️"}</span>
-        <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>
-          {(stage === "program" || stage === "content") ? activeProgram?.shortName : "CADC"}
-        </span>
+        {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
+          ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+              style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
+          : (stage === "program" || stage === "content")
+              ? <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{activeProgram?.icon}</span>
+              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "88%", height: "auto", objectFit: "contain", display: "block" }} />}
+        {!(stage === "program" || stage === "content") && (
+          <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>CADC</span>
+        )}
       </div>
 
       {/* Nodes */}
@@ -3129,18 +6086,23 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               }} />
             )}
             <div style={{
-              width: "clamp(34px,10vw,48px)", aspectRatio: "1/1",
+              width: "clamp(44px,12vw,58px)", height: "clamp(44px,12vw,58px)",
               borderRadius: "50%",
               background: isPopped ? "#E4E4FF" : "white",
               border: `${isPopped ? 3 : 2}px solid ${T.blue}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "clamp(0.85rem,4vw,1.1rem)",
+              overflow: "hidden",
+              flexShrink: 0,
               boxShadow: isPopped
                 ? `0 0 18px rgba(1,1,255,0.4), 0 4px 14px rgba(1,1,255,0.2)`
                 : "0 2px 10px rgba(1,1,255,0.14)",
               transition: "box-shadow 0.2s ease, background 0.15s ease",
             }}>
-              {icon}
+              {!isSubLevel && PROGRAM_ICONS[prog.slug]
+                ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
+                    style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
+                : icon}
             </div>
             <span style={{
               color: isPopped ? T.blue : T.blue,
@@ -3165,6 +6127,11 @@ function DesktopStyles() {
   return (
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
+
+      @keyframes surveyPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(204,0,0,0.4); }
+        50%       { box-shadow: 0 0 0 6px rgba(204,0,0,0); }
+      }
 
       /* ── Logo entry — spring-inspired float with glow bloom ── */
       @keyframes logoFloat {
@@ -3233,6 +6200,30 @@ function DesktopStyles() {
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
 
+      /* ── ADA / WCAG 2.1 AAA Focus Styles ── */
+      *:focus-visible {
+        outline: 3px solid #0101FF !important;
+        outline-offset: 3px !important;
+        border-radius: 4px;
+      }
+      button:focus-visible, a:focus-visible {
+        outline: 3px solid #0101FF !important;
+        outline-offset: 3px !important;
+      }
+      /* High contrast mode support */
+      @media (forced-colors: active) {
+        .node-disc { border: 2px solid ButtonText !important; }
+        button { border: 1px solid ButtonText; }
+      }
+      /* Reduced motion — disable all animations */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
       /* ── Node hover glow ── */
       .node-disc {
         transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.15s ease;
@@ -3279,8 +6270,9 @@ function DesktopStyles() {
       .cadc-light-content .cadc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
       .cadc-light-content .cadc-chip { background: #E4E4FF; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #0101FF; font-weight: 600; text-align: center; line-height: 1.3; }
       .cadc-light-content .cadc-stack { display: flex; flex-direction: column; gap: 8px; }
-      .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: #cc0000; color: white; padding: 13px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; letter-spacing: 0.04em; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+      .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: #cc0000; color: white; padding: 13px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; letter-spacing: 0.04em; transition: transform 0.15s ease, box-shadow 0.15s ease; border: none; cursor: pointer; font-family: inherit; }
       .cadc-light-content .cadc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(204,0,0,0.3); }
+      .cadc-light-content .cadc-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
       .cadc-light-content .cadc-link { color: #0101FF; font-weight: 700; font-size: 14px; text-decoration: none; }
       .cadc-light-content .cadc-note { color: #9ca3af; font-size: 11px; font-style: italic; margin: 8px 0 0; }
       .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 14px 0; }
@@ -3289,6 +6281,32 @@ function DesktopStyles() {
       .cadc-light-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 9px 14px; border-top: 1px solid #e5e7eb; }
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 13px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; gap: 4px; }
+      .cadc-input { width: 100%; font-size: 14px; padding: 10px 14px; border: 1.5px solid #E5E7EB; border-radius: 8px; box-sizing: border-box; font-family: inherit; color: #111827; background: #FAFAFA; outline: none; transition: all 0.15s ease; }
+      .cadc-input:focus { border-color: #0101FF; background: white; box-shadow: 0 0 0 3px rgba(1,1,255,0.08); }
+      select.cadc-input { appearance: auto; cursor: pointer; }
+      textarea.cadc-input { resize: vertical; }
+      /* ── Form layout helpers ── */
+      .form-card { background: white; border: 1px solid #E5E7EB; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+      .form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+      .form-field:last-of-type { margin-bottom: 0; }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+      .form-label { font-size: 12px; font-weight: 700; color: #374151; letter-spacing: 0.01em; }
+      .form-required { color: #CC0000; margin-left: 2px; }
+      .form-submit { width: 100%; background: #CC0000; color: white; border: none; border-radius: 10px; padding: 14px 20px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 18px; transition: background 0.15s ease, transform 0.1s ease; letter-spacing: 0.02em; }
+      .form-submit:hover { background: #AA0000; transform: translateY(-1px); }
+      .form-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+      .form-note { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 10px; line-height: 1.5; }
+      .form-success { background: #F0FFF4; border: 1.5px solid #059669; border-radius: 12px; padding: 24px; text-align: center; }
+      .form-success-icon { font-size: 36px; margin-bottom: 10px; }
+      .form-success-title { font-weight: 800; color: #059669; font-size: 16px; margin-bottom: 6px; }
+      .form-success-msg { font-size: 13px; color: #374151; line-height: 1.6; }
+      .form-error { font-size: 12px; color: #CC0000; font-weight: 700; margin-bottom: 12px; padding: 10px 14px; background: #FFF0F0; border-radius: 8px; border: 1px solid #FCA5A5; }
+      .form-priority-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+      .form-priority-btn { flex: 1; padding: 9px 8px; border-radius: 8px; border: 1.5px solid #E5E7EB; background: white; font-weight: 700; font-size: 12px; cursor: pointer; color: #374151; transition: all 0.15s ease; text-align: center; min-width: 80px; font-family: inherit; }
+      .form-priority-btn.active { border-color: #0101FF; background: #E4E4FF; color: #0101FF; }
+      .form-star-btns { display: flex; gap: 6px; }
+      .form-star-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1.5px solid #E5E7EB; background: white; font-weight: 800; font-size: 13px; cursor: pointer; color: #374151; transition: all 0.15s ease; text-align: center; font-family: inherit; }
+      .form-star-btn.active { border-color: #0101FF; background: #E4E4FF; color: #0101FF; }
     `}</style>
   );
 }
@@ -3325,6 +6343,22 @@ function MobileStyles() {
         100% { transform: scale(1); }
       }
 
+      *:focus-visible {
+        outline: 3px solid #0101FF !important;
+        outline-offset: 3px !important;
+        border-radius: 4px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      @media (forced-colors: active) {
+        .node-disc { border: 2px solid ButtonText !important; }
+      }
+
       .node-disc { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
 
       .cadc-light-content p { color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 12px; }
@@ -3349,5 +6383,18 @@ function MobileStyles() {
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 12px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; }
     `}</style>
+  );
+}
+
+// ─── Suspense wrapper — required by Next.js for useSearchParams() ─────────────
+export default function CADCOrbitSite() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F9FF" }}>
+        <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
+      </div>
+    }>
+      <LangProvider><CmsProvider><CADCOrbitSiteInner /></CmsProvider></LangProvider>
+    </Suspense>
   );
 }
