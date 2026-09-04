@@ -843,6 +843,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
     "community-survey":   "formCommunityNeeds",
     "service-screener":   "formServiceScreener",
     "board-docs":         "boardPortal",
+    "volunteer-log":      "volunteerLog",
   };
   const _filteredSubs = (activeProgram?.subAreas ?? []).filter(a => {
     const gate = _subAreaGates[a.id]; if (!gate) return true;
@@ -1835,7 +1836,7 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
     if (!form.name.trim()) { setState("err"); return; }
     if (!form.phone.trim() && !form.email.trim()) { setState("err"); return; }
     setState("sending");
-    await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, program, step }) }).catch(() => {});
+    await fetch("/api/cms/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, program, step, _gotcha: "" }) }).catch(() => {});
     setState("done");
   }
   return (
@@ -1977,7 +1978,7 @@ async function submitLead(payload: Record<string, string>, program: string, step
   return fetch("/api/cms/leads", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...payload, program, step }),
+    body: JSON.stringify({ ...payload, program, step, _gotcha: "" }),
   }).catch(() => null);
 }
 
@@ -2598,6 +2599,112 @@ function TransitFareCalculator() {
   );
 }
 
+// ─── Public Volunteer Hour Log Form ──────────────────────────────────────────
+function PublicVolunteerLogForm() {
+  const { features } = useCms();
+  const [form, setForm] = useState({
+    volunteerName: "", supervisorName: "", center: "",
+    date: new Date().toISOString().slice(0,10),
+    hours: "", type: "volunteer", description: "",
+  });
+  const [state, setState] = useState<"idle"|"sending"|"done"|"err">("idle");
+  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  if (!features?.volunteerLog) return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0F0FF", border: `1.5px solid ${T.blue}`, borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
+        <p style={{ fontSize: 28, margin: "0 0 10px" }}>🤝</p>
+        <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 6px" }}>Want to log your volunteer hours?</p>
+        <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 16px", lineHeight: 1.6 }}>Online hour logging is coming soon. For now, please submit your hours directly to your center supervisor.</p>
+        <a href="tel:+15807263343" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "12px 20px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>📞 Call Robin — 580-726-3343</a>
+      </div>
+    </div>
+  );
+
+  if (state === "done") return (
+    <div className="cadc-light-content">
+      <div style={{ background: "#F0FFF4", border: "1.5px solid #059669", borderRadius: 14, padding: "28px 20px", textAlign: "center" as const }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+        <div style={{ fontWeight: 800, color: "#059669", fontSize: 17, marginBottom: 8 }}>Hours logged!</div>
+        <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          Thank you for contributing to Head Start. Your {form.hours} hour{parseFloat(form.hours) !== 1 ? "s" : ""} have been recorded and will count toward CADC's federal in-kind match.
+        </div>
+        <button onClick={() => { setForm(p => ({ ...p, volunteerName: p.volunteerName, supervisorName: p.supervisorName, center: p.center, date: new Date().toISOString().slice(0,10), hours: "", description: "" })); setState("idle"); }}
+          style={{ marginTop: 16, background: "white", color: T.blue, border: `1.5px solid ${T.blue}`, borderRadius: 10, padding: "10px 20px", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>
+          Log More Hours
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cadc-light-content">
+      <p style={{ marginBottom: 8 }}>Log your volunteer or in-kind hours for Head Start. Every hour you contribute counts toward CADC's federal match requirement and helps keep the program free for families.</p>
+      <div style={{ background: "#FFF8E7", border: "1px solid #FDE68A", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: "#92400E" }}>
+        💡 Not sure what to log? Any time spent at a center, donating supplies, or supporting Head Start activities counts. When in doubt, log it.
+      </div>
+      {state === "err" && <div style={{ fontSize: 13, color: "#CC0000", fontWeight: 700, marginBottom: 14, padding: "12px 16px", background: "#FFF0F0", borderRadius: 10, border: "1px solid #FCA5A5" }}>Please fill in your name, supervisor, center, and hours.</div>}
+      <div style={{ background: "white", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "22px 18px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your name <span style={{ color: "#CC0000" }}>*</span></label>
+          <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.volunteerName} onChange={f("volunteerName")} placeholder="First and last name" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Center supervisor <span style={{ color: "#CC0000" }}>*</span></label>
+          <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.supervisorName} onChange={f("supervisorName")} placeholder="Name of your center supervisor" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Center <span style={{ color: "#CC0000" }}>*</span></label>
+          <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.center} onChange={f("center")}>
+            <option value="">Select your center</option>
+            {["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Date <span style={{ color: "#CC0000" }}>*</span></label>
+            <input type="date" style={{ width: "100%", fontSize: 14, padding: "12px 10px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.date} onChange={f("date")} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Hours <span style={{ color: "#CC0000" }}>*</span></label>
+            <input type="number" min="0.5" max="24" step="0.5" style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.hours} onChange={f("hours")} placeholder="e.g. 2.5" />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Type of contribution</label>
+          <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.type} onChange={f("type")}>
+            <option value="volunteer">Volunteer time (in-person at center)</option>
+            <option value="in-kind-services">In-kind services (professional skills donated)</option>
+            <option value="in-kind-space">In-kind space (facility or space donated)</option>
+            <option value="public-school-collab">Public school collaboration</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 20 }}>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>What did you do? <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional but helpful)</span></label>
+          <textarea style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block", minHeight: 80, resize: "vertical" as const }} value={form.description} onChange={f("description")} placeholder="e.g. Helped with lunch service and read to the class" />
+        </div>
+        <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }}
+          disabled={state === "sending"}
+          onClick={async () => {
+            if (!form.volunteerName || !form.supervisorName || !form.center || !form.hours) { setState("err"); return; }
+            setState("sending");
+            const r = await fetch("/api/cms/volunteer", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...form, hours: parseFloat(form.hours), program: "head-start", source: "public" }),
+            }).catch(() => null);
+            setState(r?.ok ? "done" : "err");
+          }}>
+          {state === "sending" ? "Logging…" : "Submit My Hours →"}
+        </button>
+        <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5 }}>
+          Hours are reviewed by Robin Harris and count toward CADC's Head Start federal in-kind match requirement.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 const PROGRAMS: ProgramData[] = [
 
   // ── 1. HEAD START ──────────────────────────────────────────────────────────
@@ -2609,48 +2716,6 @@ const PROGRAMS: ProgramData[] = [
     color: T.blue,
     tagline: "Free early childhood education across 11 centers",
     subAreas: [
-      {
-        id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
-        content: (
-          <div className="cadc-light-content">
-            <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
-            <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Provided at no cost while children are in care</p>
-              <ul className="cadc-list">
-                {["Formula for infants","Diapers","Wipes","Nutritious meals and snacks","Developmental screenings and individualized support"].map(i=><li key={i}>{i}</li>)}
-              </ul>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "hs", label: "Head Start Preschool", shortLabel: "Preschool", icon: "📖",
-        content: (
-          <div className="cadc-light-content">
-            <p>Head Start serves children ages 3–5 with full-day, full-year preschool at no cost to income-eligible families. Every child receives education, health, nutrition, and family support — all in one place.</p>
-            <div className="cadc-grid-2">
-              {["Full-day preschool at no cost","Health screenings","Nutritious meals daily","Family engagement","School readiness goals","Individualized learning plans"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "apply", label: "How to Apply", shortLabel: "Apply", icon: "📝",
-        content: (
-          <div className="cadc-light-content">
-            <p>Enrollment is open year-round. Applications are reviewed on a rolling basis — spaces fill quickly. Apply as early as possible.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">What you'll need</p>
-              <ul className="cadc-list">
-                {["Birth certificate or other proof of birth","Proof of residency (utility bill or address document)","Proof of SNAP, SSI, or TANF benefits (if applicable)","SoonerCare or private insurance information","Proof of income if you do not receive SNAP benefits","Immunization record","Proof of disability or special services (Speech, PT, OT)","Foster care document (if applicable)"].map(i=><li key={i}>{i}</li>)}
-              </ul>
-            </div>
-            <p className="cadc-note">This program is provided at no cost to the parent or guardian.</p>
-            <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Start Application (ChildPlus) →</a>
-          </div>
-        ),
-      },
       {
         id: "enrollment", label: "Who Qualifies", shortLabel: "Qualifies", icon: "✅",
         content: (
@@ -2671,41 +2736,36 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "hs-pre-enroll", label: "Express Interest", shortLabel: "Interest", icon: "✋",
-        content: <HeadStartPreEnrollForm />,
-      },
-      {
-        id: "ehs-education", label: "EHS Education", shortLabel: "EHS Ed", icon: "🧸",
+        id: "apply", label: "How to Apply", shortLabel: "Apply", icon: "📝",
         content: (
           <div className="cadc-light-content">
-            <p>Our Early Head Start education approach supports infants and toddlers across all developmental domains using evidence-based tools and individualized instruction.</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Brigance Developmental Screening",d:"Every child is screened within the first 45 days using the Brigance Early Childhood Screener — a standardized tool identifying strengths and areas for support across all developmental domains. Aligned with 45 CFR §1302.33."},
-                {t:"Individualized Goals",d:"Lesson plans and learning goals are created for each child based on Brigance results, DRDP assessment data, daily observations, and family input. No two children receive the same plan. Standards §1302.33 and §1302.32."},
-                {t:"Frog Street Infant/Toddler Curriculum",d:"A nationally recognized, credential-based curriculum supporting language & early literacy, cognitive development, social-emotional skills, approaches to learning, and physical development. Standards §1302.33 and §1302.32."},
-                {t:"DRDP Assessment",d:"A strength-based assessment tool measuring what children can do — not comparing against age norms. Completed three times per year (Fall, Winter, Spring). Staff document approximately 15% of each child's measures weekly through observations. Standards §1302.33 and §1302.32."},
-                {t:"Conscious Discipline — Baby Doll Circle Time",d:"A Conscious Discipline strategy using baby dolls to model nurturing interactions, build attachment, and teach self-regulation. Children develop empathy, connection, and emotional awareness through consistent rituals and predictable routines. Standard 45 CFR §1302.32 and §1302.33."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            <p>Enrollment is open year-round. Applications are reviewed on a rolling basis — spaces fill quickly. Apply as early as possible.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">What you'll need</p>
+              <ul className="cadc-list">
+                {["Birth certificate or other proof of birth","Proof of residency (utility bill or address document)","Proof of SNAP, SSI, or TANF benefits (if applicable)","SoonerCare or private insurance information","Proof of income if you do not receive SNAP benefits","Immunization record","Proof of disability or special services (Speech, PT, OT)","Foster care document (if applicable)"].map(i=><li key={i}>{i}</li>)}
+              </ul>
             </div>
+            <p className="cadc-note">This program is provided at no cost to the parent or guardian.</p>
+            <a href="https://www.childplus.net/apply/en-us/A64D6EA2F03A47EEF3D75C9197CE5727/1E6D5387820CDA26B0DE2EDC09C58447" target="_blank" rel="noopener noreferrer" className="cadc-btn">Start Application (ChildPlus) →</a>
           </div>
         ),
       },
       {
-        id: "hs-education", label: "HS Education", shortLabel: "HS Ed", icon: "📚",
+        id: "hs-pre-enroll", label: "Express Interest", shortLabel: "Interest", icon: "✋",
+        content: <HeadStartPreEnrollForm />,
+      },
+      {
+        id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
         content: (
           <div className="cadc-light-content">
-            <p>Our Head Start Preschool education program supports 3 and 4-year-old children across all developmental domains through evidence-based curriculum, individualized instruction, and rigorous assessment.</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Brigance Developmental Screening",d:"Every child is screened within the first 45 days using the Brigance Early Childhood Screener — identifying strengths and areas for support early. Aligned with 45 CFR §1302.33."},
-                {t:"Individualized Goals",d:"Lesson plans are built from Brigance results, DRDP data, daily observations, and family input — ensuring instruction is never one-size-fits-all. Standards §1302.33 and §1302.32."},
-                {t:"Frog Street Curriculum",d:"A nationally recognized, credential-based curriculum aligned to Oklahoma Early Learning Guidelines, Head Start ELOF, and DRDP developmental domains. Covers language, literacy, math, social-emotional development, and approaches to learning. Standards §1302.33 and §1302.32."},
-                {t:"DRDP Assessment",d:"Strength-based assessment completed three times per year — Fall, Winter, and Spring. Staff document approximately 15% of each child's measures weekly using observations from routines, play, and group activities. Standards §1302.33 and §1302.32."},
-                {t:"School Readiness Goals",d:"Goals aligned with ELOF, DRDP, and Frog Street — covering social-emotional skills, early literacy and language, early math and science, cognitive flexibility, physical development, and approaches to learning. Required under 45 CFR §1302.102."},
-                {t:"Conscious Discipline",d:"A nationally recognized, evidence-based social-emotional learning framework. Builds safety, connection, and problem-solving skills in the classroom. Reduces challenging behaviors, strengthens teacher confidence, and supports long-term school readiness. Standards §1302.32, §1302.33, §1302.102."},
-                {t:"CLASS — Classroom Assessment Scoring System",d:"A nationally recognized observation tool measuring the quality of teacher-child interactions across three domains: Emotional Support, Classroom Organization, and Instructional Support. CLASS data guides professional development and aligns practices with Head Start ELOF. Standard §1302.33."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
+            <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Provided at no cost while children are in care</p>
+              <ul className="cadc-list">
+                {["Formula for infants","Diapers","Wipes","Nutritious meals and snacks","Developmental screenings and individualized support"].map(i=><li key={i}>{i}</li>)}
+              </ul>
             </div>
           </div>
         ),
@@ -2766,6 +2826,10 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
+        id: "volunteer-log", label: "Log My Hours", shortLabel: "Log Hours", icon: "⏱️",
+        content: <PublicVolunteerLogForm />,
+      },
+      {
         id: "safety", label: "Safety & Training", shortLabel: "Safety", icon: "🛡️",
         content: (
           <div className="cadc-light-content">
@@ -2783,7 +2847,8 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "faq", label: "FAQs", shortLabel: "FAQ", icon: "❓",
         content: <HeadStartFAQ />,
-      },
+      }
+    
     ],
   },
 
@@ -4357,6 +4422,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
     "community-survey":   "formCommunityNeeds",
     "service-screener":   "formServiceScreener",
     "board-docs":         "boardPortal",
+    "volunteer-log":      "volunteerLog",
   };
   const _filteredSubs2 = subAreas.filter((a: SubArea) => {
     const gate = _subAreaGates2[a.id]; if (!gate) return true;
@@ -4458,6 +4524,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
           <button
             key={id}
             onClick={() => (stage === "program" || stage === "content") ? tapSubArea(sub) : tapProgram(prog)}
+            aria-label={(stage === "program" || stage === "content") ? `Go to ${(sub as SubArea).label}` : `Explore ${prog.name}`}
             aria-label={(stage === "program" || stage === "content") ? sub.label : prog.name}
             style={{
               position: "absolute",
@@ -4555,13 +4622,14 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[["9","Programs"],["11","Head Start Centers"],["110","Transit Vehicles"],["6","Senior Meal Sites"],["17","Advantage Counties"],["1966","Est."]].map(([n,l])=>(
+          {[["9","Programs","*"],["11","Head Start Centers","†"],["110","Transit Vehicles","†"],["6","Senior Meal Sites","†"],["17","Advantage Counties","†"],["1966","Est.",""]].map(([n,l,src])=>(
             <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
               <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
               <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
             </div>
           ))}
         </div>
+        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: "8px 0 0", lineHeight: 1.6 }}>* CADC internal program count · † Source: CADC FY2025 Annual Report</p>
         {/* Find My Benefits screener CTA */}
         <div style={{ marginTop: 20, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
           <span style={{ fontSize: 32, flexShrink: 0 }}>🔍</span>
@@ -4797,8 +4865,13 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
         </div>
 
         <a href="/" style={{ ...linkStyle, background: T.blue, color: "white", border: "none", marginTop: 12 }}>🏠 Home</a>
-        <a href="/about" style={linkStyle}>🏢 About CADC</a>
-        <a href="/contact" style={linkStyle}>📞 Contact &amp; Locations</a>
+
+        {sectionLabel("Get Help")}
+        <a href="/?program=board&area=service-screener" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>🔍 Find My Benefits</a>
+        <a href="tel:+15803355588" style={linkStyle}>📞 Call CADC — 580-335-5588</a>
+        <a href="/contact" style={linkStyle}>📍 Find a Location</a>
+        <a href="/?program=transit&area=rides" style={linkStyle}>🚌 Schedule a Ride</a>
+        <a href="/?program=head-start&area=apply" style={linkStyle}>📝 Apply for Head Start</a>
 
         {sectionLabel("Programs & Services")}
         {PROGRAMS.map(p => (
@@ -4836,14 +4909,12 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
           ))}
         </div>
 
-        {sectionLabel("Public Documents")}
+        {sectionLabel("About & Transparency")}
+        <a href="/about" style={linkStyle}>🏢 About CADC</a>
+        <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 Community Needs Survey</a>
         {documents.map(d => (
           <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
         ))}
-
-        {sectionLabel("Get Involved")}
-        <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>📋 2026 Community Needs Survey</a>
-        <a href="tel:+15803355588" style={linkStyle}>☎️ Call CADC — 580-335-5588</a>
       </div>
     </div>
   );
@@ -4948,7 +5019,12 @@ export function CADCFooter() {
         <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
           <div>
             <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 48, width: "auto", marginBottom: 12, filter: "brightness(0) invert(1)" }} />
-            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>Helping People. Changing Lives.<br />Serving Southwest Oklahoma since 1966.</p>
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: "0 0 16px" }}>Helping People. Changing Lives.<br />Serving Southwest Oklahoma since 1966.</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px" }}>Get Help</p>
+            <a href="/?program=board&area=service-screener" style={{ display: "block", color: "rgba(255,255,255,0.8)", fontSize: 13, textDecoration: "none", marginBottom: 7, fontWeight: 700 }}>🔍 Find My Benefits</a>
+            <a href="tel:+15803355588" style={{ display: "block", color: "white", fontWeight: 800, fontSize: 15, textDecoration: "none", marginBottom: 7 }}>📞 580-335-5588</a>
+            <a href="/contact" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>📍 Find a Location</a>
+            <a href="/?program=transit&area=rides" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>🚌 Schedule a Ride</a>
           </div>
           <div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Programs</p>
@@ -4957,17 +5033,19 @@ export function CADCFooter() {
             ))}
           </div>
           <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact & Location</p>
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8, margin: "0 0 10px" }}>105 S. Main Street · P.O. Box 989<br />Frederick, OK 73542</p>
-            <a href="tel:+15803355588" style={{ color: "white", fontWeight: 800, fontSize: 16, textDecoration: "none", display: "block", marginBottom: 8 }}>580-335-5588</a>
             <a href="/contact" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Contact &amp; Locations →</a>
-            <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>About CADC →</a>
+            <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>About CADC →</a>
+            <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Facebook →</a>
+            <a href="https://www.instagram.com/wearecadc" target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>Instagram →</a>
           </div>
           <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Public Documents &amp; Compliance</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
             {documents.map(d => (
               <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
             ))}
+            <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📋 <span>2026 Community Needs Survey</span></a>
           </div>
         </div>
         <div style={{ maxWidth: 960, margin: "28px auto 0", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 18, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
@@ -5169,6 +5247,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {availablePrograms.map(p => (
               <button key={p.slug} onClick={() => tapProgram(p)}
+                aria-label={`Explore ${p.name}`}
                 style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 12, padding: 16, textAlign: "left", cursor: "pointer" }}>
                 {PROGRAM_ICONS[p.slug]
                   ? <img src={PROGRAM_ICONS[p.slug]} alt={p.shortName}
@@ -5203,6 +5282,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
     "community-survey":   "formCommunityNeeds",
     "service-screener":   "formServiceScreener",
     "board-docs":         "boardPortal",
+    "volunteer-log":      "volunteerLog",
   };
   const _filteredSubs3 = subAreas.filter((a: SubArea) => {
     const gate = _subAreaGates3[a.id]; if (!gate) return true;
