@@ -2471,6 +2471,71 @@ function BoardDocsPanel() {
   );
 }
 
+
+// ─── CADC Now Widget ─────────────────────────────────────────────────────────
+function CADCNow() {
+  const cms = useCms();
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...5=Fri, 6=Sat
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+  const todayStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+
+  // Today's senior meal
+  const menu = cms.seniorMenu ?? MENU_DATA;
+  const monthMeals = menu.meals ?? {};
+  const todayDate = now.getDate();
+  const todayMeal = isWeekday ? (monthMeals[todayDate] ?? null) : null;
+
+  // Next community market stop
+  const market = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
+  const allStops = Object.values(market.stops ?? {}).flat() as Array<{location:string;time:string;day?:string}>;
+  const todayStops = allStops.filter(s => {
+    if (!s.day) return false;
+    const d = s.day.toLowerCase();
+    return ["sun","mon","tue","wed","thu","fri","sat"][dayOfWeek] === d.slice(0,3);
+  });
+  const nextStop = todayStops[0] ?? allStops[0] ?? null;
+
+  // Active alert
+  const alert = cms.announcement;
+  const hasAlert = alert?.enabled && alert?.text;
+
+  const items: Array<{icon:string; label:string; value:string; sub?:string; href?:string; color?:string}> = [];
+
+  if (hasAlert) items.push({ icon: "⚠️", label: "Service Alert", value: alert!.text!, href: alert!.href || undefined, color: "#CC0000" });
+  if (todayMeal) items.push({ icon: "🍽️", label: "Today's Senior Meal", value: todayMeal.main || "See menu", sub: todayMeal.sides?.join(" · ") });
+  if (nextStop) items.push({ icon: "🚚", label: "Community Market", value: nextStop.location, sub: nextStop.time });
+  items.push({ icon: "🚌", label: "Red River Transit", value: "Schedule a ride", sub: "(580) 335-2691", href: "tel:+15803352691" });
+  if (!todayMeal && isWeekday) items.push({ icon: "🧒", label: "Head Start", value: "Enrollment open", sub: "Call 580-726-3343", href: "tel:+15807263343" });
+
+  if (items.length === 0) return null;
+
+  return (
+    <div style={{ width: "100%", maxWidth: 360, margin: "0 auto" }}>
+      <div style={{ background: T.blue, borderRadius: 14, overflow: "hidden", boxShadow: "0 4px 20px rgba(1,1,255,0.25)" }}>
+        <div style={{ padding: "10px 16px", background: "rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ADE80", boxShadow: "0 0 6px #4ADE80", animation: "pulse 2s infinite" }} />
+          <span style={{ color: "white", fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>CADC Now · {todayStr}</span>
+        </div>
+        {items.map((item, i) => (
+          <a key={i} href={item.href || undefined}
+            style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "12px 16px",
+              borderTop: i > 0 ? "1px solid rgba(255,255,255,0.1)" : "none",
+              textDecoration: "none", background: "transparent" }}>
+            <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1.3 }}>{item.icon}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 2 }}>{item.label}</div>
+              <div style={{ color: item.color ? "white" : "white", fontSize: 14, fontWeight: 800, lineHeight: 1.3 }}>{item.value}</div>
+              {item.sub && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{item.sub}</div>}
+            </div>
+            {item.href && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 16, flexShrink: 0, marginTop: 4 }}>›</span>}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Transit Fare Calculator ──────────────────────────────────────────────────
 const TRANSIT_ROUTES: { label: string; from: string; to: string; miles: number }[] = [
   { label: "Frederick → Lawton", from: "Frederick", to: "Lawton", miles: 68 },
@@ -3769,6 +3834,64 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
+        id: "adv-apply", label: "How to Apply", shortLabel: "Apply", icon: "📝",
+        content: (
+          <div className="cadc-light-content">
+            <p>Advantage is an Oklahoma Medicaid program. CADC does not enroll members directly — enrollment goes through the Oklahoma Department of Human Services. Here's how to get started:</p>
+            <div className="cadc-card">
+              <p className="cadc-label">Step 1 — Apply for SoonerCare (Medicaid)</p>
+              <p>You must have an active SoonerCare case to be eligible. Apply online or call DHS.</p>
+              <a href="https://okdhslive.org" target="_blank" rel="noopener noreferrer" className="cadc-btn" style={{marginTop:10}}>Apply Online at okdhslive.org →</a>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Step 2 — Request Advantage Waiver Services</p>
+              <p>Tell your SoonerCare case manager you need home-delivered meals. They will conduct a Level of Care assessment and refer you to CADC if eligible.</p>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Step 3 — CADC Contacts You</p>
+              <p>Once approved and referred, CADC's Advantage team will contact you to set up delivery, select your meal plan, and confirm your milk and juice preferences.</p>
+              <a href="tel:+15803355588" className="cadc-btn" style={{marginTop:10}}>📞 Questions? Call CADC — 580-335-5588</a>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Need help navigating the process?</p>
+              <p>Call CADC directly. Our Advantage staff can walk you through the SoonerCare application and what to expect.</p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-wellness", label: "More Than a Meal", shortLabel: "Wellness", icon: "💙",
+        content: (
+          <div className="cadc-light-content">
+            <p>Advantage is not just a food delivery program. Each meal delivery is also a wellness check — a human connection for members who may not see many people during the week.</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Personal service",d:"CADC staff know their members by name. Deliveries are consistent, personal, and designed to feel like a neighbor stopping by — not a box drop."},
+                {t:"Wellness connection",d:"Staff are trained to watch for signs that a member may need additional support — and to connect families with the right resources when something seems off."},
+                {t:"Referrals when needed",d:"If a member needs more than meals — additional Medicaid services, transportation, weatherization, or other CADC programs — our team connects them directly."},
+                {t:"340,830 meals delivered in 2024",d:"CADC's Advantage program delivered 340,830 frozen meals to an average of 736 members per month across 13 counties in the 2024 program year. Source: CADC FY2025 Annual Report."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "adv-support", label: "Support & Donate", shortLabel: "Support", icon: "❤️",
+        content: (
+          <div className="cadc-light-content">
+            <p>Advantage is funded through Oklahoma Medicaid — but community support makes the program stronger. Here's how you can help:</p>
+            <div className="cadc-stack">
+              {[
+                {t:"Donate to CADC",d:"Financial contributions help CADC enhance services beyond what Medicaid covers — extra deliveries, holiday meals, and emergency support for members in crisis."},
+                {t:"Spread the word",d:"Many eligible seniors and adults with disabilities don't know Advantage exists. If you know someone who is homebound and food-insecure, tell them about CADC Advantage."},
+                {t:"Volunteer",d:"CADC welcomes volunteers who can assist with meal packaging, outreach, and administrative support. Contact us to learn how you can get involved."},
+              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
+            </div>
+            <a href="tel:+15803355588" className="cadc-btn" style={{marginTop:16}}>📞 Contact CADC — 580-335-5588</a>
+          </div>
+        ),
+      },
+      {
         id: "adv-offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
         content: (
           <div className="cadc-light-content">
@@ -4839,7 +4962,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[["9","Programs","*"],["11","Head Start Centers","†"],["110","Transit Vehicles","†"],["6","Senior Meal Sites","†"],["17","Advantage Counties","†"],["1966","Est.",""]].map(([n,l,src])=>(
+          {[["9","Programs",""],["11","Head Start Centers","†"],["220,175","Transit Trips/Yr","†"],["6","Senior Meal Sites","†"],["340,830","Advantage Meals/Yr","†"],["1966","Est.",""]].map(([n,l,src])=>(
             <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
               <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
               <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
@@ -4847,8 +4970,11 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           ))}
         </div>
         <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: "8px 0 0", lineHeight: 1.6 }}>* CADC internal program count · † Source: CADC FY2025 Annual Report</p>
+        {/* CADC Now */}
+        <div style={{ marginTop: 20 }}><CADCNow /></div>
+
         {/* Find My Benefits screener CTA */}
-        <div style={{ marginTop: 20, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
+        <div style={{ marginTop: 16, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
           <span style={{ fontSize: 32, flexShrink: 0 }}>🔍</span>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Not sure where to start?</p>
@@ -5351,14 +5477,19 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
 
+          {/* CADC Now */}
+          <div style={{ marginTop: 24, width: "100%", maxWidth: 360 }}>
+            <CADCNow />
+          </div>
+
           {/* Universal screener CTA */}
-          <div style={{ marginTop: 32, width: "100%", maxWidth: 320 }}>
+          <div style={{ marginTop: 16, width: "100%", maxWidth: 360 }}>
             <div style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
               <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 Not sure where to start?</p>
               <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
               <a
                 href="/?program=board&area=service-screener"
-                style={{ display: "block", width: "100%", background: T.maroon, color: "white", border: "none", borderRadius: 9, padding: "12px 16px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit", textDecoration: "none", textAlign: "center", boxSizing: "border-box" }}>
+                style={{ display: "block", width: "100%", background: T.maroon, color: "white", border: "none", borderRadius: 9, padding: "12px 16px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit", textDecoration: "none", textAlign: "center" as const, boxSizing: "border-box" as const }}>
                 Find My Benefits →
               </a>
             </div>
