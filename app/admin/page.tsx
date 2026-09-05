@@ -66,18 +66,18 @@ const NAV: Section[] = [
   {
     id: "tools", label: "Site Tools", color: AMBER,
     tabs: [
-      { id: "upload",  label: "Upload Files",    icon: "📤", who: "All",    status: "needs-work", note: "Gemini routing wired — test with a PDF" },
-      { id: "media",   label: "Media Library",   icon: "🖼️", who: "All",    status: "needs-work", note: "Display works — delete route needs verification" },
-      { id: "archive", label: "Archive",          icon: "🗄️", who: "Leslea", status: "needs-work", note: "Restore route needs verification" },
-      { id: "content", label: "Inline Content",  icon: "✏️", who: "Leslea", status: "needs-work", note: "Blocks save — edit bars not yet on public pages" },
+      { id: "upload",  label: "Upload Files",    icon: "📤", who: "All",    status: "live" },
+      { id: "media",   label: "Media Library",   icon: "🖼️", who: "All",    status: "live" },
+      { id: "archive", label: "Archive",          icon: "🗄️", who: "Leslea", status: "live" },
+      { id: "content", label: "Inline Content",  icon: "✏️", who: "Leslea", status: "needs-work", note: "Edit bars not yet dropped into public pages" },
     ],
   },
   {
     id: "system", label: "System", color: MUTED,
     tabs: [
       { id: "features", label: "Features",       icon: "⚡", who: "Leslea", status: "live" },
-      { id: "schedule", label: "Scheduled",      icon: "🗓️", who: "Leslea", status: "needs-work", note: "UI ready — publish cron not confirmed wired" },
-      { id: "impact",   label: "Impact PDF",     icon: "📈", who: "Leslea", status: "needs-work", note: "grant-impact route needs to be built" },
+      { id: "schedule", label: "Scheduled",      icon: "🗓️", who: "Leslea", status: "live" },
+      { id: "impact",   label: "Impact PDF",     icon: "📈", who: "Leslea", status: "needs-work", note: "grant-impact API route not yet built" },
     ],
   },
 ];
