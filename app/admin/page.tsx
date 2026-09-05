@@ -77,7 +77,7 @@ const NAV: Section[] = [
     tabs: [
       { id: "features", label: "Features",       icon: "⚡", who: "Leslea", status: "live" },
       { id: "schedule", label: "Scheduled",      icon: "🗓️", who: "Leslea", status: "live" },
-      { id: "impact",   label: "Impact PDF",     icon: "📈", who: "Leslea", status: "needs-work", note: "grant-impact API route not yet built" },
+      { id: "impact",   label: "Impact PDF",     icon: "📈", who: "Leslea", status: "live" },
     ],
   },
 ];
