@@ -14,9 +14,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  DEFAULT_CONTENT,
+  DEFAULT_CONTENT, DEFAULT_SITE_TEXT, DEFAULT_PROGRAM_TAGLINES,
   fetchLeads, fetchStats, fetchVolunteer, fetchBookings,
-  type SiteContent, type SiteFeatures, type BoardDoc, type ScheduledItem, type Meal, type MarketStop, type StaffMember,
+  type SiteContent, type SiteFeatures, type SiteText, type BoardDoc, type ScheduledItem, type Meal, type MarketStop, type StaffMember,
   type PublicDoc, type IntakeLead, type SiteStats, type VolunteerEntry,
   type TransitBooking, fetchSchedule,
   fetchMedia, fetchArchive, fetchContentBlocks,
@@ -32,7 +32,7 @@ const input: React.CSSProperties = { width: "100%", fontSize: 16, padding: "12px
 const lbl: React.CSSProperties = { color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", display: "block" };
 const btn = (bg = BLUE, fg = "white"): React.CSSProperties => ({ background: bg, color: fg, border: bg === "white" ? `1px solid ${BLUE}` : "none", borderRadius: 10, padding: "12px 18px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit" });
 
-type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "board-docs"
+type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "board-docs" | "site-text"
          | "leads" | "bookings" | "volunteer" | "stats"
          | "upload" | "media" | "archive" | "content"
          | "features" | "schedule" | "impact";
@@ -52,6 +52,7 @@ const NAV: Section[] = [
       { id: "staff",     label: "Staff",          icon: "👤", who: "Leslea",  status: "live" },
       { id: "docs",      label: "Documents",      icon: "📄", who: "Leslea",  status: "live" },
       { id: "board-docs",label: "Board Docs",     icon: "📁", who: "Tiffany", status: "live" },
+      { id: "site-text", label: "Site Text",      icon: "🔤", who: "Leslea",  status: "live" },
     ],
   },
   {
@@ -218,7 +219,7 @@ export default function AdminPage() {
     </div>
   );
 
-  const isContentTab = ["announce","menu","market","staff","docs","board-docs","features"].includes(tab);
+  const isContentTab = ["announce","menu","market","staff","docs","board-docs","site-text","features"].includes(tab);
   const currentTabDef = ALL_TABS.find(t => t.id === tab);
   const currentSection = NAV.find(s => s.tabs.some(t => t.id === tab));
   const newLeadCount = leads.filter(l => l.status === "new").length;
@@ -342,6 +343,12 @@ export default function AdminPage() {
         {tab === "stats"      && <StatsPanel        stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} adminKey={key} onReset={() => { fetchStats(key).then(setStats); fetchLeads(key).then(setLeads); fetchBookings(key).then(setBookings); fetchVolunteer(key).then(setVolunteer); }} />}
         {tab === "schedule"   && <SchedulePanel     schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
         {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
+        {tab === "site-text"  && (
+          <>
+            <SiteTextEditor   v={{ ...DEFAULT_SITE_TEXT,        ...(content.siteText        ?? {}) }} onChange={v => update("siteText" as keyof SiteContent, v)} />
+            <TaglinesEditor   v={{ ...DEFAULT_PROGRAM_TAGLINES, ...(content.programTaglines ?? {}) }} onChange={v => update("programTaglines" as keyof SiteContent, v)} />
+          </>
+        )}
         {tab === "impact"     && <ImpactPanel       adminKey={key} />}
         {tab === "upload"     && <UploadPanel       adminKey={key} />}
         {tab === "media"      && <MediaLibraryPanel  media={media} adminKey={key} onChange={() => fetchMedia(key).then(setMedia)} />}
@@ -1103,5 +1110,96 @@ function ResetButton({ target, label, adminKey, onReset }: { target: string; lab
     <button onClick={() => setPhase("confirm")} style={{ background: "white", color: MAROON, border: `1px solid ${MAROON}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
       🔄 Reset {label}
     </button>
+  );
+}
+
+// ─── Site Text Editor ─────────────────────────────────────────────────────────
+// Edits the fields in SiteText — footer tagline, survey URL/text, phone, address, socials.
+// Each field that changes across seasons (survey year, phone) is here.
+function SiteTextEditor({ v, onChange }: { v: SiteText; onChange: (v: SiteText) => void }) {
+  const set = (k: keyof SiteText, val: string) => onChange({ ...v, [k]: val });
+  return (
+    <>
+      <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+          These are the text fields across the site that shouldn't require a code change to update. Edit here and save — the live site updates immediately.
+        </p>
+      </div>
+
+      <div style={card}>
+        <span style={lbl}>Footer tagline</span>
+        <p style={{ fontSize: 11, color: MUTED, margin: "0 0 8px" }}>Shows below the CADC logo in the footer. Use a line break (\n) to split into two lines.</p>
+        <textarea style={{ ...input, minHeight: 72 }} value={v.footerTagline} onChange={e => set("footerTagline", e.target.value)} />
+      </div>
+
+      <div style={card}>
+        <span style={lbl}>Survey banner text</span>
+        <p style={{ fontSize: 11, color: MUTED, margin: "0 0 8px" }}>The red banner across the top of every page. Update the year and text here when the survey changes.</p>
+        <input style={{ ...input, marginBottom: 10 }} value={v.surveyBannerText} onChange={e => set("surveyBannerText", e.target.value)} placeholder="2026 Community Needs Survey — Make Your Voice Heard →" />
+        <span style={lbl}>Survey link URL</span>
+        <input style={input} value={v.surveyUrl} onChange={e => set("surveyUrl", e.target.value)} placeholder="https://www.surveymonkey.com/r/…" />
+      </div>
+
+      <div style={card}>
+        <span style={lbl}>Main CADC phone number</span>
+        <p style={{ fontSize: 11, color: MUTED, margin: "0 0 8px" }}>Shows in the header call button and footer. Format: 580-335-5588</p>
+        <input style={input} value={v.mainPhone} onChange={e => set("mainPhone", e.target.value)} placeholder="580-335-5588" />
+      </div>
+
+      <div style={card}>
+        <span style={lbl}>Head office address</span>
+        <p style={{ fontSize: 11, color: MUTED, margin: "0 0 8px" }}>Shows in the footer Contact column. Use \n to split into two lines.</p>
+        <textarea style={{ ...input, minHeight: 72 }} value={v.headOfficeAddress} onChange={e => set("headOfficeAddress", e.target.value)} />
+      </div>
+
+      <div style={card}>
+        <span style={lbl}>Facebook URL</span>
+        <input style={{ ...input, marginBottom: 10 }} value={v.facebookUrl} onChange={e => set("facebookUrl", e.target.value)} placeholder="https://www.facebook.com/…" />
+        <span style={lbl}>Instagram URL</span>
+        <input style={input} value={v.instagramUrl} onChange={e => set("instagramUrl", e.target.value)} placeholder="https://www.instagram.com/…" />
+      </div>
+    </>
+  );
+}
+
+// ─── Program Taglines Editor ──────────────────────────────────────────────────
+// Edits the tagline shown under each program name in the orbit and content panels.
+// Keys match ProgramData.slug in CADCOrbitSite.tsx.
+const PROGRAM_SLUGS: { slug: string; name: string }[] = [
+  { slug: "head-start",       name: "Head Start & Early Head Start" },
+  { slug: "transit",          name: "Red River Transit" },
+  { slug: "weatherization",   name: "Weatherization" },
+  { slug: "senior-nutrition", name: "Senior Nutrition" },
+  { slug: "community-market", name: "Community Market" },
+  { slug: "tax-help",         name: "VITA Free Tax Help" },
+  { slug: "employment",       name: "Employment & Workforce" },
+  { slug: "board",            name: "Board & Leadership" },
+  { slug: "advantage",        name: "Advantage Home Delivered Meals" },
+];
+
+function TaglinesEditor({ v, onChange }: { v: Record<string, string>; onChange: (v: Record<string, string>) => void }) {
+  const set = (slug: string, val: string) => onChange({ ...v, [slug]: val });
+  return (
+    <>
+      <div style={{ ...card, background: "#FFF8E7", border: `1px solid ${AMBER}`, padding: "10px 14px" }}>
+        <p style={{ margin: 0, fontSize: 12, color: "#374151", lineHeight: 1.6 }}>
+          These taglines appear under each program name in the orbit and program header. Keep them short — one line, under 70 characters. They often include stats from the annual report.
+        </p>
+      </div>
+      {PROGRAM_SLUGS.map(({ slug, name }) => (
+        <div key={slug} style={card}>
+          <span style={lbl}>{name}</span>
+          <input
+            style={input}
+            value={v[slug] ?? DEFAULT_PROGRAM_TAGLINES[slug] ?? ""}
+            onChange={e => set(slug, e.target.value)}
+            placeholder={DEFAULT_PROGRAM_TAGLINES[slug]}
+          />
+          <p style={{ fontSize: 10, color: MUTED, margin: "6px 0 0" }}>
+            {(v[slug] ?? "").length}/70 characters
+          </p>
+        </div>
+      ))}
+    </>
   );
 }
