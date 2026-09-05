@@ -76,6 +76,43 @@ export interface SiteFeatures {
   formCommunityNeeds: boolean;         // Community needs survey (quarterly)
 }
 
+// ─── Site-wide text fields ────────────────────────────────────────────────────
+// Strings that were hardcoded in TSX — now admin-editable without a deploy.
+// Edited via /admin → Content → Site Text tab.
+export interface SiteText {
+  footerTagline: string;        // "Helping People. Changing Lives. Serving Southwest Oklahoma since 1966."
+  surveyBannerText: string;     // "2026 Community Needs Survey — Make Your Voice Heard →"
+  surveyUrl: string;            // SurveyMonkey or other survey link
+  mainPhone: string;            // "580-335-5588" — main CADC line shown in header/footer
+  headOfficeAddress: string;    // "105 S. Main Street · P.O. Box 989\nFrederick, OK 73542"
+  facebookUrl: string;
+  instagramUrl: string;
+}
+
+export const DEFAULT_SITE_TEXT: SiteText = {
+  footerTagline:    "Helping People. Changing Lives.\nServing Southwest Oklahoma since 1966.",
+  surveyBannerText: "2026 Community Needs Survey — Make Your Voice Heard →",
+  surveyUrl:        "https://www.surveymonkey.com/r/26cadcneeds",
+  mainPhone:        "580-335-5588",
+  headOfficeAddress:"105 S. Main Street · P.O. Box 989\nFrederick, OK 73542",
+  facebookUrl:      "https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr",
+  instagramUrl:     "https://www.instagram.com/wearecadc",
+};
+
+// Program taglines — one per orbit node. Editable without a code deploy.
+// Keys match ProgramData.slug in CADCOrbitSite.tsx.
+export const DEFAULT_PROGRAM_TAGLINES: Record<string, string> = {
+  "head-start":          "Free early childhood education across 11 centers",
+  "transit":             "220,175 passenger trips · 1.5M revenue miles · 12 counties",
+  "weatherization":      "Free home energy improvements for qualifying households",
+  "senior-nutrition":    "28,827 congregate meals · 24,485 home-delivered · 327 clients served in 2025",
+  "community-market":    "Fresh, affordable groceries brought directly to your community",
+  "tax-help":            "Free IRS-certified tax prep — no cost, no fees",
+  "employment":          "Join the CADC team across Southwest Oklahoma",
+  "board":               "Governance, Policy Council, and agency leadership",
+  "advantage":           "Home-delivered meals for seniors & adults with disabilities",
+};
+
 export interface SiteContent {
   updatedAt: string;
   updatedBy: string;
@@ -86,6 +123,8 @@ export interface SiteContent {
   staff: StaffMember[];
   documents: PublicDoc[];
   boardDocs: BoardDoc[];
+  siteText: SiteText;
+  programTaglines: Record<string, string>;
 }
 
 // ─── KV Keys ─────────────────────────────────────────────────────────────────
@@ -193,6 +232,8 @@ export const DEFAULT_CONTENT: SiteContent = {
     { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
     { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
   ],
+  siteText: DEFAULT_SITE_TEXT,
+  programTaglines: DEFAULT_PROGRAM_TAGLINES,
 };
 
 // ─── Fetch helpers ────────────────────────────────────────────────────────────
