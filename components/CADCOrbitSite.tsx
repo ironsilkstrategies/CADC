@@ -198,7 +198,23 @@ const CmsContext = createContext<SiteContent>(DEFAULT_CONTENT);
 export function useCms() { return useContext(CmsContext); }
 export function CmsProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+
+  // Initial load
   useEffect(() => { fetchContent().then(setContent); }, []);
+
+  // Re-fetch whenever the tab regains focus — this is what makes admin feature
+  // toggles reflect on the public site without a hard reload. Admin saves to KV,
+  // switches back to the site tab, content updates automatically within ~1s.
+  useEffect(() => {
+    function onFocus() { fetchContent().then(setContent); }
+    window.addEventListener("visibilitychange", onFocus);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("visibilitychange", onFocus);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, []);
+
   return <CmsContext.Provider value={content}>{children}</CmsContext.Provider>;
 }
 
