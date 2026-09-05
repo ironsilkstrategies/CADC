@@ -5,6 +5,12 @@
 // Reached via the hidden door (tap the © line in the footer 5 times) or /admin.
 // Auth: single shared password (ADMIN_PASSWORD env var on Vercel), stored in
 // sessionStorage for the tab only. Saves go to Vercel KV via /api/cms.
+//
+// Navigation: four grouped sections replace the flat tab strip.
+//   CONTENT    — what staff updates week to week
+//   OPERATIONS — leads, bookings, volunteer hours, stats
+//   SITE TOOLS — upload, media, archive, inline content editor
+//   SYSTEM     — features, schedule, impact PDF
 
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -26,26 +32,57 @@ const input: React.CSSProperties = { width: "100%", fontSize: 16, padding: "12px
 const lbl: React.CSSProperties = { color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", display: "block" };
 const btn = (bg = BLUE, fg = "white"): React.CSSProperties => ({ background: bg, color: fg, border: bg === "white" ? `1px solid ${BLUE}` : "none", borderRadius: 10, padding: "12px 18px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit" });
 
-type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "leads" | "stats" | "volunteer" | "bookings" | "features" | "schedule" | "board-docs" | "impact" | "upload" | "media" | "archive" | "content";
-const TABS: { id: Tab; label: string; icon: string; who: string }[] = [
-  { id: "features",  label: "Features",      icon: "⚡", who: "Leslea" },
-  { id: "announce",  label: "Alert",         icon: "🚨", who: "Leslea" },
-  { id: "menu",      label: "Senior Menu",   icon: "🍽️", who: "Laura" },
-  { id: "market",    label: "Market",        icon: "🛒", who: "Scott" },
-  { id: "staff",     label: "Staff",         icon: "👤", who: "Leslea" },
-  { id: "docs",      label: "Documents",     icon: "📄", who: "Leslea" },
-  { id: "leads",     label: "Intake Leads",  icon: "📥", who: "All" },
-  { id: "bookings",  label: "Transit Rides", icon: "🚌", who: "Gilbert" },
-  { id: "volunteer", label: "Volunteer Hrs", icon: "🤝", who: "Robin" },
-  { id: "stats",     label: "Site Stats",    icon: "📊", who: "Leslea" },
-  { id: "schedule",  label: "Scheduled",     icon: "🗓️", who: "Leslea" },
-  { id: "board-docs",label: "Board Docs",    icon: "📁", who: "Tiffany" },
-  { id: "impact",    label: "Impact PDF",    icon: "📈", who: "Leslea" },
-  { id: "upload",    label: "Upload",        icon: "📤", who: "All" },
-  { id: "media",     label: "Media",         icon: "🖼️", who: "All" },
-  { id: "archive",   label: "Archive",       icon: "🗄️", who: "Leslea" },
-  { id: "content",   label: "Content",       icon: "📝", who: "Leslea" },
+type Tab = "announce" | "menu" | "market" | "staff" | "docs" | "board-docs"
+         | "leads" | "bookings" | "volunteer" | "stats"
+         | "upload" | "media" | "archive" | "content"
+         | "features" | "schedule" | "impact";
+
+// ─── Navigation structure ─────────────────────────────────────────────────────
+type TabStatus = "live" | "needs-work" | "locked";
+interface TabDef { id: Tab; label: string; icon: string; who: string; status: TabStatus; note?: string }
+interface Section { id: string; label: string; color: string; tabs: TabDef[] }
+
+const NAV: Section[] = [
+  {
+    id: "content", label: "Content", color: BLUE,
+    tabs: [
+      { id: "announce",  label: "Alert Banner",   icon: "🚨", who: "Leslea",  status: "live" },
+      { id: "menu",      label: "Senior Menu",    icon: "🍽️", who: "Laura",   status: "live" },
+      { id: "market",    label: "Market",         icon: "🛒", who: "Scott",   status: "live" },
+      { id: "staff",     label: "Staff",          icon: "👤", who: "Leslea",  status: "live" },
+      { id: "docs",      label: "Documents",      icon: "📄", who: "Leslea",  status: "live" },
+      { id: "board-docs",label: "Board Docs",     icon: "📁", who: "Tiffany", status: "live" },
+    ],
+  },
+  {
+    id: "operations", label: "Operations", color: GREEN,
+    tabs: [
+      { id: "leads",     label: "Intake Leads",   icon: "📥", who: "All",     status: "live" },
+      { id: "bookings",  label: "Transit Rides",  icon: "🚌", who: "Gilbert", status: "live" },
+      { id: "volunteer", label: "Volunteer Hrs",  icon: "🤝", who: "Robin",   status: "live" },
+      { id: "stats",     label: "Site Stats",     icon: "📊", who: "Leslea",  status: "live" },
+    ],
+  },
+  {
+    id: "tools", label: "Site Tools", color: AMBER,
+    tabs: [
+      { id: "upload",  label: "Upload Files",    icon: "📤", who: "All",    status: "needs-work", note: "Gemini routing wired — test with a PDF" },
+      { id: "media",   label: "Media Library",   icon: "🖼️", who: "All",    status: "needs-work", note: "Display works — delete route needs verification" },
+      { id: "archive", label: "Archive",          icon: "🗄️", who: "Leslea", status: "needs-work", note: "Restore route needs verification" },
+      { id: "content", label: "Inline Content",  icon: "✏️", who: "Leslea", status: "needs-work", note: "Blocks save — edit bars not yet on public pages" },
+    ],
+  },
+  {
+    id: "system", label: "System", color: MUTED,
+    tabs: [
+      { id: "features", label: "Features",       icon: "⚡", who: "Leslea", status: "live" },
+      { id: "schedule", label: "Scheduled",      icon: "🗓️", who: "Leslea", status: "needs-work", note: "UI ready — publish cron not confirmed wired" },
+      { id: "impact",   label: "Impact PDF",     icon: "📈", who: "Leslea", status: "needs-work", note: "grant-impact route needs to be built" },
+    ],
+  },
 ];
+
+const ALL_TABS = NAV.flatMap(s => s.tabs);
 
 const HS_CENTERS = ["Erick","Sayre","Temple","Ringling","Hobart","Hammon","Grandfield","Frederick","Burns Flat","Cordell","Sentinel"];
 const STATUS_COLORS: Record<string, string> = { new: AMBER, contacted: BLUE, enrolled: GREEN, ineligible: MUTED, closed: "#9CA3AF" };
@@ -71,12 +108,27 @@ function monthDates(month: string, year: number): string[] {
 function isWeekend(d: string) { const day = new Date(d + "T12:00:00").getDay(); return day === 0 || day === 6; }
 function dayLabel(d: string) { return new Date(d + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }); }
 
+// ─── Status badge ─────────────────────────────────────────────────────────────
+function StatusBadge({ status, small }: { status: TabStatus; small?: boolean }) {
+  const map: Record<TabStatus, [string, string, string]> = {
+    "live":       ["✅", GREEN,  "Live"],
+    "needs-work": ["🔧", AMBER,  "Needs work"],
+    "locked":     ["🔒", MUTED,  "Locked"],
+  };
+  const [icon, color, label] = map[status];
+  return (
+    <span style={{ background: `${color}18`, color, border: `1px solid ${color}40`, borderRadius: 20, padding: small ? "2px 7px" : "3px 9px", fontSize: small ? 10 : 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 3, whiteSpace: "nowrap" }}>
+      {icon} {label}
+    </span>
+  );
+}
+
 export default function AdminPage() {
   const [key, setKey] = useState("");
   const [authed, setAuthed] = useState(false);
   const [name, setName] = useState("");
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
-  const [tab, setTab] = useState<Tab>("features");
+  const [tab, setTab] = useState<Tab>("announce");
   const [status, setStatus] = useState("");
   const [dirty, setDirty] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -85,10 +137,10 @@ export default function AdminPage() {
   const [volunteer, setVolunteer] = useState<VolunteerEntry[]>([]);
   const [bookings, setBookings] = useState<TransitBooking[]>([]);
   const [schedule, setSchedule] = useState<ScheduledItem[]>([]);
-  const [impactLoading, setImpactLoading] = useState(false);
   const [media, setMedia] = useState<MediaAsset[]>([]);
   const [archived, setArchived] = useState<ArchivedItem[]>([]);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     const k = sessionStorage.getItem("cadc-admin-key");
@@ -166,51 +218,135 @@ export default function AdminPage() {
     </div>
   );
 
-  const isContentTab = ["features","announce","menu","market","staff","docs","board-docs"].includes(tab);
+  const isContentTab = ["announce","menu","market","staff","docs","board-docs","features"].includes(tab);
+  const currentTabDef = ALL_TABS.find(t => t.id === tab);
+  const currentSection = NAV.find(s => s.tabs.some(t => t.id === tab));
+  const newLeadCount = leads.filter(l => l.status === "new").length;
+  const pendingBookingCount = bookings.filter(b => b.status === "new").length;
 
   return (
     <div style={{ minHeight: "100vh", background: "#F8F9FF", fontFamily: "'Space Grotesk','Inter',sans-serif", color: "#111827" }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 10, background: "white", borderBottom: `1px solid ${BORDER}`, padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+
+      {/* ── Sticky top bar ── */}
+      <div style={{ position: "sticky", top: 0, zIndex: 20, background: "white", borderBottom: `1px solid ${BORDER}`, padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 30 }} />
-          <div><div style={{ fontWeight: 800, fontSize: 13 }}>Staff Admin</div><div style={{ fontSize: 11, color: MUTED }}>Signed in as {name || "staff"}</div></div>
+          <button onClick={() => setNavOpen(o => !o)}
+            style={{ background: navOpen ? BLUE : "white", color: navOpen ? "white" : BLUE, border: `1px solid ${navOpen ? BLUE : BORDER}`, borderRadius: 8, width: 36, height: 36, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            {navOpen ? "✕" : "☰"}
+          </button>
+          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 28 }} />
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+              {currentTabDef?.icon} {currentTabDef?.label}
+              {currentTabDef && <StatusBadge status={currentTabDef.status} small />}
+            </div>
+            <div style={{ fontSize: 11, color: MUTED }}>Signed in as {name || "staff"}</div>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           {isContentTab && <button style={{ ...btn(dirty ? MAROON : BLUE), padding: "10px 16px" }} onClick={save} disabled={!dirty}>{dirty ? "Save changes" : "Saved"}</button>}
           <button style={{ ...btn("white", BLUE), padding: "10px 12px" }} onClick={logout}>Sign out</button>
         </div>
       </div>
+
       {status && <div style={{ background: status.startsWith("✓") ? "#E4E4FF" : "#FFE4E4", color: status.startsWith("✓") ? BLUE : MAROON, padding: "10px 14px", fontWeight: 700, fontSize: 13, textAlign: "center" }}>{status}</div>}
 
-      <div style={{ display: "flex", gap: 6, padding: "12px 14px 0", overflowX: "auto", WebkitOverflowScrolling: "touch" as "touch" }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: "0 0 auto", background: tab === t.id ? BLUE : "white", color: tab === t.id ? "white" : BLUE, border: `1px solid ${tab === t.id ? BLUE : BORDER}`, borderRadius: 20, padding: "9px 14px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-            {t.icon} {t.label}
-          </button>
-        ))}
-      </div>
+      {/* ── Slide-out nav panel ── */}
+      {navOpen && (
+        <div style={{ position: "fixed", top: 57, left: 0, right: 0, bottom: 0, zIndex: 19, display: "flex" }}>
+          {/* backdrop */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)" }} onClick={() => setNavOpen(false)} />
+          {/* panel */}
+          <div style={{ position: "relative", width: 280, maxWidth: "85vw", background: "white", overflowY: "auto", padding: "12px 0 40px", borderRight: `1px solid ${BORDER}` }}>
+            {NAV.map(section => (
+              <div key={section.id} style={{ marginBottom: 8 }}>
+                <div style={{ padding: "8px 16px 4px", fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: section.color }}>
+                  {section.label}
+                </div>
+                {section.tabs.map(t => {
+                  const isActive = tab === t.id;
+                  const hasBadge = (t.id === "leads" && newLeadCount > 0) || (t.id === "bookings" && pendingBookingCount > 0);
+                  return (
+                    <button key={t.id} onClick={() => { setTab(t.id); setNavOpen(false); }}
+                      style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "11px 16px", background: isActive ? `${section.color}12` : "transparent", border: "none", borderLeft: `3px solid ${isActive ? section.color : "transparent"}`, cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>{t.icon}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: isActive ? 800 : 600, fontSize: 14, color: isActive ? section.color : "#111827", display: "flex", alignItems: "center", gap: 6 }}>
+                          {t.label}
+                          {hasBadge && (
+                            <span style={{ background: MAROON, color: "white", borderRadius: 20, fontSize: 10, fontWeight: 800, padding: "1px 7px" }}>
+                              {t.id === "leads" ? newLeadCount : pendingBookingCount}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 11, color: MUTED }}>{t.who}</div>
+                      </div>
+                      <StatusBadge status={t.status} small />
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
 
+            {/* Status legend */}
+            <div style={{ margin: "16px 16px 0", padding: "12px 14px", background: "#F9FAFB", borderRadius: 10, border: `1px solid ${BORDER}` }}>
+              <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: MUTED, marginBottom: 8 }}>Status key</div>
+              {(["live","needs-work","locked"] as TabStatus[]).map(s => (
+                <div key={s} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <StatusBadge status={s} small />
+                  <span style={{ fontSize: 11, color: "#374151" }}>
+                    {s === "live" ? "Fully wired, ready to use" : s === "needs-work" ? "Built but needs verification or finishing" : "Contract scope — not yet activated"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Main content ── */}
       <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
         {loading && <p style={{ color: MUTED }}>Loading…</p>}
-        {isContentTab && <p style={{ color: MUTED, fontSize: 12, margin: "6px 0 14px" }}>Usually updated by <strong>{TABS.find(t => t.id === tab)?.who}</strong>. Last update: {new Date(content.updatedAt).toLocaleString()} by {content.updatedBy}.</p>}
 
-        {tab === "features"  && <FeaturesEditor   v={content.features ?? { transitBooking: false, intakeLeads: false, volunteerLog: false }} onChange={v => update("features" as keyof SiteContent, v)} />}
-        {tab === "announce"  && <AnnounceEditor  v={content.announcement}    onChange={v => update("announcement", v)} />}
-        {tab === "menu"      && <MenuEditor       v={content.seniorMenu}       onChange={v => update("seniorMenu", v)} />}
-        {tab === "market"    && <MarketEditor     v={content.marketSchedule}   onChange={v => update("marketSchedule", v)} />}
-        {tab === "staff"     && <StaffEditor      v={content.staff}            onChange={v => update("staff", v)} />}
-        {tab === "docs"      && <DocsEditor       v={content.documents}        onChange={v => update("documents", v)} />}
-        {tab === "leads"     && <LeadsPanel       leads={leads}                onUpdateStatus={updateLeadStatus} />}
-        {tab === "bookings"  && <BookingsPanel    bookings={bookings}           onUpdateStatus={updateBookingStatus} />}
-        {tab === "volunteer" && <VolunteerPanel   entries={volunteer}           adminKey={key} onDelete={deleteVolunteer} onAdd={e => setVolunteer(v => [e, ...v])} />}
-        {tab === "stats"     && <StatsPanel       stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} adminKey={key} onReset={() => { fetchStats(key).then(setStats); fetchLeads(key).then(setLeads); fetchBookings(key).then(setBookings); fetchVolunteer(key).then(setVolunteer); }} />}
-        {tab === "schedule"  && <SchedulePanel    schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
+        {/* Section label + last-updated line for content tabs */}
+        {currentSection && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: currentSection.color }}>
+              {currentSection.label} › {currentTabDef?.label}
+            </span>
+            {isContentTab && (
+              <span style={{ fontSize: 11, color: MUTED }}>
+                By <strong>{currentTabDef?.who}</strong> · Last saved {new Date(content.updatedAt).toLocaleDateString()} by {content.updatedBy}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Needs-work notice */}
+        {currentTabDef?.status === "needs-work" && currentTabDef.note && (
+          <div style={{ ...card, background: "#FFFBEB", border: `1px solid ${AMBER}`, padding: "10px 14px", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 18 }}>🔧</span>
+            <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.5 }}><strong>Status:</strong> {currentTabDef.note}</p>
+          </div>
+        )}
+
+        {tab === "features"   && <FeaturesEditor   v={content.features ?? { transitBooking: false, intakeLeads: false, volunteerLog: false }} onChange={v => update("features" as keyof SiteContent, v)} />}
+        {tab === "announce"   && <AnnounceEditor   v={content.announcement}  onChange={v => update("announcement", v)} />}
+        {tab === "menu"       && <MenuEditor        v={content.seniorMenu}    onChange={v => update("seniorMenu", v)} />}
+        {tab === "market"     && <MarketEditor      v={content.marketSchedule} onChange={v => update("marketSchedule", v)} />}
+        {tab === "staff"      && <StaffEditor       v={content.staff}         onChange={v => update("staff", v)} />}
+        {tab === "docs"       && <DocsEditor        v={content.documents}     onChange={v => update("documents", v)} />}
+        {tab === "leads"      && <LeadsPanel        leads={leads}             onUpdateStatus={updateLeadStatus} />}
+        {tab === "bookings"   && <BookingsPanel     bookings={bookings}       onUpdateStatus={updateBookingStatus} />}
+        {tab === "volunteer"  && <VolunteerPanel    entries={volunteer}       adminKey={key} onDelete={deleteVolunteer} onAdd={e => setVolunteer(v => [e, ...v])} />}
+        {tab === "stats"      && <StatsPanel        stats={stats} leads={leads} bookings={bookings} volunteer={volunteer} adminKey={key} onReset={() => { fetchStats(key).then(setStats); fetchLeads(key).then(setLeads); fetchBookings(key).then(setBookings); fetchVolunteer(key).then(setVolunteer); }} />}
+        {tab === "schedule"   && <SchedulePanel     schedule={schedule} adminKey={key} onUpdate={setSchedule} />}
         {tab === "board-docs" && <BoardDocsAdminPanel content={content} adminKey={key} onChange={v => update("boardDocs" as keyof SiteContent, v)} />}
-        {tab === "impact"    && <ImpactPanel      adminKey={key} />}
-        {tab === "upload"    && <UploadPanel      adminKey={key} />}
-        {tab === "media"     && <MediaLibraryPanel media={media} adminKey={key} onChange={() => fetchMedia(key).then(setMedia)} />}
-        {tab === "archive"   && <ArchivePanel     archived={archived} adminKey={key} onChange={() => fetchArchive(key).then(setArchived)} />}
-        {tab === "content"   && (
+        {tab === "impact"     && <ImpactPanel       adminKey={key} />}
+        {tab === "upload"     && <UploadPanel       adminKey={key} />}
+        {tab === "media"      && <MediaLibraryPanel  media={media} adminKey={key} onChange={() => fetchMedia(key).then(setMedia)} />}
+        {tab === "archive"    && <ArchivePanel       archived={archived} adminKey={key} onChange={() => fetchArchive(key).then(setArchived)} />}
+        {tab === "content"    && (
           <>
             <div style={{ ...card, background: "#F0F0FF", border: `1px solid ${BLUE}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <p style={{ margin: 0, fontSize: 13, color: "#374151" }}>✏️ You can also edit content directly on the live site — visit cadcok.org while signed in here and look for pencil icons.</p>
@@ -419,7 +555,6 @@ function VolunteerPanel({ entries, adminKey, onDelete, onAdd }: { entries: Volun
 // ─── Site Stats Panel ─────────────────────────────────────────────────────────
 function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { stats: SiteStats | null; leads: IntakeLead[]; bookings: TransitBooking[]; volunteer: VolunteerEntry[]; adminKey: string; onReset: () => void }) {
   if (!stats) return <p style={{ color: MUTED, textAlign: "center", padding: 40 }}>Loading stats…</p>;
-
   const topPrograms = Object.entries(stats.programTaps).sort((a,b) => b[1]-a[1]);
   const topCounties = Object.entries(stats.countyViews).sort((a,b) => b[1]-a[1]).slice(0,10);
   const topSearches = Object.entries(stats.searchTerms).sort((a,b) => b[1]-a[1]).slice(0,12);
@@ -432,16 +567,12 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
   const enrolledLeads = leads.filter(l => l.status === "enrolled").length;
   const pendingBookings = bookings.filter(b => b.status === "new").length;
   const totalVolHours = volunteer.reduce((s, e) => s + e.hours, 0);
-
-  // Weekly narrative summary
   const topProgram = topPrograms[0];
   const topCounty = topCounties[0];
   const now = new Date();
   const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
-
   return (
     <>
-      {/* Weekly summary narrative */}
       <div style={{ ...card, background: "linear-gradient(135deg, #0101FF 0%, #1a1aff 100%)", border: "none", color: "white" }}>
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6 }}>
           📅 Weekly Summary — as of {dayName}, {now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
@@ -454,12 +585,8 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
           {newLeads > 0 && <> You have <strong style={{ color: "white" }}>{newLeads} new intake lead{newLeads !== 1 ? "s" : ""}</strong> awaiting follow-up.</>}
           {pendingBookings > 0 && <> <strong style={{ color: "white" }}>{pendingBookings} ride request{pendingBookings !== 1 ? "s" : ""}</strong> need confirmation.</>}
         </p>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
-          Check this every Monday morning or Friday afternoon for your weekly pulse.
-        </div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Check this every Monday morning or Friday afternoon for your weekly pulse.</div>
       </div>
-
-      {/* KPI row */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
         {[
           { icon: "👥", label: "Site Visits", value: stats.weeklyVisits.toLocaleString(), sub: "this week", color: BLUE },
@@ -477,11 +604,9 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
           </div>
         ))}
       </div>
-
-      {/* Program breakdown */}
       <div style={card}>
-        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>📊 Program Engagement — Full Breakdown</div>
-        <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Every program tap this week, sorted by interest. Use this to prioritize outreach.</div>
+        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>📊 Program Engagement</div>
+        <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Every program tap this week, sorted by interest.</div>
         {topPrograms.length === 0
           ? <p style={{ color: MUTED, fontSize: 13 }}>Data will appear as visitors use the site.</p>
           : topPrograms.map(([slug, count]) => {
@@ -491,7 +616,7 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                   <span style={{ fontSize: 13, fontWeight: 700, textTransform: "capitalize" }}>{slug.replace(/-/g," ")}</span>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <span style={{ fontSize: 11, color: MUTED }}>{pct}% of taps</span>
+                    <span style={{ fontSize: 11, color: MUTED }}>{pct}%</span>
                     <span style={{ fontSize: 14, fontWeight: 800, color: BLUE }}>{count.toLocaleString()}</span>
                   </div>
                 </div>
@@ -502,11 +627,9 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
             );
           })}
       </div>
-
-      {/* County breakdown */}
       <div style={card}>
-        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>🗺️ County Interest — Where Your Community Is</div>
-        <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Which counties are actively looking for services. High views = high need in that area.</div>
+        <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>🗺️ County Interest</div>
+        <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>High views = high need in that area.</div>
         {topCounties.length === 0
           ? <p style={{ color: MUTED, fontSize: 13 }}>No county views yet.</p>
           : topCounties.map(([county, count]) => (
@@ -521,26 +644,17 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
             </div>
           ))}
       </div>
-
-      {/* Intake lead breakdown */}
       {leads.length > 0 && (
         <div style={card}>
-          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>📥 Intake Lead Breakdown</div>
-          <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Every person who submitted an interest form. Follow up within 48 hours for best results.</div>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 14 }}>📥 Intake Lead Breakdown</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
-            {[
-              { label: "New", value: newLeads, color: BLUE },
-              { label: "Contacted", value: contactedLeads, color: AMBER },
-              { label: "Enrolled", value: enrolledLeads, color: GREEN },
-              { label: "Total", value: leads.length, color: MUTED },
-            ].map(({ label, value, color }) => (
+            {[{ label: "New", value: newLeads, color: BLUE },{ label: "Contacted", value: contactedLeads, color: AMBER },{ label: "Enrolled", value: enrolledLeads, color: GREEN },{ label: "Total", value: leads.length, color: MUTED }].map(({ label, value, color }) => (
               <div key={label} style={{ background: "#F9FAFB", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "10px 8px", textAlign: "center" }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color }}>{value}</div>
                 <div style={{ fontSize: 10, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>{label}</div>
               </div>
             ))}
           </div>
-          {/* By program */}
           {(() => {
             const byProg = leads.reduce((acc, l) => { acc[l.program] = (acc[l.program] ?? 0) + 1; return acc; }, {} as Record<string,number>);
             return Object.entries(byProg).sort((a,b) => b[1]-a[1]).map(([prog, count]) => (
@@ -552,12 +666,9 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
           })()}
         </div>
       )}
-
-      {/* Search terms */}
       {topSearches.length > 0 && (
         <div style={card}>
-          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>🔍 What Your Community Is Searching For</div>
-          <div style={{ fontSize: 11, color: MUTED, marginBottom: 14 }}>Top search terms from site visitors. Gaps here = services people need but can't find.</div>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 14 }}>🔍 What Your Community Is Searching For</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {topSearches.map(([term, count]) => (
               <div key={term} style={{ background: "#F0F0FF", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "6px 14px", fontSize: 13, display: "flex", gap: 8, alignItems: "center" }}>
@@ -568,13 +679,8 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
           </div>
         </div>
       )}
-
-      {/* Grant narrative helper */}
       <div style={{ ...card, background: "#F0FFF4", border: `1px solid ${GREEN}` }}>
         <div style={{ fontWeight: 800, fontSize: 13, color: GREEN, marginBottom: 8 }}>📝 Grant Narrative Helper</div>
-        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 8px", lineHeight: 1.6 }}>
-          Copy this language directly into grant reports:
-        </p>
         <div style={{ background: "white", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#374151", lineHeight: 1.7, fontStyle: "italic" }}>
           "In the current reporting period, the cadcok.org digital platform recorded {stats.weeklyVisits.toLocaleString()} community site visits
           {totalTaps > 0 ? `, ${totalTaps.toLocaleString()} program engagement interactions` : ""}
@@ -583,31 +689,17 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
           {totalCounty > 0 ? ` Community members from ${Object.keys(stats.countyViews).length} counties actively searched for CADC services.` : ""}"
         </div>
       </div>
-
-      {/* Launch reset controls */}
       <div style={{ ...card, border: `1px solid ${MAROON}`, background: "#FFF8F8" }}>
         <div style={{ fontWeight: 800, fontSize: 13, color: MAROON, marginBottom: 6 }}>🚀 Launch Reset Controls</div>
-        <p style={{ fontSize: 12, color: "#374151", margin: "0 0 14px", lineHeight: 1.6 }}>
-          Use these when switching from the preview site to cadcok.org. Clears test data so the live site starts clean. Each reset requires confirmation — this cannot be undone.
-        </p>
+        <p style={{ fontSize: 12, color: "#374151", margin: "0 0 14px", lineHeight: 1.6 }}>Use these when switching from the preview site to cadcok.org. Clears test data so the live site starts clean. Each reset requires confirmation — this cannot be undone.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
-            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Site Stats</div><div style={{ fontSize: 11, color: MUTED }}>Visits, program taps, county views, searches</div></div>
-            <ResetButton target="stats" label="Stats" adminKey={adminKey} onReset={onReset} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
-            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Intake Leads</div><div style={{ fontSize: 11, color: MUTED }}>All inquiry form submissions</div></div>
-            <ResetButton target="leads" label="Leads" adminKey={adminKey} onReset={onReset} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
-            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Transit Ride Requests</div><div style={{ fontSize: 11, color: MUTED }}>All ride booking submissions</div></div>
-            <ResetButton target="bookings" label="Bookings" adminKey={adminKey} onReset={onReset} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
-            <div><div style={{ fontWeight: 700, fontSize: 13 }}>Volunteer Hours</div><div style={{ fontSize: 11, color: MUTED }}>All logged volunteer hour entries</div></div>
-            <ResetButton target="volunteer" label="Volunteer Hours" adminKey={adminKey} onReset={onReset} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#FFF0F0", borderRadius: 8, border: `1px solid #FCA5A5` }}>
+          {[["stats","Stats","Visits, program taps, county views, searches"],["leads","Leads","All inquiry form submissions"],["bookings","Bookings","All ride booking submissions"],["volunteer","Volunteer Hours","All logged volunteer hour entries"]].map(([target, label, desc]) => (
+            <div key={target} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "white", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+              <div><div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div><div style={{ fontSize: 11, color: MUTED }}>{desc}</div></div>
+              <ResetButton target={target} label={label} adminKey={adminKey} onReset={onReset} />
+            </div>
+          ))}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#FFF0F0", borderRadius: 8, border: "1px solid #FCA5A5" }}>
             <div><div style={{ fontWeight: 700, fontSize: 13, color: MAROON }}>Reset Everything</div><div style={{ fontSize: 11, color: MUTED }}>Stats + leads + bookings + hours + schedule</div></div>
             <ResetButton target="all" label="All Data" adminKey={adminKey} onReset={onReset} />
           </div>
@@ -617,7 +709,7 @@ function StatsPanel({ stats, leads, bookings, volunteer, adminKey, onReset }: { 
   );
 }
 
-// ─── Unchanged editors ────────────────────────────────────────────────────────
+// ─── Menu Editor ──────────────────────────────────────────────────────────────
 function MenuEditor({ v, onChange }: { v: SiteContent["seniorMenu"]; onChange: (v: SiteContent["seniorMenu"]) => void }) {
   const dates = useMemo(() => monthDates(v.month, v.year), [v.month, v.year]);
   const setMeal = (d: string, meal: Meal | null) => { const meals = { ...v.meals }; if (meal) meals[d] = meal; else delete meals[d]; onChange({ ...v, meals }); };
@@ -651,6 +743,7 @@ function MenuEditor({ v, onChange }: { v: SiteContent["seniorMenu"]; onChange: (
   );
 }
 
+// ─── Market Editor ────────────────────────────────────────────────────────────
 function MarketEditor({ v, onChange }: { v: SiteContent["marketSchedule"]; onChange: (v: SiteContent["marketSchedule"]) => void }) {
   const dates = useMemo(() => monthDates(v.month, v.year), [v.month, v.year]);
   const setStops = (d: string, stops: MarketStop[] | null) => { const s = { ...v.stops }; if (stops && stops.length) s[d] = stops; else delete s[d]; onChange({ ...v, stops: s }); };
@@ -687,6 +780,7 @@ function MarketEditor({ v, onChange }: { v: SiteContent["marketSchedule"]; onCha
   );
 }
 
+// ─── Staff Editor ─────────────────────────────────────────────────────────────
 function StaffEditor({ v, onChange }: { v: StaffMember[]; onChange: (v: StaffMember[]) => void }) {
   const set = (i: number, m: StaffMember) => { const n = [...v]; n[i] = m; onChange(n); };
   return (
@@ -710,6 +804,7 @@ function StaffEditor({ v, onChange }: { v: StaffMember[]; onChange: (v: StaffMem
   );
 }
 
+// ─── Docs Editor ──────────────────────────────────────────────────────────────
 function DocsEditor({ v, onChange }: { v: PublicDoc[]; onChange: (v: PublicDoc[]) => void }) {
   const set = (i: number, d: PublicDoc) => { const n = [...v]; n[i] = d; onChange(n); };
   return (
@@ -736,15 +831,14 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
   const baseFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
     { key: "spanishToggle", label: "Spanish / English Toggle", icon: "🌐", desc: "Shows the ES/EN language toggle in the site header. Turn on when Spanish translations are fully ready." },
   ];
-
   const premiumFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
-    { key: "transitBooking",    label: "Online Ride Booking",         icon: "🚌", desc: "Online ride request form on Transit → Schedule a Ride. Off = call button only." },
-    { key: "intakeLeads",       label: "Follow-Up Capture",           icon: "📥", desc: "Follow-up contact form on eligibility pages. Sends inquiries to the Intake Leads tab." },
-    { key: "volunteerLog",      label: "Public Volunteer Hour Logger",       icon: "🤝", desc: "Shows 'Log My Hours' in Head Start → Log Hours AND the full Volunteer Hub (⭐) in Board & Leadership — with live progress ring, federal match tracker, why/who/what/when. Off = both nodes hidden." },
-    { key: "faqAccordion",      label: "Head Start FAQ",              icon: "❓", desc: "FAQ accordion section on Head Start program page. Robin requested — toggle on when content is ready." },
-    { key: "boardPortal",       label: "Board Document Portal",       icon: "📁", desc: "Board Documents sub-area in Board & Leadership — Tiffany uploads agendas, minutes, resolutions." },
-    { key: "contentScheduling", label: "Content Scheduling",          icon: "🗓️", desc: "Scheduled content publishing system — stage updates to go live automatically on a future date." },
-    { key: "grantPdf",          label: "Grant Impact PDF",            icon: "📈", desc: "Quarterly impact report generator in the admin panel. Pulls all site data into a grant-ready PDF." },
+    { key: "transitBooking",    label: "Online Ride Booking",          icon: "🚌", desc: "Online ride request form on Transit → Schedule a Ride. Off = call button only." },
+    { key: "intakeLeads",       label: "Follow-Up Capture",            icon: "📥", desc: "Follow-up contact form on eligibility pages. Sends inquiries to the Intake Leads tab." },
+    { key: "volunteerLog",      label: "Public Volunteer Hour Logger",  icon: "🤝", desc: "Shows 'Log My Hours' in Head Start → Log Hours AND the full Volunteer Hub (⭐) in Board & Leadership." },
+    { key: "faqAccordion",      label: "Head Start FAQ",               icon: "❓", desc: "FAQ accordion section on Head Start program page. Robin requested — toggle on when content is ready." },
+    { key: "boardPortal",       label: "Board Document Portal",        icon: "📁", desc: "Board Documents sub-area in Board & Leadership — Tiffany uploads agendas, minutes, resolutions." },
+    { key: "contentScheduling", label: "Content Scheduling",           icon: "🗓️", desc: "Scheduled content publishing system — stage updates to go live automatically on a future date." },
+    { key: "grantPdf",          label: "Grant Impact PDF",             icon: "📈", desc: "Quarterly impact report generator in the admin panel. Pulls all site data into a grant-ready PDF." },
   ];
 
   function Toggle({ f }: { f: { key: keyof SiteFeatures; label: string; desc: string; icon: string } }) {
@@ -776,39 +870,35 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
           Toggle site features on or off instantly — no code change, no deploy. <strong>Base features</strong> are part of the core contract. <strong>Premium features</strong> are amendment scope — turn on when the contract is signed. Save after any change.
         </p>
       </div>
-
       <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "4px 0 8px" }}>Base Features</p>
       {baseFeatures.map(f => <Toggle key={f.key} f={f} />)}
-
       <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "16px 0 8px" }}>⭐ Premium — Amendment Scope</p>
       <div style={{ ...card, background: "#FFF8E7", border: `1px solid ${AMBER}`, padding: "10px 14px", marginBottom: 12 }}>
         <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>These features are built and ready. They activate when the amended contract is signed. Turning one on before the amendment is signed is at your discretion.</p>
       </div>
       {premiumFeatures.map(f => <Toggle key={f.key} f={f} />)}
-
       <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "16px 0 8px" }}>📋 Forms & Intake — Amendment Scope</p>
       <div style={{ ...card, background: "#FFF8E7", border: `1px solid ${AMBER}`, padding: "10px 14px", marginBottom: 12 }}>
-        <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>Each form feeds directly into the Intake Leads tab. Every submission — complete or partial — becomes a documented outreach touchpoint for grant reporting. All off by default.</p>
+        <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>Each form feeds directly into the Intake Leads tab. Every submission becomes a documented outreach touchpoint for grant reporting.</p>
       </div>
       {([
-        { key: "formServiceScreener",        label: "Universal Service Screener",         icon: "🔍", desc: "\"Find Your Benefits\" — 6 questions that surface which CADC programs a resident qualifies for. Most impactful intake tool on the site." },
-        { key: "formHeadStartPreEnroll",     label: "Head Start Pre-Enrollment Form",     icon: "🏫", desc: "Captures family interest before ChildPlus. Robin's team gets a lead queue to follow up with every family who expresses interest." },
-        { key: "formWeatherizationInterest", label: "Weatherization Interest Form",       icon: "🏠", desc: "Waitlist intake for Robert's program. Captures address, household, utility info, and priority factors to help triage the queue." },
-        { key: "formVitaAppointment",        label: "VITA Appointment Request",           icon: "📋", desc: "Tax season appointment intake — name, phone, county, return type, language preference. Replaces the phone queue during VITA season." },
-        { key: "formVolunteerInterest",      label: "Volunteer Interest Form",            icon: "🤝", desc: "Public volunteer pipeline — feeds the volunteer hour tracker. Captures skills, availability, and program interest." },
-        { key: "formCommunityNeeds",         label: "Community Needs Survey",             icon: "📊", desc: "Quarterly 8-question survey. Results feed the grant impact dashboard and help CADC document community need for funders." },
+        { key: "formServiceScreener",        label: "Universal Service Screener",      icon: "🔍", desc: "\"Find Your Benefits\" — 6 questions that surface which CADC programs a resident qualifies for." },
+        { key: "formHeadStartPreEnroll",     label: "Head Start Pre-Enrollment Form",  icon: "🏫", desc: "Captures family interest before ChildPlus. Robin's team gets a lead queue to follow up." },
+        { key: "formWeatherizationInterest", label: "Weatherization Interest Form",    icon: "🏠", desc: "Waitlist intake for Robert's program. Captures address, household, utility info." },
+        { key: "formVitaAppointment",        label: "VITA Appointment Request",        icon: "📋", desc: "Tax season appointment intake — name, phone, county, return type, language preference." },
+        { key: "formVolunteerInterest",      label: "Volunteer Interest Form",         icon: "🤝", desc: "Public volunteer pipeline — feeds the volunteer hour tracker." },
+        { key: "formCommunityNeeds",         label: "Community Needs Survey",          icon: "📊", desc: "Quarterly 8-question survey. Results feed the grant impact dashboard." },
       ] as { key: keyof SiteFeatures; label: string; icon: string; desc: string }[]).map(f => <Toggle key={f.key} f={f} />)}
     </>
   );
 }
 
-// ─── Schedule Panel ────────────────────────────────────────────────────────────
+// ─── Schedule Panel ───────────────────────────────────────────────────────────
 function SchedulePanel({ schedule, adminKey, onUpdate }: { schedule: ScheduledItem[]; adminKey: string; onUpdate: (s: ScheduledItem[]) => void }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", section: "announcement" as ScheduledItem["section"], publishAt: "", expiresAt: "" });
   const [saving, setSaving] = useState(false);
   const now = new Date().toISOString();
-
   async function cancel(id: string) {
     await fetch("/api/cms/schedule", { method: "PATCH", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ id, status: "cancelled" }) });
     onUpdate(schedule.map(s => s.id === id ? { ...s, status: "cancelled" } : s));
@@ -817,17 +907,12 @@ function SchedulePanel({ schedule, adminKey, onUpdate }: { schedule: ScheduledIt
     await fetch("/api/cms/schedule", { method: "DELETE", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ id }) });
     onUpdate(schedule.filter(s => s.id !== id));
   }
-
   const upcoming = schedule.filter(s => s.status === "scheduled" && s.publishAt > now);
   const published = schedule.filter(s => s.status === "published");
-  const past = schedule.filter(s => s.status === "cancelled" || s.status === "expired");
-
   return (
     <>
       <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
-        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-          Stage content updates in advance. A scheduled item goes live automatically at the date and time you set — no login required at publish time. Use this for month-end menu swaps, announcements, or any planned content change.
-        </p>
+        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>Stage content updates in advance. A scheduled item goes live automatically at the date and time you set — no login required at publish time.</p>
       </div>
       <button style={{ ...btn(), width: "100%", marginBottom: 14 }} onClick={() => setShowForm(!showForm)}>{showForm ? "✕ Cancel" : "+ Schedule an Update"}</button>
       {showForm && (
@@ -847,7 +932,7 @@ function SchedulePanel({ schedule, adminKey, onUpdate }: { schedule: ScheduledIt
             <div><span style={lbl}>Publish date & time *</span><input style={input} type="datetime-local" value={form.publishAt} onChange={e => setForm(f => ({ ...f, publishAt: e.target.value }))} /></div>
             <div><span style={lbl}>Auto-expire (optional)</span><input style={input} type="datetime-local" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))} /></div>
           </div>
-          <p style={{ fontSize: 12, color: MUTED, margin: "0 0 14px" }}>Note: You'll need to paste in the actual content payload after creating the item — or contact Chris to set up the full payload for complex content like menus.</p>
+          <p style={{ fontSize: 12, color: MUTED, margin: "0 0 14px" }}>Note: Contact Chris to set up the full content payload for complex items like menus.</p>
           <button style={{ ...btn(), width: "100%" }} onClick={async () => {
             if (!form.title || !form.publishAt) return;
             setSaving(true);
@@ -863,7 +948,7 @@ function SchedulePanel({ schedule, adminKey, onUpdate }: { schedule: ScheduledIt
           {upcoming.map(s => (
             <div key={s.id} style={{ padding: "10px 0", borderBottom: `1px solid ${BORDER}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div><div style={{ fontWeight: 700, fontSize: 14 }}>{s.title}</div><div style={{ fontSize: 11, color: MUTED }}>{s.section} · Publishes {new Date(s.publishAt).toLocaleString()}</div></div>
+                <div><div style={{ fontWeight: 700, fontSize: 14 }}>{s.title}</div><div style={{ fontSize: 11, color: MUTED }}>{s.section} · {new Date(s.publishAt).toLocaleString()}</div></div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button onClick={() => cancel(s.id)} style={{ ...btn("white", AMBER), padding: "4px 10px", fontSize: 11, border: `1px solid ${AMBER}` }}>Cancel</button>
                   <button onClick={() => remove(s.id)} style={{ ...btn("white", MAROON), padding: "4px 10px", fontSize: 11, borderColor: MAROON }}>×</button>
@@ -903,7 +988,6 @@ function BoardDocsAdminPanel({ content, adminKey, onChange }: { content: SiteCon
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", category: "agenda" as BoardDoc["category"], date: new Date().toISOString().slice(0, 10), href: "" });
   const [saving, setSaving] = useState(false);
-
   async function add() {
     if (!form.title || !form.href) return;
     setSaving(true);
@@ -915,13 +999,10 @@ function BoardDocsAdminPanel({ content, adminKey, onChange }: { content: SiteCon
     await fetch("/api/cms/board-docs", { method: "DELETE", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ id }) });
     onChange(docs.filter(d => d.id !== id));
   }
-
   return (
     <>
       <div style={{ ...card, background: "#F0F0FF", border: "none" }}>
-        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-          Upload board agendas, minutes, and resolutions. Each document appears in the Board & Leadership section of the public site. Files must be uploaded to <strong>/documents/board/</strong> in the repo first — then paste the link here.
-        </p>
+        <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6 }}>Upload board agendas, minutes, and resolutions. Files must be uploaded to <strong>/documents/board/</strong> in the repo first — then paste the link here.</p>
       </div>
       <button style={{ ...btn(), width: "100%", marginBottom: 14 }} onClick={() => setShowForm(!showForm)}>{showForm ? "✕ Cancel" : "+ Add Board Document"}</button>
       {showForm && (
@@ -962,7 +1043,6 @@ function BoardDocsAdminPanel({ content, adminKey, onChange }: { content: SiteCon
 function ImpactPanel({ adminKey }: { adminKey: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   async function generate() {
     setLoading(true); setError("");
     const r = await fetch("/api/cms/grant-impact", { headers: { "x-admin-key": adminKey } });
@@ -975,67 +1055,52 @@ function ImpactPanel({ adminKey }: { adminKey: string }) {
     a.click(); URL.revokeObjectURL(url);
     setLoading(false);
   }
-
   return (
-    <>
-      <div style={{ ...card, background: "#F0FFF4", border: `1px solid ${GREEN}` }}>
-        <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8, color: GREEN }}>📈 Quarterly Impact Report</div>
-        <p style={{ margin: "0 0 14px", fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
-          Generate a one-page impact summary from all site data — engagement stats, intake leads, volunteer hours, and transit requests. Opens as an HTML file you can print to PDF and attach to grant applications.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 16 }}>
-          {[["📊","Site engagement & top programs"],["📥","Intake inquiries & follow-up rates"],["🤝","Volunteer hours & match value"]].map(([icon, label]) => (
-            <div key={label as string} style={{ background: "white", border: `1px solid ${GREEN}`, borderRadius: 8, padding: 10, fontSize: 11, textAlign: "center" }}>
-              <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>
-              <div style={{ color: "#374151", lineHeight: 1.4 }}>{label}</div>
-            </div>
-          ))}
-        </div>
-        <button style={{ ...btn(GREEN), width: "100%", fontSize: 15 }} onClick={generate} disabled={loading}>
-          {loading ? "Generating…" : "📥 Download Impact Report"}
-        </button>
-        {error && <p style={{ color: MAROON, fontSize: 13, marginTop: 10 }}>{error}</p>}
-        <p style={{ fontSize: 11, color: MUTED, marginTop: 10 }}>
-          The downloaded file opens in any browser. Use File → Print → Save as PDF to create the final PDF document.
-        </p>
+    <div style={{ ...card, background: "#F0FFF4", border: `1px solid ${GREEN}` }}>
+      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8, color: GREEN }}>📈 Quarterly Impact Report</div>
+      <p style={{ margin: "0 0 14px", fontSize: 13, color: "#374151", lineHeight: 1.6 }}>
+        Generate a one-page impact summary from all site data — engagement stats, intake leads, volunteer hours, and transit requests. Opens as an HTML file you can print to PDF.
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 16 }}>
+        {[["📊","Site engagement"],["📥","Intake & follow-up"],["🤝","Volunteer match"]].map(([icon, label]) => (
+          <div key={label as string} style={{ background: "white", border: `1px solid ${GREEN}`, borderRadius: 8, padding: 10, fontSize: 11, textAlign: "center" }}>
+            <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>
+            <div style={{ color: "#374151", lineHeight: 1.4 }}>{label}</div>
+          </div>
+        ))}
       </div>
-    </>
+      <button style={{ ...btn(GREEN), width: "100%", fontSize: 15 }} onClick={generate} disabled={loading}>
+        {loading ? "Generating…" : "📥 Download Impact Report"}
+      </button>
+      {error && <p style={{ color: MAROON, fontSize: 13, marginTop: 10 }}>{error}</p>}
+      <p style={{ fontSize: 11, color: MUTED, marginTop: 10 }}>Use File → Print → Save as PDF to create the final PDF document.</p>
+    </div>
   );
 }
 
 // ─── Reset Button ─────────────────────────────────────────────────────────────
 function ResetButton({ target, label, adminKey, onReset }: { target: string; label: string; adminKey: string; onReset: () => void }) {
   const [phase, setPhase] = useState<"idle"|"confirm"|"resetting"|"done"|"err">("idle");
-
   async function doReset() {
     setPhase("resetting");
-    const r = await fetch("/api/cms/reset", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
-      body: JSON.stringify({ target, confirm: "RESET_CONFIRMED" }),
-    }).catch(() => null);
+    const r = await fetch("/api/cms/reset", { method: "DELETE", headers: { "Content-Type": "application/json", "x-admin-key": adminKey }, body: JSON.stringify({ target, confirm: "RESET_CONFIRMED" }) }).catch(() => null);
     if (r?.ok) { setPhase("done"); setTimeout(() => { setPhase("idle"); onReset(); }, 2000); }
     else setPhase("err");
   }
-
   if (phase === "confirm") return (
     <div style={{ background: "#FFF0F0", border: "1px solid #FCA5A5", borderRadius: 10, padding: "12px 14px", marginBottom: 14 }}>
       <p style={{ fontSize: 13, fontWeight: 700, color: "#CC0000", margin: "0 0 10px" }}>⚠️ Are you sure? This cannot be undone.</p>
-      <p style={{ fontSize: 12, color: "#374151", margin: "0 0 12px" }}>This will permanently delete all {label.toLowerCase()} data. Use this only when switching to the live cadcok.org site.</p>
       <div style={{ display: "flex", gap: 8 }}>
         <button onClick={doReset} style={{ flex: 1, background: "#CC0000", color: "white", border: "none", borderRadius: 8, padding: "10px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>Yes, Reset {label}</button>
         <button onClick={() => setPhase("idle")} style={{ flex: 1, background: "white", color: "#374151", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
       </div>
     </div>
   );
-
   if (phase === "resetting") return <div style={{ padding: "10px 0", fontSize: 13, color: MUTED, fontWeight: 600 }}>Resetting…</div>;
   if (phase === "done") return <div style={{ padding: "10px 0", fontSize: 13, color: GREEN, fontWeight: 700 }}>✅ {label} cleared successfully.</div>;
   if (phase === "err") return <div style={{ padding: "10px 0", fontSize: 13, color: MAROON, fontWeight: 700 }}>Error resetting. Try again.</div>;
-
   return (
-    <button onClick={() => setPhase("confirm")}
-      style={{ background: "white", color: MAROON, border: `1px solid ${MAROON}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+    <button onClick={() => setPhase("confirm")} style={{ background: "white", color: MAROON, border: `1px solid ${MAROON}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
       🔄 Reset {label}
     </button>
   );
