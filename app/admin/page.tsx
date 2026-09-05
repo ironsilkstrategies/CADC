@@ -331,7 +331,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {tab === "features"   && <FeaturesEditor   v={content.features ?? { transitBooking: false, intakeLeads: false, volunteerLog: false }} onChange={v => update("features" as keyof SiteContent, v)} />}
+        {tab === "features"   && <FeaturesEditor   v={content.features ?? { transitBooking: false, intakeLeads: false, volunteerLog: false }} onChange={v => update("features" as keyof SiteContent, v)} content={content} adminKey={key} />}
         {tab === "announce"   && <AnnounceEditor   v={content.announcement}  onChange={v => update("announcement", v)} />}
         {tab === "menu"       && <MenuEditor        v={content.seniorMenu}    onChange={v => update("seniorMenu", v)} />}
         {tab === "market"     && <MarketEditor      v={content.marketSchedule} onChange={v => update("marketSchedule", v)} />}
@@ -832,8 +832,24 @@ function DocsEditor({ v, onChange }: { v: PublicDoc[]; onChange: (v: PublicDoc[]
 }
 
 // ─── Features Editor ──────────────────────────────────────────────────────────
-function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFeatures) => void }) {
+function FeaturesEditor({ v, onChange, content, adminKey }: { v: SiteFeatures; onChange: (v: SiteFeatures) => void; content: SiteContent; adminKey: string }) {
   const safe = { ...{ spanishToggle: false, transitBooking: false, intakeLeads: false, volunteerLog: false, faqAccordion: false, boardPortal: false, contentScheduling: false, grantPdf: false }, ...v };
+  const [translatePhase, setTranslatePhase] = useState<"idle"|"running"|"done"|"error">("idle");
+  const [translateDetail, setTranslateDetail] = useState("");
+
+  async function runTranslate() {
+    setTranslatePhase("running"); setTranslateDetail("");
+    try {
+      const r = await fetch("/api/cms/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
+        body: JSON.stringify({ content }),
+      });
+      const j = await r.json();
+      if (r.ok && j.ok) { setTranslatePhase("done"); setTranslateDetail(`Translated at ${new Date(j.translatedAt).toLocaleTimeString()}`); }
+      else { setTranslatePhase("error"); setTranslateDetail(j.error ?? "Unknown error"); }
+    } catch (err) { setTranslatePhase("error"); setTranslateDetail(String(err)); }
+  }
 
   const baseFeatures: { key: keyof SiteFeatures; label: string; desc: string; icon: string }[] = [
     { key: "spanishToggle", label: "Spanish / English Toggle", icon: "🌐", desc: "Shows the ES/EN language toggle in the site header. Turn on when Spanish translations are fully ready." },
@@ -879,6 +895,33 @@ function FeaturesEditor({ v, onChange }: { v: SiteFeatures; onChange: (v: SiteFe
       </div>
       <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "4px 0 8px" }}>Base Features</p>
       {baseFeatures.map(f => <Toggle key={f.key} f={f} />)}
+
+      {safe.spanishToggle && (
+        <div style={{ ...card, background: "#F0F0FF", border: `1.5px solid ${BLUE}`, padding: "14px 16px" }}>
+          <div style={{ fontWeight: 800, fontSize: 13, color: BLUE, marginBottom: 6 }}>🌐 Spanish Translation (Gemini AI)</div>
+          <p style={{ margin: "0 0 12px", fontSize: 12, color: "#374151", lineHeight: 1.6 }}>
+            Translation runs automatically when you save. Use this to re-translate manually — e.g. after updating the Senior Menu, Market Schedule, or Site Text.
+          </p>
+          {translatePhase === "idle" && (
+            <button onClick={runTranslate} style={{ ...btn(), width: "100%", fontSize: 13 }}>🔄 Re-translate to Spanish Now</button>
+          )}
+          {translatePhase === "running" && (
+            <div style={{ textAlign: "center", padding: "10px 0", fontSize: 13, color: BLUE, fontWeight: 700 }}>⏳ Translating via Gemini… (5–15 seconds)</div>
+          )}
+          {translatePhase === "done" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ color: GREEN, fontWeight: 800, fontSize: 13 }}>✅ Translation complete — {translateDetail}</div>
+              <button onClick={() => setTranslatePhase("idle")} style={{ ...btn("white", BLUE), fontSize: 12, padding: "8px 14px" }}>Translate Again</button>
+            </div>
+          )}
+          {translatePhase === "error" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ color: MAROON, fontWeight: 700, fontSize: 13 }}>❌ {translateDetail}</div>
+              <button onClick={() => setTranslatePhase("idle")} style={{ ...btn("white", MAROON), fontSize: 12, padding: "8px 14px", borderColor: MAROON }}>Try Again</button>
+            </div>
+          )}
+        </div>
+      )}
       <p style={{ color: MAROON, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "16px 0 8px" }}>⭐ Premium — Amendment Scope</p>
       <div style={{ ...card, background: "#FFF8E7", border: `1px solid ${AMBER}`, padding: "10px 14px", marginBottom: 12 }}>
         <p style={{ margin: 0, fontSize: 12, color: "#374151" }}>These features are built and ready. They activate when the amended contract is signed. Turning one on before the amendment is signed is at your discretion.</p>
