@@ -17,7 +17,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense, createContext, useContext } from "react";
-import { DEFAULT_CONTENT, fetchContent, type SiteContent } from "@/lib/cms";
+import { DEFAULT_CONTENT, DEFAULT_SITE_TEXT, DEFAULT_PROGRAM_TAGLINES, fetchContent, fetchContentEs, type SiteContent } from "@/lib/cms";
+import { EditableText, AdminModeIndicator } from "@/components/InlineEditBar";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -194,36 +195,93 @@ function useIsDesktop() {
 
 // ─── Live content (Vercel KV via /api/cms) ────────────────────────────────────
 // Directors edit at /admin. Falls back to DEFAULT_CONTENT / hardcoded data.
+// ─── CMS + Language context ───────────────────────────────────────────────────
+// CmsContext always holds the active content — English or Spanish depending on lang.
+// LangProvider manages the toggle, fetches esContent on first switch, and feeds
+// the correct SiteContent into CmsContext so every useCms() consumer gets
+// the right language automatically with no changes needed in leaf components.
+
+interface LangCtx {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  esLoading: boolean;
+  esError: boolean;   // true = spanishToggle on but no KV translation exists yet
+}
+
+const LangContext = createContext<LangCtx>({ lang: "en", setLang: () => {}, esLoading: false, esError: false });
+export function useLang() { return useContext(LangContext); }
+
 const CmsContext = createContext<SiteContent>(DEFAULT_CONTENT);
 export function useCms() { return useContext(CmsContext); }
+
+export function useProgramTagline(slug: string): string {
+  const { programTaglines } = useCms();
+  return (programTaglines ?? DEFAULT_PROGRAM_TAGLINES)[slug] ?? DEFAULT_PROGRAM_TAGLINES[slug] ?? "";
+}
+function ProgramTagline({ slug, style }: { slug: string; style?: React.CSSProperties }) {
+  return <span style={style}>{useProgramTagline(slug)}</span>;
+}
+
+// Single provider wraps both contexts so they share state.
+// Children see CmsContext automatically updated to Spanish when lang === "es".
+export function LangCmsProvider({ children }: { children: React.ReactNode }) {
+  const [enContent, setEnContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  const [esContent, setEsContent] = useState<SiteContent | null>(null);
+  const [lang, setLangState] = useState<Lang>("en");
+  const [esLoading, setEsLoading] = useState(false);
+  const [esError, setEsError] = useState(false);
+  const [esFetched, setEsFetched] = useState(false);
+
+  // Load English content on mount and on tab focus
+  useEffect(() => { fetchContent().then(setEnContent); }, []);
+  useEffect(() => {
+    function onFocus() { fetchContent().then(setEnContent); }
+    window.addEventListener("visibilitychange", onFocus);
+    window.addEventListener("focus", onFocus);
+    return () => { window.removeEventListener("visibilitychange", onFocus); window.removeEventListener("focus", onFocus); };
+  }, []);
+
+  async function setLang(l: Lang) {
+    if (l === "es" && !esFetched) {
+      setEsLoading(true);
+      try {
+        const data = await fetchContentEs();
+        if (data) { setEsContent(data); setEsError(false); }
+        else setEsError(true);
+      } catch { setEsError(true); }
+      finally { setEsLoading(false); setEsFetched(true); }
+    }
+    setLangState(l);
+  }
+
+  // Active content: Spanish when available and selected, English otherwise
+  const activeContent = lang === "es" && esContent ? esContent : enContent;
+
+  return (
+    <LangContext.Provider value={{ lang, setLang, esLoading, esError }}>
+      <CmsContext.Provider value={activeContent}>
+        {children}
+      </CmsContext.Provider>
+    </LangContext.Provider>
+  );
+}
+
+// Keep individual exports for pages that use them separately (about, contact)
 export function CmsProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
-
-  // Initial load
   useEffect(() => { fetchContent().then(setContent); }, []);
-
-  // Re-fetch whenever the tab regains focus — this is what makes admin feature
-  // toggles reflect on the public site without a hard reload. Admin saves to KV,
-  // switches back to the site tab, content updates automatically within ~1s.
   useEffect(() => {
     function onFocus() { fetchContent().then(setContent); }
     window.addEventListener("visibilitychange", onFocus);
     window.addEventListener("focus", onFocus);
-    return () => {
-      window.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
-    };
+    return () => { window.removeEventListener("visibilitychange", onFocus); window.removeEventListener("focus", onFocus); };
   }, []);
-
   return <CmsContext.Provider value={content}>{children}</CmsContext.Provider>;
 }
-
-// ─── Lang context — shared across orbit + about + contact pages ───────────────
-const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: "en", setLang: () => {} });
-export function useLang() { return useContext(LangContext); }
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>("en");
-  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>;
+  const [lang, setLangState] = useState<Lang>("en");
+  const setLang = (l: Lang) => setLangState(l);
+  return <LangContext.Provider value={{ lang, setLang, esLoading: false, esError: false }}>{children}</LangContext.Provider>;
 }
 
 
@@ -481,7 +539,9 @@ function MarketSchedule({ dark }: { dark: boolean }) {
         ))}
       </div>
 
-      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>{note}</p>
+      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
+        <EditableText id="marketSchedule.note" section="marketSchedule" label="Market Schedule Note" fallback={note}>{note}</EditableText>
+      </p>
 
       {selectedDate && selectedStops && selectedDayNum && (
         <div
@@ -664,7 +724,9 @@ function MealCalendar({ dark }: { dark: boolean }) {
       </div>
 
       {/* Note */}
-      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>{note}</p>
+      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
+        <EditableText id="seniorMenu.note" section="seniorMenu" label="Senior Menu Note" fallback={note}>{note}</EditableText>
+      </p>
 
       {/* Day detail modal */}
       {selectedDate && selectedMeal && selectedDayNum && (
@@ -5433,7 +5495,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
       <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}>{activeProgram.tagline}</p>
+          <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}><ProgramTagline slug={activeProgram.slug} /></p>
           <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary, display:"flex", alignItems:"center", gap: 12 }}>
             {PROGRAM_ICONS[activeProgram.slug]
               ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:48,height:48,objectFit:"contain",flexShrink:0}} />
@@ -5552,7 +5614,8 @@ function HeaderSearch({ compact = false }: { compact?: boolean }) {
 // Slide-out site menu — every feature reachable without the orbit
 function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [expanded, setExpanded] = useState<string | null>(null);
-  const { documents } = useCms();
+  const { documents, siteText: rawSiteText } = useCms();
+  const st = { ...DEFAULT_SITE_TEXT, ...(rawSiteText ?? {}) };
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -5621,7 +5684,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
 
         {sectionLabel("About & Transparency")}
         <a href="/about" style={linkStyle}>🏢 About CADC</a>
-        <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 Community Needs Survey</a>
+        <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 Community Needs Survey</a>
         {documents.map(d => (
           <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
         ))}
@@ -5638,8 +5701,9 @@ export interface CADCHeaderProps {
 // THE header. Identical on orbit, about, contact.
 export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
   const isDesktop = useIsDesktop();
-  const { announcement, features } = useCms();
-  const { lang, setLang } = useLang();
+  const { announcement, features, siteText: rawSiteText } = useCms();
+  const st = { ...DEFAULT_SITE_TEXT, ...(rawSiteText ?? {}) };
+  const { lang, setLang, esLoading, esError } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const close = useCallback(() => setMenuOpen(false), []);
   const btn: React.CSSProperties = { background: "white", border: `1px solid ${T.border}`, borderRadius: 8, cursor: "pointer", color: T.blue, display: "flex", alignItems: "center", justifyContent: "center" };
@@ -5648,7 +5712,9 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
       {announcement?.enabled && announcement.text && (
         <a href={announcement.href || undefined} role="status" aria-live="polite"
           style={{ display: "block", background: T.blue, color: "white", padding: "10px 16px", textAlign: "center", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-          📣 {announcement.text}{announcement.href ? " →" : ""}
+          📣 <EditableText id="announcement.text" section="announcement" label="Alert Banner Text" fallback={announcement.text}>
+            {announcement.text}
+          </EditableText>{announcement.href ? " →" : ""}
         </a>
       )}
       <header role="banner" style={{ position: "sticky", top: 0, zIndex: 400, background: "white", borderBottom: `1px solid ${T.border}`, boxShadow: "0 1px 12px rgba(1,1,255,0.06)" }}>
@@ -5672,15 +5738,19 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
             ))}
             {/* Language toggle — only shows when spanishToggle feature is on */}
             {features?.spanishToggle && (
-              <button onClick={() => setLang(lang === "en" ? "es" : "en")}
+              <button
+                onClick={() => setLang(lang === "en" ? "es" : "en")}
+                disabled={esLoading}
                 aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
-                style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.06em" }}>
-                {lang === "en" ? "ES" : "EN"}
+                title={esError && lang === "en" ? "Spanish translation not yet generated — enable in admin Features tab" : undefined}
+                style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: esLoading ? "wait" : "pointer", letterSpacing: "0.06em", display: "flex", alignItems: "center", gap: 4 }}>
+                {esLoading ? "…" : lang === "en" ? "ES" : "EN"}
+                {esError && !esLoading && <span style={{ fontSize: 9 }}>⚠️</span>}
               </button>
             )}
-            <a href="tel:+15803355588" aria-label="Call CADC at 580-335-5588"
+            <a href={`tel:+1${st.mainPhone.replace(/\D/g,"")}`} aria-label={`Call CADC at ${st.mainPhone}`}
               style={{ background: T.maroon, color: "white", padding: isDesktop ? "9px 16px" : "9px 13px", borderRadius: 8, fontSize: 12, fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}>
-              📞 {isDesktop ? "580-335-5588" : t("Call", lang)}
+              📞 {isDesktop ? st.mainPhone : t("Call", lang)}
             </a>
           </div>
         </nav>
@@ -5709,7 +5779,8 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
 
 // Survey band + footer — survey lives here now (not in the header)
 export function CADCFooter() {
-  const { documents } = useCms();
+  const { documents, siteText: rawSiteText } = useCms();
+  const st = { ...DEFAULT_SITE_TEXT, ...(rawSiteText ?? {}) };
   const router = useRouter();
   // Hidden staff door — tap the © line 5 times within 3 seconds → /admin
   const taps = useRef<number[]>([]);
@@ -5720,19 +5791,23 @@ export function CADCFooter() {
   }
   return (
     <>
-      <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
-        aria-label="Take the 2026 CADC Community Needs Survey (opens in new tab)"
+      <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer"
+        aria-label="Take the CADC Community Needs Survey (opens in new tab)"
         style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: T.maroon, color: "white", padding: "14px 20px", textDecoration: "none", fontSize: 13, fontWeight: 800, letterSpacing: "0.03em", textAlign: "center" }}>
-        📋 2026 Community Needs Survey — <span style={{ fontWeight: 500 }}>Make Your Voice Heard →</span>
+        📋 <EditableText id="siteText.surveyBannerText" section="siteText" label="Survey Banner Text" fallback={st.surveyBannerText}>{st.surveyBannerText}</EditableText>
       </a>
       <footer role="contentinfo" style={{ background: "#0A1628", color: "white", padding: "40px 24px 28px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
           <div>
             <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 48, width: "auto", marginBottom: 12, filter: "brightness(0) invert(1)" }} />
-            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: "0 0 16px" }}>Helping People. Changing Lives.<br />Serving Southwest Oklahoma since 1966.</p>
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: "0 0 16px" }}>
+              <EditableText id="siteText.footerTagline" section="siteText" label="Footer Tagline" fallback={st.footerTagline} as="span">
+                {st.footerTagline.split("\n").map((line, i) => <span key={i}>{line}{i < st.footerTagline.split("\n").length - 1 && <br />}</span>)}
+              </EditableText>
+            </p>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px" }}>Get Help</p>
             <a href="/?program=board&area=service-screener" style={{ display: "block", color: "rgba(255,255,255,0.8)", fontSize: 13, textDecoration: "none", marginBottom: 7, fontWeight: 700 }}>🔍 Find My Benefits</a>
-            <a href="tel:+15803355588" style={{ display: "block", color: "white", fontWeight: 800, fontSize: 15, textDecoration: "none", marginBottom: 7 }}>📞 580-335-5588</a>
+            <a href={`tel:+1${st.mainPhone.replace(/\D/g,"")}`} style={{ display: "block", color: "white", fontWeight: 800, fontSize: 15, textDecoration: "none", marginBottom: 7 }}>📞 {st.mainPhone}</a>
             <a href="/contact" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>📍 Find a Location</a>
             <a href="/?program=transit&area=rides" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>🚌 Schedule a Ride</a>
           </div>
@@ -5744,18 +5819,18 @@ export function CADCFooter() {
           </div>
           <div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact & Location</p>
-            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8, margin: "0 0 10px" }}>105 S. Main Street · P.O. Box 989<br />Frederick, OK 73542</p>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8, margin: "0 0 10px" }}>{st.headOfficeAddress.split("\n").map((line, i) => <span key={i}>{line}{i < st.headOfficeAddress.split("\n").length - 1 && <br />}</span>)}</p>
             <a href="/contact" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Contact &amp; Locations →</a>
             <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>About CADC →</a>
-            <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Facebook →</a>
-            <a href="https://www.instagram.com/wearecadc" target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>Instagram →</a>
+            <a href={st.facebookUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Facebook →</a>
+            <a href={st.instagramUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>Instagram →</a>
           </div>
           <div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
             {documents.map(d => (
               <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
             ))}
-            <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📋 <span>2026 Community Needs Survey</span></a>
+            <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📋 <span>Community Needs Survey</span></a>
           </div>
         </div>
         <div style={{ maxWidth: 960, margin: "28px auto 0", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 18, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
@@ -5916,7 +5991,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
             <div style={{ background: T.blue, padding: "14px 20px" }}>
-              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>{activeProgram.tagline}</p>
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}><ProgramTagline slug={activeProgram.slug} /></p>
               <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif", display:"flex", alignItems:"center", gap: 10 }}>
                 {PROGRAM_ICONS[activeProgram.slug]
                   ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:36,height:36,objectFit:"contain",flexShrink:0}} />
@@ -5969,7 +6044,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
                       style={{ width: 44, height: 44, objectFit: "contain", display: "block", marginBottom: 6 }} />
                   : <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>}
                 <span style={{ color: T.blue, fontWeight: 700, fontSize: 12, display: "block" }}>{p.shortName}</span>
-                <span style={{ color: T.textMuted, fontSize: 10 }}>{p.tagline}</span>
+                <ProgramTagline slug={p.slug} style={{ color: T.textMuted, fontSize: 10 }} />
               </button>
             ))}
           </div>
@@ -6410,7 +6485,10 @@ export default function CADCOrbitSite() {
         <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
       </div>
     }>
-      <LangProvider><CmsProvider><CADCOrbitSiteInner /></CmsProvider></LangProvider>
+      <LangCmsProvider>
+        <AdminModeIndicator />
+        <CADCOrbitSiteInner />
+      </LangCmsProvider>
     </Suspense>
   );
 }
