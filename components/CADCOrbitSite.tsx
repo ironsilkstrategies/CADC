@@ -2618,7 +2618,7 @@ function CADCNow() {
   const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
   const todayStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
 
-  // ISO date key for today — e.g. "2026-09-08"
+  // ISO date key — e.g. "2026-09-08"
   const todayKey = [
     now.getFullYear(),
     String(now.getMonth() + 1).padStart(2, "0"),
@@ -2629,12 +2629,12 @@ function CADCNow() {
   const menu = cms.seniorMenu ?? MENU_DATA;
   const todayMeal = isWeekday ? (menu.meals?.[todayKey] ?? null) : null;
 
-  // Market stop — today first, then next upcoming date
+  // Market stops — all stops for today, or first stop of next upcoming date
   const market = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
   const stops = market.stops ?? {};
-  let marketStops = stops[todayKey] ?? null;
+  let marketStops: { location: string; time: string }[] | null = stops[todayKey] ?? null;
   let marketDateLabel = "Today";
-  if (!marketStops) {
+  if (!marketStops || marketStops.length === 0) {
     const nextDate = Object.keys(stops).filter(k => k > todayKey).sort()[0];
     if (nextDate) {
       marketStops = stops[nextDate];
@@ -2642,7 +2642,6 @@ function CADCNow() {
       marketDateLabel = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     }
   }
-  const nextStop = marketStops?.[0] ?? null;
 
   // Active alert
   const alert = cms.announcement;
@@ -2652,7 +2651,19 @@ function CADCNow() {
 
   if (hasAlert) items.push({ icon: "⚠️", label: "Service Alert", value: alert!.text!, href: alert!.href || undefined, color: "#CC0000" });
   if (todayMeal) items.push({ icon: "🍽️", label: "Today's Senior Meal", value: todayMeal.headline || "See menu", sub: todayMeal.full?.slice(0, 3).join(" · ") });
-  if (nextStop) items.push({ icon: "🚚", label: `Community Market · ${marketDateLabel}`, value: nextStop.location, sub: nextStop.time });
+
+  // Push ALL stops for the day — not just the first one
+  if (marketStops && marketStops.length > 0) {
+    marketStops.forEach((stop, i) => {
+      items.push({
+        icon: "🚚",
+        label: i === 0 ? `Community Market · ${marketDateLabel}` : "",
+        value: stop.location,
+        sub: stop.time,
+      });
+    });
+  }
+
   items.push({ icon: "🚌", label: "Red River Transit", value: "Schedule a ride", sub: "(580) 335-2691", href: "tel:+15803352691" });
   if (!todayMeal && isWeekday) items.push({ icon: "🧒", label: "Head Start", value: "Enrollment open", sub: "Call 580-726-3343", href: "tel:+15807263343" });
 
