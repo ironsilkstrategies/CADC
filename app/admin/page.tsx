@@ -148,7 +148,19 @@ export default function AdminPage() {
     const n = sessionStorage.getItem("cadc-admin-name");
     if (k) { setKey(k); setAuthed(true); }
     if (n) setName(n);
-    fetch("/api/cms", { cache: "no-store" }).then(r => r.json()).then(j => { setContent({ ...DEFAULT_CONTENT, ...j }); setLoading(false); }).catch(() => setLoading(false));
+    fetch("/api/cms", { cache: "no-store" }).then(r => r.json()).then(j => {
+      const merged = { ...DEFAULT_CONTENT, ...j, features: { ...DEFAULT_CONTENT.features, ...(j.features ?? {}) } };
+      // Ensure Annual Report is always first in the documents list
+      if (Array.isArray(merged.documents)) {
+        merged.documents.sort((a: {label:string}, b: {label:string}) => {
+          if (a.label.toLowerCase().includes("annual")) return -1;
+          if (b.label.toLowerCase().includes("annual")) return 1;
+          return 0;
+        });
+      }
+      setContent(merged);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
   useEffect(() => {
