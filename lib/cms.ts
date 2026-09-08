@@ -227,9 +227,9 @@ export const DEFAULT_CONTENT: SiteContent = {
     { name: "Kristie Jackson", title: "Director, Advantage Home Delivered Meals",    phone: "580-393-2216" },
   ],
   documents: [
+    { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
     { label: "Title VI Policy (Red River Transportation)", href: "/documents/title-vi-policy.pdf" },
     { label: "Affirmative Action Plan 2023",               href: "/documents/affirmative-action-plan-2023.pdf" },
-    { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
     { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
   ],
   siteText: DEFAULT_SITE_TEXT,
@@ -243,7 +243,16 @@ export async function fetchContent(): Promise<SiteContent> {
     const r = await fetch("/api/cms", { cache: "no-store" });
     if (!r.ok) return DEFAULT_CONTENT;
     const j = await r.json();
-    return { ...DEFAULT_CONTENT, ...j, features: { ...DEFAULT_CONTENT.features, ...(j.features ?? {}) } };
+    const merged = { ...DEFAULT_CONTENT, ...j, features: { ...DEFAULT_CONTENT.features, ...(j.features ?? {}) } };
+    // Always show Annual Report first in document lists
+    if (Array.isArray(merged.documents)) {
+      merged.documents.sort((a: PublicDoc, b: PublicDoc) => {
+        if (a.label.toLowerCase().includes("annual")) return -1;
+        if (b.label.toLowerCase().includes("annual")) return 1;
+        return 0;
+      });
+    }
+    return merged;
   } catch { return DEFAULT_CONTENT; }
 }
 
