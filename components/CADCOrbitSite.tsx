@@ -2614,25 +2614,35 @@ function BoardDocsPanel() {
 function CADCNow() {
   const cms = useCms();
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...5=Fri, 6=Sat
+  const dayOfWeek = now.getDay();
   const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
   const todayStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
 
-  // Today's senior meal
-  const menu = cms.seniorMenu ?? MENU_DATA;
-  const monthMeals = menu.meals ?? {};
-  const todayDate = now.getDate();
-  const todayMeal = isWeekday ? (monthMeals[todayDate] ?? null) : null;
+  // ISO date key for today — e.g. "2026-09-08"
+  const todayKey = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
 
-  // Next community market stop
+  // Today's senior meal — keyed by ISO date string
+  const menu = cms.seniorMenu ?? MENU_DATA;
+  const todayMeal = isWeekday ? (menu.meals?.[todayKey] ?? null) : null;
+
+  // Market stop — today first, then next upcoming date
   const market = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
-  const allStops = Object.values(market.stops ?? {}).flat() as Array<{location:string;time:string;day?:string}>;
-  const todayStops = allStops.filter(s => {
-    if (!s.day) return false;
-    const d = s.day.toLowerCase();
-    return ["sun","mon","tue","wed","thu","fri","sat"][dayOfWeek] === d.slice(0,3);
-  });
-  const nextStop = todayStops[0] ?? allStops[0] ?? null;
+  const stops = market.stops ?? {};
+  let marketStops = stops[todayKey] ?? null;
+  let marketDateLabel = "Today";
+  if (!marketStops) {
+    const nextDate = Object.keys(stops).filter(k => k > todayKey).sort()[0];
+    if (nextDate) {
+      marketStops = stops[nextDate];
+      const d = new Date(nextDate + "T12:00:00");
+      marketDateLabel = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    }
+  }
+  const nextStop = marketStops?.[0] ?? null;
 
   // Active alert
   const alert = cms.announcement;
@@ -2641,8 +2651,8 @@ function CADCNow() {
   const items: Array<{icon:string; label:string; value:string; sub?:string; href?:string; color?:string}> = [];
 
   if (hasAlert) items.push({ icon: "⚠️", label: "Service Alert", value: alert!.text!, href: alert!.href || undefined, color: "#CC0000" });
-  if (todayMeal) items.push({ icon: "🍽️", label: "Today's Senior Meal", value: todayMeal.main || "See menu", sub: todayMeal.sides?.join(" · ") });
-  if (nextStop) items.push({ icon: "🚚", label: "Community Market", value: nextStop.location, sub: nextStop.time });
+  if (todayMeal) items.push({ icon: "🍽️", label: "Today's Senior Meal", value: todayMeal.headline || "See menu", sub: todayMeal.full?.slice(0, 3).join(" · ") });
+  if (nextStop) items.push({ icon: "🚚", label: `Community Market · ${marketDateLabel}`, value: nextStop.location, sub: nextStop.time });
   items.push({ icon: "🚌", label: "Red River Transit", value: "Schedule a ride", sub: "(580) 335-2691", href: "tel:+15803352691" });
   if (!todayMeal && isWeekday) items.push({ icon: "🧒", label: "Head Start", value: "Enrollment open", sub: "Call 580-726-3343", href: "tel:+15807263343" });
 
