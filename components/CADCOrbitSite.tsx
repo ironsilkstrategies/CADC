@@ -115,6 +115,27 @@ const ES: Record<string, string> = {
   // ── Footer ────────────────────────────────────────────────────────────────
   "Reducing poverty in communities by empowering people": "Reduciendo la pobreza en las comunidades empoderando a las personas",
   "Helping People. Changing Lives.": "Ayudando a las personas. Cambiando vidas.",
+  // ── Menu drawer section labels ────────────────────────────────────────────
+  "Home": "Inicio",
+  "Get Help": "Obtener Ayuda",
+  "Find a Location": "Encontrar Ubicación",
+  "Community Needs Survey": "Encuesta de Necesidades Comunitarias",
+  "About & Transparency": "Acerca e Información",
+  "Programs & Services": "Programas y Servicios",
+  "Find Services by County": "Buscar Servicios por Condado",
+  "About CADC": "Acerca de CADC",
+  // ── Sub-area labels ───────────────────────────────────────────────────────
+  "Who Qualifies": "¿Quién Califica?",
+  "Express Interest": "Expresar Interés",
+  "Health & Wellness": "Salud y Bienestar",
+  "Nutrition": "Nutrición",
+  "Parent Engagement": "Participación de Padres",
+  "Log My Hours": "Registrar Mis Horas",
+  "Safety & Training": "Seguridad y Capacitación",
+  "FAQs": "Preguntas Frecuentes",
+  "Our Team": "Nuestro Equipo",
+  "Fares": "Tarifas",
+  "Service Area": "Área de Servicio",
   "Serving": "Sirviendo",
   "counties across Southwest Oklahoma": "condados en el suroeste de Oklahoma",
   "Get Help": "Obtener Ayuda",
@@ -124,8 +145,14 @@ const ES: Record<string, string> = {
   "Your information is kept private": "Su información se mantiene privada",
 };
 
+// Module-level mutable map — populated from KV when Spanish loads.
+// Declared here, before t(), so t() can safely reference it.
+// Never reassigned during SSR; only mutated client-side inside setLang().
+const ES_RUNTIME: Record<string, string> = {};
+
 function t(key: string, lang: Lang): string {
-  return lang === "es" ? (ES[key] ?? key) : key;
+  if (lang !== "es") return key;
+  return ES_RUNTIME[key] ?? ES[key] ?? key;
 }
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -210,6 +237,13 @@ interface LangCtx {
 
 const LangContext = createContext<LangCtx>({ lang: "en", setLang: () => {}, esLoading: false, esError: false });
 export function useLang() { return useContext(LangContext); }
+// useTrans() — convenience hook. Call once at top of component, get a tr() function.
+// tr("Apply") returns Spanish if lang=es, English otherwise.
+// Must live here, after LangContext and useLang are defined.
+export function useTrans(): (key: string) => string {
+  const { lang } = useLang();
+  return useCallback((key: string) => t(key, lang), [lang]);
+}
 
 const CmsContext = createContext<SiteContent>(DEFAULT_CONTENT);
 export function useCms() { return useContext(CmsContext); }
@@ -246,7 +280,13 @@ export function LangCmsProvider({ children }: { children: React.ReactNode }) {
       setEsLoading(true);
       try {
         const data = await fetchContentEs();
-        if (data) { setEsContent(data); setEsError(false); }
+        if (data) {
+          setEsContent(data);
+          setEsError(false);
+          // Populate runtime string overrides from KV-translated uiStrings
+          const kvStrings = (data as SiteContent & { uiStrings?: Record<string, string> }).uiStrings;
+          if (kvStrings) Object.assign(ES_RUNTIME, kvStrings);
+        }
         else setEsError(true);
       } catch { setEsError(true); }
       finally { setEsLoading(false); setEsFetched(true); }
@@ -5159,6 +5199,7 @@ function CADCOrbitSiteInner() {
   const [orbitTx, setOrbitTx] = useState<TransitionState>("idle");
   const [assembled, setAssembled] = useState(false);
   const { lang, setLang } = useLang();
+  const tr = useTrans();
   const isDesktop = useIsDesktop();
 
   // ── Visit counter — fire once on mount ──────────────────────────────────
@@ -5409,7 +5450,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
               }}>
                 <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
               </div>
-              <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+              <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>{tr("Tap to Explore Your County")}</span>
             </button>
           )}
 
@@ -5679,9 +5720,9 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <div style={{ marginTop: 16, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
           <span style={{ fontSize: 32, flexShrink: 0 }}>🔍</span>
           <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Not sure where to start?</p>
+            <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>{tr("Not sure where to start?")}</p>
             <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
-            <a href="/?program=board&area=service-screener" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>Find My Benefits →</a>
+            <a href="/?program=board&area=service-screener" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>{tr("Find My Benefits →")}</a>
           </div>
         </div>
 
@@ -5890,6 +5931,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
   const [expanded, setExpanded] = useState<string | null>(null);
   const { documents, siteText: rawSiteText } = useCms();
   const st = { ...DEFAULT_SITE_TEXT, ...(rawSiteText ?? {}) };
+  const tr = useTrans();
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -5898,7 +5940,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [open, onClose]);
   if (!open) return null;
-  const sectionLabel = (t: string) => <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "22px 0 8px" }}>{t}</p>;
+  const sectionLabel = (label: string) => <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "22px 0 8px" }}>{tr(label)}</p>;
   const linkStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, padding: "11px 12px", borderRadius: 10, color: T.textPrimary, textDecoration: "none", fontSize: 15, fontWeight: 600, background: "white", border: `1px solid ${T.border}`, marginBottom: 6 };
   return (
     <div onClick={onClose} role="dialog" aria-modal="true" aria-label="Site menu"
@@ -5910,15 +5952,15 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
           <button onClick={onClose} aria-label="Close menu" style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 8, width: 38, height: 38, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
         </div>
 
-        <a href="/" style={{ ...linkStyle, background: T.blue, color: "white", border: "none", marginTop: 12 }}>🏠 Home</a>
+        <a href="/" style={{ ...linkStyle, background: T.blue, color: "white", border: "none", marginTop: 12 }}>🏠 {tr("Home")}</a>
 
         {sectionLabel("Get Help")}
-        <a href="/?program=board&area=service-screener" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>🔍 Find My Benefits</a>
-        <a href="tel:+15803355588" style={linkStyle}>📞 Call CADC — 580-335-5588</a>
-        <a href="/contact" style={linkStyle}>📍 Find a Location</a>
+        <a href="/?program=board&area=service-screener" style={{ ...linkStyle, background: T.maroon, color: "white", border: "none" }}>🔍 {tr("Find My Benefits")}</a>
+        <a href="tel:+15803355588" style={linkStyle}>📞 {tr("Call")} CADC — 580-335-5588</a>
+        <a href="/contact" style={linkStyle}>📍 {tr("Find a Location")}</a>
         <div style={{ margin: "6px 0" }}><FindNearMe /></div>
-        <a href="/?program=transit&area=rides" style={linkStyle}>🚌 Schedule a Ride</a>
-        <a href="/?program=head-start&area=apply" style={linkStyle}>📝 Apply for Head Start</a>
+        <a href="/?program=transit&area=rides" style={linkStyle}>🚌 {tr("Schedule a Ride")}</a>
+        <a href="/?program=head-start&area=apply" style={linkStyle}>📝 {tr("Apply for Head Start")}</a>
 
         {sectionLabel("Programs & Services")}
         {PROGRAMS.map(p => (
@@ -5941,7 +5983,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
               <div style={{ padding: "6px 0 4px 14px", borderLeft: `2px solid ${T.blueLight}`, marginLeft: 10, marginTop: 4 }}>
                 {p.subAreas.map(a => (
                   <a key={a.id} href={`/?program=${p.slug}&area=${a.id}`} style={{ display: "block", padding: "8px 10px", color: T.textPrimary, textDecoration: "none", fontSize: 14, borderRadius: 8 }}>
-                    <span aria-hidden="true" style={{ marginRight: 8 }}>{a.icon}</span>{a.label}
+                    <span aria-hidden="true" style={{ marginRight: 8 }}>{a.icon}</span>{tr(a.label) || a.label}
                   </a>
                 ))}
               </div>
@@ -5957,8 +5999,8 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
         </div>
 
         {sectionLabel("About & Transparency")}
-        <a href="/about" style={linkStyle}>🏢 About CADC</a>
-        <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 Community Needs Survey</a>
+        <a href="/about" style={linkStyle}>🏢 {tr("About CADC")}</a>
+        <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 {tr("Community Needs Survey")}</a>
         {documents.map(d => (
           <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
         ))}
@@ -6190,7 +6232,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             }}>
               <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
-            <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+            <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>{tr("Tap to Explore Your County")}</span>
           </button>
 
           {/* CADC Now */}
@@ -6201,12 +6243,12 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           {/* Universal screener CTA */}
           <div style={{ marginTop: 16, width: "100%", maxWidth: 360 }}>
             <div style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-              <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 Not sure where to start?</p>
+              <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 {tr("Not sure where to start?")}</p>
               <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
               <a
                 href="/?program=board&area=service-screener"
                 style={{ display: "block", width: "100%", background: T.maroon, color: "white", border: "none", borderRadius: 9, padding: "12px 16px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit", textDecoration: "none", textAlign: "center" as const, boxSizing: "border-box" as const }}>
-                Find My Benefits →
+                {tr("Find My Benefits →")}
               </a>
             </div>
           </div>
@@ -6241,10 +6283,10 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <div style={{ padding: "12px 20px 0", textAlign: "center" }}>
             {activeCountyName && (
               <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 2px" }}>
-                {activeCountyName} County — {availablePrograms.length} programs available
+                {activeCountyName} County — {availablePrograms.length} {tr("programs available")}
               </p>
             )}
-            <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>Tap a program node to explore</p>
+            <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>{tr("Tap a program node to explore")}</p>
           </div>
           <div style={{ padding: "12px 0 0" }}>
             <SpringOrbit
