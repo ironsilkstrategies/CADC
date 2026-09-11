@@ -25,7 +25,57 @@ interface TranslatableSlice {
     surveyBannerText: string;
   };
   programTaglines: Record<string, string>;
+  // Static UI strings — translated once, served from KV, no client-side map needed
+  uiStrings: Record<string, string>;
 }
+
+// Static UI strings sent to Gemini for translation.
+// Keys are English source strings; values are English (Gemini will translate to Spanish).
+// Add new strings here when new t() calls are added to the frontend.
+const UI_STRINGS_TO_TRANSLATE: Record<string, string> = {
+  "Home": "Home",
+  "Back": "Back",
+  "Call": "Call",
+  "Get Help": "Get Help",
+  "Find My Benefits": "Find My Benefits",
+  "Find My Benefits →": "Find My Benefits →",
+  "Find a Location": "Find a Location",
+  "Schedule a Ride": "Schedule a Ride",
+  "Apply for Head Start": "Apply for Head Start",
+  "Programs & Services": "Programs & Services",
+  "Find Services by County": "Find Services by County",
+  "About CADC": "About CADC",
+  "About & Transparency": "About & Transparency",
+  "Community Needs Survey": "Community Needs Survey",
+  "Tap a program node to explore": "Tap a program node to explore",
+  "programs available": "programs available",
+  "All Counties": "All Counties",
+  "View all services": "View all services",
+  "Not sure where to start?": "Not sure where to start?",
+  "Tap to Explore Your County": "Tap to Explore Your County",
+  "Apply": "Apply",
+  "Apply Now": "Apply Now",
+  "Who Qualifies": "Who Qualifies",
+  "How to Apply": "How to Apply",
+  "Express Interest": "Express Interest",
+  "Early Head Start": "Early Head Start",
+  "Health & Wellness": "Health & Wellness",
+  "Nutrition": "Nutrition",
+  "Parent Engagement": "Parent Engagement",
+  "Log My Hours": "Log My Hours",
+  "Safety & Training": "Safety & Training",
+  "FAQs": "FAQs",
+  "Our Team": "Our Team",
+  "Fares": "Fares",
+  "Service Area": "Service Area",
+  "About the Fleet": "About the Fleet",
+  "View Map": "View Map",
+  "Contact Us": "Contact Us",
+  "Learn More": "Learn More",
+  "Download": "Download",
+  "Spanish-speaking staff available": "Spanish-speaking staff available",
+  "Helping People. Changing Lives.": "Helping People. Changing Lives.",
+};
 
 function extractTranslatableSlice(content: SiteContent): TranslatableSlice {
   const st = { ...DEFAULT_SITE_TEXT, ...(content.siteText ?? {}) };
@@ -45,6 +95,7 @@ function extractTranslatableSlice(content: SiteContent): TranslatableSlice {
       surveyBannerText: st.surveyBannerText,
     },
     programTaglines: pt,
+    uiStrings: UI_STRINGS_TO_TRANSLATE,
   };
 }
 
@@ -118,7 +169,7 @@ export async function POST(req: Request) {
   }
 
   // Merge translated slice back into full content — everything else stays English
-  const esContent: SiteContent = {
+  const esContent: SiteContent & { uiStrings?: Record<string, string> } = {
     ...content,
     announcement: {
       ...content.announcement,
@@ -146,7 +197,6 @@ export async function POST(req: Request) {
     siteText: {
       ...DEFAULT_SITE_TEXT,
       ...(content.siteText ?? {}),
-      // Translate only the two visible text fields — URLs, phone, address stay English
       footerTagline: translated.siteText?.footerTagline ?? content.siteText?.footerTagline ?? DEFAULT_SITE_TEXT.footerTagline,
       surveyBannerText: translated.siteText?.surveyBannerText ?? content.siteText?.surveyBannerText ?? DEFAULT_SITE_TEXT.surveyBannerText,
     },
@@ -155,6 +205,8 @@ export async function POST(req: Request) {
       ...(content.programTaglines ?? {}),
       ...translated.programTaglines,
     },
+    // Store translated UI strings — fetched by LangCmsProvider and fed into the ES map at runtime
+    uiStrings: translated.uiStrings ?? {},
   };
 
   try {
