@@ -158,12 +158,6 @@ function t(key: string, lang: Lang): string {
   // Runtime KV translations take precedence over the static compile-time map
   return ES_RUNTIME[key] ?? ES[key] ?? key;
 }
-// Convenience hook — call inside any component to get a bound translator.
-// Usage: const tr = useTrans(); then tr("Apply") anywhere in JSX.
-export function useTrans(): (key: string) => string {
-  const { lang } = useLang();
-  return (key: string) => t(key, lang);
-}
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -247,6 +241,12 @@ interface LangCtx {
 
 const LangContext = createContext<LangCtx>({ lang: "en", setLang: () => {}, esLoading: false, esError: false });
 export function useLang() { return useContext(LangContext); }
+// Convenience hook — call inside any component to get a bound translator.
+// Usage: const tr = useTrans(); then tr("Apply") anywhere in JSX.
+export function useTrans(): (key: string) => string {
+  const { lang } = useLang();
+  return (key: string) => t(key, lang);
+}
 
 const CmsContext = createContext<SiteContent>(DEFAULT_CONTENT);
 export function useCms() { return useContext(CmsContext); }
