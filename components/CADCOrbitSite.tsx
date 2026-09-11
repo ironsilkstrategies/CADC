@@ -1274,11 +1274,11 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         transition:"transform 0s", // let spring handle it
       }}>
         {isSubLevel && activeProgram && PROGRAM_ICONS[activeProgram.slug]
-          ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+          ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
               style={{width:"92%",height:"92%",objectFit:"contain",display:"block"}} />
           : isSubLevel
             ? <span style={{fontSize:"clamp(1rem,2.5vw,1.4rem)"}}>{activeProgram?.icon}</span>
-            : <img src="/images/cadc-logo.png" alt="CADC" style={{width:"88%",height:"auto",objectFit:"contain",display:"block"}} />}
+            : <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{width:"88%",height:"auto",objectFit:"contain",display:"block"}} />}
         {/* Only show text label at entry stage — hide when program icon fills hub */}
         {!isSubLevel && (
           <span style={{
@@ -1354,7 +1354,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               transition:"box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease",
             }}>
               {customIcon
-                ? <img src={customIcon} alt={label}
+                ? <img loading="lazy" decoding="async" src={customIcon} alt={label}
                     style={{width:"90%",height:"90%",objectFit:"contain",display:"block"}} />
                 : icon}
             </div>
@@ -1422,7 +1422,7 @@ const PHOTOS = {
       "/images/head-start/classroom/hs-boy-nature-science.jpg",
       "/images/head-start/classroom/hs-boy-sandbox.jpg",
       "/images/head-start/classroom/hs-boys-watercolor-seeds.jpg",
-      "/images/head-start/classroom/hs-enrollment-office.JPG",
+      "/images/head-start/classroom/hs-enrollment-office.jpg",
       "/images/head-start/classroom/hs-girl-dramatic-play-doll.jpg",
       "/images/head-start/classroom/hs-girl-feather-art.jpg",
       "/images/head-start/classroom/hs-girl-magnifying-glass.jpg",
@@ -1446,40 +1446,40 @@ const PHOTOS = {
     ],
     // Community events (11)
     community: [
-      "/images/head-start/community/hs-air-evac-wide.JPG",
-      "/images/head-start/community/hs-community-event-outdoor.JPG",
-      "/images/head-start/community/hs-community-pumpkin-booth.HEIC",
+      "/images/head-start/community/hs-air-evac-wide.jpg",
+      "/images/head-start/community/hs-community-event-outdoor.jpg",
+      "/images/head-start/community/hs-community-pumpkin-booth.jpg",
       "/images/head-start/community/hs-fire-prevention-trailer.jpg",
       "/images/head-start/community/hs-firefighter-lifting-child.jpg",
-      "/images/head-start/community/hs-foss-fire-hose-wide.JPG",
+      "/images/head-start/community/hs-foss-fire-hose-wide.jpg",
       "/images/head-start/community/hs-girl-fire-truck-seat.jpg",
       "/images/head-start/community/hs-girl-firefighter-hose.jpg",
-      "/images/head-start/community/hs-relay-for-life.JPG",
-      "/images/head-start/community/hs-volunteers-needed-flyer.JPG",
-      "/images/head-start/community/hs-washita-back-to-school.HEIC",
+      "/images/head-start/community/hs-relay-for-life.jpg",
+      "/images/head-start/community/hs-volunteers-needed-flyer.jpg",
+      "/images/head-start/community/hs-washita-back-to-school.jpg",
     ],
     // Parenting / Family engagement (6)
     parenting: [
-      "/images/head-start/parenting/hs-fatherhood-dad-child.JPG",
-      "/images/head-start/parenting/hs-fatherhood-dinner.JPG",
-      "/images/head-start/parenting/hs-muffins-with-mom-wide.JPG",
-      "/images/head-start/parenting/hs-nursing-home-visit.JPG",
-      "/images/head-start/parenting/hs-parent-training-meeting.JPG",
-      "/images/head-start/parenting/hs-parenting-expedition-flyer.PNG",
+      "/images/head-start/parenting/hs-fatherhood-dad-child.jpg",
+      "/images/head-start/parenting/hs-fatherhood-dinner.jpg",
+      "/images/head-start/parenting/hs-muffins-with-mom-wide.jpg",
+      "/images/head-start/parenting/hs-nursing-home-visit.jpg",
+      "/images/head-start/parenting/hs-parent-training-meeting.jpg",
+      "/images/head-start/parenting/hs-parenting-expedition-flyer.jpg",
     ],
     // Staff photos (7)
     staff: [
-      "/images/head-start/staff/hs-staff-training.JPG",
+      "/images/head-start/staff/hs-staff-training.jpg",
       "/images/head-start/staff/hs-teachers-bear-ears.jpg",
       "/images/head-start/staff/staff-allison-zavala.jpg",
-      "/images/head-start/staff/staff-christy-glisson.heic",   // ⚠️ partial selfie — flag for better photo
+      "/images/head-start/staff/staff-christy-glisson.jpg",   // ⚠️ partial selfie — flag for better photo
       "/images/head-start/staff/staff-johnna-mann.jpg",
-      "/images/head-start/staff/staff-tarra-harrison.PNG",
+      "/images/head-start/staff/staff-tarra-harrison.jpg",
       "/images/head-start/staff/staff-teacher-child-hug.jpg",
     ],
     // Convenience aliases
     classroomActivity: "/images/head-start/classroom/hs-girl-magnifying-glass.jpg",
-    fatherhoodHero:    "/images/head-start/parenting/hs-fatherhood-dad-child.JPG",
+    fatherhoodHero:    "/images/head-start/parenting/hs-fatherhood-dad-child.jpg",
   },
 } as const;
 
@@ -1515,6 +1515,8 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
       animation: "fadeSlideIn 0.5s ease",
     }}>
       <img
+        loading="lazy"
+        decoding="async"
         src={hero.src}
         alt={hero.caption}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -1558,8 +1560,8 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/head-start/classroom/hs-teacher-kids-art.jpg",        alt: "Teacher and children doing art together" },
     { src: "/images/head-start/community/hs-firefighter-lifting-child.jpg", alt: "Firefighter with CADC Head Start child — community safety visit" },
     { src: "/images/head-start/community/hs-girl-fire-truck-seat.jpg",    alt: "Girl in fire truck seat during community safety event" },
-    { src: "/images/head-start/community/hs-community-event-outdoor.JPG", alt: "CADC Head Start outdoor community event" },
-    { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.JPG",  alt: "Muffins with Mom family engagement event" },
+    { src: "/images/head-start/community/hs-community-event-outdoor.jpg", alt: "CADC Head Start outdoor community event" },
+    { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.jpg",  alt: "Muffins with Mom family engagement event" },
     { src: "/images/hero/hero-1.jpg",  alt: "Head Start Civil Rights training, CADC banner" },
     { src: "/images/hero/hero-8.jpg",  alt: "Head Start CPR and First Aid training" },
     { src: "/images/hero/hero-15.jpg", alt: "Head Start classroom visit with legislators" },
@@ -1624,6 +1626,8 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
     }}>
       {/* Bottom layer — current photo, always fully visible */}
       <img
+        loading="lazy"
+        decoding="async"
         src={photos[current]?.src}
         alt={photos[current]?.alt}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -1635,6 +1639,8 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
       />
       {/* Top layer — next photo, fades in over the current */}
       <img
+        loading="lazy"
+        decoding="async"
         key={next}
         src={photos[next]?.src}
         alt={photos[next]?.alt}
@@ -1687,6 +1693,8 @@ function PhotoStrip({ photos, dark }: {
       <style>{`.photo-strip::-webkit-scrollbar { display: none; }`}</style>
       {visible.map((photo, i) => (
         <img
+        loading="lazy"
+        decoding="async"
           key={photo.src}
           src={photo.src}
           alt={photo.alt}
@@ -1737,6 +1745,8 @@ function PhotoGrid({ photos, dark }: {
           gridColumn: i === 0 && hasSpan ? "1 / span 2" : "auto",
         }}>
           <img
+        loading="lazy"
+        decoding="async"
             src={photo.src}
             alt={photo.alt}
             onError={() => {
@@ -3413,7 +3423,7 @@ const PROGRAMS: ProgramData[] = [
                 { src: "/images/head-start/ehs/ehs-toddler-outdoor-smile.jpg",      alt: "EHS toddler smiling outdoors" },
                 { src: "/images/head-start/ehs/ehs-toddler-playground-structure.jpg", alt: "EHS toddler on playground structure" },
               ].map(p => (
-                <img key={p.src} src={p.src} alt={p.alt}
+                <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   style={{ height: 120, width: 160, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
               ))}
@@ -3520,7 +3530,9 @@ const PROGRAMS: ProgramData[] = [
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <div style={{ flexShrink: 0 }}>
                   <img
-                    src="/images/head-start/parenting/hs-fatherhood-dad-child.JPG"
+        loading="lazy"
+        decoding="async"
+                    src="/images/head-start/parenting/hs-fatherhood-dad-child.jpg"
                     alt="Father and child — CADC Head Start Fatherhood Engagement"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10, border: "2px solid rgba(255,255,255,0.3)" }}
@@ -3535,12 +3547,12 @@ const PROGRAMS: ProgramData[] = [
               {/* Fatherhood photo strip */}
               <div style={{ display: "flex", gap: 8, marginTop: 12, overflowX: "auto" }}>
                 {[
-                  { src: "/images/head-start/parenting/hs-fatherhood-dinner.JPG", alt: "Fatherhood family dinner event" },
-                  { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.JPG", alt: "Muffins with Mom family engagement" },
-                  { src: "/images/head-start/parenting/hs-parent-training-meeting.JPG", alt: "Parent training meeting" },
-                  { src: "/images/head-start/parenting/hs-nursing-home-visit.JPG", alt: "Community nursing home visit with children" },
+                  { src: "/images/head-start/parenting/hs-fatherhood-dinner.jpg", alt: "Fatherhood family dinner event" },
+                  { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.jpg", alt: "Muffins with Mom family engagement" },
+                  { src: "/images/head-start/parenting/hs-parent-training-meeting.jpg", alt: "Parent training meeting" },
+                  { src: "/images/head-start/parenting/hs-nursing-home-visit.jpg", alt: "Community nursing home visit with children" },
                 ].map(p => (
-                  <img key={p.src} src={p.src} alt={p.alt}
+                  <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     style={{ height: 70, width: 100, objectFit: "cover", borderRadius: 8, flexShrink: 0, border: "1px solid rgba(255,255,255,0.2)" }} />
                 ))}
@@ -3601,11 +3613,11 @@ const PROGRAMS: ProgramData[] = [
             {/* Staff photo row — group shots */}
             <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>
               {[
-                { src: "/images/head-start/staff/hs-staff-training.JPG",       alt: "CADC Head Start staff training" },
+                { src: "/images/head-start/staff/hs-staff-training.jpg",       alt: "CADC Head Start staff training" },
                 { src: "/images/head-start/staff/hs-teachers-bear-ears.jpg",   alt: "CADC Head Start teachers wearing bear ears" },
                 { src: "/images/head-start/staff/staff-teacher-child-hug.jpg", alt: "Head Start teacher hugging child" },
               ].map(p => (
-                <img key={p.src} src={p.src} alt={p.alt}
+                <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   style={{ height: 110, width: 160, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
               ))}
@@ -3616,6 +3628,8 @@ const PROGRAMS: ProgramData[] = [
               {/* Johnna Mann */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <img
+        loading="lazy"
+        decoding="async"
                   src="/images/head-start/staff/staff-johnna-mann.jpg"
                   alt="Johnna Mann — Education Coordinator"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -3631,7 +3645,9 @@ const PROGRAMS: ProgramData[] = [
               {/* Tarra Harrison */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <img
-                  src="/images/head-start/staff/staff-tarra-harrison.PNG"
+        loading="lazy"
+        decoding="async"
+                  src="/images/head-start/staff/staff-tarra-harrison.jpg"
                   alt="Tarra Harrison — PFCE Coordinator"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
@@ -3646,6 +3662,8 @@ const PROGRAMS: ProgramData[] = [
               {/* Allison Zavala */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <img
+        loading="lazy"
+        decoding="async"
                   src="/images/head-start/staff/staff-allison-zavala.jpg"
                   alt="Allison Zavala — Administrative Assistant"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -4030,7 +4048,9 @@ const PROGRAMS: ProgramData[] = [
             {/* Scott Fraley blurb card */}
             <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
               <img
-                src="/images/staff/staff-scott-fraley.PNG"
+        loading="lazy"
+        decoding="async"
+                src="/images/staff/staff-scott-fraley.jpg"
                 alt="Scott Fraley — Community Market Director"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
@@ -5418,7 +5438,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
                 padding: 20,
                 animation: "logoAssemble 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards, logoFloat 3.5s ease-in-out 0.8s infinite",
               }}>
-                <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
+                <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
               </div>
               <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
             </button>
@@ -5534,11 +5554,11 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
           width: "75%", height: "75%",
         }}>
           {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
-            ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+            ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
                 style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
             : (stage === "program" || stage === "content")
               ? activeProgram?.icon
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "88%", height: "auto", objectFit: "contain", display: "block" }} />}
+              : <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ width: "88%", height: "auto", objectFit: "contain", display: "block" }} />}
         </span>
         {!(stage === "program" || stage === "content") && (
           <span style={{
@@ -5632,7 +5652,7 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
               transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-width 0.15s ease",
             }}>
               {isProgLevel && PROGRAM_ICONS[prog.slug]
-                ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
+                ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
                     style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
                 : icon}
             </div>
@@ -5758,7 +5778,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           {availablePrograms.map(p => (
             <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600, display:"flex", alignItems:"center", gap: 6 }}>
               {PROGRAM_ICONS[p.slug]
-                ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:22,height:22,objectFit:"contain"}} />
+                ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:22,height:22,objectFit:"contain"}} />
                 : p.icon}
               {p.shortName}
             </div>
@@ -5783,7 +5803,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}><ProgramTagline slug={activeProgram.slug} /></p>
           <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary, display:"flex", alignItems:"center", gap: 12 }}>
             {PROGRAM_ICONS[activeProgram.slug]
-              ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:48,height:48,objectFit:"contain",flexShrink:0}} />
+              ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:48,height:48,objectFit:"contain",flexShrink:0}} />
               : <span>{activeProgram.icon}</span>}
             {activeProgram.name}
           </h2>
@@ -5917,7 +5937,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
       <div onClick={e => e.stopPropagation()}
         style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "min(88vw, 380px)", background: T.void, overflowY: "auto", padding: "16px 18px 40px", boxShadow: "8px 0 32px rgba(0,0,0,0.25)", animation: "drawerIn 0.25s ease" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-          <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 34 }} />
+          <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ height: 34 }} />
           <button onClick={onClose} aria-label="Close menu" style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 8, width: 38, height: 38, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
         </div>
 
@@ -5937,7 +5957,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
             <div style={{ display: "flex", gap: 6 }}>
               <a href={`/?program=${p.slug}`} style={{ ...linkStyle, flex: 1, marginBottom: 0 }}>
                 {PROGRAM_ICONS[p.slug]
-                  ? <img src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true"
+                  ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true"
                       style={{width:32,height:32,objectFit:"contain",flexShrink:0}} />
                   : <span aria-hidden="true">{p.icon}</span>}
                 {p.name}
@@ -6009,7 +6029,7 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
             <button onClick={() => setMenuOpen(true)} aria-label="Open site menu" aria-expanded={menuOpen} style={{ ...btn, width: 42, height: 42, fontSize: 20 }}>☰</button>
             <a href="/" aria-label="CADC home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-              <img src="/images/cadc-logo.png" alt="CADC" style={{ height: isDesktop ? 40 : 32, width: "auto", display: "block" }} />
+              <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ height: isDesktop ? 40 : 32, width: "auto", display: "block" }} />
               <span style={{ display: "flex", alignItems: "center", gap: 5, color: T.blue, fontWeight: 800, fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase", background: T.blueLight, padding: "6px 11px", borderRadius: 8 }}>🏠 Home</span>
             </a>
           </div>
@@ -6084,7 +6104,7 @@ export function CADCFooter() {
       <footer role="contentinfo" style={{ background: "#0A1628", color: "white", padding: "40px 24px 28px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
           <div>
-            <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 48, width: "auto", marginBottom: 12, filter: "brightness(0) invert(1)" }} />
+            <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ height: 48, width: "auto", marginBottom: 12, filter: "brightness(0) invert(1)" }} />
             <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7, margin: "0 0 16px" }}>
               <EditableText id="siteText.footerTagline" section="siteText" label="Footer Tagline" fallback={st.footerTagline} as="span">
                 {st.footerTagline.split("\n").map((line, i) => <span key={i}>{line}{i < st.footerTagline.split("\n").length - 1 && <br />}</span>)}
@@ -6199,7 +6219,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               display: "flex", alignItems: "center", justifyContent: "center",
               padding: 20,
             }}>
-              <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
+              <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
             <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
@@ -6279,7 +6299,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}><ProgramTagline slug={activeProgram.slug} /></p>
               <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif", display:"flex", alignItems:"center", gap: 10 }}>
                 {PROGRAM_ICONS[activeProgram.slug]
-                  ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:36,height:36,objectFit:"contain",flexShrink:0}} />
+                  ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:36,height:36,objectFit:"contain",flexShrink:0}} />
                   : <span>{activeProgram.icon}</span>}
                 {activeProgram.name}
               </h2>
@@ -6325,7 +6345,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
                 aria-label={`Explore ${p.name}`}
                 style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 12, padding: 16, textAlign: "left", cursor: "pointer" }}>
                 {PROGRAM_ICONS[p.slug]
-                  ? <img src={PROGRAM_ICONS[p.slug]} alt={p.shortName}
+                  ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[p.slug]} alt={p.shortName}
                       style={{ width: 44, height: 44, objectFit: "contain", display: "block", marginBottom: 6 }} />
                   : <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>}
                 <span style={{ color: T.blue, fontWeight: 700, fontSize: 12, display: "block" }}>{p.shortName}</span>
@@ -6399,11 +6419,11 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
       }}>
         {(stage === "program" || stage === "content") && activeProgram && PROGRAM_ICONS[activeProgram.slug]
-          ? <img src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
+          ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt={activeProgram.shortName}
               style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
           : (stage === "program" || stage === "content")
               ? <span style={{ fontSize: "clamp(1rem,5vw,1.4rem)" }}>{activeProgram?.icon}</span>
-              : <img src="/images/cadc-logo.png" alt="CADC" style={{ width: "88%", height: "auto", objectFit: "contain", display: "block" }} />}
+              : <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ width: "88%", height: "auto", objectFit: "contain", display: "block" }} />}
         {!(stage === "program" || stage === "content") && (
           <span style={{ color: T.blue, fontSize: "clamp(0.35rem,1.8vw,0.5rem)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center", lineHeight: 1.2, padding: "0 4px" }}>CADC</span>
         )}
@@ -6476,7 +6496,7 @@ function MobileOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               transition: "box-shadow 0.2s ease, background 0.15s ease",
             }}>
               {!isSubLevel && PROGRAM_ICONS[prog.slug]
-                ? <img src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
+                ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[prog.slug]} alt={prog.shortName}
                     style={{ width: "90%", height: "90%", objectFit: "contain", display: "block" }} />
                 : icon}
             </div>
@@ -6767,7 +6787,7 @@ export default function CADCOrbitSite() {
   return (
     <Suspense fallback={
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8F9FF" }}>
-        <img src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
+        <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ height: 60, opacity: 0.4 }} />
       </div>
     }>
       <LangCmsProvider>
