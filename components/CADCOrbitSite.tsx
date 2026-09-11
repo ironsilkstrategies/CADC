@@ -3661,9 +3661,12 @@ const PROGRAMS: ProgramData[] = [
 
               {/* Christy Glisson — flagged for better photo */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
-                  👩‍💼
-                </div>
+                <img
+                  src="/images/head-start/staff/staff-christy-glisson.heic"
+                  alt="Christy Glisson — Administrative Assistant"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Christy Glisson</p>
                   <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
@@ -4027,10 +4030,21 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-label">Economic impact</p>
               <p>Tax dollars generated through Community Market purchases are returned to the communities it serves — keeping economic resources local and supporting the continued vitality of rural Oklahoma.</p>
             </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Contact Scott Fraley — Community Market Director</p>
-              <a href="tel:+15803051964" className="cadc-link">580-305-1964</a>
-              <a href="mailto:SFraley@cadcok.org" className="cadc-link" style={{display:"block",marginTop:4}}>SFraley@cadcok.org</a>
+            {/* Scott Fraley blurb card */}
+            <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <img
+                src="/images/staff/staff-scott-fraley.PNG"
+                alt="Scott Fraley — Community Market Director"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+              />
+              <div>
+                <p className="cadc-card-title" style={{ marginBottom: 2 }}>Scott Fraley</p>
+                <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Community Market Director</p>
+                <a href="tel:+15803051964" className="cadc-link" style={{ fontSize: 11, display: "block" }}>580-305-1964</a>
+                <a href="mailto:SFraley@cadcok.org" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 8 }}>SFraley@cadcok.org</a>
+                <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As Community Market Director, I do this work because I enjoy helping and serving others. Growing up in a small community, I watched local businesses and grocery stores dwindle, making access to fresh food more difficult — especially for those with limited transportation. The Mobile Market helps bridge that gap by bringing fresh, nutritious food directly to communities with limited resources. Being able to connect people with healthy food and needed resources gives me a true sense of purpose."</p>
+              </div>
             </div>
           </div>
         ),
