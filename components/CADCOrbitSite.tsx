@@ -153,6 +153,11 @@ const ES: Record<string, string> = {
   "Your information is kept private": "Su información se mantiene privada",
 };
 
+// ─── Runtime translation override map ────────────────────────────────────────
+// Populated from KV uiStrings when Spanish content loads (LangCmsProvider).
+// Must be declared before t() which references it.
+let ES_RUNTIME: Record<string, string> = {};
+
 function t(key: string, lang: Lang): string {
   if (lang !== "es") return key;
   // Runtime KV translations take precedence over the static compile-time map
@@ -263,7 +268,7 @@ function ProgramTagline({ slug, style }: { slug: string; style?: React.CSSProper
 // Children see CmsContext automatically updated to Spanish when lang === "es".
 // Runtime ES string overrides — populated from KV uiStrings when Spanish loads.
 // Separate from the static ES map so the static map is still the fallback.
-let ES_RUNTIME: Record<string, string> = {};
+// Declared here (before LangCmsProvider) so t() can reference it safely.
 
 export function LangCmsProvider({ children }: { children: React.ReactNode }) {
   const [enContent, setEnContent] = useState<SiteContent>(DEFAULT_CONTENT);
