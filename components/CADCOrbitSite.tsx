@@ -1415,11 +1415,71 @@ const PHOTOS = {
     refrigeratedExtra:   "/images/community-market-10.PNG",
   },
 
-  // ── Head Start (placeholder — photos coming from Robin/Tarra) ─────────────
+  // ── Head Start ────────────────────────────────────────────────────────────
   headStart: {
-    classroomActivity: "/images/headstart-classroom.jpg",
-    outdoorPlay:       "/images/headstart-outdoor.jpg",
-    familyEngagement:  "/images/headstart-family.jpg",
+    // Classroom (16)
+    classroom: [
+      "/images/head-start/classroom/hs-boy-nature-science.jpg",
+      "/images/head-start/classroom/hs-boy-sandbox.jpg",
+      "/images/head-start/classroom/hs-boys-watercolor-seeds.jpg",
+      "/images/head-start/classroom/hs-enrollment-office.JPG",
+      "/images/head-start/classroom/hs-girl-dramatic-play-doll.jpg",
+      "/images/head-start/classroom/hs-girl-feather-art.jpg",
+      "/images/head-start/classroom/hs-girl-magnifying-glass.jpg",
+      "/images/head-start/classroom/hs-girl-playground-peek.jpg",
+      "/images/head-start/classroom/hs-girl-swinging.jpg",
+      "/images/head-start/classroom/hs-girls-magnetic-tiles.jpg",
+      "/images/head-start/classroom/hs-kids-bug-observation.jpg",
+      "/images/head-start/classroom/hs-kids-chef-home-living.jpg",
+      "/images/head-start/classroom/hs-kids-fire-station-blocks.jpg",
+      "/images/head-start/classroom/hs-kids-hand-in-hand.jpg",
+      "/images/head-start/classroom/hs-kids-sensory-table-bugs.jpg",
+      "/images/head-start/classroom/hs-kids-swings.jpg",
+      "/images/head-start/classroom/hs-teacher-kids-art.jpg",
+    ],
+    // EHS — Early Head Start (4)
+    ehs: [
+      "/images/head-start/ehs/ehs-baby-tunnel-crawl.jpg",
+      "/images/head-start/ehs/ehs-infant-tummy-time.jpg",
+      "/images/head-start/ehs/ehs-toddler-outdoor-smile.jpg",
+      "/images/head-start/ehs/ehs-toddler-playground-structure.jpg",
+    ],
+    // Community events (11)
+    community: [
+      "/images/head-start/community/hs-air-evac-wide.JPG",
+      "/images/head-start/community/hs-community-event-outdoor.JPG",
+      "/images/head-start/community/hs-community-pumpkin-booth.HEIC",
+      "/images/head-start/community/hs-fire-prevention-trailer.jpg",
+      "/images/head-start/community/hs-firefighter-lifting-child.jpg",
+      "/images/head-start/community/hs-foss-fire-hose-wide.JPG",
+      "/images/head-start/community/hs-girl-fire-truck-seat.jpg",
+      "/images/head-start/community/hs-girl-firefighter-hose.jpg",
+      "/images/head-start/community/hs-relay-for-life.JPG",
+      "/images/head-start/community/hs-volunteers-needed-flyer.JPG",
+      "/images/head-start/community/hs-washita-back-to-school.HEIC",
+    ],
+    // Parenting / Family engagement (6)
+    parenting: [
+      "/images/head-start/parenting/hs-fatherhood-dad-child.JPG",
+      "/images/head-start/parenting/hs-fatherhood-dinner.JPG",
+      "/images/head-start/parenting/hs-muffins-with-mom-wide.JPG",
+      "/images/head-start/parenting/hs-nursing-home-visit.JPG",
+      "/images/head-start/parenting/hs-parent-training-meeting.JPG",
+      "/images/head-start/parenting/hs-parenting-expedition-flyer.PNG",
+    ],
+    // Staff photos (7)
+    staff: [
+      "/images/head-start/staff/hs-staff-training.JPG",
+      "/images/head-start/staff/hs-teachers-bear-ears.jpg",
+      "/images/head-start/staff/staff-allison-zavala.jpg",
+      "/images/head-start/staff/staff-christy-glisson.heic",   // ⚠️ partial selfie — flag for better photo
+      "/images/head-start/staff/staff-johnna-mann.jpg",
+      "/images/head-start/staff/staff-tarra-harrison.PNG",
+      "/images/head-start/staff/staff-teacher-child-hug.jpg",
+    ],
+    // Convenience aliases
+    classroomActivity: "/images/head-start/classroom/hs-girl-magnifying-glass.jpg",
+    fatherhoodHero:    "/images/head-start/parenting/hs-fatherhood-dad-child.JPG",
   },
 } as const;
 
@@ -1440,7 +1500,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
     },
     "head-start": {
       src: PHOTOS.headStart.classroomActivity,
-      caption: "Early childhood education across 11 CADC centers",
+      caption: "Curiosity-driven learning — CADC Head Start classrooms across Southwest Oklahoma",
     },
   };
 
@@ -1488,12 +1548,21 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
 
 const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
   "head-start": [
+    { src: "/images/head-start/classroom/hs-girl-magnifying-glass.jpg",   alt: "Girl using a magnifying glass — CADC Head Start classroom" },
+    { src: "/images/head-start/classroom/hs-boys-watercolor-seeds.jpg",   alt: "Boys painting watercolor seeds — hands-on learning" },
+    { src: "/images/head-start/classroom/hs-kids-hand-in-hand.jpg",       alt: "Children walking hand in hand" },
+    { src: "/images/head-start/classroom/hs-girl-feather-art.jpg",        alt: "Girl creating feather art in classroom" },
+    { src: "/images/head-start/classroom/hs-boy-nature-science.jpg",      alt: "Boy exploring nature and science activity" },
+    { src: "/images/head-start/classroom/hs-girls-magnetic-tiles.jpg",    alt: "Girls building with magnetic tiles" },
+    { src: "/images/head-start/classroom/hs-kids-chef-home-living.jpg",   alt: "Children in dramatic play home-living area" },
+    { src: "/images/head-start/classroom/hs-teacher-kids-art.jpg",        alt: "Teacher and children doing art together" },
+    { src: "/images/head-start/community/hs-firefighter-lifting-child.jpg", alt: "Firefighter with CADC Head Start child — community safety visit" },
+    { src: "/images/head-start/community/hs-girl-fire-truck-seat.jpg",    alt: "Girl in fire truck seat during community safety event" },
+    { src: "/images/head-start/community/hs-community-event-outdoor.JPG", alt: "CADC Head Start outdoor community event" },
+    { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.JPG",  alt: "Muffins with Mom family engagement event" },
     { src: "/images/hero/hero-1.jpg",  alt: "Head Start Civil Rights training, CADC banner" },
     { src: "/images/hero/hero-8.jpg",  alt: "Head Start CPR and First Aid training" },
-    { src: "/images/hero/hero-10.jpg", alt: "Large Head Start staff training" },
-    { src: "/images/hero/hero-13.jpg", alt: "Child doing math manipulatives activity" },
     { src: "/images/hero/hero-15.jpg", alt: "Head Start classroom visit with legislators" },
-    { src: "/images/hero/hero-25.jpg", alt: "Large Head Start staff meeting" },
   ],
   "senior-meals": [
     { src: "/images/senior-dining-1.JPG",  alt: "Seniors dining together at a CADC meal site" },
@@ -3336,6 +3405,19 @@ const PROGRAMS: ProgramData[] = [
         id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
         content: (
           <div className="cadc-light-content">
+            {/* EHS Photo Row */}
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>
+              {[
+                { src: "/images/head-start/ehs/ehs-baby-tunnel-crawl.jpg",         alt: "EHS infant crawling through tunnel" },
+                { src: "/images/head-start/ehs/ehs-infant-tummy-time.jpg",          alt: "EHS infant tummy time activity" },
+                { src: "/images/head-start/ehs/ehs-toddler-outdoor-smile.jpg",      alt: "EHS toddler smiling outdoors" },
+                { src: "/images/head-start/ehs/ehs-toddler-playground-structure.jpg", alt: "EHS toddler on playground structure" },
+              ].map(p => (
+                <img key={p.src} src={p.src} alt={p.alt}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ height: 120, width: 160, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
+              ))}
+            </div>
             <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
             <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
             <div className="cadc-card">
@@ -3369,10 +3451,59 @@ const PROGRAMS: ProgramData[] = [
         id: "nutrition", label: "Nutrition", shortLabel: "Nutrition", icon: "🥗",
         content: (
           <div className="cadc-light-content">
-            <p>All meals meet <strong>CACFP (Child and Adult Care Food Program)</strong> requirements — a federal nutrition standard ensuring balanced, age-appropriate meals every day.</p>
-            <ul className="cadc-list">
-              {["Breakfast, lunch, and snacks served daily at no cost","Menus planned by nutrition staff to meet CACFP standards","Age-appropriate portions and food groups","Formula, diapers, and wipes provided for Early Head Start infants","Allergy accommodations with doctor's documentation","Family nutrition education and resources"].map(i=><li key={i}>{i}</li>)}
-            </ul>
+            <p style={{ fontWeight: 700, color: "#1D4ED8", fontSize: 13, marginBottom: 4 }}>Nutrition Services</p>
+            <p>CADC Head Start is committed to the health and wellness of every child we serve. Our Nutrition Services team ensures that every child receives balanced, age-appropriate meals that support growth, development, and learning — every single day.</p>
+
+            <div className="cadc-card">
+              <p className="cadc-label">CACFP Guidelines</p>
+              <p>All meals and snacks served at CADC Head Start meet the requirements of the <strong>Child and Adult Care Food Program (CACFP)</strong> — a federal nutrition standard established to ensure children in care receive nutritious, well-balanced meals.</p>
+              <ul className="cadc-list">
+                {[
+                  "Breakfast, lunch, and snacks served daily at no cost to enrolled families",
+                  "Menus developed and approved by our nutrition staff according to CACFP requirements",
+                  "Age-appropriate food groups and portion sizes",
+                  "Formula, diapers, and wipes provided for Early Head Start infants at no cost while in care",
+                ].map(i=><li key={i}>{i}</li>)}
+              </ul>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Food Allergy Policy</p>
+              <p>The safety of children with food allergies is a top priority. To receive a meal substitution, families must provide:</p>
+              <ul className="cadc-list">
+                {[
+                  "A signed physician's statement identifying the specific food allergy",
+                  "Approved food substitutes as recommended by the child's doctor",
+                  "Medical documentation updated as needed",
+                ].map(i=><li key={i}>{i}</li>)}
+              </ul>
+              <p style={{ fontSize: 12, color: "#6B7280", marginTop: 8 }}>All allergy documentation is kept on file and shared with classroom staff to ensure consistent, safe meal service.</p>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Breastfeeding Support</p>
+              <p>CADC Head Start supports breastfeeding mothers and their infants. Breastfeeding-friendly policies are in place across all centers, and staff are trained to support the unique nutritional needs of breastfed infants. Mothers are encouraged to speak with their center coordinator for accommodations.</p>
+            </div>
+
+            <div className="cadc-card">
+              <p className="cadc-label">Family Nutrition Resources</p>
+              <p>Our nutrition team provides families with education and resources to support healthy eating at home. Throughout the year, families have access to:</p>
+              <ul className="cadc-list">
+                {[
+                  "Nutrition education materials and workshops",
+                  "Healthy recipe ideas aligned with CACFP standards",
+                  "Guidance on building balanced meals at home",
+                  "Referrals to local food assistance programs when needed",
+                ].map(i=><li key={i}>{i}</li>)}
+              </ul>
+            </div>
+
+            <div style={{ background: "#EFF6FF", borderRadius: 10, padding: "12px 14px", marginTop: 8 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "#1D4ED8", margin: "0 0 4px" }}>Contact Nutrition Services</p>
+              <p style={{ fontSize: 12, color: "#374151", margin: 0 }}>Frances Baker — Nutrition &amp; Supplies Supervisor</p>
+              <a href="mailto:fbaker@cadcok.org" className="cadc-link" style={{ fontSize: 12, display: "block", marginTop: 2 }}>fbaker@cadcok.org</a>
+              <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 12, display: "block" }}>580-726-3343</a>
+            </div>
           </div>
         ),
       },
@@ -3380,6 +3511,42 @@ const PROGRAMS: ProgramData[] = [
         id: "parent-engagement", label: "Parent Engagement", shortLabel: "Parents", icon: "👨‍👩‍👧",
         content: (
           <div className="cadc-light-content">
+
+            {/* Fatherhood Feature — prominently first per Robin Harris */}
+            <div style={{
+              background: "linear-gradient(135deg, #1D4ED8 0%, #1e3a8a 100%)",
+              borderRadius: 14, padding: "16px 16px 12px", marginBottom: 16,
+            }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ flexShrink: 0 }}>
+                  <img
+                    src="/images/head-start/parenting/hs-fatherhood-dad-child.JPG"
+                    alt="Father and child — CADC Head Start Fatherhood Engagement"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10, border: "2px solid rgba(255,255,255,0.3)" }}
+                  />
+                </div>
+                <div>
+                  <p style={{ color: "#BFDBFE", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 4px" }}>Fatherhood Engagement</p>
+                  <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: "0 0 6px", lineHeight: 1.4 }}>Dads belong here.</p>
+                  <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 12, margin: 0, lineHeight: 1.5 }}>CADC Head Start actively welcomes and celebrates father involvement. From classroom visits and family dinners to mentorship and policy participation — fathers are partners in this program, not guests.</p>
+                </div>
+              </div>
+              {/* Fatherhood photo strip */}
+              <div style={{ display: "flex", gap: 8, marginTop: 12, overflowX: "auto" }}>
+                {[
+                  { src: "/images/head-start/parenting/hs-fatherhood-dinner.JPG", alt: "Fatherhood family dinner event" },
+                  { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.JPG", alt: "Muffins with Mom family engagement" },
+                  { src: "/images/head-start/parenting/hs-parent-training-meeting.JPG", alt: "Parent training meeting" },
+                  { src: "/images/head-start/parenting/hs-nursing-home-visit.JPG", alt: "Community nursing home visit with children" },
+                ].map(p => (
+                  <img key={p.src} src={p.src} alt={p.alt}
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    style={{ height: 70, width: 100, objectFit: "cover", borderRadius: 8, flexShrink: 0, border: "1px solid rgba(255,255,255,0.2)" }} />
+                ))}
+              </div>
+            </div>
+
             <p>Parent and community involvement is not optional at Head Start — it is foundational. Families are partners in the program, and the community is part of the team.</p>
             <div className="cadc-stack">
               {[
@@ -3424,6 +3591,92 @@ const PROGRAMS: ProgramData[] = [
       {
         id: "faq", label: "FAQs", shortLabel: "FAQ", icon: "❓",
         content: <HeadStartFAQ />,
+      },
+      {
+        id: "hs-team", label: "Our Team", shortLabel: "Team", icon: "👩‍🏫",
+        content: (
+          <div className="cadc-light-content">
+            <p>The people behind CADC Head Start bring decades of experience and deep commitment to the families we serve.</p>
+
+            {/* Staff photo row — group shots */}
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>
+              {[
+                { src: "/images/head-start/staff/hs-staff-training.JPG",       alt: "CADC Head Start staff training" },
+                { src: "/images/head-start/staff/hs-teachers-bear-ears.jpg",   alt: "CADC Head Start teachers wearing bear ears" },
+                { src: "/images/head-start/staff/staff-teacher-child-hug.jpg", alt: "Head Start teacher hugging child" },
+              ].map(p => (
+                <img key={p.src} src={p.src} alt={p.alt}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ height: 110, width: 160, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
+              ))}
+            </div>
+
+            <div className="cadc-stack">
+
+              {/* Johnna Mann */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <img
+                  src="/images/head-start/staff/staff-johnna-mann.jpg"
+                  alt="Johnna Mann — Education Coordinator"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                />
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Johnna Mann</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Education Coordinator</p>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"I do this work because early childhood education is foundational. The experiences children have in their first years shape their confidence, their learning, and their future. As an Education Coordinator, I'm committed to ensuring our teachers feel supported, our classrooms are high-quality, and our families feel valued. Head Start changes lives."</p>
+                </div>
+              </div>
+
+              {/* Tarra Harrison */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <img
+                  src="/images/head-start/staff/staff-tarra-harrison.PNG"
+                  alt="Tarra Harrison — PFCE Coordinator"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                />
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Tarra Harrison</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>PFCE Coordinator</p>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"Every family has incredible potential, but not everyone has access to the support they need to reach it. As the PFCE Coordinator, I get to help parents and families recognize their own strengths, overcome barriers, and build lasting stability for their children's future. When we partner with families and give them the resources to achieve their goals, we aren't just supporting a child — we are lifting up the entire community."</p>
+                </div>
+              </div>
+
+              {/* Allison Zavala */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <img
+                  src="/images/head-start/staff/staff-allison-zavala.jpg"
+                  alt="Allison Zavala — Administrative Assistant"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                />
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Allison Zavala</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
+                  <a href="mailto:azavala@cadcok.org" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 6 }}>azavala@cadcok.org</a>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As an Administrative Assistant, I am committed to providing reliable and effective administrative support that enables our team to successfully serve the needs of our community. I take pride in helping ensure that our daily operations run efficiently and that our team has the support necessary to accomplish its goals. I am passionate about community engagement and the role that strong connections play in creating thriving communities."</p>
+                </div>
+              </div>
+
+              {/* Christy Glisson — flagged for better photo */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                  👩‍💼
+                </div>
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Christy Glisson</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
+                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 6 }}>580-726-3343</a>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"I have been an administrative assistant with the CADC Head Start Office for 21 and a half years. I started out as an EHS parent and on policy council. That's when I learned about all the services and benefits that Head Start provides for children and their families. I love to see the children and hear about success stories with them and their families that might not have happened if they had not had encouragement, guidance and resources provided from our Head Start Program."</p>
+                </div>
+              </div>
+
+            </div>
+
+            <p className="cadc-note" style={{ marginTop: 12 }}>Interested in joining the CADC Head Start team? View open positions on the <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-link">CADC Facebook page</a> or call 580-726-3343.</p>
+          </div>
+        ),
       }
     
     ],
