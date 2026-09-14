@@ -19,6 +19,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense, createContext, useContext } from "react";
 import { DEFAULT_CONTENT, DEFAULT_SITE_TEXT, DEFAULT_PROGRAM_TAGLINES, fetchContent, fetchContentEs, type SiteContent } from "@/lib/cms";
 import { EditableText, AdminModeIndicator } from "@/components/InlineEditBar";
+import SpanishLayer from "@/components/SpanishLayer";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -232,6 +233,14 @@ export function LangCmsProvider({ children }: { children: React.ReactNode }) {
   const [esError, setEsError] = useState(false);
   const [esFetched, setEsFetched] = useState(false);
 
+  // Remember the visitor's language across page navigations (/about, /contact).
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("cadc_lang") === "es") setLang("es");
+    } catch { /* private mode — ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Load English content on mount and on tab focus
   useEffect(() => { fetchContent().then(setEnContent); }, []);
   useEffect(() => {
@@ -252,6 +261,7 @@ export function LangCmsProvider({ children }: { children: React.ReactNode }) {
       finally { setEsLoading(false); setEsFetched(true); }
     }
     setLangState(l);
+    try { localStorage.setItem("cadc_lang", l); } catch { /* ignore */ }
   }
 
   // Active content: Spanish when available and selected, English otherwise
@@ -260,6 +270,10 @@ export function LangCmsProvider({ children }: { children: React.ReactNode }) {
   return (
     <LangContext.Provider value={{ lang, setLang, esLoading, esError }}>
       <CmsContext.Provider value={activeContent}>
+        <SpanishLayer
+          active={lang === "es"}
+          extra={(esContent as (SiteContent & { uiStrings?: Record<string, string> }) | null)?.uiStrings}
+        />
         {children}
       </CmsContext.Provider>
     </LangContext.Provider>
