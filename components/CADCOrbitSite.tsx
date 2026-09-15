@@ -1105,10 +1105,8 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       const dt = Math.min((now - lastTime.current) / 1000, 0.05);
       lastTime.current = now;
 
-      // Idle orbit rotation — slow drift
-      if (orbitTx === "idle" && assembled) {
-        idleAngle.current += dt * 0.06; // ~3.4° per second
-      }
+      // Idle orbit rotation disabled — nodes stay fixed, spring pop-out still active
+      // idleAngle.current += dt * 0.06;
 
       // Hub pulse
       hubPulse.current += dt * 2.4;
@@ -1536,7 +1534,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
           width: "100%", height: "100%", objectFit: "cover",
-          objectPosition: "center",
+          objectPosition: "center 30%",
           display: "block",
         }}
       />
@@ -1648,6 +1646,7 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%", objectFit: "cover",
+          objectPosition: "center 30%",
           opacity: 1,
         }}
       />
@@ -1662,6 +1661,7 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%", objectFit: "cover",
+          objectPosition: "center 30%",
           opacity: transitioning ? 1 : 0,
           transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
         }}
@@ -1721,6 +1721,7 @@ function PhotoStrip({ photos, dark }: {
             width: 130, height: 100,
             borderRadius: 10,
             objectFit: "cover",
+            objectPosition: "center 25%",
             border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
             display: "block",
           }}
@@ -1767,7 +1768,7 @@ function PhotoGrid({ photos, dark }: {
               const originalIndex = photos.findIndex(p => p.src === photo.src);
               setFailed(prev => new Set([...prev, originalIndex]));
             }}
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%", display: "block" }}
           />
         </div>
       ))}
@@ -1837,14 +1838,15 @@ function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; 
 }
 
 const MARKET_COUNTIES: { county: string; slug: string; cities: string[] }[] = [
-  { county: "Beckham County",     slug: "beckham",     cities: ["Erick"] },
-  { county: "Comanche County",    slug: "comanche",    cities: ["Cache","Chattanooga","Fletcher","Geronimo","Lawton","Sterling"] },
-  { county: "Cotton County",      slug: "cotton",      cities: ["Randlett","Temple"] },
-  { county: "Jefferson County",   slug: "jefferson",   cities: ["Ringling","Ryan"] },
-  { county: "Kiowa County",       slug: "kiowa",       cities: ["Lone Wolf","Mountain View"] },
-  { county: "Roger Mills County", slug: "roger-mills", cities: ["Hammon"] },
-  { county: "Tillman County",     slug: "tillman",     cities: ["Grandfield","Tipton"] },
-  { county: "Washita County",     slug: "washita",     cities: ["Burns Flat","Canute","Corn","Sentinel"] },
+  { county: "Beckham County",     slug: "beckham",     cities: [] },
+  { county: "Canadian County",    slug: "canadian",    cities: [] },
+  { county: "Comanche County",    slug: "comanche",    cities: [] },
+  { county: "Cotton County",      slug: "cotton",      cities: [] },
+  { county: "Jefferson County",   slug: "jefferson",   cities: [] },
+  { county: "Kiowa County",       slug: "kiowa",       cities: [] },
+  { county: "Roger Mills County", slug: "roger-mills", cities: [] },
+  { county: "Tillman County",     slug: "tillman",     cities: [] },
+  { county: "Washita County",     slug: "washita",     cities: [] },
 ];
 
 function MarketCommunities() {
@@ -3439,7 +3441,7 @@ const PROGRAMS: ProgramData[] = [
               ].map(p => (
                 <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ height: 120, width: 160, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
+                  style={{ height: 120, width: 160, objectFit: "cover", objectPosition: "center 20%", borderRadius: 10, flexShrink: 0 }} />
               ))}
             </div>
             <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
@@ -3549,7 +3551,7 @@ const PROGRAMS: ProgramData[] = [
                     src="/images/head-start/parenting/hs-fatherhood-dad-child.jpg"
                     alt="Father and child — CADC Head Start Fatherhood Engagement"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                    style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10, border: "2px solid rgba(255,255,255,0.3)" }}
+                    style={{ width: 80, height: 80, objectFit: "cover", objectPosition: "center 20%", borderRadius: 10, border: "2px solid rgba(255,255,255,0.3)" }}
                   />
                 </div>
                 <div>
@@ -3568,7 +3570,7 @@ const PROGRAMS: ProgramData[] = [
                 ].map(p => (
                   <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                    style={{ height: 70, width: 100, objectFit: "cover", borderRadius: 8, flexShrink: 0, border: "1px solid rgba(255,255,255,0.2)" }} />
+                    style={{ height: 70, width: 100, objectFit: "cover", objectPosition: "center 25%", borderRadius: 8, flexShrink: 0, border: "1px solid rgba(255,255,255,0.2)" }} />
                 ))}
               </div>
             </div>
@@ -3633,7 +3635,7 @@ const PROGRAMS: ProgramData[] = [
               ].map(p => (
                 <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ height: 110, width: 160, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
+                  style={{ height: 110, width: 160, objectFit: "cover", objectPosition: "center 25%", borderRadius: 10, flexShrink: 0 }} />
               ))}
             </div>
 
@@ -3647,7 +3649,7 @@ const PROGRAMS: ProgramData[] = [
                   src="/images/head-start/staff/staff-johnna-mann.jpg"
                   alt="Johnna Mann — Education Coordinator"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
                 />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Johnna Mann</p>
@@ -3664,7 +3666,7 @@ const PROGRAMS: ProgramData[] = [
                   src="/images/head-start/staff/staff-tarra-harrison.jpg"
                   alt="Tarra Harrison — PFCE Coordinator"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
                 />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Tarra Harrison</p>
@@ -3681,7 +3683,7 @@ const PROGRAMS: ProgramData[] = [
                   src="/images/head-start/staff/staff-allison-zavala.jpg"
                   alt="Allison Zavala — Administrative Assistant"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
                 />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Allison Zavala</p>
@@ -4067,7 +4069,7 @@ const PROGRAMS: ProgramData[] = [
                 src="/images/staff/staff-scott-fraley.jpg"
                 alt="Scott Fraley — Community Market Director"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                style={{ width: 72, height: 72, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
               />
               <div>
                 <p className="cadc-card-title" style={{ marginBottom: 2 }}>Scott Fraley</p>
@@ -4192,81 +4194,6 @@ const PROGRAMS: ProgramData[] = [
     ],
   },
 
-  // ── 7. EMPLOYMENT ──────────────────────────────────────────────────────────
-  {
-    slug: "employment",
-    name: "Employment & Workforce",
-    shortName: "Employment",
-    icon: "💼",
-    color: T.blue,
-    tagline: "Join the CADC team across Southwest Oklahoma",
-    subAreas: [
-      {
-        id: "jobs", label: "Open Positions", shortLabel: "Jobs", icon: "📋",
-        content: (
-          <div className="cadc-light-content">
-            <p>CADC employs more than 200 people across 9 counties in Southwest Oklahoma — teachers, drivers, weatherization crews, cooks, caseworkers, and administrators. We hire from the communities we serve.</p>
-            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF"}}>
-              <p style={{fontWeight:800,fontSize:14,color:"#111827",margin:"0 0 4px"}}>📋 View Current Openings</p>
-              <p style={{fontSize:12,color:"#6B7280",margin:"0 0 12px",lineHeight:1.5}}>Current job postings are listed on the CADC Facebook page. New positions are posted regularly.</p>
-              <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-btn">View Jobs on Facebook →</a>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Or call HR directly</p>
-              <p style={{fontSize:13,margin:"0 0 8px"}}>Suzie Fletcher · Human Resources</p>
-              <a href="tel:+15803355588" className="cadc-btn">📞 580-335-5588</a>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "pay-benefits", label: "Pay & Benefits", shortLabel: "Pay", icon: "💰",
-        content: (
-          <div className="cadc-light-content">
-            <p>CADC offers competitive pay, especially for positions that carry community responsibility. Here's what you can expect.</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Head Start Teacher Pay Scale",d:"$12.50/hr — no CDA or degree\n$14.00/hr — CDA credential\n$15.50/hr — Associate's degree\n$17.23/hr — Bachelor's degree or higher\n\nCDA training reimbursement available. CADC actively supports staff in earning credentials while working."},
-                {t:"Transit Driver",d:"Competitive hourly rate. CDL required or training assistance available. Full benefits included."},
-                {t:"100% Agency-Paid Benefits",d:"Vision insurance · Life insurance · Paid holidays · Paid leave · Retirement plan options. CADC covers 100% of employee premiums for vision and life insurance."},
-                {t:"Professional Development",d:"CADC supports staff training, credential attainment, and career growth. Head Start teachers can move up the pay scale as they earn credentials — on the job."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p style={{whiteSpace:"pre-line"}}>{i.d}</p></div>)}
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "quick-apply", label: "Quick Apply", shortLabel: "Apply", icon: "✍️",
-        content: (
-          <div className="cadc-light-content">
-            <p style={{marginBottom:16}}>Take 60 seconds to let us know you're interested. CADC HR will reach out to discuss open positions and next steps.</p>
-            <QuickApplyForm />
-          </div>
-        ),
-      },
-      {
-        id: "why", label: "Why CADC", shortLabel: "Why CADC", icon: "⭐",
-        content: (
-          <div className="cadc-light-content">
-            <p>Working at CADC means showing up every day for the people in your community who need it most — children, seniors, families navigating hard times. Here's what makes it different.</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Your work is visible",d:"You don't spend your career wondering if it matters. In Southwest Oklahoma, people know CADC. They know the bus driver who got their grandmother to dialysis. They know the Head Start teacher who helped their kid learn to read."},
-                {t:"Deep community roots since 1966",d:"CADC has been here for 60 years. This isn't a startup. It's a stable organization with a real track record — and a team that stays."},
-                {t:"Growth from within",d:"Many of CADC's senior staff and directors started in entry-level positions. If you want to grow, the path is here."},
-                {t:"Southwest Oklahoma is home",d:"CADC hires locally and intentionally. We believe the best people to serve a community are the people who live there."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
-            </div>
-            <div className="cadc-card" style={{marginTop:4}}>
-              <p className="cadc-label">Ready to join the team?</p>
-              <a href="/?program=employment&area=quick-apply" className="cadc-btn">Apply in 60 Seconds →</a>
-            </div>
-          </div>
-        ),
-      },
-    ],
-  },
-
   // ── 8. BOARD & LEADERSHIP ─────────────────────────────────────────────────
   {
     slug: "board",
@@ -4371,7 +4298,7 @@ const PROGRAMS: ProgramData[] = [
         id: "about-cadc", label: "About CADC", shortLabel: "About", icon: "🏢",
         content: (
           <div className="cadc-light-content">
-            <p>Community Action Development Corporation (CADC) has been serving Southwest Oklahoma families since 1966. We are a private, non-profit Community Action Agency and Community Action Partnership member.</p>
+            <p>Community Action Development Corporation (CADC) has been serving Southwest Oklahoma families since 1966. We are a private, non-profit Community Action Agency.</p>
             <div className="cadc-card">
               <p className="cadc-label">Main office</p>
               <p>105 S. Main Street · P.O. Box 989<br/>Frederick, OK 73542</p>
@@ -4535,8 +4462,8 @@ const PROGRAMS: ProgramData[] = [
             <p>CADC Advantage provides home-delivered meals to older adults and individuals with disabilities through Oklahoma Medicaid waiver programs — Advantage, Living Choice, and Medically Fragile.</p>
             <p>Meals are delivered every two weeks. Members may receive 14 or 28 meals per delivery, plus fresh milk and juice. Both frozen and shelf-stable meal options are available.</p>
             <div className="cadc-card">
-              <p className="cadc-label">13 counties served</p>
-              <p>Beckham · Caddo · Comanche · Cotton · Custer · Greer · Harmon · Jackson · Jefferson · Kiowa · Roger Mills · Tillman · Washita</p>
+              <p className="cadc-label">14 counties served</p>
+              <p>Beckham · Canadian · Caddo · Comanche · Cotton · Custer · Greer · Harmon · Jackson · Jefferson · Kiowa · Roger Mills · Tillman · Washita</p>
               <p className="cadc-note">Service area per Annual Report 2025. Contact CADC for eligibility confirmation in your county.</p>
             </div>
           </div>
@@ -4622,22 +4549,7 @@ const PROGRAMS: ProgramData[] = [
           </div>
         ),
       },
-      {
-        id: "adv-support", label: "Support & Donate", shortLabel: "Support", icon: "❤️",
-        content: (
-          <div className="cadc-light-content">
-            <p>Advantage is funded through Oklahoma Medicaid — but community support makes the program stronger. Here's how you can help:</p>
-            <div className="cadc-stack">
-              {[
-                {t:"Donate to CADC",d:"Financial contributions help CADC enhance services beyond what Medicaid covers — extra deliveries, holiday meals, and emergency support for members in crisis."},
-                {t:"Spread the word",d:"Many eligible seniors and adults with disabilities don't know Advantage exists. If you know someone who is homebound and food-insecure, tell them about CADC Advantage."},
-                {t:"Volunteer",d:"CADC welcomes volunteers who can assist with meal packaging, outreach, and administrative support. Contact us to learn how you can get involved."},
-              ].map(i=><div key={i.t} className="cadc-card-sm"><p className="cadc-card-title">{i.t}</p><p>{i.d}</p></div>)}
-            </div>
-            <a href="tel:+15803355588" className="cadc-btn" style={{marginTop:16}}>📞 Contact CADC — 580-335-5588</a>
-          </div>
-        ),
-      },
+
       {
         id: "adv-offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
         content: (
@@ -4658,22 +4570,7 @@ const PROGRAMS: ProgramData[] = [
           </div>
         ),
       },
-      {
-        id: "adv-donate", label: "Support & Donate", shortLabel: "Donate", icon: "❤️",
-        content: (
-          <div className="cadc-light-content">
-            <p>CADC is exploring ways for community members and businesses to support our nutrition programs directly. Details coming soon — check back or contact us to express interest.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Coming soon</p>
-              <p>Online donation options, Amazon Smile, Walmart Community, and Shop Raise are being set up. We'll update this page once logistics are confirmed.</p>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Questions? Contact us</p>
-              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
-            </div>
-          </div>
-        ),
-      },
+
     ],
   },
 
@@ -6061,10 +5958,8 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
                 onClick={() => setLang(lang === "en" ? "es" : "en")}
                 disabled={esLoading}
                 aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
-                title={esError && lang === "en" ? "Spanish translation not yet generated — enable in admin Features tab" : undefined}
                 style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: esLoading ? "wait" : "pointer", letterSpacing: "0.06em", display: "flex", alignItems: "center", gap: 4 }}>
                 {esLoading ? "…" : lang === "en" ? "ES" : "EN"}
-                {esError && !esLoading && <span style={{ fontSize: 9 }}>⚠️</span>}
               </button>
             )}
             <a href={`tel:+1${st.mainPhone.replace(/\D/g,"")}`} aria-label={`Call CADC at ${st.mainPhone}`}
