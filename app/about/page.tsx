@@ -199,6 +199,18 @@ const LOCATIONS: CADCLocation[] = [
     hours: "Mon–Fri 8:00am–5:00pm",
   },
   {
+    id: "temple-advantage",
+    name: "Advantage — Temple Office",
+    city: "Temple",
+    county: "Cotton",
+    address: "102 W. Texas, Temple, OK 73568",
+    phone: "580-342-6967",
+    phoneHref: "tel:+15803426967",
+    programs: ["Advantage Home Delivered Meals"],
+    mapsQuery: "102 W Texas Temple OK 73568",
+    hours: "Mon–Fri 8:00am–5:00pm",
+  },
+  {
     id: "lawton-advantage",
     name: "Advantage — Lawton Office",
     city: "Lawton",
@@ -395,6 +407,7 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
   // Temple, Cotton County — county centroid lx:372.8, ly:306.4
   // Temple is in northern Cotton
   "temple-senior":      { x: 368, y: 298 },
+  "temple-advantage":   { x: 374, y: 294 },
 
   // Walters, Cotton County — central Cotton
   "walters-senior":     { x: 376, y: 312 },
