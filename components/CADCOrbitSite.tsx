@@ -8,7 +8,7 @@
  *
  * Interaction model:
  *   Stage 0 → logo assembly animation (1.2s)
- *   Stage 1 → Main orbit  (8 program nodes)
+ *   Stage 1 → Main orbit  (6 program nodes)
  *   Stage 2 → Program orbit (sub-area nodes)
  *   Stage 3 → Content panel
  *   Back navigation collapses through stages
@@ -4837,7 +4837,7 @@ const HERO_POOLS: Record<string, string[]> = {
   "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
   "transit":         [14].map(n=>`/images/hero/hero-${n}.jpg`),
   "weatherization":  [17].map(n=>`/images/hero/hero-${n}.jpg`),
-  "general":         [6,7,15,16,18,5].map(n=>`/images/hero/hero-${n}.jpg`),
+  "general":         [6,7,15,16,18,4].map(n=>`/images/hero/hero-${n}.jpg`),
 };
 
 // Daily seed — resets at midnight CST (UTC-6). Same visitor gets same photo order all day.
@@ -5606,7 +5606,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[["9","Programs",""],["11","Head Start Centers","†"],["220,175","Transit Trips/Yr","†"],["6","Senior Meal Sites","†"],["340,830","Advantage Meals/Yr","†"],["1966","Est.",""]].map(([n,l,src])=>(
+          {[["6","Programs",""],["11","Head Start Centers","†"],["220,175","Transit Trips/Yr","†"],["6","Senior Meal Sites","†"],["340,830","Advantage Meals/Yr","†"],["1966","Est.",""]].map(([n,l,src])=>(
             <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
               <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
               <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
@@ -5891,7 +5891,9 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
           </div>
         ))}
 
-        {sectionLabel("Find Services by County")}
+        {sectionLabel("Work With Us")}
+        <a href="/programs/employment" style={linkStyle}>💼 Join Our Team</a>
+
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {SW_OK_COUNTIES.map(c => (
             <a key={c.id} href={`/?county=${c.id}`} style={{ background: "white", border: `1.5px solid ${T.blue}`, color: T.blue, padding: "7px 13px", borderRadius: 20, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{c.name}</a>
