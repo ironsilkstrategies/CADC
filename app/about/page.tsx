@@ -771,30 +771,33 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Timeline bar */}
-      <div style={{ background: "#0101FF" }} role="region" aria-label="CADC history timeline">
-        <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
-          <div style={{ display: "flex", minWidth: "max-content", padding: "0 24px" }}>
+      {/* Timeline bar — full bleed, horizontally scrollable on all screen sizes */}
+      <div style={{ background: "#0101FF", width: "100vw", position: "relative", left: "50%", marginLeft: "-50vw" }} role="region" aria-label="CADC history timeline">
+        <div
+          id="timeline-scroll"
+          style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", cursor: "grab", scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.25) transparent" }}
+        >
+          <style>{`#timeline-scroll::-webkit-scrollbar{height:4px}#timeline-scroll::-webkit-scrollbar-track{background:transparent}#timeline-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.25);border-radius:2px}#timeline-scroll:active{cursor:grabbing}`}</style>
+          <div style={{ display: "flex", minWidth: "max-content", padding: "0 32px" }}>
             {TIMELINE.map((t, i) => (
               <div key={t.year} style={{
-                padding: "24px 20px",
+                padding: "28px 24px",
                 borderRight: i < TIMELINE.length - 1 ? "1px solid rgba(255,255,255,0.12)" : "none",
-                minWidth: 180,
+                minWidth: 200,
                 position: "relative",
               }}>
-                {/* Dot on top line */}
                 <div style={{
                   width: 8, height: 8, borderRadius: "50%", background: "#CC0000",
-                  border: "2px solid white", marginBottom: 10,
+                  border: "2px solid white", marginBottom: 12,
                 }} aria-hidden="true" />
-                <div style={{ color: "white", fontSize: 20, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>{t.year}</div>
-                <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 12, fontWeight: 700, marginTop: 4, marginBottom: 6, letterSpacing: "0.02em" }}>{t.label}</div>
-                <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, lineHeight: 1.55, maxWidth: 160 }}>{t.detail}</div>
+                <div style={{ color: "white", fontSize: 22, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>{t.year}</div>
+                <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 12, fontWeight: 700, marginTop: 5, marginBottom: 7, letterSpacing: "0.02em" }}>{t.label}</div>
+                <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, lineHeight: 1.6, maxWidth: 170 }}>{t.detail}</div>
               </div>
             ))}
           </div>
         </div>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, textAlign: "center", padding: "0 0 10px", margin: 0 }}>← scroll to see full history →</p>
+        <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, textAlign: "center", padding: "0 0 10px", margin: 0, letterSpacing: "0.08em" }}>← scroll to see full history →</p>
       </div>
 
       <main id="main-about-content" style={{ maxWidth: 860, margin: "0 auto", padding: "56px 24px 80px", display: "flex", flexDirection: "column", gap: 56 }}>
