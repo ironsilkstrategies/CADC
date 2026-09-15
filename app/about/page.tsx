@@ -835,7 +835,21 @@ export default function AboutPage() {
           <h2 id="service-area-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 16 }}>9 Counties Across Southwest Oklahoma</h2>
           <ul style={{ display: "flex", flexWrap: "wrap", gap: 8, listStyle: "none", padding: 0, margin: 0 }}>
             {COUNTIES.map(c => (
-              <li key={c} style={{ background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.2)", borderRadius: 6, padding: "7px 14px", fontSize: 13, color: "#0101FF", fontWeight: 700 }}>{c}</li>
+              <li key={c}>
+                <Link
+                  href={`/?county=${c.toLowerCase().replace(" ", "-")}`}
+                  aria-label={`See CADC services in ${c} County`}
+                  style={{
+                    display: "block",
+                    background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.2)",
+                    borderRadius: 6, padding: "7px 14px", fontSize: 13,
+                    color: "#0101FF", fontWeight: 700, textDecoration: "none",
+                    transition: "background 0.15s, border-color 0.15s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = "#c7c7ff"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "#0101FF"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = "#E4E4FF"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(1,1,255,0.2)"; }}
+                >{c} →</Link>
+              </li>
             ))}
           </ul>
           <p style={{ color: "#6b7280", fontSize: 13, marginTop: 12 }}>
