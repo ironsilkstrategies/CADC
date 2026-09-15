@@ -3595,7 +3595,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[["9","Programs"],["11","Head Start Centers"],["110","Transit Vehicles"],["6","Senior Meal Sites"],["17","Advantage Counties"],["1966","Est."]].map(([n,l])=>(
+          {[["6","Programs"],["11","Head Start Centers"],["110","Transit Vehicles"],["6","Senior Meal Sites"],["17","Advantage Counties"],["1966","Est."]].map(([n,l])=>(
             <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
               <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
               <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
