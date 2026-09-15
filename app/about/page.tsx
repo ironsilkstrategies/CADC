@@ -9,10 +9,6 @@ import CADCShell from "@/components/CADCShell";
 
 const STATS = [
   { value: "1966", label: "Year founded" },
-  { value: "9", label: "Counties served" },
-  { value: "11", label: "Head Start centers" },
-  { value: "110", label: "Transit vehicles" },
-  { value: "6", label: "Senior meal sites" },
 ];
 
 const COUNTIES = [
@@ -28,7 +24,6 @@ const PROGRAMS = [
   { name: "Advantage Home Delivered Meals", slug: "advantage", icon: "🚗" },
   { name: "VITA Free Tax Help", slug: "tax-help", icon: "📋" },
   { name: "Community Market", slug: "community-market", icon: "🛒" },
-  { name: "Employment & Workforce", slug: "employment", icon: "💼" },
 ];
 
 const STAFF = [
@@ -72,6 +67,18 @@ const LOCATIONS: CADCLocation[] = [
     phone: "580-335-5588",
     phoneHref: "tel:+15803355588",
     programs: ["All Programs — Main Office", "Senior Nutrition", "Transit"],
+    mapsQuery: "105 S Main Street Frederick OK 73542",
+    hours: "Mon–Fri 8:00am–5:00pm",
+  },
+  {
+    id: "frederick-transit",
+    name: "Red River Transit — Frederick Office",
+    city: "Frederick",
+    county: "Tillman",
+    address: "105 S. Main Street, Frederick, OK 73542",
+    phone: "580-335-2691",
+    phoneHref: "tel:+15803352691",
+    programs: ["Red River Transportation", "Transit Office"],
     mapsQuery: "105 S Main Street Frederick OK 73542",
     hours: "Mon–Fri 8:00am–5:00pm",
   },
@@ -143,9 +150,21 @@ const LOCATIONS: CADCLocation[] = [
     address: "400 Taylor St. Apt #8, Ryan, OK 73565",
     phone: "580-757-2412",
     phoneHref: "tel:+15807572412",
-    programs: ["Senior Congregate Meals", "Transit Office"],
+    programs: ["Senior Congregate Meals"],
     mapsQuery: "400 Taylor St Ryan OK 73565",
     hours: "Mon–Fri 11:00am–1:00pm",
+  },
+  {
+    id: "ryan-transit",
+    name: "Red River Transit — Ryan Office",
+    city: "Ryan",
+    county: "Jefferson",
+    address: "400 Taylor St. Apt #8, Ryan, OK 73565",
+    phone: "580-757-2235",
+    phoneHref: "tel:+15807572235",
+    programs: ["Red River Transportation", "Transit Office"],
+    mapsQuery: "400 Taylor St Ryan OK 73565",
+    hours: "Mon–Fri 8:00am–5:00pm",
   },
   {
     id: "sayre-transit",
@@ -360,6 +379,7 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
   // Frederick city is in northern Tillman
   "frederick-main":     { x: 332, y: 282 },
   "frederick-senior":   { x: 336, y: 286 },
+  "frederick-transit":  { x: 328, y: 282 },
 
   // Cache, Comanche County — county centroid lx:368.3, ly:269.0
   // Cache is SW of Lawton
@@ -378,6 +398,7 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
 
   // Ryan, Jefferson County — SW Jefferson
   "ryan-senior":        { x: 412, y: 340 },
+  "ryan-transit":       { x: 418, y: 340 },
 
   // Sayre, Beckham County — county centroid lx:272.4, ly:199.8
   // Sayre is central Beckham
@@ -656,7 +677,7 @@ function LocationMap() {
         ))}
         <div role="listitem" style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <div style={{ width: 10, height: 10, background: "#D97706", transform: "rotate(45deg)", flexShrink: 0, border: "1px solid white" }} aria-hidden="true" />
-          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Head Start Centers (11)</span>
+          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Head Start Centers</span>
         </div>
       </div>
 
@@ -749,7 +770,7 @@ export default function AboutPage() {
           <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Mission</p>
           <h2 id="mission-heading" style={{ color: "#0101FF", fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>Helping People. Changing Lives.</h2>
           <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 660 }}>
-            CADC is a private, non-profit Community Action Agency and Community Action Partnership member. We work to reduce poverty, revitalize communities, and empower people across Southwest Oklahoma through direct services, advocacy, and partnerships.
+            CADC is a private, non-profit Community Action Agency. We work to reduce poverty, revitalize communities, and empower people across Southwest Oklahoma through direct services, advocacy, and partnerships.
           </p>
           <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 660, marginTop: 14 }}>
             Every program we operate is built around one belief: that people, given the right support at the right time, can and do change their circumstances. We show up for that moment — every day, across 9 counties.
