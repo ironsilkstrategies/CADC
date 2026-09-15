@@ -5380,7 +5380,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
         {/* RIGHT — Content panel */}
         <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
-          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} tapSubArea={tapSubArea} />
+          <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} tapProgram={tapProgram} tapSubArea={tapSubArea} />
         </main>
       </div>
 
@@ -5584,10 +5584,10 @@ function DesktopOrbit({ stage, activeProgram, availablePrograms, glowNode, popNo
   );
 }
 
-function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty, tapSubArea }: {
+function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSubArea, availablePrograms, tapCounty, tapProgram, tapSubArea }: {
   stage: Stage; activeCountyName: string | null; activeProgram: ProgramData | null;
   activeSubArea: SubArea | null; availablePrograms: ProgramData[];
-  tapCounty: (id: string) => void; tapSubArea: (a: SubArea) => void;
+  tapCounty: (id: string) => void; tapProgram: (p: ProgramData) => void; tapSubArea: (a: SubArea) => void;
 }) {
   if (stage === "entry") {
     return (
@@ -5687,12 +5687,13 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         </h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
           {availablePrograms.map(p => (
-            <div key={p.slug} style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600, display:"flex", alignItems:"center", gap: 6 }}>
+            <button key={p.slug} onClick={() => tapProgram(p)}
+              style={{ background: "#E4E4FF", border: `1px solid rgba(1,1,255,0.2)`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T.blue, fontWeight: 600, display:"flex", alignItems:"center", gap: 6, cursor: "pointer", fontFamily: "inherit" }}>
               {PROGRAM_ICONS[p.slug]
                 ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{width:22,height:22,objectFit:"contain"}} />
                 : p.icon}
               {p.shortName}
-            </div>
+            </button>
           ))}
         </div>
         {firstProg && (
