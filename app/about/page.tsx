@@ -7,8 +7,16 @@ import CADCShell from "@/components/CADCShell";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const STATS = [
-  { value: "1966", label: "Year founded" },
+const TIMELINE = [
+  { year: "1966", label: "CADC Founded", detail: "Established to serve Southwest Oklahoma families under the federal Economic Opportunity Act — one of the original Community Action Agencies in the state." },
+  { year: "1984", label: "Transit Launches", detail: "Red River Transportation begins service in 5 counties, connecting rural residents to medical care, work, and essential services." },
+  { year: "1991", label: "Housing Expands", detail: "Weatherization & Housing program grows — over the following decades, more than 1,000 homes are weatherized across the region." },
+  { year: "1996", label: "Weatherization Formalized", detail: "Dedicated Weatherization Director role established. Program funded through U.S. Department of Energy and Oklahoma DHS." },
+  { year: "1999", label: "25 Years of Head Start", detail: "Head Start team deepens roots — staff members begin decades-long careers serving children and families across Southwest Oklahoma." },
+  { year: "2016", label: "Education Expands", detail: "Head Start education coordination grows to serve 11 centers across 9 counties, reaching more families than ever before." },
+  { year: "2021", label: "Transit Leadership", detail: "Gilbert Nuncio promoted to Transit Director after 7 years with the agency — 110-vehicle fleet now serving 12 counties." },
+  { year: "2024", label: "New Leadership", detail: "Leslea Hixson becomes Executive Director, bringing 17 years in education and 2 years as Head Start Director to the top role." },
+  { year: "2026", label: "Transit Grows Again", detail: "Red River Transportation expands to 12 counties following the MAGB transition — 220,175 passenger trips logged in FY2025." },
 ];
 
 const COUNTIES = [
@@ -368,7 +376,6 @@ const LEGEND_ITEMS = [
   { color: "#CC0000", label: "Senior Nutrition Sites" },
   { color: "#059669", label: "Transit Offices" },
   { color: "#7C3AED", label: "Advantage Offices" },
-  { color: "#D97706", label: "Head Start Centers" },
 ];
 
 // SVG viewBox: "150 60 360 310" — exact coords derived from county path centroids
@@ -751,16 +758,30 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Stats bar */}
-      <div style={{ background: "#0101FF" }} role="region" aria-label="CADC key statistics">
-        <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px", display: "flex", flexWrap: "wrap" }}>
-          {STATS.map(s => (
-            <div key={s.label} style={{ flex: "1 1 120px", padding: "20px 16px", textAlign: "center", borderRight: "1px solid rgba(255,255,255,0.12)" }}>
-              <div style={{ color: "white", fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 800, lineHeight: 1 }} aria-label={`${s.value} — ${s.label}`}>{s.value}</div>
-              <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 4 }} aria-hidden="true">{s.label}</div>
-            </div>
-          ))}
+      {/* Timeline bar */}
+      <div style={{ background: "#0101FF" }} role="region" aria-label="CADC history timeline">
+        <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+          <div style={{ display: "flex", minWidth: "max-content", padding: "0 24px" }}>
+            {TIMELINE.map((t, i) => (
+              <div key={t.year} style={{
+                padding: "24px 20px",
+                borderRight: i < TIMELINE.length - 1 ? "1px solid rgba(255,255,255,0.12)" : "none",
+                minWidth: 180,
+                position: "relative",
+              }}>
+                {/* Dot on top line */}
+                <div style={{
+                  width: 8, height: 8, borderRadius: "50%", background: "#CC0000",
+                  border: "2px solid white", marginBottom: 10,
+                }} aria-hidden="true" />
+                <div style={{ color: "white", fontSize: 20, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>{t.year}</div>
+                <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 12, fontWeight: 700, marginTop: 4, marginBottom: 6, letterSpacing: "0.02em" }}>{t.label}</div>
+                <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, lineHeight: 1.55, maxWidth: 160 }}>{t.detail}</div>
+              </div>
+            ))}
+          </div>
         </div>
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, textAlign: "center", padding: "0 0 10px", margin: 0 }}>← scroll to see full history →</p>
       </div>
 
       <main id="main-about-content" style={{ maxWidth: 860, margin: "0 auto", padding: "56px 24px 80px", display: "flex", flexDirection: "column", gap: 56 }}>
@@ -775,6 +796,37 @@ export default function AboutPage() {
           <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 660, marginTop: 14 }}>
             Every program we operate is built around one belief: that people, given the right support at the right time, can and do change their circumstances. We show up for that moment — every day, across 9 counties.
           </p>
+        </section>
+
+        {/* History */}
+        <section aria-labelledby="history-heading">
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our History</p>
+          <h2 id="history-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 8 }}>Six Decades of Service</h2>
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 660, marginBottom: 28 }}>
+            CADC was established in 1966 under the federal Economic Opportunity Act — part of President Johnson's War on Poverty — as one of Oklahoma's original Community Action Agencies. What began as a small organization serving a handful of counties in Southwest Oklahoma has grown into a multi-program agency touching the lives of thousands of families every year.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {TIMELINE.map((t, i) => (
+              <div key={t.year} style={{ display: "flex", gap: 0, alignItems: "flex-start" }}>
+                {/* Left: year column */}
+                <div style={{ width: 72, flexShrink: 0, paddingTop: 2 }}>
+                  <span style={{ color: "#0101FF", fontWeight: 900, fontSize: 15, fontFamily: "'Space Grotesk', sans-serif" }}>{t.year}</span>
+                </div>
+                {/* Center: line + dot */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 20, flexShrink: 0 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#CC0000", border: "2px solid white", boxShadow: "0 0 0 2px #0101FF", marginTop: 4, flexShrink: 0 }} aria-hidden="true" />
+                  {i < TIMELINE.length - 1 && (
+                    <div style={{ width: 2, flex: 1, background: "rgba(1,1,255,0.12)", minHeight: 32 }} aria-hidden="true" />
+                  )}
+                </div>
+                {/* Right: content */}
+                <div style={{ paddingLeft: 16, paddingBottom: i < TIMELINE.length - 1 ? 24 : 0, paddingTop: 0 }}>
+                  <p style={{ color: "#111827", fontWeight: 700, fontSize: 14, margin: "0 0 4px", lineHeight: 1.3 }}>{t.label}</p>
+                  <p style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.65, margin: 0, maxWidth: 520 }}>{t.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Service area */}
