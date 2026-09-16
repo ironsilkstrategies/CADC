@@ -1535,8 +1535,10 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
         style={{
           width: "100%",
           height: "auto",
+          minHeight: 200,
           maxHeight: 300,
-          objectFit: "contain",
+          objectFit: "cover",
+          objectPosition: "center 20%",
           display: "block",
         }}
       />
@@ -1636,7 +1638,7 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
       marginBottom: 16, position: "relative",
       background: "#0a0d1f",
     }}>
-      {/* Bottom layer — current photo, full and contained */}
+      {/* Bottom layer — current photo, fills box */}
       <img
         loading="lazy"
         decoding="async"
@@ -1644,8 +1646,13 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         alt={photos[current]?.alt}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
-          width: "100%", height: "auto", maxHeight: 280,
-          objectFit: "contain", display: "block",
+          width: "100%",
+          height: "auto",
+          minHeight: 180,
+          maxHeight: 280,
+          objectFit: "cover",
+          objectPosition: "center 20%",
+          display: "block",
           opacity: 1,
         }}
       />
@@ -1659,7 +1666,8 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
           position: "absolute", inset: 0,
-          width: "100%", height: "100%", objectFit: "contain",
+          width: "100%", height: "100%",
+          objectFit: "cover", objectPosition: "center 20%",
           opacity: transitioning ? 1 : 0,
           transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
         }}
