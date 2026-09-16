@@ -1523,7 +1523,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
     <div style={{
       position: "relative", width: "100%", height: 180,
       borderRadius: 14, overflow: "hidden", marginBottom: 20,
-      background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
+      background: "#0a0d1f",
       animation: "fadeSlideIn 0.5s ease",
     }}>
       <img
@@ -1533,25 +1533,25 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
         alt={hero.caption}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
-          width: "100%", height: "100%", objectFit: "cover",
-          objectPosition: "center 30%",
+          width: "100%",
+          height: "auto",
+          maxHeight: 300,
+          objectFit: "contain",
           display: "block",
         }}
       />
-      {/* Gradient overlay */}
+      {/* Caption bar */}
       <div style={{
-        position: "absolute", inset: 0,
-        background: dark
-          ? "linear-gradient(to top, rgba(0,0,20,0.85) 0%, rgba(0,0,20,0.2) 60%, transparent 100%)"
-          : "linear-gradient(to top, rgba(0,0,60,0.75) 0%, rgba(0,0,60,0.1) 60%, transparent 100%)",
-      }}/>
-      {/* Caption */}
-      <p style={{
-        position: "absolute", bottom: 10, left: 14, right: 14,
-        color: "rgba(255,255,255,0.85)", fontSize: 10, fontWeight: 600,
-        fontStyle: "italic", margin: 0, letterSpacing: "0.03em",
-        textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-      }}>{hero.caption}</p>
+        position: "absolute", bottom: 0, left: 0, right: 0,
+        background: "linear-gradient(to top, rgba(0,0,20,0.88) 0%, transparent 100%)",
+        padding: "24px 14px 10px",
+      }}>
+        <p style={{
+          color: "rgba(255,255,255,0.85)", fontSize: 10, fontWeight: 600,
+          fontStyle: "italic", margin: 0, letterSpacing: "0.03em",
+          textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+        }}>{hero.caption}</p>
+      </div>
     </div>
   );
 }
@@ -1632,11 +1632,11 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
 
   return (
     <div style={{
-      width: "100%", height: 160, borderRadius: 12, overflow: "hidden",
+      width: "100%", borderRadius: 12, overflow: "hidden",
       marginBottom: 16, position: "relative",
-      background: "#e8eaff",
+      background: "#0a0d1f",
     }}>
-      {/* Bottom layer — current photo, always fully visible */}
+      {/* Bottom layer — current photo, full and contained */}
       <img
         loading="lazy"
         decoding="async"
@@ -1644,13 +1644,12 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         alt={photos[current]?.alt}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%", objectFit: "cover",
-          objectPosition: "center 30%",
+          width: "100%", height: "auto", maxHeight: 280,
+          objectFit: "contain", display: "block",
           opacity: 1,
         }}
       />
-      {/* Top layer — next photo, fades in over the current */}
+      {/* Top layer — next photo, fades in */}
       <img
         loading="lazy"
         decoding="async"
@@ -1660,8 +1659,7 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         style={{
           position: "absolute", inset: 0,
-          width: "100%", height: "100%", objectFit: "cover",
-          objectPosition: "center 30%",
+          width: "100%", height: "100%", objectFit: "contain",
           opacity: transitioning ? 1 : 0,
           transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
         }}
