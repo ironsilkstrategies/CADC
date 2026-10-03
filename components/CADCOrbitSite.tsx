@@ -142,7 +142,7 @@ const T = {
   surface:     "#ffffff",
   border:      "#e5e7eb",
   textPrimary: "#111827",
-  textMuted:   "#6b7280",
+  textMuted:   "#374151",
 };
 
 // ─── Program icon images (replaces emoji on program-level orbit nodes) ────────
@@ -504,12 +504,12 @@ function MarketSchedule({ dark }: { dark: boolean }) {
     <div style={{ position: "relative" }}>
       <div style={{ background: c.headerBg, borderRadius: "10px 10px 0 0", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ color: "white", fontWeight: 800, fontSize: 13, letterSpacing: "0.05em" }}>{month} {year}</span>
-        <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 600 }}>Tap a day to see stops</span>
+        <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: 600 }}>Tap a day to see stops</span>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", background: c.bg, borderLeft: `1px solid ${c.border}`, borderRight: `1px solid ${c.border}` }}>
         {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
-          <div key={d} style={{ textAlign: "center", padding: "6px 2px", fontSize: 9, fontWeight: 700, color: c.dayLabel, textTransform: "uppercase", letterSpacing: "0.08em" }}>{d}</div>
+          <div key={d} style={{ textAlign: "center", padding: "8px 2px", fontSize: 13, fontWeight: 700, color: c.dayLabel, textTransform: "uppercase", letterSpacing: "0.04em" }}>{d}</div>
         ))}
       </div>
 
@@ -527,7 +527,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
                   key={di}
                   onClick={() => hasStop && key && setSelectedDate(key)}
                   style={{
-                    minHeight: 52,
+                    minHeight: 70,
                     background: !day ? "transparent" : weekend ? c.weekend : hasStop ? c.cellHasMeal : c.cellBg,
                     borderLeft: di > 0 ? `1px solid ${c.cellBorder}` : "none",
                     borderTop: hasStop ? `2px solid ${c.cellHasMealBorder}` : "2px solid transparent",
@@ -538,9 +538,9 @@ function MarketSchedule({ dark }: { dark: boolean }) {
                 >
                   {day && (
                     <>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: hasStop ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: hasStop ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
                       {dayStops && (
-                        <span style={{ fontSize: 7, fontWeight: 600, color: c.headline, lineHeight: 1.3 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: c.headline, lineHeight: 1.3 }}>
                           {dayStops.map(s => s.location.split("—")[0].trim()).join(", ")}
                         </span>
                       )}
@@ -553,7 +553,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
         ))}
       </div>
 
-      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
+      <p style={{ fontSize: 13, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
         <EditableText id="marketSchedule.note" section="marketSchedule" label="Market Schedule Note" fallback={note}>{note}</EditableText>
       </p>
 
@@ -568,7 +568,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <div>
-                <p style={{ color: T.blue, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
+                <p style={{ color: T.blue, fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
                   {month} {selectedDayNum}, {year}
                 </p>
                 <h4 style={{ color: c.modalTitle, fontWeight: 800, fontSize: 16, margin: 0 }}>Market Stops Today</h4>
@@ -578,16 +578,16 @@ function MarketSchedule({ dark }: { dark: boolean }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {selectedStops.map((stop, i) => (
                 <div key={i} style={{ padding: "10px 14px", background: dark ? "rgba(1,1,255,0.12)" : "#EEF0FF", borderRadius: 10, borderLeft: `3px solid ${T.blue}` }}>
-                  <p style={{ color: T.blue, fontSize: 10, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stop.time}</p>
+                  <p style={{ color: T.blue, fontSize: 13, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stop.time}</p>
                   <p style={{ color: c.modalTitle, fontWeight: 700, fontSize: 14, margin: 0 }}>{stop.location}</p>
                 </div>
               ))}
             </div>
             <div style={{ marginTop: 14, padding: "10px 14px", background: dark ? "rgba(255,255,255,0.05)" : "#f9fafb", borderRadius: 10 }}>
-              <p style={{ color: c.note, fontSize: 10, margin: "0 0 4px" }}>Need a ride?</p>
+              <p style={{ color: c.note, fontSize: 13, margin: "0 0 4px" }}>Need a ride?</p>
               <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>580-374-5518</a>
             </div>
-            <p style={{ color: c.note, fontSize: 10, fontStyle: "italic", margin: "10px 0 0", textAlign: "center" }}>Tap outside to close</p>
+            <p style={{ color: c.note, fontSize: 13, fontStyle: "italic", margin: "10px 0 0", textAlign: "center" }}>Tap outside to close</p>
           </div>
         </div>
       )}
@@ -610,9 +610,9 @@ function MarketSchedulePanel() {
       >
         📅 Save Schedule to Calendar (.ics)
       </button>
-      <p style={{ fontSize: 10, color: "#9ca3af", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <p style={{ fontSize: 13, color: "#4B5563", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
       <div style={{ marginTop: 4, padding: "10px 14px", background: "#EEF0FF", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: T.blue, margin: "0 0 6px" }}>Need a ride to the market?</p>
+        <p style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: T.blue, margin: "0 0 6px" }}>Need a ride to the market?</p>
         <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call or text for a ride at 580-374-5518">Call or text 580-374-5518</a>
       </div>
     </div>
@@ -687,7 +687,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
         <span style={{ color: c.headerText, fontWeight: 800, fontSize: 13, letterSpacing: "0.05em" }}>
           {month} {year}
         </span>
-        <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 600 }}>Mon–Fri service</span>
+        <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 600 }}>Mon–Fri service</span>
       </div>
 
       {/* Day labels */}
@@ -726,7 +726,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
                     <>
                       <span style={{ fontSize: 12, fontWeight: 800, color: hasMeal ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
                       {meal && (
-                        <span style={{ fontSize: 11, fontWeight: 600, color: c.headline, lineHeight: 1.3, wordBreak: "break-word" }}>{meal.headline}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: c.headline, lineHeight: 1.3, wordBreak: "break-word" }}>{meal.headline}</span>
                       )}
                     </>
                   )}
@@ -738,7 +738,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
       </div>
 
       {/* Note */}
-      <p style={{ fontSize: 10, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
+      <p style={{ fontSize: 13, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
         <EditableText id="seniorMenu.note" section="seniorMenu" label="Senior Menu Note" fallback={note}>{note}</EditableText>
       </p>
 
@@ -767,7 +767,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <div>
-                <p style={{ color: dark ? "rgba(1,1,255,0.9)" : "#0101FF", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
+                <p style={{ color: dark ? "rgba(1,1,255,0.9)" : "#0101FF", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
                   {month} {selectedDayNum}, {year}
                 </p>
                 <h4 style={{ color: c.modalTitle, fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -788,7 +788,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
                 </div>
               ))}
             </div>
-            <p style={{ color: c.note, fontSize: 10, fontStyle: "italic", margin: "12px 0 0", textAlign: "center" }}>Tap outside to close</p>
+            <p style={{ color: c.note, fontSize: 13, fontStyle: "italic", margin: "12px 0 0", textAlign: "center" }}>Tap outside to close</p>
           </div>
         </div>
       )}
@@ -812,13 +812,13 @@ function MealCalendarPanel() {
       >
         📅 Save to Calendar (.ics)
       </button>
-      <p style={{ fontSize: 10, color: "#9ca3af", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <p style={{ fontSize: 13, color: "#4B5563", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
       <div style={{ marginTop: 4, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>About our menus</p>
+        <p style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>About our menus</p>
         <p style={{ fontSize: 12, color: "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers.</p>
       </div>
       <div style={{ marginTop: 10, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
+        <p style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>Questions about the menu?</p>
         <a href="tel:+15803355588" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call CADC at 580-335-5588">580-335-5588</a>
       </div>
     </div>
@@ -1028,7 +1028,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
 
   const RADIUS = isMobile ? 36 : 38;
   const SIZE = isMobile ? "min(92vw,400px)" : "min(80vw,420px)";
-  const NODE_SIZE = isMobile ? 42 : 58;
+  const NODE_SIZE = isMobile ? 54 : 78;
 
   // Initialize / sync node springs when items change
   useEffect(() => {
@@ -1549,7 +1549,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
         padding: "24px 14px 10px",
       }}>
         <p style={{
-          color: "rgba(255,255,255,0.85)", fontSize: 10, fontWeight: 600,
+          color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: 600,
           fontStyle: "italic", margin: 0, letterSpacing: "0.03em",
           textShadow: "0 1px 4px rgba(0,0,0,0.5)",
         }}>{hero.caption}</p>
@@ -1760,7 +1760,7 @@ function PhotoGrid({ photos, dark }: {
     }}>
       {display.map((photo, i) => (
         <div key={photo.src} style={{
-          borderRadius: 10, overflow: "hidden", aspectRatio: "4/3",
+          borderRadius: 10, overflow: "hidden",
           background: dark ? "rgba(1,1,255,0.1)" : "#e8eaff",
           border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
           gridColumn: i === 0 && hasSpan ? "1 / span 2" : "auto",
@@ -1774,7 +1774,7 @@ function PhotoGrid({ photos, dark }: {
               const originalIndex = photos.findIndex(p => p.src === photo.src);
               setFailed(prev => new Set([...prev, originalIndex]));
             }}
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%", display: "block" }}
+            style={{ width: "100%", height: "auto", display: "block" }}
           />
         </div>
       ))}
@@ -1816,12 +1816,12 @@ function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; 
       <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 16, padding: 22, maxWidth: 420, width: "100%", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
-            <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>Community Market</p>
+            <p style={{ color: T.maroon, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>Community Market</p>
             <h4 style={{ color: T.textPrimary, fontWeight: 800, fontSize: 20, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>{county}</h4>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ background: T.void, border: `1px solid ${T.border}`, borderRadius: 8, width: 36, height: 36, fontSize: 20, cursor: "pointer", color: T.textPrimary }}>×</button>
         </div>
-        <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "12px 0 8px" }}>Market stops this month</p>
+        <p style={{ color: T.maroon, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "12px 0 8px" }}>Market stops this month</p>
         {stops.map(st => (
           <div key={st.city} style={{ background: "#F5F5FF", border: `1px solid #dcdcf5`, borderRadius: 10, padding: "10px 12px", marginBottom: 6 }}>
             <p style={{ color: T.blue, fontWeight: 800, fontSize: 14, margin: "0 0 4px" }}>{st.city}</p>
@@ -1830,7 +1830,7 @@ function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; 
               : <p style={{ color: T.textMuted, fontSize: 12, margin: 0, fontStyle: "italic" }}>Check the schedule for upcoming dates</p>}
           </div>
         ))}
-        <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "14px 0 8px" }}>Other CADC services in {county}</p>
+        <p style={{ color: T.maroon, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", margin: "14px 0 8px" }}>Other CADC services in {county}</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {programs.map(p => <a key={p.slug} href={`/?county=${slug}&program=${p.slug}`} style={{ background: T.blueLight, color: T.blue, padding: "6px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{p.icon} {p.shortName}</a>)}
         </div>
@@ -1912,7 +1912,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
     { label: "View Fares", icon: "💲", areaId: "fares", desc: "See pricing" },
   ],
   "weatherization": [
-    { label: "Apply Online", icon: "🏠", href: "https://ok.mywaplink.org", desc: "Oklahoma WAP Portal" },
+    { label: "Paper Application", icon: "📄", href: "/documents/weatherization-application.pdf", desc: "Print & mail or drop off" },
     { label: "Check Eligibility", icon: "✅", areaId: "eligibility-weath", desc: "Income guidelines" },
   ],
   "senior-meals": [
@@ -1932,7 +1932,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
   ],
   "advantage": [
     { label: "Check Eligibility", icon: "✅", areaId: "adv-eligibility", desc: "SoonerCare required" },
-    { label: "Call to Apply", icon: "📞", href: "tel:+18009877767", desc: "1-800-987-7767" },
+    { label: "Apply by Phone", icon: "📞", areaId: "adv-apply", desc: "Call your nearest office" },
   ],
   "board": [
     { label: "Staff Directory", icon: "👤", areaId: "leadership", desc: "All program directors" },
@@ -1965,7 +1965,7 @@ function ProgramCTABar({ slug, onSelectArea }: { slug: string; onSelectArea: (id
             >
               <span style={{ fontSize: 22 }}>{cta.icon}</span>
               <span>{cta.label}</span>
-              <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.8 }}>{cta.desc}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>{cta.desc}</span>
             </a>
           : <button key={cta.label} onClick={() => onSelectArea(cta.areaId!)}
               style={{
@@ -1982,7 +1982,7 @@ function ProgramCTABar({ slug, onSelectArea }: { slug: string; onSelectArea: (id
             >
               <span style={{ fontSize: 22 }}>{cta.icon}</span>
               <span>{cta.label}</span>
-              <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6 }}>{cta.desc}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.6 }}>{cta.desc}</span>
             </button>
       ))}
     </div>
@@ -2002,9 +2002,18 @@ function TransitRideSection() {
         <p className="cadc-note">Spanish-speaking staff available. ADA equipped vehicles.</p>
         <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
       </div>
-      <div className="cadc-card">
-        <p className="cadc-label">Counties served</p>
-        <p>Beckham · Caddo · Canadian · Comanche · Cotton · Custer · Jefferson · Kiowa · Roger Mills · Stephens · Tillman · Washita</p>
+      <p className="cadc-label" style={{ marginTop: 8 }}>Counties served — call your county's office</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
+        {[
+          ["Beckham","580-928-2199"],["Caddo","580-335-2691"],["Canadian","580-335-2691"],["Comanche","580-335-2691"],
+          ["Cotton","580-335-2691"],["Custer","580-335-2691"],["Jefferson","580-757-2412"],["Kiowa","580-335-2691"],
+          ["Roger Mills","580-928-2199"],["Stephens","580-335-2691"],["Tillman","580-335-2691"],["Washita","580-335-2691"],
+        ].map(([county, phone]) => (
+          <div key={county} className="cadc-card-sm" style={{ border: "1.5px solid #E4E4FF" }}>
+            <p className="cadc-card-title">{county} County</p>
+            <a href={`tel:+1${phone.replace(/\D/g,"")}`} style={{ color: "#0101FF", fontWeight: 800, fontSize: 17, textDecoration: "none" }}>📞 {phone}</a>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -2054,7 +2063,7 @@ function TransitBookingForm() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}><label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block", marginBottom: 2 }}>Additional notes</label><textarea style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} value={form.notes} onChange={f("notes")} placeholder="Anything else Gilbert's team should know" /></div>
         <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", marginTop: 20, display: "block", letterSpacing: "0.02em" }} onClick={submit} disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Submit Ride Request →"}</button>
-        <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5, display: "block" }}>Spanish-speaking staff available · ADA vehicles on all routes</p>
+        <p style={{ fontSize: 13, color: "#4B5563", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5, display: "block" }}>Spanish-speaking staff available · ADA vehicles on all routes</p>
       </div>
     </div>
   );
@@ -2093,9 +2102,9 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
           {/* Header row with dismiss */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
             <p style={{ fontSize: 14, fontWeight: 800, color: "#111827", margin: 0 }}>Want us to follow up with you?</p>
-            <button onClick={() => setState("dismissed")} aria-label="Dismiss" style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: 18, lineHeight: 1, padding: "0 0 0 8px", fontFamily: "inherit" }}>✕</button>
+            <button onClick={() => setState("dismissed")} aria-label="Dismiss" style={{ background: "none", border: "none", cursor: "pointer", color: "#4B5563", fontSize: 18, lineHeight: 1, padding: "0 0 0 8px", fontFamily: "inherit" }}>✕</button>
           </div>
-          <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 16px", lineHeight: 1.5 }}>Leave your name and contact info and a CADC staff member will reach out to help you through the process.</p>
+          <p style={{ fontSize: 12, color: "#374151", margin: "0 0 16px", lineHeight: 1.5 }}>Leave your name and contact info and a CADC staff member will reach out to help you through the process.</p>
           {state === "err" && (
             <div style={{ fontSize: 12, color: "#CC0000", fontWeight: 700, marginBottom: 12, padding: "10px 14px", background: "#FFF0F0", borderRadius: 8, border: "1px solid #FCA5A5" }}>
               Please enter your name and at least a phone number or email.
@@ -2113,12 +2122,12 @@ function IntakeLeadForm({ program, step, children }: { program: string; step: st
           </div>
           {/* Email — optional but encouraged */}
           <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
-            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Email <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional)</span></label>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Email <span style={{ fontSize: 13, color: "#4B5563", fontWeight: 400 }}>(optional)</span></label>
             <input style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} type="email" value={form.email} onChange={f("email")} placeholder="you@email.com" />
           </div>
           {/* County */}
           <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 18 }}>
-            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your county <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional)</span></label>
+            <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>Your county <span style={{ fontSize: 13, color: "#4B5563", fontWeight: 400 }}>(optional)</span></label>
             <select style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "white", outline: "none", display: "block" }} value={form.county} onChange={f("county")}>
               <option value="">Select county</option>
               {["Beckham","Canadian","Comanche","Cotton","Jefferson","Kiowa","Roger Mills","Tillman","Washita","Caddo","Custer","Grady","Greer","Harmon","Jackson","McClain","Stephens","Garvin"].map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
@@ -2201,7 +2210,7 @@ function BoardDocsSectionGated() {
       <div className="cadc-card" style={{ textAlign: "center", padding: 28 }}>
         <p style={{ fontSize: 28, margin: "0 0 8px" }}>📄</p>
         <p style={{ fontWeight: 700, margin: "0 0 6px" }}>Board documents coming soon.</p>
-        <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Agendas, minutes, and resolutions will be posted here.</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Agendas, minutes, and resolutions will be posted here.</p>
       </div>
       <div className="cadc-card">
         <p className="cadc-label">Questions about board documents</p>
@@ -2241,7 +2250,6 @@ function ServiceScreenerForm() {
     if (form.age60plus === "yes") programs.push("Senior Nutrition / Congregate Meals");
     if (form.age60plus === "yes") programs.push("Advantage Home Delivered Meals");
     if (form.county !== "") programs.push("Red River Transportation");
-    programs.push("VITA Free Tax Help");
     if (form.income !== "" && parseInt(form.income) < 40000) programs.push("Community Market");
     const unique = [...new Set(programs)];
     setResults(unique);
@@ -2257,7 +2265,7 @@ function ServiceScreenerForm() {
         <div style={{ marginTop: 12, textAlign: "left" }}>
           {results.map(r => <div key={r} style={{ padding: "8px 0", borderBottom: "1px solid #D1FAE5", fontWeight: 600, fontSize: 14, color: "#111827" }}>✓ {r}</div>)}
         </div>
-        <p style={{ fontSize: 12, color: "#6B7280", margin: "14px 0 0", textAlign: "left" }}>Eligibility is determined by CADC staff. Call to confirm and start the process.</p>
+        <p style={{ fontSize: 12, color: "#374151", margin: "14px 0 0", textAlign: "left" }}>Eligibility is determined by CADC staff. Call to confirm and start the process.</p>
       </div>
       <a href="tel:+15803355588" className="cadc-btn" style={{ display: "block", textAlign: "center", marginTop: 14 }}>📞 Call CADC — 580-335-5588</a>
       <button style={{ width: "100%", marginTop: 10, background: "white", color: T.blue, border: `1.5px solid ${T.blue}`, borderRadius: 10, padding: "12px", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }} onClick={() => { setState("idle"); setResults(null); }}>Start Over</button>
@@ -2612,7 +2620,6 @@ function CommunityNeedsSurvey() {
           <option value="food">Food / groceries</option>
           <option value="weatherization">Home energy / weatherization</option>
           <option value="senior-meals">Senior meals / nutrition</option>
-          <option value="tax-help">Free tax help</option>
           <option value="employment">Employment / job training</option>
           <option value="healthcare">Healthcare access</option>
           <option value="housing">Housing assistance</option>
@@ -2676,7 +2683,7 @@ function BoardDocsPanel() {
       <div className="cadc-card" style={{ textAlign: "center", padding: 32 }}>
         <p style={{ fontSize: 28, margin: "0 0 10px" }}>📄</p>
         <p style={{ fontWeight: 700, margin: "0 0 6px" }}>No documents posted yet.</p>
-        <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Board agendas, minutes, and resolutions will appear here when uploaded by CADC staff.</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>Board agendas, minutes, and resolutions will appear here when uploaded by CADC staff.</p>
       </div>
       <div className="cadc-card">
         <p className="cadc-label">Questions about board documents</p>
@@ -2699,7 +2706,7 @@ function BoardDocsPanel() {
                 <a key={doc.id} href={doc.href} target="_blank" rel="noopener noreferrer"
                   style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f3f4f6", textDecoration: "none", color: T.blue, fontWeight: 700, fontSize: 13, gap: 12 }}>
                   <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.title}</span>
-                  <span style={{ fontSize: 11, color: "#6B7280", fontWeight: 400, flexShrink: 0 }}>{new Date(doc.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                  <span style={{ fontSize: 13, color: "#374151", fontWeight: 400, flexShrink: 0 }}>{new Date(doc.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
                 </a>
               ))}
             </div>
@@ -2775,7 +2782,7 @@ function CADCNow() {
       <div style={{ background: T.blue, borderRadius: 14, overflow: "hidden", boxShadow: "0 4px 20px rgba(1,1,255,0.25)" }}>
         <div style={{ padding: "10px 16px", background: "rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ADE80", boxShadow: "0 0 6px #4ADE80", animation: "pulse 2s infinite" }} />
-          <span style={{ color: "white", fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>CADC Now · {todayStr}</span>
+          <span style={{ color: "white", fontSize: 13, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>CADC Now · {todayStr}</span>
         </div>
         {items.map((item, i) => (
           <a key={i} href={item.href || undefined}
@@ -2784,9 +2791,9 @@ function CADCNow() {
               textDecoration: "none", background: "transparent" }}>
             <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1.3 }}>{item.icon}</span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 2 }}>{item.label}</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 2 }}>{item.label}</div>
               <div style={{ color: item.color ? "white" : "white", fontSize: 14, fontWeight: 800, lineHeight: 1.3 }}>{item.value}</div>
-              {item.sub && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{item.sub}</div>}
+              {item.sub && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{item.sub}</div>}
             </div>
             {item.href && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 16, flexShrink: 0, marginTop: 4 }}>›</span>}
           </a>
@@ -2800,13 +2807,29 @@ function CADCNow() {
 
 // ─── Find CADC Near Me ────────────────────────────────────────────────────────
 const CADC_LOCATIONS = [
-  { name: "CADC Main Office", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Head Start","Weatherization","Senior Nutrition","VITA","Administration"] },
-  { name: "Head Start — Hobart Center", city: "Hobart", lat: 35.0212, lng: -99.0912, phone: "580-726-3343", href: "tel:+15807263343", services: ["Head Start","Early Head Start"] },
-  { name: "Head Start — Sayre Center", city: "Sayre", lat: 35.2912, lng: -99.6412, phone: "580-928-2199", href: "tel:+15809282199", services: ["Head Start"] },
-  { name: "Advantage — Sentinel Office", city: "Sentinel", lat: 35.1612, lng: -99.1712, phone: "580-393-2216", href: "tel:+15803932216", services: ["Advantage Meals"] },
-  { name: "Advantage — Temple Office", city: "Temple", lat: 34.2712, lng: -98.2412, phone: "580-342-6967", href: "tel:+15803426967", services: ["Advantage Meals"] },
-  { name: "Advantage — Lawton Office", city: "Lawton", lat: 34.6086, lng: -98.3959, phone: "580-699-8880", href: "tel:+15806998880", services: ["Advantage Meals"] },
-  { name: "Red River Transit Dispatch", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-2691", href: "tel:+15803352691", services: ["Transportation"] },
+  // Main
+  { name: "CADC Main Office", city: "Frederick", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Administration"] },
+  // Senior Nutrition (6)
+  { name: "Senior Nutrition — Frederick", city: "Frederick · 100 E Grand", lat: 34.3925, lng: -98.9900, phone: "580-335-7026", href: "tel:+15803357026", services: ["Senior Nutrition"] },
+  { name: "Senior Nutrition — Cache", city: "Cache · 416 West C Ave.", lat: 34.6295, lng: -98.6267, phone: "580-429-3427", href: "tel:+15804293427", services: ["Senior Nutrition"] },
+  { name: "Senior Nutrition — Temple", city: "Temple · 201 S Commercial", lat: 34.2712, lng: -98.2340, phone: "580-342-6944", href: "tel:+15803426944", services: ["Senior Nutrition"] },
+  { name: "Senior Nutrition — Walters", city: "Walters · 500 E California", lat: 34.3598, lng: -98.3078, phone: "580-875-9044", href: "tel:+15808759044", services: ["Senior Nutrition"] },
+  { name: "Senior Nutrition — Ringling", city: "Ringling · 200 D St.", lat: 34.1784, lng: -97.5939, phone: "580-662-2362", href: "tel:+15806622362", services: ["Senior Nutrition"] },
+  { name: "Senior Nutrition — Ryan", city: "Ryan · 400 Taylor St.", lat: 34.0187, lng: -97.9534, phone: "580-757-2412", href: "tel:+15807572412", services: ["Senior Nutrition"] },
+  // Advantage (3)
+  { name: "Advantage — Sentinel Office", city: "Sentinel · 122 S. 3rd", lat: 35.1612, lng: -99.1712, phone: "580-393-2216", href: "tel:+15803932216", services: ["Advantage Meals"] },
+  { name: "Advantage — Temple Office", city: "Temple · 102 W. Texas", lat: 34.2712, lng: -98.2412, phone: "580-342-6967", href: "tel:+15803426967", services: ["Advantage Meals"] },
+  { name: "Advantage — Lawton Office", city: "Lawton · 802 SW A Ave, Ste B", lat: 34.6086, lng: -98.3959, phone: "580-699-8880", href: "tel:+15806998880", services: ["Advantage Meals"] },
+  // Head Start (1)
+  { name: "Head Start — Administrative Office", city: "Hobart", lat: 35.0295, lng: -99.0929, phone: "580-726-3343", href: "tel:+15807263343", services: ["Head Start","Early Head Start"] },
+  // Transit (3)
+  { name: "Red River Transit — Frederick", city: "Frederick · 105 S. Main", lat: 34.3923, lng: -98.9912, phone: "580-335-2691", href: "tel:+15803352691", services: ["Transportation"] },
+  { name: "Red River Transit — Sayre", city: "Sayre · 304 W. Main", lat: 35.2912, lng: -99.6401, phone: "580-928-2199", href: "tel:+15809282199", services: ["Transportation"] },
+  { name: "Red River Transit — Ryan", city: "Ryan · 400 Taylor St.", lat: 34.0187, lng: -97.9534, phone: "580-757-2412", href: "tel:+15807572412", services: ["Transportation"] },
+  // Weatherization (1)
+  { name: "Weatherization Office", city: "Frederick · 105 S. Main", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Weatherization","Housing"] },
+  // Community Market (1)
+  { name: "Community Market", city: "Mobile — call for stops", lat: 34.3923, lng: -98.9912, phone: "580-305-1964", href: "tel:+15803051964", services: ["Community Market"] },
 ];
 
 function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -2848,7 +2871,7 @@ function FindNearMe({ onClose }: { onClose?: () => void }) {
   );
 
   if (state === "loading") return (
-    <div style={{ textAlign: "center", padding: "20px", color: "#6B7280", fontSize: 13 }}>📍 Finding nearest location…</div>
+    <div style={{ textAlign: "center", padding: "20px", color: "#374151", fontSize: 13 }}>📍 Finding nearest location…</div>
   );
 
   if (state === "denied") return (
@@ -2862,18 +2885,18 @@ function FindNearMe({ onClose }: { onClose?: () => void }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
         <div>
           <div style={{ fontWeight: 800, fontSize: 15, color: "#111827", marginBottom: 2 }}>{nearest.name}</div>
-          <div style={{ fontSize: 12, color: "#6B7280" }}>{nearest.city}, OK · {nearest.miles} miles away</div>
+          <div style={{ fontSize: 12, color: "#374151" }}>{nearest.city}, OK · {nearest.miles} miles away</div>
         </div>
         <div style={{ background: "#E4E4FF", color: "#0101FF", fontWeight: 800, fontSize: 13, padding: "4px 10px", borderRadius: 20 }}>{nearest.miles} mi</div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-        {nearest.services.map(s => <span key={s} style={{ background: "#F0F0FF", color: "#0101FF", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>{s}</span>)}
+        {nearest.services.map(s => <span key={s} style={{ background: "#F0F0FF", color: "#0101FF", fontSize: 13, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>{s}</span>)}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <a href={nearest.href} style={{ display: "block", background: "#CC0000", color: "white", textAlign: "center" as const, padding: "12px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>📞 Call</a>
         <a href={`https://maps.google.com/?q=${nearest.name}+${nearest.city}+OK`} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: "white", color: "#0101FF", textAlign: "center" as const, padding: "12px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none", border: "1.5px solid #0101FF" }}>🗺️ Directions</a>
       </div>
-      {onClose && <button onClick={onClose} style={{ marginTop: 10, width: "100%", background: "none", border: "none", color: "#9CA3AF", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Close</button>}
+      {onClose && <button onClick={onClose} style={{ marginTop: 10, width: "100%", background: "none", border: "none", color: "#4B5563", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Close</button>}
     </div>
   );
 
@@ -2931,7 +2954,7 @@ function QuickApplyForm() {
               body: JSON.stringify({ ...form, program: "employment", step: "quick-apply", _gotcha: "" }) }).catch(() => {});
             setState("done");
           }}>{state === "sending" ? "Sending…" : "Submit Application →"}</button>
-        <p style={{ fontSize: 10, color: "#9CA3AF", textAlign: "center" as const, marginTop: 8, lineHeight: 1.5 }}>🔒 Your information is used only for employment consideration and kept confidential.</p>
+        <p style={{ fontSize: 13, color: "#4B5563", textAlign: "center" as const, marginTop: 8, lineHeight: 1.5 }}>🔒 Your information is used only for employment consideration and kept confidential.</p>
       </div>
     </div>
   );
@@ -3010,7 +3033,7 @@ function TransitFareCalculator() {
           <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>One-way miles</label>
           <input type="number" value={customMiles} onChange={e => setCustomMiles(e.target.value)} placeholder="e.g. 85"
             style={{ width: "100%", fontSize: 15, padding: "13px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block" }} />
-          <p style={{ fontSize: 11, color: "#9CA3AF", margin: "4px 0 0" }}>Fares are calculated on round-trip mileage.</p>
+          <p style={{ fontSize: 13, color: "#4B5563", margin: "4px 0 0" }}>Fares are calculated on round-trip mileage.</p>
         </div>
       )}
 
@@ -3027,27 +3050,27 @@ function TransitFareCalculator() {
       {/* Result */}
       {hasResult && (
         <div style={{ background: T.blue, borderRadius: 14, padding: "20px 18px", marginBottom: 16 }}>
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 10px" }}>
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 10px" }}>
             Estimated Fare · {miles} mi one way · {roundTrip} mi round trip
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "14px 16px", textAlign: "center" as const }}>
               <div style={{ color: "white", fontSize: 28, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>{reduced ? fareRed : fareStd}</div>
-              <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, marginTop: 4 }}>{reduced ? "Reduced rate" : "Standard rate"}</div>
+              <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, marginTop: 4 }}>{reduced ? "Reduced rate" : "Standard rate"}</div>
             </div>
             <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "14px 16px", textAlign: "center" as const }}>
               <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 22, fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif" }}>{reduced ? fareStd : fareRed}</div>
-              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 4 }}>{reduced ? "Standard rate" : "Reduced rate"}</div>
+              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 4 }}>{reduced ? "Standard rate" : "Reduced rate"}</div>
             </div>
           </div>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: "12px 0 0", textAlign: "center" as const }}>Estimate only · Final fare confirmed at time of booking</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "12px 0 0", textAlign: "center" as const }}>Estimate only · Final fare confirmed at time of booking</p>
         </div>
       )}
 
       {/* Call CTA */}
       <div style={{ background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px" }}>
         <p style={{ fontWeight: 700, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>Ready to schedule?</p>
-        <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px" }}>Call Gilbert's team to book your ride and confirm the exact fare.</p>
+        <p style={{ fontSize: 12, color: "#374151", margin: "0 0 12px" }}>Call Gilbert's team to book your ride and confirm the exact fare.</p>
         <a href="tel:+15803352691" style={{ display: "block", background: T.maroon, color: "white", textAlign: "center" as const, padding: "13px", borderRadius: 10, fontWeight: 800, fontSize: 15, textDecoration: "none", letterSpacing: "0.02em" }}>📞 Call (580) 335-2691</a>
       </div>
 
@@ -3056,11 +3079,11 @@ function TransitFareCalculator() {
         <summary style={{ fontSize: 13, fontWeight: 700, color: T.blue, cursor: "pointer", padding: "8px 0" }}>View full fare table</summary>
         <div style={{ marginTop: 10 }} className="cadc-fare-table">
           <div className="cadc-fare-header"><span>Round-Trip Miles</span><span>Standard</span><span>Reduced</span></div>
-          {[["1–10 miles","$8.00","$8.00"],["11–30 miles","$15.00","$15.00"],["31–50 miles","$30.00","$20.00"],["51–100 miles","$45.00","$30.00"],["101–150 miles","$60.00","$40.00"],["151–249 miles","$80.00","$60.00"],["250+ miles","$0.40/mi","$0.40/mi"],["Wait time","$10.00/hr","$10.00/hr"]].map(r =>
+          {[["1–10 miles","$8.00","$8.00"],["11–30 miles","$15.00","$15.00"],["31–50 miles","$30.00","$20.00"],["51–100 miles","$45.00","$30.00"],["101–150 miles","$60.00","$40.00"],["151–249 miles","$80.00","$60.00"],["250+ miles","$0.40/mi","$0.40/mi"]] .map(r =>
             <div key={r[0]} className="cadc-fare-row"><span>{r[0]}</span><span>{r[1]}</span><span>{r[2]}</span></div>
           )}
         </div>
-        <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 8 }}>In-town service: $1.00 standard · $0.75 elderly/disabled · per stop</p>
+        <p style={{ fontSize: 13, color: "#4B5563", marginTop: 8 }}>In-town service: $1.00 standard · $0.75 elderly/disabled · per stop</p>
       </details>
     </div>
   );
@@ -3082,7 +3105,7 @@ function PublicVolunteerLogForm() {
       <div style={{ background: "#F0F0FF", border: `1.5px solid ${T.blue}`, borderRadius: 14, padding: "24px 20px", textAlign: "center" as const }}>
         <p style={{ fontSize: 28, margin: "0 0 10px" }}>🤝</p>
         <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 6px" }}>Want to log your volunteer hours?</p>
-        <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 16px", lineHeight: 1.6 }}>Online hour logging is coming soon. For now, please submit your hours directly to your center supervisor.</p>
+        <p style={{ fontSize: 13, color: "#374151", margin: "0 0 16px", lineHeight: 1.6 }}>Online hour logging is coming soon. For now, please submit your hours directly to your center supervisor.</p>
         <a href="tel:+15807263343" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "12px 20px", borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none" }}>📞 Call Robin — 580-726-3343</a>
       </div>
     </div>
@@ -3147,7 +3170,7 @@ function PublicVolunteerLogForm() {
           </select>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 20 }}>
-          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>What did you do? <span style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 400 }}>(optional but helpful)</span></label>
+          <label style={{ fontSize: 13, fontWeight: 700, color: "#1F2937", display: "block" }}>What did you do? <span style={{ fontSize: 13, color: "#4B5563", fontWeight: 400 }}>(optional but helpful)</span></label>
           <textarea style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1.5px solid #D1D5DB", borderRadius: 10, boxSizing: "border-box" as const, fontFamily: "inherit", color: "#111827", background: "#F9FAFB", outline: "none", display: "block", minHeight: 80, resize: "vertical" as const }} value={form.description} onChange={f("description")} placeholder="e.g. Helped with lunch service and read to the class" />
         </div>
         <button style={{ width: "100%", background: "#CC0000", color: "white", border: "none", borderRadius: 12, padding: "16px 20px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", display: "block", letterSpacing: "0.02em" }}
@@ -3164,7 +3187,7 @@ function PublicVolunteerLogForm() {
           }}>
           {state === "sending" ? "Logging…" : "Submit My Hours →"}
         </button>
-        <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5 }}>
+        <p style={{ fontSize: 13, color: "#4B5563", textAlign: "center" as const, marginTop: 10, lineHeight: 1.5 }}>
           Hours are reviewed by Robin Harris and count toward CADC's Head Start federal in-kind match requirement.
         </p>
       </div>
@@ -3264,7 +3287,7 @@ function VolunteerHub() {
 
       {/* ── IMPACT RING ── */}
       <div style={{ background: `linear-gradient(135deg, ${T.blue} 0%, #1a1aee 100%)`, borderRadius: 18, padding: "28px 20px", marginBottom: 20, textAlign: "center" as const }}>
-        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 20px" }}>Community Impact Tracker</p>
+        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 20px" }}>Community Impact Tracker</p>
 
         {/* Animated ring */}
         <div style={{ position: "relative", width: 140, height: 140, margin: "0 auto 20px" }}>
@@ -3284,7 +3307,7 @@ function VolunteerHub() {
             <span style={{ color: "white", fontSize: 28, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
               {loading ? "…" : `${pct}%`}
             </span>
-            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em" }}>OF GOAL</span>
+            <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em" }}>OF GOAL</span>
           </div>
         </div>
 
@@ -3297,7 +3320,7 @@ function VolunteerHub() {
           ].map(({ label, value }) => (
             <div key={label} style={{ background: "rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 6px" }}>
               <div style={{ color: "white", fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1 }}>{value}</div>
-              <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>{label}</div>
+              <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>{label}</div>
             </div>
           ))}
         </div>
@@ -3326,7 +3349,7 @@ function VolunteerHub() {
               <span style={{ fontSize: 22, flexShrink: 0 }}>{w.icon}</span>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 14, color: "#111827", margin: "0 0 2px" }}>{w.title}</p>
-                {activeSection === w.title && <p style={{ fontSize: 13, color: "#6B7280", margin: 0, lineHeight: 1.6 }}>{w.body}</p>}
+                {activeSection === w.title && <p style={{ fontSize: 13, color: "#374151", margin: 0, lineHeight: 1.6 }}>{w.body}</p>}
               </div>
               <span style={{ marginLeft: "auto", color: T.blue, fontWeight: 800, fontSize: 16, flexShrink: 0 }}>{activeSection === w.title ? "−" : "+"}</span>
             </div>
@@ -3340,7 +3363,7 @@ function VolunteerHub() {
         <ul className="cadc-list">
           {WHO.map(w => <li key={w}>{w}</li>)}
         </ul>
-        <p style={{ fontSize: 12, color: "#6B7280", marginTop: 10, fontStyle: "italic" }}>No experience necessary. No background check for most activities. Just show up.</p>
+        <p style={{ fontSize: 12, color: "#374151", marginTop: 10, fontStyle: "italic" }}>No experience necessary. No background check for most activities. Just show up.</p>
       </div>
 
       {/* ── WHAT YOU CAN DO ── */}
@@ -3367,7 +3390,7 @@ function VolunteerHub() {
             <a key={w.center} href={`tel:+1${w.phone.replace(/\D/g,"")}`}
               style={{ display: "flex", flexDirection: "column", background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px 12px", textDecoration: "none" }}>
               <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{w.center}</span>
-              <span style={{ fontSize: 11, color: T.blue, fontWeight: 600 }}>{w.phone}</span>
+              <span style={{ fontSize: 13, color: T.blue, fontWeight: 600 }}>{w.phone}</span>
             </a>
           ))}
         </div>
@@ -3447,7 +3470,7 @@ const PROGRAMS: ProgramData[] = [
               ].map(p => (
                 <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ height: 120, width: 160, objectFit: "cover", objectPosition: "center 20%", borderRadius: 10, flexShrink: 0 }} />
+                  style={{ height: 220, width: "auto", borderRadius: 10, flexShrink: 0 }} />
               ))}
             </div>
             <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
@@ -3509,7 +3532,7 @@ const PROGRAMS: ProgramData[] = [
                   "Medical documentation updated as needed",
                 ].map(i=><li key={i}>{i}</li>)}
               </ul>
-              <p style={{ fontSize: 12, color: "#6B7280", marginTop: 8 }}>All allergy documentation is kept on file and shared with classroom staff to ensure consistent, safe meal service.</p>
+              <p style={{ fontSize: 12, color: "#374151", marginTop: 8 }}>All allergy documentation is kept on file and shared with classroom staff to ensure consistent, safe meal service.</p>
             </div>
 
             <div className="cadc-card">
@@ -3561,7 +3584,7 @@ const PROGRAMS: ProgramData[] = [
                   />
                 </div>
                 <div>
-                  <p style={{ color: "#BFDBFE", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 4px" }}>Fatherhood Engagement</p>
+                  <p style={{ color: "#BFDBFE", fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 4px" }}>Fatherhood Engagement</p>
                   <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: "0 0 6px", lineHeight: 1.4 }}>Dads belong here.</p>
                   <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 12, margin: 0, lineHeight: 1.5 }}>CADC Head Start actively welcomes and celebrates father involvement. From classroom visits and family dinners to mentorship and policy participation — fathers are partners in this program, not guests.</p>
                 </div>
@@ -3641,7 +3664,7 @@ const PROGRAMS: ProgramData[] = [
               ].map(p => (
                 <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ height: 110, width: 160, objectFit: "cover", objectPosition: "center 25%", borderRadius: 10, flexShrink: 0 }} />
+                  style={{ height: 220, width: "auto", borderRadius: 10, flexShrink: 0 }} />
               ))}
             </div>
 
@@ -3659,7 +3682,7 @@ const PROGRAMS: ProgramData[] = [
                 />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Johnna Mann</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Education Coordinator</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Education Coordinator</p>
                   <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"I do this work because early childhood education is foundational. The experiences children have in their first years shape their confidence, their learning, and their future. As an Education Coordinator, I'm committed to ensuring our teachers feel supported, our classrooms are high-quality, and our families feel valued. Head Start changes lives."</p>
                 </div>
               </div>
@@ -3676,7 +3699,7 @@ const PROGRAMS: ProgramData[] = [
                 />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Tarra Harrison</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>PFCE Coordinator</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>PFCE Coordinator</p>
                   <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"Every family has incredible potential, but not everyone has access to the support they need to reach it. As the PFCE Coordinator, I get to help parents and families recognize their own strengths, overcome barriers, and build lasting stability for their children's future. When we partner with families and give them the resources to achieve their goals, we aren't just supporting a child — we are lifting up the entire community."</p>
                 </div>
               </div>
@@ -3693,8 +3716,8 @@ const PROGRAMS: ProgramData[] = [
                 />
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Allison Zavala</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
-                  <a href="mailto:azavala@cadcok.org" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 6 }}>azavala@cadcok.org</a>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
+                  <a href="mailto:azavala@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 6 }}>azavala@cadcok.org</a>
                   <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As an Administrative Assistant, I am committed to providing reliable and effective administrative support that enables our team to successfully serve the needs of our community. I take pride in helping ensure that our daily operations run efficiently and that our team has the support necessary to accomplish its goals. I am passionate about community engagement and the role that strong connections play in creating thriving communities."</p>
                 </div>
               </div>
@@ -3706,8 +3729,8 @@ const PROGRAMS: ProgramData[] = [
                 </div>
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Christy Glisson</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
-                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 6 }}>580-726-3343</a>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
+                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 6 }}>580-726-3343</a>
                   <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"I have been an administrative assistant with the CADC Head Start Office for 21 and a half years. I started out as an EHS parent and on policy council. That's when I learned about all the services and benefits that Head Start provides for children and their families. I love to see the children and hear about success stories with them and their families that might not have happened if they had not had encouragement, guidance and resources provided from our Head Start Program."</p>
                 </div>
               </div>
@@ -3717,9 +3740,9 @@ const PROGRAMS: ProgramData[] = [
                 <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Robin Harris</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start / Early Head Start Director</p>
-                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 4 }}>580-726-3343</a>
-                  <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 11, display: "block" }}>rharris@cadcok.org</a>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start / Early Head Start Director</p>
+                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 4 }}>580-726-3343</a>
+                  <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block" }}>rharris@cadcok.org</a>
                 </div>
               </div>
 
@@ -3728,7 +3751,7 @@ const PROGRAMS: ProgramData[] = [
                 <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🏫</div>
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Karen Segler</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
                   <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>25+ years of service to CADC Head Start families across Southwest Oklahoma.</p>
                 </div>
               </div>
@@ -3738,7 +3761,7 @@ const PROGRAMS: ProgramData[] = [
                 <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Dori Lientz</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
                 </div>
               </div>
 
@@ -3747,7 +3770,7 @@ const PROGRAMS: ProgramData[] = [
                 <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🍳</div>
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Frances Baker</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Nutrition &amp; Supplies Supervisor</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Nutrition &amp; Supplies Supervisor</p>
                   <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>Oversees nutrition planning and meal supply coordination across all Head Start and Early Head Start centers.</p>
                 </div>
               </div>
@@ -3779,7 +3802,7 @@ const PROGRAMS: ProgramData[] = [
               ].map(c => (
                 <div key={c.city} className="cadc-card-sm">
                   <p className="cadc-card-title">{c.city}</p>
-                  <p style={{ fontSize: 11, color: "#6B7280", margin: "2px 0 6px" }}>{c.county}</p>
+                  <p style={{ fontSize: 13, color: "#374151", margin: "2px 0 6px" }}>{c.county}</p>
                   <a href={`tel:+15807263343`} className="cadc-link">{c.phone}</a>
                 </div>
               ))}
@@ -3849,7 +3872,7 @@ const PROGRAMS: ProgramData[] = [
             {/* Reduced Fare Chart */}
             <div className="cadc-card">
               <p className="cadc-label" style={{ marginBottom: 4 }}>Reduced Fare</p>
-              <p style={{ fontSize: 12, color: "#6B7280", marginBottom: 12 }}>For riders age 55+ and persons with disabilities.</p>
+              <p style={{ fontSize: 12, color: "#374151", marginBottom: 12 }}>For riders age 55+ and persons with disabilities.</p>
               <table style={{ width: "100%", borderCollapse: "collapse" as const, fontSize: 13 }}>
                 <thead>
                   <tr style={{ background: "#CC0000" }}>
@@ -3876,7 +3899,7 @@ const PROGRAMS: ProgramData[] = [
               </table>
             </div>
 
-            <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 12, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: "#4B5563", marginTop: 12, lineHeight: 1.5 }}>
               In-town fares: $1.00 regular · $0.75 elderly/disabled. Contact Gilbert Nuncio for updated rate sheets: <a href="tel:+15803352691" style={{ color: T.blue }}>580-335-2691</a>
             </p>
           </div>
@@ -3968,7 +3991,7 @@ const PROGRAMS: ProgramData[] = [
             </div>
             <div className="cadc-card">
               <p className="cadc-label">2026–2027 Income eligibility guidelines</p>
-              <p style={{fontSize:11,margin:"0 0 10px",color:"#374151"}}>DOE WAP, DOE BIL &amp; DHS LIHEAP · Effective April 1, 2026 – March 30, 2027 · 200% of Federal Poverty Level</p>
+              <p style={{fontSize:13,margin:"0 0 10px",color:"#374151"}}>DOE WAP, DOE BIL &amp; DHS LIHEAP · Effective April 1, 2026 – March 30, 2027 · 200% of Federal Poverty Level</p>
               <div className="cadc-fare-table">
                 <div className="cadc-fare-header"><span>Household Size</span><span>100% FPL</span><span>200% FPL</span></div>
                 {[
@@ -4014,7 +4037,7 @@ const PROGRAMS: ProgramData[] = [
             <p>CADC manages a limited number of rental properties for qualifying individuals and families. Units become available periodically — contact us to learn about current openings.</p>
             <div className="cadc-card" style={{ background: "#F0F0FF", border: "1.5px solid #0101FF" }}>
               <p className="cadc-label">Available Rental Properties</p>
-              <p style={{ fontSize: 13, color: "#6B7280", fontStyle: "italic" }}>Current availability coming soon. Call to inquire about openings.</p>
+              <p style={{ fontSize: 13, color: "#374151", fontStyle: "italic" }}>Current availability coming soon. Call to inquire about openings.</p>
               <a href="tel:+15803355588" className="cadc-btn" style={{ marginTop: 12 }}>📞 Call to Inquire — 580-335-5588</a>
             </div>
             <div className="cadc-card">
@@ -4125,7 +4148,7 @@ const PROGRAMS: ProgramData[] = [
               ].map(s=>(
                 <div key={s.name} className="cadc-card-sm">
                   <p className="cadc-card-title">{s.name}</p>
-                  <p style={{fontSize:10,opacity:0.6,margin:"2px 0 4px"}}>{s.county}</p>
+                  <p style={{fontSize:13,opacity:0.6,margin:"2px 0 4px"}}>{s.county}</p>
                   <p>{s.addr}</p>
                   <a href={s.href} className="cadc-link">{s.phone}</a>
                 </div>
@@ -4216,9 +4239,9 @@ const PROGRAMS: ProgramData[] = [
               />
               <div>
                 <p className="cadc-card-title" style={{ marginBottom: 2 }}>Scott Fraley</p>
-                <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Community Market Director</p>
-                <a href="tel:+15803051964" className="cadc-link" style={{ fontSize: 11, display: "block" }}>580-305-1964</a>
-                <a href="mailto:SFraley@cadcok.org" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 8 }}>SFraley@cadcok.org</a>
+                <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Community Market Director</p>
+                <a href="tel:+15803051964" className="cadc-link" style={{ fontSize: 13, display: "block" }}>580-305-1964</a>
+                <a href="mailto:SFraley@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 8 }}>SFraley@cadcok.org</a>
                 <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As Community Market Director, I do this work because I enjoy helping and serving others. Growing up in a small community, I watched local businesses and grocery stores dwindle, making access to fresh food more difficult — especially for those with limited transportation. The Mobile Market helps bridge that gap by bringing fresh, nutritious food directly to communities with limited resources. Being able to connect people with healthy food and needed resources gives me a true sense of purpose."</p>
               </div>
             </div>
@@ -4317,17 +4340,17 @@ const PROGRAMS: ProgramData[] = [
               ].map(r=>(
                 <div key={r.name} className="cadc-card-sm">
                   <p className="cadc-card-title">{r.name}</p>
-                  <p style={{fontSize:11,marginBottom:6}}>{r.desc}</p>
+                  <p style={{fontSize:13,marginBottom:6}}>{r.desc}</p>
                   <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:8}}>
                     {[`Serves ${r.serves}`,`Prep ${r.prep}`,`Cook ${r.cook}`].map(s=>(
                       <span key={s} style={{fontSize:9,fontWeight:700,padding:"2px 7px",background:"rgba(1,1,255,0.08)",borderRadius:20,color:"#0101FF"}}>{s}</span>
                     ))}
                   </div>
-                  <p style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 4px",opacity:0.6}}>Ingredients</p>
+                  <p style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 4px",opacity:0.6}}>Ingredients</p>
                   <ul style={{margin:"0 0 8px",paddingLeft:16,fontSize:11}}>
                     {r.ingredients.map(i=><li key={i}>{i}</li>)}
                   </ul>
-                  <p style={{fontSize:10,fontStyle:"italic",margin:0,opacity:0.7}}>💡 {r.tip}</p>
+                  <p style={{fontSize:13,fontStyle:"italic",margin:0,opacity:0.7}}>💡 {r.tip}</p>
                 </div>
               ))}
             </div>
@@ -4359,7 +4382,7 @@ const PROGRAMS: ProgramData[] = [
         content: (
           <div className="cadc-light-content">
             <p>CADC is governed by a tripartite Board of Directors — public sector, private sector, and low-income community representatives — from each county we serve. Members serve 3-year terms. Source: FY '25 CSBG Board Membership Roster, August 18, 2025.</p>
-            <p style={{fontSize:11,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Chairman: Eddie Whitworth · Frederick, OK</p>
+            <p style={{fontSize:13,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Chairman: Eddie Whitworth · Frederick, OK</p>
             <div className="cadc-stack">
               {[
                 {county:"Beckham County",members:[
@@ -4403,8 +4426,8 @@ const PROGRAMS: ProgramData[] = [
                   {members.map(m=>(
                     <div key={m.name} style={{marginBottom:10,paddingBottom:10,borderBottom:"1px solid #e5e7eb"}}>
                       <p style={{fontWeight:700,fontSize:13,margin:"0 0 2px"}}>{m.name}</p>
-                      {m.sector && <p style={{fontSize:10,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 2px"}}>{m.sector} Sector{m.group ? ` — ${m.group}` : ""}</p>}
-                      {m.term && <p style={{fontSize:10,color:"#9ca3af",margin:"4px 0 0"}}>Term: {m.term}</p>}
+                      {m.sector && <p style={{fontSize:13,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 2px"}}>{m.sector} Sector{m.group ? ` — ${m.group}` : ""}</p>}
+                      {m.term && <p style={{fontSize:13,color:"#4B5563",margin:"4px 0 0"}}>Term: {m.term}</p>}
                     </div>
                   ))}
                 </div>
@@ -4480,7 +4503,7 @@ const PROGRAMS: ProgramData[] = [
                 <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer"
                   style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:"1px solid rgba(1,1,255,0.1)",textDecoration:"none"}}>
                   <span style={{fontSize:20,flexShrink:0}}>📄</span>
-                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{d.label}</div><div style={{fontSize:11,color:"#6B7280"}}>{d.note}</div></div>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{d.label}</div><div style={{fontSize:13,color:"#6B7280"}}>{d.note}</div></div>
                 </a>
               ))}
             </div>
@@ -4500,7 +4523,7 @@ const PROGRAMS: ProgramData[] = [
                   <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{prog}</div><div style={{fontSize:12,color:"#6B7280",lineHeight:1.5}}>{stat}</div></div>
                 </div>
               ))}
-              <p style={{fontSize:10,color:"#9CA3AF",marginTop:10}}>Source: CADC FY2025 Annual Report</p>
+              <p style={{fontSize:13,color:"#9CA3AF",marginTop:10}}>Source: CADC FY2025 Annual Report</p>
             </div>
 
             <div className="cadc-card">
@@ -4571,8 +4594,9 @@ const PROGRAMS: ProgramData[] = [
             </div>
             <div className="cadc-card">
               <p className="cadc-label">To apply or get help</p>
-              <a href="tel:+18009877767" className="cadc-btn">📞 1-800-987-7767</a>
-              <p className="cadc-note">Or call 405-522-5050</p>
+              <a href="tel:+18009877767" style={{ display: "block", background: "#0101FF", color: "#FFFFFF", padding: "14px 16px", borderRadius: 10, fontWeight: 800, fontSize: 18, textDecoration: "none", textAlign: "center" }}>📞 1-800-987-7767</a>
+              <p style={{ color: "#111827", fontSize: 15, fontWeight: 700, margin: "10px 0 0" }}>Or call <a href="tel:+14055225050" style={{ color: "#0101FF" }}>405-522-5050</a></p>
+              <p style={{ color: "#111827", fontSize: 15, fontWeight: 700, margin: "6px 0 0" }}>CADC Advantage: <a href="tel:+15806998880" style={{ color: "#0101FF" }}>580-699-8880</a></p>
             </div>
             </div>
           </IntakeLeadSection>
@@ -4923,7 +4947,7 @@ function SketchField() {
 // Category-locked crossfade — orbit panel only, daily random seed (resets at midnight CST)
 
 const HERO_POOLS: Record<string, string[]> = {
-  "head-start":      [1,8,10,13,15,16,22,25].map(n=>`/images/hero/hero-${n}.jpg`),
+  "head-start":      ["hs-girl-magnifying-glass","hs-kids-hand-in-hand","hs-teacher-kids-art","hs-girls-magnetic-tiles","hs-kids-swings","hs-boys-watercolor-seeds"].map(n=>`/images/head-start/classroom/${n}.jpg`),
   "senior-meals":    [12,19,20,21].map(n=>`/images/hero/hero-${n}.jpg`),
   "advantage":       [2,24].map(n=>`/images/hero/hero-${n}.jpg`),
   "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
@@ -4952,28 +4976,25 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
 }
 
 function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
-  const rawPool = programSlug && HERO_POOLS[programSlug]
-    ? HERO_POOLS[programSlug]
-    : HERO_POOLS["general"];
-
-  // Pick one photo for the day — same photo all day, changes at midnight CST
-  const photo = useMemo(() => {
-    const seed = getDailySeed() + (programSlug ? programSlug.split("").reduce((a,c)=>a+c.charCodeAt(0),0) : 0);
-    const idx = Math.abs(seed) % rawPool.length;
-    return rawPool[idx];
-  }, [programSlug]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!photo) return null;
-
+  const pool = programSlug && HERO_POOLS[programSlug] ? HERO_POOLS[programSlug] : HERO_POOLS["general"];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => { setIdx(0); }, [programSlug]);
+  useEffect(() => {
+    if (pool.length < 2) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % pool.length), 6000);
+    return () => clearInterval(t);
+  }, [pool]);
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }} aria-hidden="true">
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: `url(${photo})`,
-        backgroundSize: "cover", backgroundPosition: "center",
-        opacity: 0.22,
-        filter: "saturate(0.6)",
-      }} />
+      {pool.map((photo, i) => (
+        <div key={photo} style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url(${photo})`, backgroundSize: "cover", backgroundPosition: "center",
+          opacity: i === idx ? 0.38 : 0,
+          transition: "opacity 1.4s ease-in-out",
+        }} />
+      ))}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.35) 100%)" }} />
     </div>
   );
 }
@@ -5422,11 +5443,16 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
       />
 
       {/* Main split layout */}
-      <div style={{ display: "flex", minHeight: "calc(100vh - 64px)" }}>
+      <div style={{ display: "flex", minHeight: "calc(100vh - 84px)", alignItems: "flex-start" }}>
 
-        {/* LEFT — Orbit / Map panel */}
-        <div style={{ width: "36%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
+        {/* LEFT — Orbit / Map panel (sticky so the wheel is fully visible without scrolling) */}
+        <div style={{ width: stage === "county" ? "100%" : stage === "content" ? "0%" : "38%", overflow: "hidden", transition: "width 0.35s ease", position: "sticky", top: 84, height: "calc(100vh - 84px)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
           <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
+          {stage === "county" && activeCountyName?.toLowerCase().includes("canadian") && (
+            <a href="tel:+15803355588" style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 5, background: "#FFF8F0", border: "2px solid #D97706", borderRadius: 12, padding: "12px 18px", textDecoration: "none", color: "#92400E", fontWeight: 800, fontSize: 15, boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }}>
+              ⚡ El Reno Emergency Utility Assistance — Call 580-335-5588
+            </a>
+          )}
 
           {/* Entry state — large tappable logo */}
           {stage === "entry" && (
@@ -5444,7 +5470,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
               }}>
                 <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
               </div>
-              <span style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+              <span style={{ color: T.textMuted, fontSize: 13, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
             </button>
           )}
 
@@ -5472,7 +5498,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         </div>
 
         {/* RIGHT — Content panel */}
-        <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 36px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
+        <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: stage === "county" ? "none" : "flex", alignItems: "flex-start", justifyContent: "center", padding: stage === "content" ? "32px 48px" : "32px 36px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
           <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} tapProgram={tapProgram} tapSubArea={tapSubArea} />
         </main>
       </div>
@@ -5685,7 +5711,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "entry") {
     return (
       <div style={{ maxWidth: 680, color: T.textPrimary }}>
-        <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
+        <p style={{ color: T.maroon, fontSize: 13, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
         <h1 style={{ fontSize: "clamp(2rem,3.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Community Action<br />
           <span style={{ color: T.blue }}>Development</span><br />
@@ -5713,8 +5739,8 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = "none"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 2px 8px rgba(1,1,255,0.06)"; }}
             >
               <div style={{ fontSize: 24, marginBottom: 4 }}>{p.icon}</div>
-              <div style={{ color: T.blue, fontWeight: 800, fontSize: 11, lineHeight: 1.3 }}>{p.label}</div>
-              <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 600, marginTop: 3, lineHeight: 1.4 }}>{p.sub}</div>
+              <div style={{ color: T.blue, fontWeight: 800, fontSize: 13, lineHeight: 1.3 }}>{p.label}</div>
+              <div style={{ color: T.textMuted, fontSize: 12, fontWeight: 600, marginTop: 3, lineHeight: 1.4 }}>{p.sub}</div>
             </a>
           ))}
         </div>
@@ -5726,38 +5752,17 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <span style={{ fontSize: 32, flexShrink: 0 }}>🔍</span>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Not sure where to start?</p>
-            <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+            <p style={{ fontSize: 12, color: "#374151", margin: "0 0 12px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
             <a href="/?program=board&area=service-screener" style={{ display: "inline-block", background: T.maroon, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>Find My Benefits →</a>
           </div>
         </div>
-
-        {/* Survey CTA */}
-        <a
-          href="https://www.surveymonkey.com/r/26cadcneeds"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Take the 2026 CADC Community Needs Survey — your feedback shapes our programs (opens in new tab)"
-          style={{
-            display: "flex", alignItems: "center", gap: 14, marginTop: 20,
-            background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)",
-            borderRadius: 12, padding: "16px 20px", textDecoration: "none",
-            boxShadow: "0 4px 20px rgba(204,0,0,0.25)",
-          }}
-        >
-          <span style={{ fontSize: 28 }}>📋</span>
-          <div>
-            <p style={{ color: "white", fontWeight: 800, fontSize: 13, margin: 0, letterSpacing: "0.02em" }}>2026 CADC Community Needs Survey</p>
-            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>Your input directly shapes which programs we fund and expand.</p>
-          </div>
-          <span style={{ color: "white", fontSize: 18, marginLeft: "auto" }}>→</span>
-        </a>
 
         {/* Job Postings */}
         <div style={{ marginTop: 16, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
           <span style={{ fontSize: 32, flexShrink: 0 }}>💼</span>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Work With CADC</p>
-            <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px", lineHeight: 1.5 }}>CADC employs 200+ staff across 9 counties. View current job openings and apply today.</p>
+            <p style={{ fontSize: 12, color: "#374151", margin: "0 0 12px", lineHeight: 1.5 }}>CADC employs 200+ staff across 9 counties. View current job openings and apply today.</p>
             <a href="/programs/employment" style={{ display: "inline-block", background: T.blue, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>View Job Openings →</a>
           </div>
         </div>
@@ -5769,7 +5774,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "map") {
     return (
       <div style={{ maxWidth: 680, color: T.textPrimary, animation: "fadeSlideIn 0.4s ease" }}>
-        <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Select Your County</p>
+        <p style={{ color: T.maroon, fontSize: 13, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Select Your County</p>
         <h2 style={{ fontSize: "clamp(1.6rem,2.8vw,2.4rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Where do you need help?
         </h2>
@@ -5788,7 +5793,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             >{c.name}</button>
           ))}
         </div>
-        <p style={{ color: T.textMuted, fontSize: 11, marginTop: 20 }}>9 base counties · Helping People. Changing Lives.</p>
+        <p style={{ color: T.textMuted, fontSize: 13, marginTop: 20 }}>9 base counties · Helping People. Changing Lives.</p>
       </div>
     );
   }
@@ -5817,7 +5822,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             <span style={{ fontSize: 22, flexShrink: 0 }}>⚡</span>
             <div>
               <p style={{ fontWeight: 800, fontSize: 13, color: "#92400E", margin: "0 0 4px" }}>Emergency Utility Assistance — El Reno Only</p>
-              <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 8px", lineHeight: 1.5 }}>Emergency utility assistance is available to qualifying El Reno residents. Contact the CADC main office to check eligibility and apply.</p>
+              <p style={{ fontSize: 12, color: "#374151", margin: "0 0 8px", lineHeight: 1.5 }}>Emergency utility assistance is available to qualifying El Reno residents. Contact the CADC main office to check eligibility and apply.</p>
               <a href="tel:+15803355588" style={{ display: "inline-block", background: "#D97706", color: "white", padding: "8px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>📞 Call 580-335-5588</a>
             </div>
           </div>
@@ -5836,7 +5841,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
       <div style={{ maxWidth: 680, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}><ProgramTagline slug={activeProgram.slug} /></p>
+          <p style={{ color: T.maroon, fontSize: 13, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}><ProgramTagline slug={activeProgram.slug} /></p>
           <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: 0, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary, display:"flex", alignItems:"center", gap: 12 }}>
             {PROGRAM_ICONS[activeProgram.slug]
               ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:48,height:48,objectFit:"contain",flexShrink:0}} />
@@ -5856,7 +5861,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 680, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+      <div style={{ maxWidth: 960, width: "100%", color: T.textPrimary, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
@@ -5942,7 +5947,7 @@ function HeaderSearch({ compact = false }: { compact?: boolean }) {
                 <span aria-hidden="true">{item.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: T.textPrimary }}>{item.label}</div>
-                  <div style={{ fontSize: 10, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.type === "county" ? "County" : item.type === "program" ? "Program" : "Service"}</div>
+                  <div style={{ fontSize: 13, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{item.type === "county" ? "County" : item.type === "program" ? "Program" : "Service"}</div>
                 </div>
               </button>
             </li>
@@ -5966,7 +5971,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [open, onClose]);
   if (!open) return null;
-  const sectionLabel = (t: string) => <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "22px 0 8px" }}>{t}</p>;
+  const sectionLabel = (t: string) => <p style={{ color: T.maroon, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "22px 0 8px" }}>{t}</p>;
   const linkStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, padding: "11px 12px", borderRadius: 10, color: T.textPrimary, textDecoration: "none", fontSize: 15, fontWeight: 600, background: "white", border: `1px solid ${T.border}`, marginBottom: 6 };
   return (
     <div onClick={onClose} role="dialog" aria-modal="true" aria-label="Site menu"
@@ -6028,7 +6033,6 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
 
         {sectionLabel("About & Transparency")}
         <a href="/about" style={linkStyle}>🏢 About CADC</a>
-        <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer" style={linkStyle}>📋 Community Needs Survey</a>
         {documents.map(d => (
           <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
         ))}
@@ -6068,7 +6072,7 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
             <button onClick={() => setMenuOpen(true)} aria-label="Open site menu" aria-expanded={menuOpen} style={{ ...btn, width: 42, height: 42, fontSize: 20 }}>☰</button>
             <a href="/" aria-label="CADC home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-              <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ height: isDesktop ? 40 : 32, width: "auto", display: "block" }} />
+              <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="Community Action Development Corporation" style={{ height: isDesktop ? 60 : 44, width: "auto", display: "block" }} />
               <span style={{ display: "flex", alignItems: "center", gap: 5, color: T.blue, fontWeight: 800, fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase", background: T.blueLight, padding: "6px 11px", borderRadius: 8 }}>🏠 Home</span>
             </a>
           </div>
@@ -6086,7 +6090,7 @@ export function CADCHeader({ crumbs, onBack }: CADCHeaderProps) {
                 onClick={() => setLang(lang === "en" ? "es" : "en")}
                 disabled={esLoading}
                 aria-label={lang === "en" ? "Switch to Spanish" : "Cambiar a Inglés"}
-                style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 11, fontWeight: 800, cursor: esLoading ? "wait" : "pointer", letterSpacing: "0.06em", display: "flex", alignItems: "center", gap: 4 }}>
+                style={{ background: lang === "es" ? T.blue : "transparent", color: lang === "es" ? "white" : T.textMuted, border: `1px solid ${lang === "es" ? T.blue : T.border}`, borderRadius: 6, padding: "7px 10px", fontSize: 13, fontWeight: 800, cursor: esLoading ? "wait" : "pointer", letterSpacing: "0.06em", display: "flex", alignItems: "center", gap: 4 }}>
                 {esLoading ? "…" : lang === "en" ? "ES" : "EN"}
               </button>
             )}
@@ -6133,11 +6137,7 @@ export function CADCFooter() {
   }
   return (
     <>
-      <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer"
-        aria-label="Take the CADC Community Needs Survey (opens in new tab)"
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: T.maroon, color: "white", padding: "14px 20px", textDecoration: "none", fontSize: 13, fontWeight: 800, letterSpacing: "0.03em", textAlign: "center" }}>
-        📋 <EditableText id="siteText.surveyBannerText" section="siteText" label="Survey Banner Text" fallback={st.surveyBannerText}>{st.surveyBannerText}</EditableText>
-      </a>
+
       <footer role="contentinfo" style={{ background: "#0A1628", color: "white", padding: "40px 24px 28px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
           <div>
@@ -6147,35 +6147,35 @@ export function CADCFooter() {
                 {st.footerTagline.split("\n").map((line, i) => <span key={i}>{line}{i < st.footerTagline.split("\n").length - 1 && <br />}</span>)}
               </EditableText>
             </p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px" }}>Get Help</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px" }}>Get Help</p>
             <a href="/?program=board&area=service-screener" style={{ display: "block", color: "rgba(255,255,255,0.8)", fontSize: 13, textDecoration: "none", marginBottom: 7, fontWeight: 700 }}>🔍 Find My Benefits</a>
             <a href={`tel:+1${st.mainPhone.replace(/\D/g,"")}`} style={{ display: "block", color: "white", fontWeight: 800, fontSize: 15, textDecoration: "none", marginBottom: 7 }}>📞 {st.mainPhone}</a>
             <a href="/contact" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>📍 Find a Location</a>
             <a href="/?program=transit&area=rides" style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>🚌 Schedule a Ride</a>
           </div>
           <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Programs</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Programs</p>
             {PROGRAMS.map(p => (
               <a key={p.slug} href={`/?program=${p.slug}`} style={{ display: "block", color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", marginBottom: 7 }}>{p.name}</a>
             ))}
           </div>
           <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact & Location</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Contact & Location</p>
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8, margin: "0 0 10px" }}>{st.headOfficeAddress.split("\n").map((line, i) => <span key={i}>{line}{i < st.headOfficeAddress.split("\n").length - 1 && <br />}</span>)}</p>
             <a href="/contact" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Contact &amp; Locations →</a>
             <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>About CADC →</a>
             <a href={st.facebookUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Facebook →</a>
           </div>
           <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
             {documents.map(d => (
               <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
             ))}
-            <a href={st.surveyUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📋 <span>Community Needs Survey</span></a>
+
           </div>
         </div>
         <div style={{ maxWidth: 960, margin: "28px auto 0", borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 18, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-          <p onClick={secretTap} style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0, lineHeight: 1.6, userSelect: "none", cursor: "default" }}>
+          <p onClick={secretTap} style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0, lineHeight: 1.6, userSelect: "none", cursor: "default" }}>
             © {new Date().getFullYear()} Community Action Development Corporation · cadcok.org · An Equal Opportunity Employer and Provider · Title VI Compliant
           </p>
           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
@@ -6250,7 +6250,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             }}>
               <img loading="lazy" decoding="async" src="/images/cadc-logo.png" alt="CADC" style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
-            <span style={{ color: T.blue, fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
+            <span style={{ color: T.blue, fontSize: 13, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
 
           {/* CADC Now */}
@@ -6262,7 +6262,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <div style={{ marginTop: 16, width: "100%", maxWidth: 360 }}>
             <div style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
               <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 Not sure where to start?</p>
-              <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
+              <p style={{ fontSize: 12, color: "#374151", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
               <a
                 href="/?program=board&area=service-screener"
                 style={{ display: "block", width: "100%", background: T.maroon, color: "white", border: "none", borderRadius: 9, padding: "12px 16px", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "inherit", textDecoration: "none", textAlign: "center" as const, boxSizing: "border-box" as const }}>
@@ -6277,7 +6277,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
       {stage === "map" && (
         <div style={{ padding: "20px 20px 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <p style={{ color: T.maroon, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 6px" }}>Select Your County</p>
+            <p style={{ color: T.maroon, fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 6px" }}>Select Your County</p>
             <h2 style={{ color: T.blue, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>Where do you need help?</h2>
           </div>
           <div style={{ background: "white", borderRadius: 16, border: `1px solid ${T.border}`, overflow: "hidden", padding: 8 }}>
@@ -6291,7 +6291,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               }}>{c.name}</button>
             ))}
           </div>
-          <p style={{ textAlign: "center", color: T.textMuted, fontSize: 11, marginTop: 12 }}>9 base counties · Helping People. Changing Lives.</p>
+          <p style={{ textAlign: "center", color: T.textMuted, fontSize: 13, marginTop: 12 }}>9 base counties · Helping People. Changing Lives.</p>
         </div>
       )}
 
@@ -6300,11 +6300,11 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
         <>
           <div style={{ padding: "12px 20px 0", textAlign: "center" }}>
             {activeCountyName && (
-              <p style={{ color: T.maroon, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 2px" }}>
+              <p style={{ color: T.maroon, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 2px" }}>
                 {activeCountyName} County — {availablePrograms.length} programs available
               </p>
             )}
-            <p style={{ color: T.textMuted, fontSize: 11, margin: 0 }}>Tap a program node to explore</p>
+            <p style={{ color: T.textMuted, fontSize: 13, margin: 0 }}>Tap a program node to explore</p>
           </div>
           <div style={{ padding: "12px 0 0" }}>
             <SpringOrbit
@@ -6325,7 +6325,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
           <div style={{ background: "white", borderRadius: 16, overflow: "hidden", border: `1px solid ${T.border}` }}>
             <div style={{ background: T.blue, padding: "14px 20px" }}>
-              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}><ProgramTagline slug={activeProgram.slug} /></p>
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}><ProgramTagline slug={activeProgram.slug} /></p>
               <h2 style={{ color: "white", fontWeight: 800, fontSize: 17, margin: 0, fontFamily: "'Space Grotesk', sans-serif", display:"flex", alignItems:"center", gap: 10 }}>
                 {PROGRAM_ICONS[activeProgram.slug]
                   ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[activeProgram.slug]} alt="" aria-hidden="true" style={{width:36,height:36,objectFit:"contain",flexShrink:0}} />
@@ -6682,13 +6682,13 @@ function DesktopStyles() {
       .cadc-dark-content .cadc-content { display: flex; flex-direction: column; }
 
       /* ── Light content styles (desktop) ── */
-      .cadc-light-content p { color: #374151; font-size: 15px; line-height: 1.75; margin: 0 0 14px; }
+      .cadc-light-content p { color: #1F2937; font-size: 17px; line-height: 1.75; margin: 0 0 14px; }
       .cadc-light-content strong { color: #111827; }
       .cadc-light-content h3 { color: #111827; font-size: 17px; font-weight: 700; margin: 0 0 10px; }
       .cadc-light-content .cadc-card { background: #E4E4FF; border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
       .cadc-light-content .cadc-card-sm { background: #f5f5ff; border: 1px solid #dcdcf5; border-radius: 10px; padding: 14px 16px; margin: 6px 0; }
-      .cadc-light-content .cadc-card-title { color: #0101FF; font-weight: 700; font-size: 11px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.08em; }
-      .cadc-light-content .cadc-label { color: #cc0000; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin: 0 0 10px; display: block; }
+      .cadc-light-content .cadc-card-title { color: #0101FF; font-weight: 800; font-size: 14px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+      .cadc-light-content .cadc-label { color: #cc0000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin: 0 0 10px; display: block; }
       .cadc-light-content .cadc-list { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px; }
       .cadc-light-content .cadc-list li { color: #374151; font-size: 14px; padding-left: 16px; position: relative; line-height: 1.5; }
       .cadc-light-content .cadc-list li::before { content: "·"; position: absolute; left: 0; color: #0101FF; font-weight: 900; font-size: 18px; line-height: 1; top: 1px; }
@@ -6699,7 +6699,7 @@ function DesktopStyles() {
       .cadc-light-content .cadc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(204,0,0,0.3); }
       .cadc-light-content .cadc-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
       .cadc-light-content .cadc-link { color: #0101FF; font-weight: 700; font-size: 14px; text-decoration: none; }
-      .cadc-light-content .cadc-note { color: #9ca3af; font-size: 11px; font-style: italic; margin: 8px 0 0; }
+      .cadc-light-content .cadc-note { color: #4B5563; font-size: 14px; font-style: italic; margin: 8px 0 0; }
       .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 14px 0; }
       .cadc-light-content .cadc-fare-header { display: grid; grid-template-columns: 2fr 1fr 1fr; background: #0101FF; padding: 10px 14px; }
       .cadc-light-content .cadc-fare-header span { color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
@@ -6786,12 +6786,12 @@ function MobileStyles() {
 
       .node-disc { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
 
-      .cadc-light-content p { color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 12px; }
+      .cadc-light-content p { color: #1F2937; font-size: 16px; line-height: 1.7; margin: 0 0 12px; }
       .cadc-light-content strong { color: #111827; }
       .cadc-light-content .cadc-card { background: #E4E4FF; border-radius: 10px; padding: 14px; margin: 12px 0; }
       .cadc-light-content .cadc-card-sm { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin: 6px 0; }
-      .cadc-light-content .cadc-card-title { color: ${T.blue}; font-weight: 700; font-size: 11px; margin: 0 0 5px; text-transform: uppercase; letter-spacing: 0.06em; }
-      .cadc-light-content .cadc-label { color: ${T.maroon}; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; }
+      .cadc-light-content .cadc-card-title { color: ${T.blue}; font-weight: 800; font-size: 14px; margin: 0 0 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+      .cadc-light-content .cadc-label { color: ${T.maroon}; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; }
       .cadc-light-content .cadc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
       .cadc-light-content .cadc-list li { color: #374151; font-size: 13px; padding-left: 14px; position: relative; }
       .cadc-light-content .cadc-list li::before { content: "·"; position: absolute; left: 0; color: ${T.blue}; font-weight: 700; }
@@ -6800,7 +6800,7 @@ function MobileStyles() {
       .cadc-light-content .cadc-stack { display: flex; flex-direction: column; gap: 6px; }
       .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: ${T.maroon}; color: white; padding: 12px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 8px; }
       .cadc-light-content .cadc-link { color: ${T.blue}; font-weight: 700; font-size: 13px; text-decoration: none; }
-      .cadc-light-content .cadc-note { color: #9ca3af; font-size: 11px; font-style: italic; margin: 6px 0 0; }
+      .cadc-light-content .cadc-note { color: #4B5563; font-size: 14px; font-style: italic; margin: 6px 0 0; }
       .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 12px 0; }
       .cadc-light-content .cadc-fare-header { display: grid; grid-template-columns: 2fr 1fr 1fr; background: ${T.blue}; padding: 8px 12px; }
       .cadc-light-content .cadc-fare-header span { color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }

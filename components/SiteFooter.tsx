@@ -64,14 +64,6 @@ export default function SiteFooter() {
               >
                 Facebook
               </a>
-              <a
-                href={contact.social.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Instagram
-              </a>
             </div>
           </div>
         </div>

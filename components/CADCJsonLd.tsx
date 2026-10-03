@@ -29,8 +29,7 @@ export function CADCJsonLd() {
       "Roger Mills County, OK", "Tillman County, OK", "Washita County, OK"
     ],
     "sameAs": [
-      "https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr",
-      "https://www.instagram.com/wearecadc"
+      "https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr"
     ],
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
