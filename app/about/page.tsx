@@ -168,8 +168,8 @@ const LOCATIONS: CADCLocation[] = [
     city: "Ryan",
     county: "Jefferson",
     address: "400 Taylor St. Apt #8, Ryan, OK 73565",
-    phone: "580-757-2235",
-    phoneHref: "tel:+15807572235",
+    phone: "580-757-2412",
+    phoneHref: "tel:+15807572412",
     programs: ["Red River Transportation", "Transit Office"],
     mapsQuery: "400 Taylor St Ryan OK 73565",
     hours: "Mon–Fri 8:00am–5:00pm",
@@ -224,14 +224,14 @@ const LOCATIONS: CADCLocation[] = [
   },
   {
     id: "hs-main",
-    name: "Head Start — Main Office",
-    city: "Frederick",
-    county: "Tillman",
-    address: "105 S. Main Street, Frederick, OK 73542",
+    name: "Head Start — Administrative Office",
+    city: "Hobart",
+    county: "Kiowa",
+    address: "Hobart, OK 73651",
     phone: "580-726-3343",
     phoneHref: "tel:+15807263343",
     programs: ["Head Start & Early Head Start"],
-    mapsQuery: "105 S Main Street Frederick OK 73542",
+    mapsQuery: "CADC Head Start Hobart OK 73651",
     hours: "Mon–Fri 8:00am–5:00pm",
   },
   {
@@ -435,7 +435,7 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
   "frederick-main":     { x: 332, y: 282 },
   "frederick-senior":   { x: 336, y: 286 },
   "frederick-transit":  { x: 328, y: 282 },
-  "hs-main":            { x: 332, y: 278 },
+  "hs-main":            { x: 316, y: 242 },
   "weatherization-main":{ x: 336, y: 278 },
   "market-main":        { x: 328, y: 286 },
 
@@ -989,16 +989,16 @@ export default function AboutPage() {
               { name: "Leslea Hixson", title: "Executive Director", phone: "580-530-0009", email: "lhixson@cadcok.org" },
               { name: "Robin Harris", title: "Head Start / Early Head Start Director", phone: "580-726-3343", email: "rharris@cadcok.org" },
               { name: "Gilbert Nuncio", title: "Red River Transportation Director", phone: "580-335-2691", email: "redriver@pldi.net" },
-              { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "rmeador@cadcok.org" },
-              { name: "Kristie Jackson", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "kjackson@cadcok.org" },
-              { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
+              { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "" },
+              { name: "Kristie", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "" },
+              { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "" },
               { name: "Tiffany Camero", title: "Executive Secretary", phone: "580-335-5588", email: "tcamero@cadcok.org" },
             ].map(d => (
               <div key={d.name} style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 18px" }}>
                 <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 3px" }}>{d.name}</p>
                 <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 10px", lineHeight: 1.4 }}>{d.title}</p>
                 <a href={`tel:+1${d.phone.replace(/\D/g,"")}`} style={{ display: "block", color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none", marginBottom: 4 }}>{d.phone}</a>
-                <a href={`mailto:${d.email}`} style={{ display: "block", color: "#0101FF", fontSize: 12, textDecoration: "none" }}>{d.email}</a>
+                {d.email && <a href={`mailto:${d.email}`} style={{ display: "block", color: "#0101FF", fontSize: 14, textDecoration: "none" }}>{d.email}</a>}
               </div>
             ))}
           </div>
