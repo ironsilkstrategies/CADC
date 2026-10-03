@@ -96,7 +96,7 @@ export const DEFAULT_SITE_TEXT: SiteText = {
   mainPhone:        "580-335-5588",
   headOfficeAddress:"105 S. Main Street · P.O. Box 989\nFrederick, OK 73542",
   facebookUrl:      "https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr",
-  instagramUrl:     "https://www.instagram.com/wearecadc",
+  instagramUrl:     "",
 };
 
 // Program taglines — one per orbit node. Editable without a code deploy.

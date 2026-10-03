@@ -46,7 +46,6 @@ export const contact = {
 
   social: {
     facebook: "https://www.facebook.com/WeAreCADC/",
-    instagram: "https://www.instagram.com/wearecadc/",
   },
 } as const;
 
@@ -179,28 +178,28 @@ export const programDirectors = {
     title: "Weatherization & Housing Director",
     phone: "580-335-5588",
     phoneHref: "tel:+15803355588",
-    email: "rmeador@cadcok.org",
+    email: "",
   },
   seniorNutrition: {
     name: "Senior Nutrition Director",
     title: "Senior Nutrition Program",
     phone: "580-335-5588",
     phoneHref: "tel:+15803355588",
-    email: "nutrition@cadcok.org",
+    email: "",
   },
   advantage: {
-    name: "Kristie Jackson",
+    name: "Kristie",
     title: "Advantage Home Delivered Meals — Lawton Office",
     phone: "580-699-8880",
     phoneHref: "tel:+15806998880",
-    email: "kjackson@cadcok.org",
+    email: "",
   },
   communityMarket: {
     name: "Scott Fraley",
     title: "Community Market Director",
     phone: "580-305-1964",
     phoneHref: "tel:+15803051964",
-    email: "sfraley@cadcok.org",
+    email: "",
   },
   executive: {
     name: "Leslea Hixson",
