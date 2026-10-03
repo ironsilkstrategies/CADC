@@ -157,3 +157,56 @@ export const redirects: Record<string, string> = {
   "/discover-more": "/contact",
   "/about-1": "/about",
 };
+
+// ─── Program Directors ────────────────────────────────────────────────────────
+export const programDirectors = {
+  headStart: {
+    name: "Robin Harris",
+    title: "Head Start / Early Head Start Director",
+    phone: "580-726-3343",
+    phoneHref: "tel:+15807263343",
+    email: "rharris@cadcok.org",
+  },
+  transit: {
+    name: "Gilbert Nuncio",
+    title: "Red River Transportation Director",
+    phone: "580-335-2691",
+    phoneHref: "tel:+15803352691",
+    email: "redriver@pldi.net",
+  },
+  weatherization: {
+    name: "Robert Meador",
+    title: "Weatherization & Housing Director",
+    phone: "580-335-5588",
+    phoneHref: "tel:+15803355588",
+    email: "rmeador@cadcok.org",
+  },
+  seniorNutrition: {
+    name: "Senior Nutrition Director",
+    title: "Senior Nutrition Program",
+    phone: "580-335-5588",
+    phoneHref: "tel:+15803355588",
+    email: "nutrition@cadcok.org",
+  },
+  advantage: {
+    name: "Kristie Jackson",
+    title: "Advantage Home Delivered Meals — Lawton Office",
+    phone: "580-699-8880",
+    phoneHref: "tel:+15806998880",
+    email: "kjackson@cadcok.org",
+  },
+  communityMarket: {
+    name: "Scott Fraley",
+    title: "Community Market Director",
+    phone: "580-305-1964",
+    phoneHref: "tel:+15803051964",
+    email: "sfraley@cadcok.org",
+  },
+  executive: {
+    name: "Leslea Hixson",
+    title: "Executive Director",
+    phone: "580-530-0009",
+    phoneHref: "tel:+15805300009",
+    email: "lhixson@cadcok.org",
+  },
+} as const;
