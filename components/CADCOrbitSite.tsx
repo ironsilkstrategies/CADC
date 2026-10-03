@@ -1415,7 +1415,7 @@ const PHOTOS = {
 
   // ── Community Market ──────────────────────────────────────────────────────
   communityMarket: {
-    trailerHero:         "/images/community-market-1.PNG",
+    trailerHero:         "/images/community-market-3.PNG",
     frozenMeals:         "/images/community-market-2.PNG",
     freshProduce:        "/images/community-market-3.PNG",
     dairy:               "/images/community-market-4.PNG",
@@ -1545,7 +1545,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
       {/* Caption bar */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0,
-        background: "linear-gradient(to top, rgba(0,0,20,0.88) 0%, transparent 100%)",
+        background: "linear-gradient(to top, rgba(0,0,20,0.65) 0%, transparent 100%)",
         padding: "24px 14px 10px",
       }}>
         <p style={{
@@ -1594,7 +1594,7 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/hero/hero-24.jpg", alt: "Advantage freezer stocking" },
   ],
   "community-market": [
-    { src: "/images/community-market-1.PNG", alt: "CADC Community Market 42-foot mobile grocery trailer" },
+    { src: "/images/community-market-3.PNG", alt: "Fresh produce at the CADC Community Market" },
     { src: "/images/community-market-3.PNG", alt: "Fresh produce at the Community Market" },
     { src: "/images/community-market-4.PNG", alt: "Dairy and refrigerated items" },
     { src: "/images/community-market-6.PNG", alt: "Frozen foods section" },
@@ -3714,7 +3714,83 @@ const PROGRAMS: ProgramData[] = [
 
             </div>
 
+              {/* Robin Harris */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Robin Harris</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start / Early Head Start Director</p>
+                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 11, display: "block", marginBottom: 4 }}>580-726-3343</a>
+                  <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 11, display: "block" }}>rharris@cadcok.org</a>
+                </div>
+              </div>
+
+              {/* Karen Segler */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🏫</div>
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Karen Segler</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>25+ years of service to CADC Head Start families across Southwest Oklahoma.</p>
+                </div>
+              </div>
+
+              {/* Dori Lientz */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Dori Lientz</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
+                </div>
+              </div>
+
+              {/* Frances Baker */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🍳</div>
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Frances Baker</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Nutrition &amp; Supplies Supervisor</p>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>Oversees nutrition planning and meal supply coordination across all Head Start and Early Head Start centers.</p>
+                </div>
+              </div>
+
+            </div>
+
             <p className="cadc-note" style={{ marginTop: 12 }}>Interested in joining the CADC Head Start team? View open positions on the <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-link">CADC Facebook page</a> or call 580-726-3343.</p>
+          </div>
+        ),
+      },
+      {
+        id: "hs-locations", label: "Our Centers", shortLabel: "Centers", icon: "📍",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC Head Start operates <strong>11 centers</strong> across Southwest Oklahoma, serving children from birth through age 5.</p>
+            <div className="cadc-stack">
+              {[
+                { city: "Erick",       county: "Beckham County",    phone: "580-726-3343" },
+                { city: "Sayre",       county: "Beckham County",    phone: "580-726-3343" },
+                { city: "Burns Flat",  county: "Washita County",    phone: "580-726-3343" },
+                { city: "Hammon",      county: "Roger Mills County", phone: "580-726-3343" },
+                { city: "Hobart",      county: "Kiowa County",      phone: "580-726-3343" },
+                { city: "Frederick",   county: "Tillman County",    phone: "580-726-3343" },
+                { city: "Temple",      county: "Cotton County",     phone: "580-726-3343" },
+                { city: "Grandfield",  county: "Tillman County",    phone: "580-726-3343" },
+                { city: "Ringling",    county: "Jefferson County",  phone: "580-726-3343" },
+                { city: "Cordell",     county: "Washita County",    phone: "580-726-3343" },
+                { city: "Sentinel",    county: "Washita County",    phone: "580-726-3343" },
+              ].map(c => (
+                <div key={c.city} className="cadc-card-sm">
+                  <p className="cadc-card-title">{c.city}</p>
+                  <p style={{ fontSize: 11, color: "#6B7280", margin: "2px 0 6px" }}>{c.county}</p>
+                  <a href={`tel:+15807263343`} className="cadc-link">{c.phone}</a>
+                </div>
+              ))}
+            </div>
+            <div className="cadc-card" style={{ marginTop: 12 }}>
+              <p className="cadc-label">Contact Head Start Director</p>
+              <p style={{ fontSize: 13, margin: "0 0 8px" }}>Robin Harris — <a href="tel:+15807263343" className="cadc-link">580-726-3343</a></p>
+              <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 12 }}>rharris@cadcok.org</a>
+            </div>
           </div>
         ),
       }
@@ -3737,7 +3813,76 @@ const PROGRAMS: ProgramData[] = [
       },
       {
         id: "fares", label: "Fare Schedule", shortLabel: "Fares", icon: "💲",
-        content: <TransitFareCalculator />,
+        content: (
+          <div className="cadc-light-content">
+            <p style={{ fontSize: 13, color: "#374151", marginBottom: 16, lineHeight: 1.6 }}>
+              Fares are based on round-trip mileage. Effective October 1, 2022.
+            </p>
+
+            {/* Regular Fare Chart */}
+            <div className="cadc-card" style={{ marginBottom: 16 }}>
+              <p className="cadc-label" style={{ marginBottom: 12 }}>Regular Fare</p>
+              <table style={{ width: "100%", borderCollapse: "collapse" as const, fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: T.blue }}>
+                    <th style={{ color: "white", padding: "8px 12px", textAlign: "left" as const, fontWeight: 700, borderRadius: "6px 0 0 0" }}>Round-Trip Miles</th>
+                    <th style={{ color: "white", padding: "8px 12px", textAlign: "right" as const, fontWeight: 700, borderRadius: "0 6px 0 0" }}>Fare</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ["Up to 10 miles", "$8.00"],
+                    ["11 – 30 miles", "$15.00"],
+                    ["31 – 50 miles", "$30.00"],
+                    ["51 – 100 miles", "$45.00"],
+                    ["101 – 150 miles", "$60.00"],
+                    ["151 – 249 miles", "$80.00"],
+                    ["250+ miles", "$0.40 per mile"],
+                  ].map(([range, fare], i) => (
+                    <tr key={range} style={{ background: i % 2 === 0 ? "#F8F9FF" : "white" }}>
+                      <td style={{ padding: "8px 12px", color: "#374151", borderBottom: "1px solid #E5E7EB" }}>{range}</td>
+                      <td style={{ padding: "8px 12px", color: T.blue, fontWeight: 700, textAlign: "right" as const, borderBottom: "1px solid #E5E7EB" }}>{fare}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Reduced Fare Chart */}
+            <div className="cadc-card">
+              <p className="cadc-label" style={{ marginBottom: 4 }}>Reduced Fare</p>
+              <p style={{ fontSize: 12, color: "#6B7280", marginBottom: 12 }}>For riders age 55+ and persons with disabilities.</p>
+              <table style={{ width: "100%", borderCollapse: "collapse" as const, fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: "#CC0000" }}>
+                    <th style={{ color: "white", padding: "8px 12px", textAlign: "left" as const, fontWeight: 700, borderRadius: "6px 0 0 0" }}>Round-Trip Miles</th>
+                    <th style={{ color: "white", padding: "8px 12px", textAlign: "right" as const, fontWeight: 700, borderRadius: "0 6px 0 0" }}>Reduced Fare</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ["Up to 10 miles", "$8.00"],
+                    ["11 – 30 miles", "$15.00"],
+                    ["31 – 50 miles", "$20.00"],
+                    ["51 – 100 miles", "$30.00"],
+                    ["101 – 150 miles", "$40.00"],
+                    ["151 – 249 miles", "$60.00"],
+                    ["250+ miles", "$0.40 per mile"],
+                  ].map(([range, fare], i) => (
+                    <tr key={range} style={{ background: i % 2 === 0 ? "#FFF8F8" : "white" }}>
+                      <td style={{ padding: "8px 12px", color: "#374151", borderBottom: "1px solid #E5E7EB" }}>{range}</td>
+                      <td style={{ padding: "8px 12px", color: "#CC0000", fontWeight: 700, textAlign: "right" as const, borderBottom: "1px solid #E5E7EB" }}>{fare}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 12, lineHeight: 1.5 }}>
+              In-town fares: $1.00 regular · $0.75 elderly/disabled. Contact Gilbert Nuncio for updated rate sheets: <a href="tel:+15803352691" style={{ color: T.blue }}>580-335-2691</a>
+            </p>
+          </div>
+        ),
       },
       {
         id: "offices", label: "Office Locations", shortLabel: "Offices", icon: "📍",
@@ -3763,7 +3908,7 @@ const PROGRAMS: ProgramData[] = [
         id: "ada", label: "ADA & Accessibility", shortLabel: "ADA", icon: "♿",
         content: (
           <div className="cadc-light-content">
-            <p>All 110 Red River Transportation vehicles are equipped with lifts or ramps. No rider is turned away due to a mobility device or disability.</p>
+            <p>Red River Transportation vehicles are equipped with lifts or ramps. No rider is turned away due to a mobility device or disability.</p>
             <div className="cadc-card">
               <p className="cadc-label">Title VI Non-Discrimination</p>
               <p>Red River Transportation does not discriminate on the basis of race, color, or national origin. For Title VI information or to file a complaint, contact the Frederick office.</p>
@@ -3798,13 +3943,14 @@ const PROGRAMS: ProgramData[] = [
         id: "apply-weath", label: "Apply", shortLabel: "Apply", icon: "📝",
         content: (
           <div className="cadc-light-content">
-            <p>Applications are submitted online through the Oklahoma Weatherization portal. The process typically includes an energy audit of your home before work begins.</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Apply online</p>
-              <a href="https://ok.mywaplink.org" target="_blank" rel="noopener noreferrer" className="cadc-btn">Oklahoma WAP Portal →</a>
+            <p>Due to a recent change at the state level, online applications are temporarily unavailable. Applications must be submitted using our paper form. Call or stop by your nearest CADC office to request a form or have one mailed to you.</p>
+            <div className="cadc-card" style={{ background: "#FFF8F0", border: "1.5px solid #D97706" }}>
+              <p className="cadc-label" style={{ color: "#D97706" }}>⚠️ Online Applications Temporarily Unavailable</p>
+              <p style={{ fontSize: 13, marginBottom: 10 }}>Paper applications are now required. Download and print below, or call us to have one mailed to you.</p>
+              <a href="/documents/weatherization-application.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">📄 Download Paper Application →</a>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Questions?</p>
+              <p className="cadc-label">Call to Apply</p>
               <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
             </div>
           </div>
@@ -3846,8 +3992,45 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "weath-interest", label: "Join Waitlist", shortLabel: "Waitlist", icon: "📝",
-        content: <WeatherizationInterestForm />,
+        id: "weath-counties", label: "Counties Served", shortLabel: "Counties", icon: "📍",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC Weatherization serves <strong>17 counties</strong> across Southwest and Central Oklahoma.</p>
+            <div className="cadc-grid-2">
+              {["Beckham","Caddo","Comanche","Cotton","Custer","Garvin","Grady","Greer","Harmon","Jackson","Jefferson","Kiowa","McClain","Roger Mills","Stephens","Tillman","Washita"].map(c=>(
+                <div key={c} className="cadc-chip">{c} County</div>
+              ))}
+            </div>
+            <div className="cadc-card" style={{ marginTop: 12 }}>
+              <p className="cadc-label">Contact Weatherization</p>
+              <p style={{ fontSize: 13, margin: "0 0 6px" }}>Robert Meador — Weatherization Director</p>
+              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "weath-housing", label: "Housing", shortLabel: "Housing", icon: "🏠",
+        content: (
+          <div className="cadc-light-content">
+            <p>CADC manages a limited number of rental properties for qualifying individuals and families. Units become available periodically — contact us to learn about current openings.</p>
+            <div className="cadc-card" style={{ background: "#F0F0FF", border: "1.5px solid #0101FF" }}>
+              <p className="cadc-label">Available Rental Properties</p>
+              <p style={{ fontSize: 13, color: "#6B7280", fontStyle: "italic" }}>Current availability coming soon. Call to inquire about openings.</p>
+              <a href="tel:+15803355588" className="cadc-btn" style={{ marginTop: 12 }}>📞 Call to Inquire — 580-335-5588</a>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">Rental Application</p>
+              <p style={{ fontSize: 13, marginBottom: 10 }}>Download and complete the rental application below. Return completed applications to the Frederick office.</p>
+              <a href="/documents/rental-application.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">📄 Download Rental Application →</a>
+            </div>
+            <div className="cadc-card">
+              <p className="cadc-label">CADC Main Office</p>
+              <p style={{ fontSize: 13, margin: "0 0 4px" }}>105 S. Main Street, Frederick, OK 73542</p>
+              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
+            </div>
+          </div>
+        ),
       },
     ],
   },
@@ -3882,7 +4065,7 @@ const PROGRAMS: ProgramData[] = [
               <div className="cadc-stack">
                 {[
                   {t:"Food Handlers Certification",d:"All nutrition staff are required to complete a Food Handlers class prior to working in our kitchens."},
-                  {t:"CPR / First Aid / Heimlich",d:"All nutrition staff are certified in CPR, First Aid, and Heimlich Maneuver. Training completed June 2026 — recertified every two years."},
+                  {t:"CPR / First Aid / Heimlich",d:"All nutrition staff hold current CPR, First Aid, and Heimlich Maneuver certifications."},
                   {t:"Health Department Inspections",d:"Every center is inspected by the Health Department twice per year."},
                   {t:"Vent Hood Suppression Systems",d:"Kitchen suppression systems inspected twice per year at all centers."},
                   {t:"Fire Inspections",d:"Annual fire inspections conducted at all six centers."},
@@ -3976,50 +4159,6 @@ const PROGRAMS: ProgramData[] = [
             </div>
           </div>
         ),
-      },
-    ],
-  },
-
-  // ── 5. TAX HELP ────────────────────────────────────────────────────────────
-  {
-    slug: "tax-help",
-    name: "VITA Free Tax Help",
-    shortName: "Tax Help",
-    icon: "📋",
-    color: T.blue,
-    tagline: "Free IRS-certified tax prep — no cost, no fees",
-    subAreas: [
-      {
-        id: "vita-what", label: "About VITA", shortLabel: "About", icon: "ℹ️",
-        content: (
-          <div className="cadc-light-content">
-            <p>The Volunteer Income Tax Assistance (VITA) program offers free tax preparation by IRS-certified volunteers to individuals and families who generally make $55,000 or less. In 2025, CADC completed 91 tax returns. VITA has been available in Beckham, Cotton, Kiowa, Washita, and Tillman counties for 18 years.</p>
-            <div className="cadc-grid-2">
-              {["$0 filing cost","IRS-certified volunteers","Federal and state returns","EITC maximization","No hidden fees","Secure and confidential"].map(i=><div key={i} className="cadc-chip">{i}</div>)}
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "vita-bring", label: "What to Bring", shortLabel: "Bring", icon: "📎",
-        content: (
-          <div className="cadc-light-content">
-            <div className="cadc-card">
-              <p className="cadc-label">Required documents</p>
-              <ul className="cadc-list">
-                {["Photo ID for all adults","Social Security cards for everyone on the return","All W-2, 1099, and income forms","Last year's tax return (if available)","Bank account and routing number for direct deposit","Health insurance information (1095-A if you had Marketplace coverage)","Childcare provider name, address, and tax ID (if applicable)"].map(i=><li key={i}>{i}</li>)}
-              </ul>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Find a site</p>
-              <a href="tel:+15803355588" className="cadc-link">580-335-5588</a>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "vita-appointment", label: "Request Appointment", shortLabel: "Appointment", icon: "📅",
-        content: <VitaAppointmentForm />,
       },
     ],
   },
@@ -4267,8 +4406,6 @@ const PROGRAMS: ProgramData[] = [
                     <div key={m.name} style={{marginBottom:10,paddingBottom:10,borderBottom:"1px solid #e5e7eb"}}>
                       <p style={{fontWeight:700,fontSize:13,margin:"0 0 2px"}}>{m.name}</p>
                       {m.sector && <p style={{fontSize:10,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 2px"}}>{m.sector} Sector{m.group ? ` — ${m.group}` : ""}</p>}
-                      {m.addr && <p style={{fontSize:11,color:"#6b7280",margin:"0 0 2px"}}>{m.addr}</p>}
-                      {m.phone && <a href={"tel:+1" + m.phone.split("/")[0].replace(/\D/g,"")} style={{fontSize:11,color:"#0101FF",fontWeight:700,textDecoration:"none",display:"block"}}>{m.phone}</a>}
                       {m.term && <p style={{fontSize:10,color:"#9ca3af",margin:"4px 0 0"}}>Term: {m.term}</p>}
                     </div>
                   ))}
@@ -4395,58 +4532,6 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "community-voice", label: "What You Told Us", shortLabel: "Your Voice", icon: "🗣️",
-        content: (
-          <div className="cadc-light-content">
-            <p>CADC conducts a Community Needs Assessment every three years. Here's what Southwest Oklahoma residents are telling us — and what CADC is doing about it.</p>
-
-            <div style={{background:"linear-gradient(135deg,#0101FF 0%,#1a1aee 100%)",borderRadius:14,padding:"20px 18px",marginBottom:16}}>
-              <p style={{color:"rgba(255,255,255,0.65)",fontSize:10,fontWeight:800,letterSpacing:"0.18em",textTransform:"uppercase",margin:"0 0 14px"}}>Top Reported Community Needs</p>
-              {[
-                {need:"Transportation",pct:31,color:"#60A5FA"},
-                {need:"Food Access",pct:27,color:"#34D399"},
-                {need:"Housing",pct:22,color:"#FBBF24"},
-                {need:"Employment",pct:18,color:"#F87171"},
-                {need:"Healthcare Access",pct:14,color:"#A78BFA"},
-              ].map(({need,pct,color})=>(
-                <div key={need} style={{marginBottom:12}}>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                    <span style={{color:"white",fontSize:13,fontWeight:700}}>{need}</span>
-                    <span style={{color:"rgba(255,255,255,0.7)",fontSize:13,fontWeight:800}}>{pct}%</span>
-                  </div>
-                  <div style={{background:"rgba(255,255,255,0.15)",borderRadius:6,height:8}}>
-                    <div style={{height:"100%",width:`${pct}%`,background:color,borderRadius:6,transition:"width 1s ease"}} />
-                  </div>
-                </div>
-              ))}
-              <p style={{color:"rgba(255,255,255,0.45)",fontSize:10,margin:"12px 0 0"}}>Source: CADC Community Needs Assessment · Southwest Oklahoma</p>
-            </div>
-
-            <div className="cadc-card">
-              <p className="cadc-label">What CADC is doing about it</p>
-              <div className="cadc-stack">
-                {[
-                  {need:"Transportation",action:"Red River Transit expanded to 12 counties in 2026 after MAGB transition. Online ride requests now available at cadcok.org."},
-                  {need:"Food Access",action:"Community Market mobile food program operating across Southwest Oklahoma. Senior Nutrition serving 327+ clients across 6 sites. Advantage delivering 340K+ frozen meals annually."},
-                  {need:"Housing & Energy",action:"Weatherization Assistance Program operating in 17 counties. Priority given to households with elderly, disabled, or children 18 and under."},
-                  {need:"Employment",action:"CADC employs 200+ staff across 9 counties. Head Start offers CDA training reimbursement and a career ladder for teaching staff."},
-                ].map(i=><div key={i.need} className="cadc-card-sm"><p className="cadc-card-title">✅ {i.need}</p><p>{i.action}</p></div>)}
-              </div>
-            </div>
-
-            <div className="cadc-card" style={{background:"#F0F0FF",border:"1.5px solid #0101FF"}}>
-              <p style={{fontWeight:800,fontSize:14,color:"#111827",margin:"0 0 6px"}}>Have your say</p>
-              <p style={{fontSize:13,color:"#6B7280",margin:"0 0 14px",lineHeight:1.5}}>Your input directly shapes how CADC plans programs and allocates resources. Take the 2026 Community Needs Survey.</p>
-              <a href="/?program=board&area=community-survey" className="cadc-btn">Take the Survey →</a>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "community-survey", label: "Community Survey", shortLabel: "Survey", icon: "📊",
-        content: <CommunityNeedsSurvey />,
-      },
-      {
         id: "service-screener", label: "Find My Benefits", shortLabel: "Screener", icon: "🔍",
         content: <ServiceScreenerForm />,
       },
@@ -4514,27 +4599,30 @@ const PROGRAMS: ProgramData[] = [
         ),
       },
       {
-        id: "adv-apply", label: "How to Apply", shortLabel: "Apply", icon: "📝",
+        id: "adv-apply", label: "How to Apply", shortLabel: "Apply", icon: "📞",
         content: (
           <div className="cadc-light-content">
-            <p>Advantage is an Oklahoma Medicaid program. CADC does not enroll members directly — enrollment goes through the Oklahoma Department of Human Services. Here's how to get started:</p>
-            <div className="cadc-card">
-              <p className="cadc-label">Step 1 — Apply for SoonerCare (Medicaid)</p>
-              <p>You must have an active SoonerCare case to be eligible. Apply online or call DHS.</p>
-              <a href="https://okdhslive.org" target="_blank" rel="noopener noreferrer" className="cadc-btn" style={{marginTop:10}}>Apply Online at okdhslive.org →</a>
+            <p>Applications for Advantage Home Delivered Meals are handled by phone. Call your nearest CADC Advantage office and our team will walk you through the process.</p>
+            <div className="cadc-card" style={{ background: "#F0F0FF", border: "1.5px solid #0101FF" }}>
+              <p className="cadc-label">Call to Start Your Application</p>
+              <div className="cadc-stack" style={{ marginTop: 10 }}>
+                {[
+                  { n: "Sentinel Office", p: "580-393-2216", href: "tel:+15803932216" },
+                  { n: "Temple Office", p: "580-342-6967", href: "tel:+15803426967" },
+                  { n: "Lawton Office", p: "580-699-8880", href: "tel:+15806998880" },
+                ].map(o => (
+                  <div key={o.n} className="cadc-card-sm">
+                    <p className="cadc-card-title">{o.n}</p>
+                    <a href={o.href} className="cadc-btn" style={{ marginTop: 6 }}>📞 {o.p}</a>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="cadc-card">
-              <p className="cadc-label">Step 2 — Request Advantage Waiver Services</p>
-              <p>Tell your SoonerCare case manager you need home-delivered meals. They will conduct a Level of Care assessment and refer you to CADC if eligible.</p>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Step 3 — CADC Contacts You</p>
-              <p>Once approved and referred, CADC's Advantage team will contact you to set up delivery, select your meal plan, and confirm your milk and juice preferences.</p>
-              <a href="tel:+15803355588" className="cadc-btn" style={{marginTop:10}}>📞 Questions? Call CADC — 580-335-5588</a>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Need help navigating the process?</p>
-              <p>Call CADC directly. Our Advantage staff can walk you through the SoonerCare application and what to expect.</p>
+              <p className="cadc-label">What to have ready when you call</p>
+              <ul className="cadc-list">
+                {["Your SoonerCare (Medicaid) ID number","Proof of age or disability","Your home address and delivery preferences","An emergency contact name and phone number"].map(i=><li key={i}>{i}</li>)}
+              </ul>
             </div>
           </div>
         ),
@@ -4885,8 +4973,8 @@ function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
         position: "absolute", inset: 0,
         backgroundImage: `url(${photo})`,
         backgroundSize: "cover", backgroundPosition: "center",
-        opacity: 0.13,
-        filter: "saturate(0.5)",
+        opacity: 0.22,
+        filter: "saturate(0.6)",
       }} />
     </div>
   );
@@ -4905,7 +4993,7 @@ const CADC_EXTENDED_COUNTIES = ["caddo","custer","stephens","grady","jackson","h
 // Which programs are available per county
 const COUNTY_PROGRAM_MAP: Record<string, string[]> = {
   beckham:      ["head-start","transit","weatherization","advantage","community-market"],
-  canadian:     ["head-start","transit","advantage"], // Weatherization not yet active per Robert Meador 9/1/2026
+  canadian:     ["transit","advantage"], // No Head Start in Canadian County per Leslea 10/2/2026; Weatherization not yet active per Robert Meador 9/1/2026
   comanche:     ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   cotton:       ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
   jefferson:    ["head-start","transit","weatherization","senior-meals","advantage","community-market"],
@@ -5338,7 +5426,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
       <div style={{ display: "flex", minHeight: "calc(100vh - 64px)" }}>
 
         {/* LEFT — Orbit / Map panel */}
-        <div style={{ width: "42%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
+        <div style={{ width: "36%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexDirection: "column" }}>
           <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
 
           {/* Entry state — large tappable logo */}
@@ -5385,7 +5473,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
         </div>
 
         {/* RIGHT — Content panel */}
-        <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
+        <main id="main-content" role="main" aria-live="polite" aria-atomic="false" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 36px", borderLeft: `1px solid ${T.border}`, background: "white" }}>
           <DesktopContentPanel stage={stage} activeCountyName={activeCountyName} activeProgram={activeProgram} activeSubArea={activeSubArea} availablePrograms={availablePrograms} tapCounty={tapCounty} tapProgram={tapProgram} tapSubArea={tapSubArea} />
         </main>
       </div>
@@ -5597,7 +5685,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 }) {
   if (stage === "entry") {
     return (
-      <div style={{ maxWidth: 520, color: T.textPrimary }}>
+      <div style={{ maxWidth: 680, color: T.textPrimary }}>
         <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
         <h1 style={{ fontSize: "clamp(2rem,3.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Community Action<br />
@@ -5612,14 +5700,25 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <a href="/about" style={{ border: `1px solid ${T.border}`, color: T.blue, padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>About CADC</a>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[["6","Programs",""],["11","Head Start Centers","†"],["220,175","Transit Trips/Yr","†"],["6","Senior Meal Sites","†"],["340,830","Advantage Meals/Yr","†"],["1966","Est.",""]].map(([n,l,src])=>(
-            <div key={l} style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
-              <div style={{ color: T.blue, fontWeight: 900, fontSize: 22 }}>{n}</div>
-              <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2 }}>{l}</div>
-            </div>
+          {[
+            { icon: "🏫", label: "Head Start", sub: "Birth–5 · 11 centers", href: "/?program=head-start", slug: "head-start" },
+            { icon: "🚌", label: "Red River Transit", sub: "12-county service area", href: "/?program=transit", slug: "transit" },
+            { icon: "🏠", label: "Weatherization", sub: "Free home energy upgrades", href: "/?program=weatherization", slug: "weatherization" },
+            { icon: "🍽️", label: "Senior Nutrition", sub: "6 congregate sites", href: "/?program=senior-meals", slug: "senior-meals" },
+            { icon: "🚗", label: "Advantage Meals", sub: "Home-delivered frozen meals", href: "/?program=advantage", slug: "advantage" },
+            { icon: "🛒", label: "Community Market", sub: "Mobile grocery program", href: "/?program=community-market", slug: "community-market" },
+          ].map(p => (
+            <a key={p.slug} href={p.href}
+              style={{ background: "white", border: `1px solid ${T.border}`, borderRadius: 10, padding: "14px 10px", textAlign: "center" as const, boxShadow: "0 2px 8px rgba(1,1,255,0.06)", textDecoration: "none", display: "block", cursor: "pointer", transition: "transform 0.15s, box-shadow 0.15s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 6px 20px rgba(1,1,255,0.12)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = "none"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 2px 8px rgba(1,1,255,0.06)"; }}
+            >
+              <div style={{ fontSize: 24, marginBottom: 4 }}>{p.icon}</div>
+              <div style={{ color: T.blue, fontWeight: 800, fontSize: 11, lineHeight: 1.3 }}>{p.label}</div>
+              <div style={{ color: T.textMuted, fontSize: 9, fontWeight: 600, marginTop: 3, lineHeight: 1.4 }}>{p.sub}</div>
+            </a>
           ))}
         </div>
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: "8px 0 0", lineHeight: 1.6 }}>* CADC internal program count · † Source: CADC FY2025 Annual Report</p>
         {/* CADC Now */}
         <div style={{ marginTop: 20 }}><CADCNow /></div>
 
@@ -5653,13 +5752,24 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           </div>
           <span style={{ color: "white", fontSize: 18, marginLeft: "auto" }}>→</span>
         </a>
+
+        {/* Job Postings */}
+        <div style={{ marginTop: 16, background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,0.06)", display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ fontSize: 32, flexShrink: 0 }}>💼</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Work With CADC</p>
+            <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 12px", lineHeight: 1.5 }}>CADC employs 200+ staff across 9 counties. View current job openings and apply today.</p>
+            <a href="/programs/employment" style={{ display: "inline-block", background: T.blue, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>View Job Openings →</a>
+          </div>
+        </div>
+
       </div>
     );
   }
 
   if (stage === "map") {
     return (
-      <div style={{ maxWidth: 520, color: T.textPrimary, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 680, color: T.textPrimary, animation: "fadeSlideIn 0.4s ease" }}>
         <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Select Your County</p>
         <h2 style={{ fontSize: "clamp(1.6rem,2.8vw,2.4rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Where do you need help?
@@ -5687,7 +5797,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "county" && activeCountyName) {
     const firstProg = availablePrograms[0];
     return (
-      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 680, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <h2 style={{ fontSize: "clamp(1.4rem,2.4vw,2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px", fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           Programs available in your area
         </h2>
@@ -5702,6 +5812,17 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             </button>
           ))}
         </div>
+        {/* El Reno Emergency Utility — Canadian County only */}
+        {activeCountyName?.toLowerCase().includes("canadian") && (
+          <div style={{ background: "#FFF8F0", border: "1.5px solid #D97706", borderRadius: 12, padding: "14px 16px", marginBottom: 16, display: "flex", gap: 12, alignItems: "flex-start" }}>
+            <span style={{ fontSize: 22, flexShrink: 0 }}>⚡</span>
+            <div>
+              <p style={{ fontWeight: 800, fontSize: 13, color: "#92400E", margin: "0 0 4px" }}>Emergency Utility Assistance — El Reno Only</p>
+              <p style={{ fontSize: 12, color: "#6B7280", margin: "0 0 8px", lineHeight: 1.5 }}>Emergency utility assistance is available to qualifying El Reno residents. Contact the CADC main office to check eligibility and apply.</p>
+              <a href="tel:+15803355588" style={{ display: "inline-block", background: "#D97706", color: "white", padding: "8px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>📞 Call 580-335-5588</a>
+            </div>
+          </div>
+        )}
         {firstProg && (
           <div className="cadc-light-content">
             {firstProg.subAreas[0]?.content}
@@ -5715,7 +5836,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "program" && activeProgram) {
     const firstSub = activeProgram.subAreas[0];
     return (
-      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
+      <div style={{ maxWidth: 680, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "fadeSlideIn 0.4s ease" }}>
         <ProgramHeroBanner slug={activeProgram.slug} dark={false} />
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: T.maroon, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 6px" }}><ProgramTagline slug={activeProgram.slug} /></p>
@@ -5738,7 +5859,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
 
   if (stage === "content" && activeSubArea) {
     return (
-      <div style={{ maxWidth: 580, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+      <div style={{ maxWidth: 680, color: T.textPrimary, maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: 20, animation: "clipReveal 0.45s cubic-bezier(0.22,1,0.36,1) forwards" }}>
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
@@ -5781,6 +5902,7 @@ export const PUBLIC_DOCUMENTS: { label: string; href: string; note?: string }[] 
   { label: "Affirmative Action Plan 2023",               href: "/documents/affirmative-action-plan-2023.pdf" },
   { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
   { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
+  { label: "Board Meeting Agendas & Minutes",            href: "/board-meetings" },
 ];
 
 // Unified header search — navigates by URL so it works on every page
@@ -6046,7 +6168,6 @@ export function CADCFooter() {
             <a href="/contact" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Contact &amp; Locations →</a>
             <a href="/about" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>About CADC →</a>
             <a href={st.facebookUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block", marginBottom: 6 }}>Facebook →</a>
-            <a href={st.instagramUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#8C8CFF", fontSize: 13, textDecoration: "none", fontWeight: 600, display: "block" }}>Instagram →</a>
           </div>
           <div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
@@ -6069,14 +6190,7 @@ export function CADCFooter() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               Facebook
             </a>
-            <a href="https://www.instagram.com/wearecadc" target="_blank" rel="noopener noreferrer"
-              aria-label="CADC on Instagram"
-              style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6, transition: "color 0.15s ease" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "white")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-              Instagram
-            </a>
+
           </div>
         </div>
       </footer>
