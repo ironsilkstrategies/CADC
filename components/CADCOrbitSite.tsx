@@ -3712,8 +3712,6 @@ const PROGRAMS: ProgramData[] = [
                 </div>
               </div>
 
-            </div>
-
               {/* Robin Harris */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
@@ -3754,7 +3752,7 @@ const PROGRAMS: ProgramData[] = [
                 </div>
               </div>
 
-            </div>
+            </div>{/* end cadc-stack */}
 
             <p className="cadc-note" style={{ marginTop: 12 }}>Interested in joining the CADC Head Start team? View open positions on the <a href="https://www.facebook.com/share/1Ei1cCmz46/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="cadc-link">CADC Facebook page</a> or call 580-726-3343.</p>
           </div>
