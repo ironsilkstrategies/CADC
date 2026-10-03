@@ -693,7 +693,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
       {/* Day labels */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", background: c.bg, borderLeft: `1px solid ${c.border}`, borderRight: `1px solid ${c.border}` }}>
         {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
-          <div key={d} style={{ textAlign: "center", padding: "6px 2px", fontSize: 9, fontWeight: 700, color: c.dayLabel, textTransform: "uppercase", letterSpacing: "0.08em" }}>{d}</div>
+          <div key={d} style={{ textAlign: "center", padding: "8px 2px", fontSize: 12, fontWeight: 700, color: c.dayLabel, textTransform: "uppercase", letterSpacing: "0.04em" }}>{d}</div>
         ))}
       </div>
 
@@ -712,7 +712,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
                   key={di}
                   onClick={() => hasMeal && key && setSelectedDate(key)}
                   style={{
-                    minHeight: 52,
+                    minHeight: 66,
                     background: !day ? "transparent" : weekend ? c.weekend : hasMeal ? c.cellHasMeal : c.cellBg,
                     borderLeft: di > 0 ? `1px solid ${c.cellBorder}` : "none",
                     borderTop: hasMeal ? `2px solid ${c.cellHasMealBorder}` : "2px solid transparent",
@@ -724,9 +724,9 @@ function MealCalendar({ dark }: { dark: boolean }) {
                 >
                   {day && (
                     <>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: hasMeal ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: hasMeal ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
                       {meal && (
-                        <span style={{ fontSize: 8, fontWeight: 600, color: c.headline, lineHeight: 1.3, wordBreak: "break-word" }}>{meal.headline}</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: c.headline, lineHeight: 1.3, wordBreak: "break-word" }}>{meal.headline}</span>
                       )}
                     </>
                   )}
@@ -5117,12 +5117,17 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
         return (
           <g key={c.fips} style={{ cursor: "pointer" }}>
             <path d={c.path}
-              fill={isSel ? selectedFill : isHov ? "rgba(1,1,255,0.14)" : "rgba(1,1,255,0.05)"}
-              stroke={isSel ? selectedFill : "rgba(1,1,255,0.4)"} strokeWidth={1} strokeDasharray="3 2" strokeLinejoin="round"
+              fill={isSel ? selectedFill : isHov ? "rgba(1,1,255,0.18)" : "rgba(1,1,255,0.10)"}
+              stroke={isSel ? selectedFill : "rgba(1,1,255,0.35)"} strokeWidth={1} strokeLinejoin="round"
               style={{ transition: "fill 0.18s ease" }}
               onMouseEnter={() => setHovered(c.slug)} onMouseLeave={() => setHovered(null)}
               onClick={() => c.slug && onSelectCounty(c.slug)} />
-            <text x={c.lx} y={c.ly + 2} textAnchor="middle" dominantBaseline="middle" fontSize={5.5} fontWeight="700"
+            {!isSel && (
+              <circle cx={c.lx} cy={c.ly - 7} r={2.5}
+                fill={isHov ? "#0101FF" : "rgba(1,1,255,0.5)"}
+                style={{ pointerEvents:"none", transition:"fill 0.15s" }} />
+            )}
+            <text x={c.lx} y={c.ly + 4} textAnchor="middle" dominantBaseline="middle" fontSize={5.5} fontWeight="700"
               fill={isSel ? selectedLabel : dark ? "rgba(255,255,255,0.6)" : "#3b3b8a"} style={{ pointerEvents:"none", userSelect:"none" }}>{c.name}</text>
           </g>
         );
@@ -5161,15 +5166,11 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
       })}
 
       {/* Legend */}
-      <g transform="translate(12,348)">
-        <rect x={0} y={-5} width={10} height={7} rx={1} fill={cadcFill} stroke={cadcStroke} strokeWidth={0.8}/>
-        <text x={13} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>CADC County</text>
-        <rect x={72} y={-5} width={10} height={7} rx={1} fill={greyFill} stroke={greyStroke} strokeWidth={0.8}/>
-        <text x={85} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Other County</text>
-        <rect x={145} y={-5} width={10} height={7} rx={1} fill="rgba(1,1,255,0.05)" stroke="rgba(1,1,255,0.4)" strokeWidth={0.8} strokeDasharray="2 1.5"/>
-        <text x={158} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Extended service area</text>
-        <circle cx={240} cy={-1.5} r={3} fill="#CC0000"/>
-        <text x={246} y={0} fontSize={5.5} fill={dark?"rgba(255,255,255,0.4)":"#6b7280"}>Tap to see services</text>
+      <g transform="translate(10,345)">
+        <circle cx={5} cy={0} r={5} fill="#0101FF"/>
+        <text x={14} y={3} fontSize={7.5} fontWeight="700" fill={dark?"rgba(255,255,255,0.7)":"#374151"}>Primary Service Area (9 counties)</text>
+        <circle cx={5} cy={16} r={5} fill="rgba(1,1,255,0.35)" stroke="#0101FF" strokeWidth={0.8}/>
+        <text x={14} y={19} fontSize={7.5} fontWeight="700" fill={dark?"rgba(255,255,255,0.55)":"#6b7280"}>Extended Service Area</text>
       </g>
     </svg>
   );
@@ -5823,11 +5824,9 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
             </div>
           </div>
         )}
-        {firstProg && (
-          <div className="cadc-light-content">
-            {firstProg.subAreas[0]?.content}
-          </div>
-        )}
+        <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>
+          Select a program above to learn more and connect with services.
+        </p>
         <BackToTop />
       </div>
     );
