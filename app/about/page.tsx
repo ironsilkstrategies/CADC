@@ -222,6 +222,42 @@ const LOCATIONS: CADCLocation[] = [
     mapsQuery: "802 SW A Ave Suite B Lawton OK 73501",
     hours: "Mon–Fri 8:00am–5:00pm",
   },
+  {
+    id: "hs-main",
+    name: "Head Start — Main Office",
+    city: "Frederick",
+    county: "Tillman",
+    address: "105 S. Main Street, Frederick, OK 73542",
+    phone: "580-726-3343",
+    phoneHref: "tel:+15807263343",
+    programs: ["Head Start & Early Head Start"],
+    mapsQuery: "105 S Main Street Frederick OK 73542",
+    hours: "Mon–Fri 8:00am–5:00pm",
+  },
+  {
+    id: "weatherization-main",
+    name: "Weatherization — Main Office",
+    city: "Frederick",
+    county: "Tillman",
+    address: "105 S. Main Street, Frederick, OK 73542",
+    phone: "580-335-5588",
+    phoneHref: "tel:+15803355588",
+    programs: ["Weatherization Assistance"],
+    mapsQuery: "105 S Main Street Frederick OK 73542",
+    hours: "Mon–Fri 8:00am–5:00pm",
+  },
+  {
+    id: "market-main",
+    name: "Community Market — Scheduling Office",
+    city: "Frederick",
+    county: "Tillman",
+    address: "105 S. Main Street, Frederick, OK 73542",
+    phone: "580-305-1964",
+    phoneHref: "tel:+15803051964",
+    programs: ["Community Market"],
+    mapsQuery: "105 S Main Street Frederick OK 73542",
+    hours: "Call for market schedule",
+  },
 ];
 
 // Program color legend
@@ -399,6 +435,9 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
   "frederick-main":     { x: 332, y: 282 },
   "frederick-senior":   { x: 336, y: 286 },
   "frederick-transit":  { x: 328, y: 282 },
+  "hs-main":            { x: 332, y: 278 },
+  "weatherization-main":{ x: 336, y: 278 },
+  "market-main":        { x: 328, y: 286 },
 
   // Cache, Comanche County — county centroid lx:368.3, ly:269.0
   // Cache is SW of Lawton
@@ -547,6 +586,9 @@ function LocationMap() {
           { id: "senior", label: "🍽️ Senior Meals" },
           { id: "transit", label: "🚌 Transit" },
           { id: "advantage", label: "🚗 Advantage" },
+          { id: "head start", label: "🏫 Head Start" },
+          { id: "weatherization", label: "🏠 Weatherization" },
+          { id: "community market", label: "🛒 Market" },
           { id: "main", label: "🏛️ Main Office" },
         ].map(f => (
           <button
@@ -817,9 +859,30 @@ export default function AboutPage() {
         {/* History */}
         <section aria-labelledby="history-heading">
           <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our History</p>
-          <h2 id="history-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 8 }}>Six Decades of Service</h2>
-          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 660, marginBottom: 28 }}>
-            CADC was established in 1966 under the federal Economic Opportunity Act — part of President Johnson's War on Poverty — as one of Oklahoma's original Community Action Agencies. What began as a small organization serving a handful of counties in Southwest Oklahoma has grown into a multi-program agency touching the lives of thousands of families every year.
+          <h2 id="history-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 16 }}>Six Decades of Service</h2>
+
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 18 }}>
+            CADC was established in 1966 under the federal Economic Opportunity Act — one of the cornerstones of President Lyndon B. Johnson's War on Poverty. We were among the first Community Action Agencies created in Oklahoma, built on the belief that poverty is not inevitable, and that people — given the right support at the right time — can and do change their circumstances.
+          </p>
+
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 18 }}>
+            In those early years, CADC operated with a small staff and limited resources, focused on emergency assistance and connecting families to federal programs in a handful of Southwest Oklahoma counties. Over the decades, the organization grew — not by chasing programs, but by responding to real needs in the communities we serve.
+          </p>
+
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 18 }}>
+            Red River Transportation launched in 1984 with service in just 5 counties — a direct response to the isolation that rural families faced without reliable transportation. Today it operates 110 vehicles across 12 counties, logging over 220,000 passenger trips per year and connecting residents to medical care, employment, and essential services.
+          </p>
+
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 18 }}>
+            Weatherization has quietly transformed thousands of homes across Southwest Oklahoma since the program's formal establishment in the 1990s. By reducing energy costs for low-income households — especially those with elderly members, people with disabilities, and children — CADC has helped families keep more of what they earn and live in safer, more comfortable homes.
+          </p>
+
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 18 }}>
+            Head Start has been a cornerstone of CADC's work since the program's federal creation in 1965. Over the decades, CADC expanded its Head Start and Early Head Start network to 11 centers, serving children from birth through age 5 — and the families who are raising them — across the region. Many of our current Head Start staff members have been with us for 15, 20, even 25 years. That continuity matters. It means the children we serve are seen, known, and supported by people who are committed to this work for the long term.
+          </p>
+
+          <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 28 }}>
+            Today, CADC employs over 200 staff members across 9 base counties — and serves a broader region through transit, Advantage, and weatherization. Our mission has never changed: <strong>reducing poverty in communities by empowering people.</strong> The programs have grown. The counties served have expanded. But the work is the same as it was in 1966 — showing up for families, every day, with whatever they need to move forward.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {TIMELINE.map((t, i) => (
@@ -915,6 +978,30 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        {/* Program Directors */}
+        <section aria-labelledby="directors-heading">
+          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Program Leadership</p>
+          <h2 id="directors-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Program Directors</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
+            {[
+              { name: "Leslea Hixson", title: "Executive Director", phone: "580-530-0009", email: "lhixson@cadcok.org" },
+              { name: "Robin Harris", title: "Head Start / Early Head Start Director", phone: "580-726-3343", email: "rharris@cadcok.org" },
+              { name: "Gilbert Nuncio", title: "Red River Transportation Director", phone: "580-335-2691", email: "redriver@pldi.net" },
+              { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "rmeador@cadcok.org" },
+              { name: "Kristie Jackson", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "kjackson@cadcok.org" },
+              { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
+              { name: "Tiffany Camero", title: "Executive Secretary", phone: "580-335-5588", email: "tcamero@cadcok.org" },
+            ].map(d => (
+              <div key={d.name} style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 18px" }}>
+                <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 3px" }}>{d.name}</p>
+                <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 10px", lineHeight: 1.4 }}>{d.title}</p>
+                <a href={`tel:+1${d.phone.replace(/\D/g,"")}`} style={{ display: "block", color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none", marginBottom: 4 }}>{d.phone}</a>
+                <a href={`mailto:${d.email}`} style={{ display: "block", color: "#0101FF", fontSize: 12, textDecoration: "none" }}>{d.email}</a>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Contact CTA */}
