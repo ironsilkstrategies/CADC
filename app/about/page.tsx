@@ -30,7 +30,6 @@ const PROGRAMS = [
   { name: "Weatherization & Housing", slug: "weatherization", icon: "🏠" },
   { name: "Senior Nutrition", slug: "senior-meals", icon: "🍽️" },
   { name: "Advantage Home Delivered Meals", slug: "advantage", icon: "🚗" },
-  { name: "VITA Free Tax Help", slug: "tax-help", icon: "📋" },
   { name: "Community Market", slug: "community-market", icon: "🛒" },
 ];
 
