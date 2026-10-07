@@ -2019,17 +2019,36 @@ function titleRank(title: string): number {
   return 6;
 }
 
+const STAFF_PHOTOS: Record<string, string> = {
+  "Leslea Hixson": "/images/staff/staff-leslea-hixson.jpg",
+  "Terry Collom": "/images/staff/staff-terry-collom.jpg",
+  "Suzi Fletcher": "/images/staff/staff-suzi-fletcher.jpg",
+  "Gilbert Nuncio": "/images/staff/staff-gilbert-nuncio.jpg",
+  "Robert Meador": "/images/staff/staff-robert-meador.jpg",
+  "Laura Vardell": "/images/staff/staff-laura-vardell.jpg",
+  "Scott Fraley": "/images/staff/staff-scott-fraley-headshot.jpg",
+  "Kristie Jackson": "/images/staff/staff-kristie-jackson.jpg",
+  "Marty Martin": "/images/staff/staff-marty-martin.jpg",
+  "Tiffany Camero": "/images/staff/staff-tiffany-camero.jpg",
+  "Sarah Perez": "/images/staff/staff-sarah-perez.jpg",
+};
+
 function StaffList() {
   const { staff } = useCms();
   const sorted = staff.map((p, i) => ({ p, i })).sort((a, b) => titleRank(a.p.title) - titleRank(b.p.title) || a.i - b.i).map(x => x.p);
   return (
     <div className="cadc-stack">
       {sorted.map(p => (
-        <div key={p.name + p.title} className="cadc-card-sm">
-          <p className="cadc-card-title">{p.name}</p>
-          <p>{p.title}</p>
-          {p.phone && <a href={`tel:+1${p.phone.replace(/\D/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.phone}</a>}
-          {p.email && <a href={`mailto:${p.email}`} className="cadc-link" style={{display:"block"}}>{p.email}</a>}
+        <div key={p.name + p.title} className="cadc-card-sm" style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          {STAFF_PHOTOS[p.name]
+            ? <img src={STAFF_PHOTOS[p.name]} alt={p.name} loading="lazy" decoding="async" style={{ width: 72, height: 72, borderRadius: "50%", objectFit: "cover", objectPosition: p.name === "Laura Vardell" ? "center 62%" : "center 25%", flexShrink: 0, border: "2px solid #d8dcf2" }} />
+            : <div aria-hidden="true" style={{ width: 72, height: 72, borderRadius: "50%", background: "#eef0fb", color: "#0101FF", fontWeight: 800, fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{p.name.split(" ").map(w => w[0]).join("")}</div>}
+          <div>
+            <p className="cadc-card-title">{p.name}</p>
+            <p>{p.title}</p>
+            {p.phone && <a href={`tel:+1${p.phone.replace(/\D/g,"")}`} className="cadc-link" style={{display:"block"}}>{p.phone}</a>}
+            {p.email && <a href={`mailto:${p.email}`} className="cadc-link" style={{display:"block"}}>{p.email}</a>}
+          </div>
         </div>
       ))}
     </div>
