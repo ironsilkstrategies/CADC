@@ -231,7 +231,6 @@ export const DEFAULT_CONTENT: SiteContent = {
     { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
     { label: "Title VI Policy (Red River Transportation)", href: "/documents/title-vi-policy.pdf" },
     { label: "Affirmative Action Plan 2023",               href: "/documents/affirmative-action-plan-2023.pdf" },
-    { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
   ],
   siteText: DEFAULT_SITE_TEXT,
   programTaglines: DEFAULT_PROGRAM_TAGLINES,

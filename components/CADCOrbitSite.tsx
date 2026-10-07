@@ -2164,7 +2164,7 @@ function TransitRideSection() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
         {[
           ["Beckham","580-928-2199"],["Caddo","580-335-2691"],["Canadian","580-335-2691"],["Comanche","580-335-2691"],
-          ["Cotton","580-335-2691"],["Custer","580-335-2691"],["Jefferson","580-757-2412"],["Kiowa","580-335-2691"],
+          ["Cotton","580-335-2691"],["Custer","580-335-2691"],["Jefferson","580-757-2235"],["Kiowa","580-335-2691"],
           ["Roger Mills","580-928-2199"],["Stephens","580-335-2691"],["Tillman","580-335-2691"],["Washita","580-335-2691"],
         ].map(([county, phone]) => (
           <div key={county} className="cadc-card-sm" style={{ border: "1.5px solid #E4E4FF" }}>
@@ -4550,39 +4550,39 @@ const PROGRAMS: ProgramData[] = [
             <div className="cadc-stack">
               {[
                 {county:"Beckham County",members:[
-                  {name:"Purcy Walker",addr:"Box 461, Elk City, OK 73648",phone:"580-821-0303",sector:"Low Income",group:"Sayre Senior Citizens Group",term:"4/2025–4/2028"},
-                  {name:"Tate Finnell",addr:"P.O. Box 67, Sayre, OK 73662",phone:"928-2457 / Cell: 580-243-8612",sector:"Public",group:"Beckham County Commissioners (Exec. Committee)",term:"4/2023–4/2026"},
-                  {name:"Jackie Anderson",addr:"1208 S. Washington, Elk City, OK 73644",phone:"580-309-7887",sector:"Private",group:"Elk City Chamber of Commerce",term:"6/2025–6/2028"},
+                  {name:"Purcy Walker",sector:"Low Income",group:"Sayre Senior Citizens Group",term:"4/2025–4/2028"},
+                  {name:"Tate Finnell",sector:"Public",group:"Beckham County Commissioners (Exec. Committee)",term:"4/2023–4/2026"},
+                  {name:"Jackie Anderson",sector:"Private",group:"Elk City Chamber of Commerce",term:"6/2025–6/2028"},
                 ]},
                 {county:"Cotton County",members:[
-                  {name:"Dave Johnson",addr:"508 S. Broadway, Walters, OK 73572",phone:"580-458-1524 / Cell: 580-755-0551",sector:"Private",group:"Walters Chamber of Commerce (Vice-Chairman Exec. Committee)",term:"6/2023–6/2026"},
-                  {name:"Milton Honeycutt",addr:"P.O. Box 10, Randlett, OK",phone:"940-642-5020",sector:"Public",group:"Cotton County Commissioners",term:"1/2023–1/2026"},
-                  {name:"Paul Metcalfe",addr:"211 E. Colorado St., Walters, OK 73572",phone:"580-512-9005",sector:"Low Income",group:"Walters Church of the Nazarene",term:"3/2023–3/2026"},
+                  {name:"Dave Johnson",sector:"Private",group:"Walters Chamber of Commerce (Vice-Chairman Exec. Committee)",term:"6/2023–6/2026"},
+                  {name:"Milton Honeycutt",sector:"Public",group:"Cotton County Commissioners",term:"1/2023–1/2026"},
+                  {name:"Paul Metcalfe",sector:"Low Income",group:"Walters Church of the Nazarene",term:"3/2023–3/2026"},
                 ]},
                 {county:"Comanche County",members:[
-                  {name:"Jo Peters",addr:"6306 SW Brookline Ave., Lawton, OK 73505",phone:"580-512-2006",sector:"Private",group:"NAACP Chapter 6131",term:"9/2024–9/2027"},
-                  {name:"Chandra Barnett",addr:"2213 SW Edinburough Dr., Lawton, OK 73505",phone:"",sector:"Low Income",group:"Cache Sr. Citizens Group",term:"11/2024–11/2027"},
+                  {name:"Jo Peters",sector:"Private",group:"NAACP Chapter 6131",term:"9/2024–9/2027"},
+                  {name:"Chandra Barnett",sector:"Low Income",group:"Cache Sr. Citizens Group",term:"11/2024–11/2027"},
                 ]},
                 {county:"Jefferson County",members:[
-                  {name:"Bryce Bohot",addr:"",phone:"",sector:"",group:"Jefferson County",term:""},
+                  {name:"Bryce Bohot",sector:"",group:"Jefferson County",term:""},
                 ]},
                 {county:"Kiowa County",members:[
-                  {name:"Gary Jennings",addr:"300 16th St., Snyder, OK 73566",phone:"580-682-0288",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"9/2022–9/2025"},
-                  {name:"Chris Block",addr:"14070 N. 2180 Rd., Hobart, OK 73651",phone:"",sector:"Low Income",group:"",term:"11/2024–11/2027"},
+                  {name:"Gary Jennings",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"9/2022–9/2025"},
+                  {name:"Chris Block",sector:"Low Income",group:"",term:"11/2024–11/2027"},
                 ]},
                 {county:"Roger Mills County",members:[
-                  {name:"Monty Denny",addr:"9071 US 283, Cheyenne, OK 73628",phone:"580-497-7773",sector:"Public",group:"Roger Mills County Commissioners / Cheyenne & Arapaho Tribes",term:"1/2023–1/2026"},
-                  {name:"Rector Candy",addr:"202 S. 7th St., Hammon, OK 73650",phone:"",sector:"Private",group:"",term:"1/2024–1/2027"},
+                  {name:"Monty Denny",sector:"Public",group:"Roger Mills County Commissioners / Cheyenne & Arapaho Tribes",term:"1/2023–1/2026"},
+                  {name:"Rector Candy",sector:"Private",group:"",term:"1/2024–1/2027"},
                 ]},
                 {county:"Tillman County",members:[
-                  {name:"Roger Heap",addr:"P.O. Box 796, Frederick, OK 73542",phone:"580-770-1405",sector:"Public",group:"Frederick Lions Club",term:"1/2024–1/2027"},
-                  {name:"Eddie Whitworth",addr:"520 N. 18th, Frederick, OK 73542",phone:"335-1175",sector:"Public",group:"Frederick Head Start Parents' Committee (Chairman)",term:"2/2024–2/2027"},
-                  {name:"Araceli Rodriguez",addr:"819 Willard, Frederick, OK 73542",phone:"305-7260",sector:"Private",group:"Frederick Chamber of Commerce",term:"5/2025–5/2028"},
+                  {name:"Roger Heap",sector:"Public",group:"Frederick Lions Club",term:"1/2024–1/2027"},
+                  {name:"Eddie Whitworth",sector:"Public",group:"Frederick Head Start Parents' Committee (Chairman)",term:"2/2024–2/2027"},
+                  {name:"Araceli Rodriguez",sector:"Private",group:"Frederick Chamber of Commerce",term:"5/2025–5/2028"},
                 ]},
                 {county:"Washita County",members:[
-                  {name:"Bruce Mayfield",addr:"11246 N. 2420 Rd., Colony, OK 73021",phone:"580-393-1129",sector:"Private",group:"Town of Sentinel (Sec Exec Committee)",term:"7/2024–7/2027"},
-                  {name:"Betty Mayfield",addr:"11246 N. 2420 Rd., Colony, OK 73021",phone:"",sector:"Low Income",group:"Head Start",term:"5/2025–5/2028"},
-                  {name:"Greg Chandler",addr:"P.O. Box 93, Sentinel, OK 73664",phone:"C: 580-821-0467 / Shop: 580-674-3392",sector:"Public",group:"Washita County Commissioners",term:"1/2023–1/2026"},
+                  {name:"Bruce Mayfield",sector:"Private",group:"Town of Sentinel (Sec Exec Committee)",term:"7/2024–7/2027"},
+                  {name:"Betty Mayfield",sector:"Low Income",group:"Head Start",term:"5/2025–5/2028"},
+                  {name:"Greg Chandler",sector:"Public",group:"Washita County Commissioners",term:"1/2023–1/2026"},
                 ]},
               ].map(({county,members})=>(
                 <div key={county} className="cadc-card-sm">
@@ -4680,7 +4680,6 @@ const PROGRAMS: ProgramData[] = [
                 ["🍽️","Senior Nutrition","28,827 congregate meals + 24,485 home-delivered meals · 327 clients · 6 sites"],
                 ["🏠","Advantage Meals","340,830 frozen meals delivered · avg 736 clients/month · 13 counties"],
                 ["🏡","Weatherization","17 counties served · Priority: elderly, disabled, children 18 and under"],
-                ["💰","VITA Tax Help","91 returns filed · $67,000 income threshold · 5 counties"],
               ].map(([icon,prog,stat])=>(
                 <div key={prog} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:"1px solid #F3F4F6"}}>
                   <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
@@ -5878,13 +5877,10 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
   if (stage === "entry") {
     return (
       <div style={{ maxWidth: 680, color: T.textPrimary }}>
-        <p style={{ color: T.maroon, fontSize: 13, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 16 }}>Helping People. Changing Lives.</p>
-        <h1 style={{ fontSize: "clamp(2rem,3.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
-          Community Action<br />
-          <span style={{ color: T.blue }}>Development</span><br />
-          Corporation
+        <h1 style={{ margin: "0 0 20px" }}>
+          <img src="/images/cadc-logo.png" alt="Community Action Development Corporation" style={{ display: "block", width: "min(100%, 460px)", height: "auto" }} />
         </h1>
-        <p style={{ color: T.textMuted, fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+        <p style={{ color: "#374151", fontSize: 17, lineHeight: 1.7, marginBottom: 24 }}>
           Serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, senior nutrition, and more. Tap the CADC logo to find services in your county.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
@@ -6070,7 +6066,6 @@ export const PUBLIC_DOCUMENTS: { label: string; href: string; note?: string }[] 
   { label: "Title VI Policy (Red River Transportation)", href: "/documents/title-vi-policy.pdf" },
   { label: "Affirmative Action Plan 2023",               href: "/documents/affirmative-action-plan-2023.pdf" },
   { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },
-  { label: "Federal Program Disclosures",                href: "/documents/federal-disclosures.pdf" },
   { label: "Board Meeting Agendas & Minutes",            href: "/board-meetings" },
 ];
 
@@ -6200,9 +6195,10 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
 
         {sectionLabel("About & Transparency")}
         <a href="/about" style={linkStyle}>🏢 About CADC</a>
-        {documents.map(d => (
+        {documents.filter(d => !d.href.includes("federal-disclosures")).map(d => (
           <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📄 {d.label}</a>
         ))}
+        <a href="/board-meetings" style={{ ...linkStyle, fontSize: 13, padding: "9px 12px" }}>📋 Board Meeting Agendas &amp; Minutes</a>
       </div>
     </div>
   );
@@ -6335,9 +6331,10 @@ export function CADCFooter() {
           </div>
           <div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>Transparency &amp; Compliance</p>
-            {documents.map(d => (
+            {documents.filter(d => !d.href.includes("federal-disclosures")).map(d => (
               <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📄 <span>{d.label}</span></a>
             ))}
+            <a href="/board-meetings" style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.75)", fontSize: 13, textDecoration: "none", marginBottom: 8, fontWeight: 600 }}>📋 Board Meeting Agendas &amp; Minutes</a>
 
           </div>
         </div>
