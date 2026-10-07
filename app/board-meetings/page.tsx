@@ -9,7 +9,7 @@ export default function BoardMeetingsPage() {
       <main style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
 
         {/* Header */}
-        <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
+        <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
           Transparency &amp; Governance
         </p>
         <h1 style={{ color: "#0101FF", fontSize: "clamp(1.6rem,3vw,2.4rem)", fontWeight: 800, marginBottom: 8, lineHeight: 1.15, fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -38,7 +38,7 @@ export default function BoardMeetingsPage() {
 
         {/* Meeting Schedule */}
         <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "24px 28px", marginBottom: 24 }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9CA3AF", marginBottom: 14 }}>Board Meeting Schedule</p>
+          <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#4B5563", marginBottom: 14 }}>Board Meeting Schedule</p>
           <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.7 }}>
             The CADC Board of Directors meets quarterly. Special meetings may be called as needed.
             Meeting times and locations are announced in advance. Contact the office for the current schedule.
@@ -50,7 +50,7 @@ export default function BoardMeetingsPage() {
 
         {/* Annual Reports */}
         <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "24px 28px", marginBottom: 40 }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9CA3AF", marginBottom: 14 }}>Related Documents</p>
+          <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#4B5563", marginBottom: 14 }}>Related Documents</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               { label: "FY2025 Annual Report", href: "/documents/annual-report-2025.pdf", note: "Program outcomes, financials, board roster" },
@@ -62,7 +62,7 @@ export default function BoardMeetingsPage() {
                 <span style={{ fontSize: 18, flexShrink: 0 }}>📄</span>
                 <div>
                   <p style={{ fontWeight: 700, fontSize: 13, color: "#0101FF", margin: 0 }}>{d.label}</p>
-                  {d.note && <p style={{ fontSize: 11, color: "#9CA3AF", margin: "2px 0 0" }}>{d.note}</p>}
+                  {d.note && <p style={{ fontSize: 14, color: "#4B5563", margin: "2px 0 0" }}>{d.note}</p>}
                 </div>
               </a>
             ))}

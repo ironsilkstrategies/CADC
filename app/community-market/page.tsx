@@ -10,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function CommunityMarketPage() {
-  redirect("/?program=market");
+  redirect("/?program=community-market");
 }

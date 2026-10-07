@@ -40,7 +40,7 @@ export function CADCJsonLd() {
         { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Weatherization Assistance Program", "url": "https://cadcok.org/?program=weatherization" } },
         { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Senior Nutrition Program", "url": "https://cadcok.org/?program=senior-meals" } },
         { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Advantage Home Delivered Meals", "url": "https://cadcok.org/?program=advantage" } },
-        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Community Market", "url": "https://cadcok.org/?program=market" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Community Market", "url": "https://cadcok.org/?program=community-market" } },
         { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "VITA Free Tax Preparation", "url": "https://cadcok.org/?program=tax-help" } },
       ]
     }

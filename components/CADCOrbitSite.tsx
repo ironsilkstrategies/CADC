@@ -487,9 +487,9 @@ function MarketSchedule({ dark }: { dark: boolean }) {
     cellBorder: dark ? "rgba(255,255,255,0.08)" : "#e5e7eb",
     border: dark ? "rgba(1,1,255,0.2)" : "#C7C7FF",
     bg: dark ? "rgba(1,1,255,0.08)" : "#F0F0FF",
-    dayLabel: dark ? "rgba(255,255,255,0.4)" : "#6b7280",
-    dayNum: dark ? "rgba(255,255,255,0.5)" : "#9ca3af",
-    note: dark ? "rgba(255,255,255,0.35)" : "#9ca3af",
+    dayLabel: dark ? "rgba(255,255,255,0.75)" : "#374151",
+    dayNum: dark ? "rgba(255,255,255,0.5)" : "#4B5563",
+    note: dark ? "rgba(255,255,255,0.35)" : "#4B5563",
     modalBg: dark ? "#00001A" : "#ffffff",
     modalBorder: T.blue,
     modalTitle: dark ? "white" : "#111827",
@@ -659,12 +659,12 @@ function MealCalendar({ dark }: { dark: boolean }) {
     border: dark ? "rgba(1,1,255,0.2)" : "#d4d4f0",
     headerBg: dark ? "rgba(1,1,255,0.25)" : "#0101FF",
     headerText: "white",
-    dayLabel: dark ? "rgba(255,255,255,0.4)" : "#6b7280",
+    dayLabel: dark ? "rgba(255,255,255,0.75)" : "#374151",
     cellBg: dark ? "rgba(255,255,255,0.04)" : "#ffffff",
     cellBorder: dark ? "rgba(1,1,255,0.12)" : "#e5e7eb",
     cellHasMeal: dark ? "rgba(1,1,255,0.18)" : "#eeeeff",
     cellHasMealBorder: dark ? "rgba(1,1,255,0.4)" : "#0101FF",
-    dayNum: dark ? "rgba(255,255,255,0.5)" : "#9ca3af",
+    dayNum: dark ? "rgba(255,255,255,0.5)" : "#4B5563",
     dayNumMeal: dark ? "white" : "#111827",
     headline: dark ? "rgba(255,255,255,0.85)" : "#111827",
     weekend: dark ? "rgba(255,255,255,0.02)" : "#fafafa",
@@ -674,7 +674,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
     modalTitle: dark ? "white" : "#111827",
     modalItem: dark ? "rgba(255,255,255,0.7)" : "#374151",
     overlay: "rgba(0,0,10,0.72)",
-    note: dark ? "rgba(255,255,255,0.35)" : "#9ca3af",
+    note: dark ? "rgba(255,255,255,0.35)" : "#4B5563",
   };
 
   const selectedMeal = selectedDate ? meals[selectedDate] : null;
@@ -1274,7 +1274,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       {/* Hub center */}
       <div style={{
         position:"absolute", left:"50%", top:"50%",
-        width: isMobile ? "clamp(60px,18vw,80px)" : "clamp(96px,18%,116px)",
+        width: isMobile ? "clamp(96px,28vw,124px)" : "clamp(140px,30%,170px)",
         aspectRatio:"1/1",
         transform:`translate(-50%,-50%) scale(${hubS})`,
         borderRadius:"50%",
@@ -1295,7 +1295,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
         {!isSubLevel && (
           <span style={{
             color:T.blue,
-            fontSize: isMobile ? "clamp(0.35rem,1.8vw,0.5rem)" : "clamp(0.35rem,0.8vw,0.5rem)",
+            fontSize: isMobile ? "0.7rem" : "0.8rem",
             fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase",
             textAlign:"center", padding:"0 4px", lineHeight:1.2,
             opacity: orbitTx === "out" ? 0 : 1,
@@ -1352,8 +1352,8 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             )}
             {/* Node disc */}
             <div className="node-disc" style={{
-              width: isMobile ? "clamp(44px,12vw,58px)" : 64,
-              height: isMobile ? "clamp(44px,12vw,58px)" : 64,
+              width: isMobile ? "clamp(56px,15vw,72px)" : 84,
+              height: isMobile ? "clamp(56px,15vw,72px)" : 84,
               borderRadius:"50%",
               background: isActive ? "#E4E4FF" : "white",
               border:`${isActive?3:2}px solid ${T.blue}`,
@@ -1372,12 +1372,12 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             </div>
             <span style={{
               color: T.blue,
-              fontSize: isMobile ? "clamp(0.40rem,1.6vw,0.52rem)" : "clamp(0.42rem,0.85vw,0.58rem)",
+              fontSize: isMobile ? "clamp(0.7rem,3.2vw,0.85rem)" : "0.9rem",
               fontWeight: isActive ? 800 : 700,
               textTransform:"uppercase", letterSpacing:"0.02em",
               textAlign:"center", lineHeight:1.2,
-              width: isMobile ? "clamp(60px,16vw,80px)" : "clamp(80px,14%,110px)",
-              whiteSpace: "nowrap",
+              width: isMobile ? "clamp(80px,24vw,110px)" : 130,
+              whiteSpace: "normal",
               textShadow: "none",
             }}>
               {label}
@@ -1521,7 +1521,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
 
   return (
     <div style={{
-      position: "relative", width: "100%", height: 180,
+      position: "relative", width: "100%", height: "clamp(240px, 38vh, 380px)",
       borderRadius: 14, overflow: "hidden", marginBottom: 20,
       background: "#0a0d1f",
       animation: "fadeSlideIn 0.5s ease",
@@ -1532,16 +1532,9 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
         src={hero.src}
         alt={hero.caption}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        style={{
-          width: "100%",
-          height: "auto",
-          minHeight: 200,
-          maxHeight: 300,
-          objectFit: "cover",
-          objectPosition: "center 20%",
-          display: "block",
-        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block", zIndex: 1 }}
       />
+      <div aria-hidden="true" style={{ position: "absolute", inset: -20, backgroundImage: `url(${hero.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: "blur(18px) brightness(0.85)", zIndex: 0 }} />
       {/* Caption bar */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0,
@@ -1586,6 +1579,10 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/senior-dining-3.JPG",  alt: "Community dining room at CADC senior site" },
     { src: "/images/senior-dining-6.JPG",  alt: "Wide view of community dining room" },
     { src: "/images/senior-kitchen-staff.JPG", alt: "CADC senior nutrition kitchen staff" },
+    { src: "/images/senior-dining-5.JPG",  alt: "Seniors sharing a meal at a CADC site" },
+    { src: "/images/senior-dining-7.JPG",  alt: "Congregate meal service" },
+    { src: "/images/senior-games-1.JPG",   alt: "Seniors enjoying games after lunch" },
+    { src: "/images/senior-staff-1.JPG",   alt: "CADC senior nutrition staff" },
     { src: "/images/hero/hero-19.jpg", alt: "Senior Easter kitchen crew" },
     { src: "/images/hero/hero-20.jpg", alt: "Senior serving line, Easter decorations" },
   ],
@@ -1595,7 +1592,6 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
   ],
   "community-market": [
     { src: "/images/community-market-3.PNG", alt: "Fresh produce at the CADC Community Market" },
-    { src: "/images/community-market-3.PNG", alt: "Fresh produce at the Community Market" },
     { src: "/images/community-market-4.PNG", alt: "Dairy and refrigerated items" },
     { src: "/images/community-market-6.PNG", alt: "Frozen foods section" },
     { src: "/images/community-market-7.PNG", alt: "Refrigerated produce" },
@@ -1634,27 +1630,19 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
 
   return (
     <div style={{
-      width: "100%", borderRadius: 12, overflow: "hidden",
+      width: "100%", height: "clamp(260px, 42vh, 420px)", borderRadius: 12, overflow: "hidden",
       marginBottom: 16, position: "relative",
       background: "#0a0d1f",
     }}>
-      {/* Bottom layer — current photo, fills box */}
+      <div aria-hidden="true" style={{ position: "absolute", inset: -20, backgroundImage: `url(${photos[current]?.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: "blur(18px) brightness(0.85)" }} />
+      {/* Bottom layer — current photo, shown whole */}
       <img
         loading="lazy"
         decoding="async"
         src={photos[current]?.src}
         alt={photos[current]?.alt}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        style={{
-          width: "100%",
-          height: "auto",
-          minHeight: 180,
-          maxHeight: 280,
-          objectFit: "cover",
-          objectPosition: "center 20%",
-          display: "block",
-          opacity: 1,
-        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block", opacity: 1 }}
       />
       {/* Top layer — next photo, fades in */}
       <img
@@ -1667,7 +1655,7 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 20%",
+          objectFit: "contain",
           opacity: transitioning ? 1 : 0,
           transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
         }}
@@ -1920,7 +1908,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
     { label: "Find a Site", icon: "📍", areaId: "congregate", desc: "6 dining locations" },
   ],
   "community-market": [
-    { label: "See Schedule", icon: "📅", areaId: "market-schedule", desc: "September stop times" },
+    { label: "See Schedule", icon: "📅", areaId: "market-schedule", desc: "Monthly stop schedule" },
     { label: "Call Scott", icon: "📞", href: "tel:+15803051964", desc: "580-305-1964" },
   ],
   "tax-help": [
@@ -4343,7 +4331,7 @@ const PROGRAMS: ProgramData[] = [
                   <p style={{fontSize:13,marginBottom:6}}>{r.desc}</p>
                   <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:8}}>
                     {[`Serves ${r.serves}`,`Prep ${r.prep}`,`Cook ${r.cook}`].map(s=>(
-                      <span key={s} style={{fontSize:9,fontWeight:700,padding:"2px 7px",background:"rgba(1,1,255,0.08)",borderRadius:20,color:"#0101FF"}}>{s}</span>
+                      <span key={s} style={{fontSize:12,fontWeight:700,padding:"2px 7px",background:"rgba(1,1,255,0.08)",borderRadius:20,color:"#0101FF"}}>{s}</span>
                     ))}
                   </div>
                   <p style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",margin:"0 0 4px",opacity:0.6}}>Ingredients</p>
@@ -4503,7 +4491,7 @@ const PROGRAMS: ProgramData[] = [
                 <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer"
                   style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:"1px solid rgba(1,1,255,0.1)",textDecoration:"none"}}>
                   <span style={{fontSize:20,flexShrink:0}}>📄</span>
-                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{d.label}</div><div style={{fontSize:13,color:"#6B7280"}}>{d.note}</div></div>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{d.label}</div><div style={{fontSize:13,color:"#374151"}}>{d.note}</div></div>
                 </a>
               ))}
             </div>
@@ -4520,10 +4508,10 @@ const PROGRAMS: ProgramData[] = [
               ].map(([icon,prog,stat])=>(
                 <div key={prog} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:"1px solid #F3F4F6"}}>
                   <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
-                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{prog}</div><div style={{fontSize:12,color:"#6B7280",lineHeight:1.5}}>{stat}</div></div>
+                  <div><div style={{fontWeight:700,fontSize:13,color:"#111827"}}>{prog}</div><div style={{fontSize:12,color:"#374151",lineHeight:1.5}}>{stat}</div></div>
                 </div>
               ))}
-              <p style={{fontSize:13,color:"#9CA3AF",marginTop:10}}>Source: CADC FY2025 Annual Report</p>
+              <p style={{fontSize:13,color:"#4B5563",marginTop:10}}>Source: CADC FY2025 Annual Report</p>
             </div>
 
             <div className="cadc-card">
@@ -4948,9 +4936,9 @@ function SketchField() {
 
 const HERO_POOLS: Record<string, string[]> = {
   "head-start":      ["hs-girl-magnifying-glass","hs-kids-hand-in-hand","hs-teacher-kids-art","hs-girls-magnetic-tiles","hs-kids-swings","hs-boys-watercolor-seeds"].map(n=>`/images/head-start/classroom/${n}.jpg`),
-  "senior-meals":    [12,19,20,21].map(n=>`/images/hero/hero-${n}.jpg`),
+  "senior-meals":    ["/images/senior-dining-1.JPG","/images/senior-dining-2.JPG","/images/senior-dining-6.JPG","/images/hero/hero-19.jpg","/images/hero/hero-20.jpg"],
   "advantage":       [2,24].map(n=>`/images/hero/hero-${n}.jpg`),
-  "community-market":["/images/community-market-1.PNG","/images/community-market-3.PNG","/images/community-market-7.PNG"],
+  "community-market":["/images/community-market-3.PNG","/images/community-market-7.PNG","/images/community-market-4.PNG"],
   "transit":         [14].map(n=>`/images/hero/hero-${n}.jpg`),
   "weatherization":  [17].map(n=>`/images/hero/hero-${n}.jpg`),
   "general":         [6,7,15,16,18,4].map(n=>`/images/hero/hero-${n}.jpg`),
@@ -5114,6 +5102,7 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
   const selectedLabel = "white";
 
   return (
+    <div>
     <svg viewBox="150 60 360 310" style={{ width: "100%", display: "block" }}
       aria-label="SW Oklahoma county map — CADC service counties highlighted in blue">
       <rect x={0} y={0} width={500} height={380} fill={bg} rx={8} />
@@ -5142,12 +5131,12 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
               onMouseEnter={() => setHovered(c.slug)} onMouseLeave={() => setHovered(null)}
               onClick={() => c.slug && onSelectCounty(c.slug)} />
             {!isSel && (
-              <circle cx={c.lx} cy={c.ly - 7} r={2.5}
-                fill={isHov ? "#0101FF" : "rgba(1,1,255,0.5)"}
+              <circle cx={c.lx} cy={c.ly - 7} r={3.5}
+                fill={isHov ? "#0101FF" : "#D97706"} stroke="white" strokeWidth={0.8}
                 style={{ pointerEvents:"none", transition:"fill 0.15s" }} />
             )}
-            <text x={c.lx} y={c.ly + 4} textAnchor="middle" dominantBaseline="middle" fontSize={5.5} fontWeight="700"
-              fill={isSel ? selectedLabel : dark ? "rgba(255,255,255,0.6)" : "#3b3b8a"} style={{ pointerEvents:"none", userSelect:"none" }}>{c.name}</text>
+            <text x={c.lx} y={c.ly + 4} textAnchor="middle" dominantBaseline="middle" fontSize={7} fontWeight="700"
+              fill={isSel ? selectedLabel : dark ? "rgba(255,255,255,0.75)" : "#3b3b8a"} style={{ pointerEvents:"none", userSelect:"none" }}>{c.name}</text>
           </g>
         );
       })}
@@ -5170,12 +5159,12 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
               onClick={() => c.slug && onSelectCounty(c.slug)}
             />
             {!isSel && (
-              <circle cx={c.lx} cy={c.ly - 9} r={3}
-                fill={isHov ? "#0101FF" : "#CC0000"}
+              <circle cx={c.lx} cy={c.ly - 9} r={4}
+                fill={isHov ? "#0101FF" : "#CC0000"} stroke="white" strokeWidth={0.8}
                 style={{ pointerEvents:"none", transition:"fill 0.15s" }} />
             )}
             <text x={c.lx} y={c.ly + 4} textAnchor="middle" dominantBaseline="middle"
-              fontSize={isSel ? 7.5 : 6.5} fontWeight={isSel ? "800" : "700"}
+              fontSize={isSel ? 9 : 8} fontWeight={isSel ? "800" : "700"}
               fill={isSel ? selectedLabel : cadcLabel}
               style={{ pointerEvents:"none", userSelect:"none" }}>
               {c.name}
@@ -5184,14 +5173,16 @@ function OklahomaCountyMap({ selectedCounty, onSelectCounty, dark }: {
         );
       })}
 
-      {/* Legend */}
-      <g transform="translate(10,345)">
-        <circle cx={5} cy={0} r={5} fill="#0101FF"/>
-        <text x={14} y={3} fontSize={7.5} fontWeight="700" fill={dark?"rgba(255,255,255,0.7)":"#374151"}>Primary Service Area (9 counties)</text>
-        <circle cx={5} cy={16} r={5} fill="rgba(1,1,255,0.35)" stroke="#0101FF" strokeWidth={0.8}/>
-        <text x={14} y={19} fontSize={7.5} fontWeight="700" fill={dark?"rgba(255,255,255,0.55)":"#6b7280"}>Extended Service Area</text>
-      </g>
     </svg>
+    <div role="list" aria-label="Map key" style={{ display: "flex", flexWrap: "wrap", gap: "10px 22px", justifyContent: "center", padding: "12px 8px 4px" }}>
+      <span role="listitem" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: dark ? "rgba(255,255,255,0.9)" : "#111827" }}>
+        <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: "50%", background: "#CC0000", border: "2px solid white", boxShadow: "0 0 0 1px #CC0000" }} />Primary Service Area (9 counties)
+      </span>
+      <span role="listitem" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: dark ? "rgba(255,255,255,0.9)" : "#111827" }}>
+        <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: "50%", background: "#D97706", border: "2px solid white", boxShadow: "0 0 0 1px #D97706" }} />Extended Service Area
+      </span>
+    </div>
+    </div>
   );
 }
 
@@ -5763,7 +5754,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 800, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>Work With CADC</p>
             <p style={{ fontSize: 12, color: "#374151", margin: "0 0 12px", lineHeight: 1.5 }}>CADC employs 200+ staff across 9 counties. View current job openings and apply today.</p>
-            <a href="/programs/employment" style={{ display: "inline-block", background: T.blue, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>View Job Openings →</a>
+            <a href="/join-our-team" style={{ display: "inline-block", background: T.blue, color: "white", padding: "10px 18px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none", letterSpacing: "0.02em" }}>View Job Openings →</a>
           </div>
         </div>
 
@@ -6023,7 +6014,7 @@ function SiteMenuDrawer({ open, onClose }: { open: boolean; onClose: () => void 
         ))}
 
         {sectionLabel("Work With Us")}
-        <a href="/programs/employment" style={linkStyle}>💼 Join Our Team</a>
+        <a href="/join-our-team" style={linkStyle}>💼 Join Our Team</a>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {SW_OK_COUNTIES.map(c => (
@@ -6231,7 +6222,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
       />
       {/* Ride the River quick line */}
       <div style={{ background: T.blueLight, padding: "7px 20px", textAlign: "center" }}>
-        <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🚌 Ride the River: (580) 335-2691</a>
+        <a href="tel:+15803352691" style={{ color: T.blue, fontWeight: 700, fontSize: 15, textDecoration: "none" }}>🚌 Ride the River: (580) 335-2691</a>
       </div>
 
       {/* ENTRY — Large tappable logo, centered */}
@@ -6253,13 +6244,34 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             <span style={{ color: T.blue, fontSize: 13, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
 
+          {/* Program tiles — each one is a link */}
+          <div style={{ marginTop: 28, width: "100%", maxWidth: 420, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {PROGRAMS.filter(p => p.slug !== "board").map(p => (
+              <a key={p.slug} href={`/?program=${p.slug}`} style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: "14px 10px", textAlign: "center", textDecoration: "none", boxShadow: "0 2px 8px rgba(1,1,255,0.06)" }}>
+                {PROGRAM_ICONS[p.slug]
+                  ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[p.slug]} alt="" aria-hidden="true" style={{ width: 52, height: 52, objectFit: "contain", display: "block", margin: "0 auto 6px" }} />
+                  : <span style={{ fontSize: 30, display: "block", marginBottom: 6 }}>{p.icon}</span>}
+                <span style={{ color: T.blue, fontWeight: 800, fontSize: 15, display: "block", lineHeight: 1.25 }}>{p.shortName}</span>
+              </a>
+            ))}
+          </div>
+
           {/* CADC Now */}
-          <div style={{ marginTop: 24, width: "100%", maxWidth: 360 }}>
+          <div style={{ marginTop: 24, width: "100%", maxWidth: 420 }}>
             <CADCNow />
           </div>
 
+          {/* Job postings */}
+          <a href="/join-our-team" style={{ marginTop: 16, width: "100%", maxWidth: 420, boxSizing: "border-box", display: "flex", gap: 14, alignItems: "center", background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+            <span style={{ fontSize: 30 }}>💼</span>
+            <span>
+              <span style={{ display: "block", fontWeight: 800, fontSize: 17, color: "#111827" }}>Work With CADC</span>
+              <span style={{ display: "block", fontSize: 15, color: "#374151", marginTop: 2 }}>See job openings and apply →</span>
+            </span>
+          </a>
+
           {/* Universal screener CTA */}
-          <div style={{ marginTop: 16, width: "100%", maxWidth: 360 }}>
+          <div style={{ marginTop: 16, width: "100%", maxWidth: 420 }}>
             <div style={{ background: "white", border: `1.5px solid ${T.border}`, borderRadius: 14, padding: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
               <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 4px" }}>🔍 Not sure where to start?</p>
               <p style={{ fontSize: 12, color: "#374151", margin: "0 0 14px", lineHeight: 1.5 }}>Answer 6 quick questions and we'll show you which CADC programs you may qualify for.</p>
@@ -6287,7 +6299,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             {SW_OK_COUNTIES.map(c => (
               <button key={c.id} onClick={() => tapCounty(c.id)} style={{
                 background: "white", border: `1.5px solid ${T.blue}`, color: T.blue,
-                padding: "8px 16px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer",
+                padding: "10px 18px", borderRadius: 20, fontSize: 15, fontWeight: 700, cursor: "pointer",
               }}>{c.name}</button>
             ))}
           </div>
@@ -6368,6 +6380,12 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
       {/* County landing — show available programs summary */}
       {stage === "county" && !activeProgram && (
         <div style={{ padding: "16px 20px 80px" }}>
+          {activeCountyName?.toLowerCase().includes("canadian") && (
+            <a href="tel:+15803355588" style={{ display: "block", background: "#FFF8F0", border: "2px solid #D97706", borderRadius: 12, padding: "14px 16px", marginBottom: 14, textDecoration: "none", color: "#92400E" }}>
+              <span style={{ display: "block", fontWeight: 800, fontSize: 16 }}>⚡ El Reno Emergency Utility Assistance</span>
+              <span style={{ display: "block", fontSize: 15, marginTop: 4, color: "#374151" }}>Available to El Reno residents only. Tap to call 580-335-5588.</span>
+            </a>
+          )}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {availablePrograms.map(p => (
               <button key={p.slug} onClick={() => tapProgram(p)}
@@ -6377,8 +6395,8 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
                   ? <img loading="lazy" decoding="async" src={PROGRAM_ICONS[p.slug]} alt={p.shortName}
                       style={{ width: 44, height: 44, objectFit: "contain", display: "block", marginBottom: 6 }} />
                   : <span style={{ fontSize: 24, display: "block", marginBottom: 6 }}>{p.icon}</span>}
-                <span style={{ color: T.blue, fontWeight: 700, fontSize: 12, display: "block" }}>{p.shortName}</span>
-                <ProgramTagline slug={p.slug} style={{ color: T.textMuted, fontSize: 10 }} />
+                <span style={{ color: T.blue, fontWeight: 800, fontSize: 16, display: "block" }}>{p.shortName}</span>
+                <ProgramTagline slug={p.slug} style={{ color: T.textMuted, fontSize: 13 }} />
               </button>
             ))}
           </div>
@@ -6663,7 +6681,7 @@ function DesktopStyles() {
       .cadc-dark-content .cadc-card { background: rgba(1,1,255,0.12); border: 1px solid rgba(1,1,255,0.25); border-radius: 12px; padding: 16px; margin: 14px 0; }
       .cadc-dark-content .cadc-card-sm { background: rgba(1,1,255,0.1); border: 1px solid rgba(1,1,255,0.2); border-radius: 10px; padding: 14px; margin: 8px 0; }
       .cadc-dark-content .cadc-card-title { color: rgba(1,1,255,0.9); font-weight: 700; font-size: 12px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-      .cadc-dark-content .cadc-label { color: rgba(204,0,0,0.9); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; }
+      .cadc-dark-content .cadc-label { color: rgba(204,0,0,0.9); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; }
       .cadc-dark-content .cadc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
       .cadc-dark-content .cadc-list li { color: rgba(255,255,255,0.65); font-size: 13px; padding-left: 14px; position: relative; }
       .cadc-dark-content .cadc-list li::before { content: "·"; position: absolute; left: 0; color: ${T.blue}; font-weight: 700; }
@@ -6673,10 +6691,10 @@ function DesktopStyles() {
       .cadc-dark-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: ${T.maroon}; color: white; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 8px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
       .cadc-dark-content .cadc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(204,0,0,0.4); }
       .cadc-dark-content .cadc-link { color: ${T.blue}; font-weight: 700; font-size: 14px; text-decoration: none; }
-      .cadc-dark-content .cadc-note { color: rgba(255,255,255,0.4); font-size: 11px; font-style: italic; margin: 8px 0 0; }
+      .cadc-dark-content .cadc-note { color: rgba(255,255,255,0.75); font-size: 14px; font-style: italic; margin: 8px 0 0; }
       .cadc-dark-content .cadc-fare-table { border: 1px solid rgba(1,1,255,0.25); border-radius: 10px; overflow: hidden; margin: 14px 0; }
       .cadc-dark-content .cadc-fare-header { display: grid; grid-template-columns: 2fr 1fr 1fr; background: rgba(1,1,255,0.25); padding: 8px 14px; }
-      .cadc-dark-content .cadc-fare-header span { color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+      .cadc-dark-content .cadc-fare-header span { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
       .cadc-dark-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 8px 14px; border-top: 1px solid rgba(1,1,255,0.1); }
       .cadc-dark-content .cadc-fare-row span { color: rgba(255,255,255,0.65); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
       .cadc-dark-content .cadc-content { display: flex; flex-direction: column; }
@@ -6702,7 +6720,7 @@ function DesktopStyles() {
       .cadc-light-content .cadc-note { color: #4B5563; font-size: 14px; font-style: italic; margin: 8px 0 0; }
       .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 14px 0; }
       .cadc-light-content .cadc-fare-header { display: grid; grid-template-columns: 2fr 1fr 1fr; background: #0101FF; padding: 10px 14px; }
-      .cadc-light-content .cadc-fare-header span { color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+      .cadc-light-content .cadc-fare-header span { color: white; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
       .cadc-light-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 9px 14px; border-top: 1px solid #e5e7eb; }
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 13px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; gap: 4px; }
@@ -6720,7 +6738,7 @@ function DesktopStyles() {
       .form-submit { width: 100%; background: #CC0000; color: white; border: none; border-radius: 10px; padding: 14px 20px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 18px; transition: background 0.15s ease, transform 0.1s ease; letter-spacing: 0.02em; }
       .form-submit:hover { background: #AA0000; transform: translateY(-1px); }
       .form-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-      .form-note { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 10px; line-height: 1.5; }
+      .form-note { font-size: 14px; color: #4B5563; text-align: center; margin-top: 10px; line-height: 1.5; }
       .form-success { background: #F0FFF4; border: 1.5px solid #059669; border-radius: 12px; padding: 24px; text-align: center; }
       .form-success-icon { font-size: 36px; margin-bottom: 10px; }
       .form-success-title { font-weight: 800; color: #059669; font-size: 16px; margin-bottom: 6px; }
@@ -6796,14 +6814,14 @@ function MobileStyles() {
       .cadc-light-content .cadc-list li { color: #374151; font-size: 13px; padding-left: 14px; position: relative; }
       .cadc-light-content .cadc-list li::before { content: "·"; position: absolute; left: 0; color: ${T.blue}; font-weight: 700; }
       .cadc-light-content .cadc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
-      .cadc-light-content .cadc-chip { background: #E4E4FF; border-radius: 6px; padding: 6px 10px; font-size: 11px; color: ${T.blue}; font-weight: 600; text-align: center; }
+      .cadc-light-content .cadc-chip { background: #E4E4FF; border-radius: 6px; padding: 8px 10px; font-size: 14px; color: ${T.blue}; font-weight: 600; text-align: center; }
       .cadc-light-content .cadc-stack { display: flex; flex-direction: column; gap: 6px; }
       .cadc-light-content .cadc-btn { display: inline-flex; align-items: center; justify-content: center; background: ${T.maroon}; color: white; padding: 12px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 8px; }
       .cadc-light-content .cadc-link { color: ${T.blue}; font-weight: 700; font-size: 13px; text-decoration: none; }
       .cadc-light-content .cadc-note { color: #4B5563; font-size: 14px; font-style: italic; margin: 6px 0 0; }
       .cadc-light-content .cadc-fare-table { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin: 12px 0; }
       .cadc-light-content .cadc-fare-header { display: grid; grid-template-columns: 2fr 1fr 1fr; background: ${T.blue}; padding: 8px 12px; }
-      .cadc-light-content .cadc-fare-header span { color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+      .cadc-light-content .cadc-fare-header span { color: white; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
       .cadc-light-content .cadc-fare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 7px 12px; border-top: 1px solid #e5e7eb; }
       .cadc-light-content .cadc-fare-row span { color: #374151; font-size: 12px; }
       .cadc-light-content .cadc-content { display: flex; flex-direction: column; }

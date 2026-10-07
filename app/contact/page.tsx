@@ -76,7 +76,7 @@ export default function ContactPage() {
       {/* Hero */}
       <header style={{ background: "rgba(248,249,255,0.92)", borderBottom: "1px solid #e5e7eb", padding: "48px 0 40px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px" }}>
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>We're Here to Help</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>We're Here to Help</p>
           <h1 style={{ color: "#0101FF", fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 16 }}>Contact CADC</h1>
           <p style={{ color: "#374151", fontSize: 16, lineHeight: 1.75, maxWidth: 560, marginBottom: 24 }}>
             Reach us by phone, visit a location, or connect with the program director who can help you most.
@@ -96,22 +96,22 @@ export default function ContactPage() {
 
         {/* Office locations */}
         <section aria-labelledby="offices-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Offices</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Offices</p>
           <h2 id="offices-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Find a Location Near You</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))", gap: 16 }}>
             {OFFICES.map(office => (
               <div key={office.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: "20px 22px" }}>
                 <p style={{ color: "#0101FF", fontWeight: 800, fontSize: 14, margin: "0 0 4px" }}>{office.name}</p>
-                <p style={{ color: "#6b7280", fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>{office.address}</p>
-                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 4px" }}>Hours</p>
-                <p style={{ color: "#374151", fontSize: 12, margin: "0 0 12px" }}>{office.hours}</p>
-                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 4px" }}>Programs</p>
-                <p style={{ color: "#374151", fontSize: 12, margin: "0 0 16px", lineHeight: 1.5 }}>{office.programs.join(" · ")}</p>
+                <p style={{ color: "#374151", fontSize: 15, margin: "0 0 12px", lineHeight: 1.5 }}>{office.address}</p>
+                <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 4px" }}>Hours</p>
+                <p style={{ color: "#374151", fontSize: 15, margin: "0 0 12px" }}>{office.hours}</p>
+                <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 4px" }}>Programs</p>
+                <p style={{ color: "#374151", fontSize: 15, margin: "0 0 16px", lineHeight: 1.5 }}>{office.programs.join(" · ")}</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <a href={office.phoneHref} aria-label={`Call ${office.name}`} style={{ flex: 1, minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, background: "#0101FF", color: "white", padding: "9px 12px", borderRadius: 8, fontWeight: 700, fontSize: 11, textDecoration: "none" }}>
+                  <a href={office.phoneHref} aria-label={`Call ${office.name}`} style={{ flex: 1, minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, background: "#0101FF", color: "white", padding: "9px 12px", borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
                     📞 {office.phone}
                   </a>
-                  <a href={office.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={`Directions to ${office.name} via Google Maps`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, background: "#f0f0ff", color: "#0101FF", padding: "9px 12px", borderRadius: 8, fontWeight: 700, fontSize: 11, textDecoration: "none", border: "1px solid rgba(1,1,255,0.2)" }}>
+                  <a href={office.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={`Directions to ${office.name} via Google Maps`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, background: "#f0f0ff", color: "#0101FF", padding: "9px 12px", borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: "none", border: "1px solid rgba(1,1,255,0.2)" }}>
                     🗺️ Directions
                   </a>
                 </div>
@@ -122,13 +122,13 @@ export default function ContactPage() {
 
         {/* Program directors */}
         <section aria-labelledby="directors-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Program Directors</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Program Directors</p>
           <h2 id="directors-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Contact the Right Person</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))", gap: 12 }}>
             {DIRECTORS.map(d => (
               <div key={d.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 18px" }}>
                 <p style={{ color: "#111827", fontWeight: 800, fontSize: 14, margin: "0 0 2px" }}>{d.name}</p>
-                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" }}>{d.title}</p>
+                <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" }}>{d.title}</p>
                 <a href={`tel:+1${d.phone.replace(/\D/g,"")}`} aria-label={`Call ${d.name} at ${d.phone}`} style={{ display: "flex", alignItems: "center", gap: 6, color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none", marginBottom: d.email ? 8 : 0 }}>
                   📞 {d.phone}
                 </a>
@@ -148,7 +148,7 @@ export default function ContactPage() {
 
         {/* Quick contact cards */}
         <section aria-labelledby="quick-contact-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Quick Access</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Quick Access</p>
           <h2 id="quick-contact-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>What Do You Need?</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: 12 }}>
             {[
@@ -171,7 +171,7 @@ export default function ContactPage() {
               >
                 <span style={{ fontSize: 22, display: "block", marginBottom: 8 }} aria-hidden="true">{card.icon}</span>
                 <p style={{ color: "#111827", fontWeight: 700, fontSize: 13, margin: "0 0 4px" }}>{card.title}</p>
-                <p style={{ color: "#6b7280", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{card.desc}</p>
+                <p style={{ color: "#374151", fontSize: 14, margin: 0, lineHeight: 1.4 }}>{card.desc}</p>
               </a>
             ))}
           </div>
@@ -179,7 +179,7 @@ export default function ContactPage() {
 
         {/* Main office CTA */}
         <section style={{ background: "#F0F0FF", borderRadius: 16, padding: "32px 36px", border: "1px solid rgba(1,1,255,0.12)" }} aria-labelledby="main-contact-cta">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Main Office</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Main Office</p>
           <h2 id="main-contact-cta" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.8rem)", fontWeight: 800, marginBottom: 8 }}>Community Action Development Corporation</h2>
           <p style={{ color: "#374151", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
             105 S. Main Street, Frederick, OK 73542<br />

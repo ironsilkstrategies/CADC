@@ -339,38 +339,38 @@ function LocationCard({ loc, onClose }: { loc: CADCLocation; onClose: () => void
             style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "white", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}
           >×</button>
           <p id={`loc-title-${loc.id}`} style={{ color: "white", fontWeight: 800, fontSize: 16, margin: 0, paddingRight: 40 }}>{loc.name}</p>
-          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, margin: "4px 0 0" }}>{loc.city} · {loc.county} County</p>
+          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 15, margin: "4px 0 0" }}>{loc.city} · {loc.county} County</p>
         </div>
 
         {/* Body */}
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Address */}
           <div>
-            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Address</p>
+            <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Address</p>
             <p style={{ color: "#111827", fontSize: 14, margin: 0, lineHeight: 1.5 }}>{loc.address}</p>
           </div>
 
           {/* Hours */}
           {loc.hours && (
             <div>
-              <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Hours</p>
+              <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Hours</p>
               <p style={{ color: "#111827", fontSize: 14, margin: 0 }}>{loc.hours}</p>
             </div>
           )}
 
           {/* Programs */}
           <div>
-            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 6px" }}>Services at this location</p>
+            <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 6px" }}>Services at this location</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {loc.programs.map(p => (
-                <span key={p} style={{ background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.2)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#0101FF", fontWeight: 600 }}>{p}</span>
+                <span key={p} style={{ background: "#E4E4FF", border: "1px solid rgba(1,1,255,0.2)", borderRadius: 6, padding: "4px 10px", fontSize: 15, color: "#0101FF", fontWeight: 600 }}>{p}</span>
               ))}
             </div>
           </div>
 
           {/* Phone */}
           <div>
-            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 6px" }}>Phone</p>
+            <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 6px" }}>Phone</p>
             <a href={loc.phoneHref} style={{ color: "#0101FF", fontWeight: 800, fontSize: 16, textDecoration: "none" }} aria-label={`Call ${loc.name} at ${loc.phone}`}>{loc.phone}</a>
           </div>
 
@@ -381,7 +381,7 @@ function LocationCard({ loc, onClose }: { loc: CADCLocation; onClose: () => void
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Get directions to ${loc.name} via Google Maps`}
-              style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#0101FF", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}
+              style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#0101FF", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: "none" }}
             >
               🗺️ Google Maps
             </a>
@@ -390,14 +390,14 @@ function LocationCard({ loc, onClose }: { loc: CADCLocation; onClose: () => void
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Get directions to ${loc.name} via Apple Maps`}
-              style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#111827", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}
+              style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#111827", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: "none" }}
             >
               🍎 Apple Maps
             </a>
             <button
               onClick={() => downloadVCard(loc)}
               aria-label={`Save ${loc.name} contact information to your phone`}
-              style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#059669", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, border: "none", cursor: "pointer" }}
+              style={{ flex: 1, minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#059669", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}
             >
               💾 Save Contact
             </button>
@@ -406,7 +406,7 @@ function LocationCard({ loc, onClose }: { loc: CADCLocation; onClose: () => void
           <button
             onClick={onClose}
             aria-label="Close"
-            style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px", fontSize: 12, fontWeight: 700, color: "#6b7280", cursor: "pointer" }}
+            style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px", fontSize: 15, fontWeight: 700, color: "#374151", cursor: "pointer" }}
           >
             Close
           </button>
@@ -537,24 +537,24 @@ function HSCard({ hs, onClose }: { hs: typeof HEAD_START_CENTERS[0]; onClose: ()
         <div style={{ background: "#D97706", padding: "20px 24px", position: "relative" }}>
           <button onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "white", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
           <p id={`hs-title-${hs.city}`} style={{ color: "white", fontWeight: 800, fontSize: 16, margin: 0 }}>🏫 {hs.name}</p>
-          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, margin: "4px 0 0" }}>{hs.city} · {hs.county} County</p>
+          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 15, margin: "4px 0 0" }}>{hs.city} · {hs.county} County</p>
         </div>
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Program</p>
+            <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Program</p>
             <p style={{ color: "#111827", fontSize: 14, margin: 0 }}>Head Start & Early Head Start</p>
-            <p style={{ color: "#6b7280", fontSize: 12, margin: "4px 0 0" }}>Free early childhood education — birth through age 5</p>
+            <p style={{ color: "#374151", fontSize: 15, margin: "4px 0 0" }}>Free early childhood education — birth through age 5</p>
           </div>
           <div>
-            <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Enrollment</p>
+            <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Enrollment</p>
             <p style={{ color: "#111827", fontSize: 14, margin: 0 }}>Open year-round · No cost to eligible families</p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            <a href={`tel:+1${hs.phone.replace(/\D/g,"")}`} aria-label={`Call ${hs.name}`} style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#0101FF", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>📞 {hs.phone}</a>
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Google Maps directions" style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#111827", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>🗺️ Directions</a>
-            <a href="/?program=head-start&area=ehs" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#D97706", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 12, textDecoration: "none" }}>Learn About Head Start →</a>
+            <a href={`tel:+1${hs.phone.replace(/\D/g,"")}`} aria-label={`Call ${hs.name}`} style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#0101FF", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: "none" }}>📞 {hs.phone}</a>
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Google Maps directions" style={{ flex: 1, minWidth: 100, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#111827", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: "none" }}>🗺️ Directions</a>
+            <a href="/?program=head-start&area=ehs" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "#D97706", color: "white", padding: "11px 14px", borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: "none" }}>Learn About Head Start →</a>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: 10, fontSize: 12, fontWeight: 700, color: "#6b7280", cursor: "pointer" }}>Close</button>
+          <button onClick={onClose} style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: 10, fontSize: 15, fontWeight: 700, color: "#374151", cursor: "pointer" }}>Close</button>
         </div>
       </div>
     </div>
@@ -574,9 +574,9 @@ function LocationMap() {
 
   return (
     <section aria-labelledby="map-section-title">
-      <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Find Us</p>
+      <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Find Us</p>
       <h2 id="map-section-title" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 8 }}>CADC Service Map</h2>
-      <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 20, lineHeight: 1.6 }}>All CADC locations, Head Start centers, and service counties. Tap any pin for address, hours, directions, and contact info.</p>
+      <p style={{ color: "#374151", fontSize: 14, marginBottom: 20, lineHeight: 1.6 }}>All CADC locations, Head Start centers, and service counties. Tap any pin for address, hours, directions, and contact info.</p>
 
       {/* Filter chips */}
       <div role="group" aria-label="Filter locations by program type" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
@@ -598,7 +598,7 @@ function LocationMap() {
               background: filter === f.id ? "#0101FF" : "white",
               color: filter === f.id ? "white" : "#374151",
               border: `1.5px solid ${filter === f.id ? "#0101FF" : "#e5e7eb"}`,
-              borderRadius: 20, padding: "7px 14px", fontSize: 12,
+              borderRadius: 20, padding: "7px 14px", fontSize: 15,
               fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
             }}
           >{f.label}</button>
@@ -686,7 +686,7 @@ function LocationMap() {
             {n:"Burns Flat",  x:306,  y:197},
             {n:"Cordell",     x:332,  y:191},
           ].map(c => (
-            <text key={c.n} x={c.x} y={c.y} textAnchor="middle" fontSize={3.8} fill="#6b7280" fontStyle="italic" style={{ userSelect: "none", pointerEvents: "none" }}>{c.n}</text>
+            <text key={c.n} x={c.x} y={c.y} textAnchor="middle" fontSize={3.8} fill="#374151" fontStyle="italic" style={{ userSelect: "none", pointerEvents: "none" }}>{c.n}</text>
           ))}
 
           {/* ── Head Start centers — amber diamonds ── */}
@@ -733,12 +733,12 @@ function LocationMap() {
         {LEGEND_ITEMS.map(item => (
           <div key={item.label} role="listitem" style={{ display: "flex", alignItems: "center", gap: 7 }}>
             <div style={{ width: 12, height: 12, borderRadius: "50%", background: item.color, flexShrink: 0, border: "1.5px solid white", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }} aria-hidden="true" />
-            <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>{item.label}</span>
+            <span style={{ fontSize: 15, color: "#374151", fontWeight: 600 }}>{item.label}</span>
           </div>
         ))}
         <div role="listitem" style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <div style={{ width: 10, height: 10, background: "#D97706", transform: "rotate(45deg)", flexShrink: 0, border: "1px solid white" }} aria-hidden="true" />
-          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Head Start Centers</span>
+          <span style={{ fontSize: 15, color: "#374151", fontWeight: 600 }}>Head Start Centers</span>
         </div>
       </div>
 
@@ -765,8 +765,8 @@ function LocationMap() {
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: color, marginTop: 4, flexShrink: 0 }} aria-hidden="true" />
                 <div>
                   <p style={{ color: "#111827", fontWeight: 700, fontSize: 13, margin: "0 0 2px" }}>{loc.name}</p>
-                  <p style={{ color: "#6b7280", fontSize: 11, margin: "0 0 4px" }}>{loc.city} · {loc.county} County</p>
-                  <p style={{ color: "#0101FF", fontSize: 11, fontWeight: 700, margin: 0 }}>{loc.phone}</p>
+                  <p style={{ color: "#374151", fontSize: 14, margin: "0 0 4px" }}>{loc.city} · {loc.county} County</p>
+                  <p style={{ color: "#0101FF", fontSize: 14, fontWeight: 700, margin: 0 }}>{loc.phone}</p>
                 </div>
               </button>
             );
@@ -792,7 +792,7 @@ export default function AboutPage() {
       {/* Hero — no standalone nav needed, shell handles it */}
       <header style={{ background: "rgba(248,249,255,0.92)", borderBottom: "1px solid #e5e7eb", padding: "48px 0 40px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px" }}>
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Southwest Oklahoma · Since 1966</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Southwest Oklahoma · Since 1966</p>
           <h1 style={{ color: "#0101FF", fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: 16 }}>
             About CADC
           </h1>
@@ -832,20 +832,20 @@ export default function AboutPage() {
                   border: "2px solid white", marginBottom: 12,
                 }} aria-hidden="true" />
                 <div style={{ color: "white", fontSize: 22, fontWeight: 900, lineHeight: 1, fontFamily: "'Space Grotesk', sans-serif" }}>{t.year}</div>
-                <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 12, fontWeight: 700, marginTop: 5, marginBottom: 7, letterSpacing: "0.02em" }}>{t.label}</div>
-                <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, lineHeight: 1.6, maxWidth: 170 }}>{t.detail}</div>
+                <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 15, fontWeight: 700, marginTop: 5, marginBottom: 7, letterSpacing: "0.02em" }}>{t.label}</div>
+                <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, lineHeight: 1.6, maxWidth: 170 }}>{t.detail}</div>
               </div>
             ))}
           </div>
         </div>
-        <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, textAlign: "center", padding: "0 0 10px", margin: 0, letterSpacing: "0.08em" }}>← scroll to see full history →</p>
+        <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, textAlign: "center", padding: "0 0 10px", margin: 0, letterSpacing: "0.08em" }}>← scroll to see full history →</p>
       </div>
 
       <main id="main-about-content" style={{ maxWidth: 860, margin: "0 auto", padding: "56px 24px 80px", display: "flex", flexDirection: "column", gap: 56 }}>
 
         {/* Mission */}
         <section aria-labelledby="mission-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Mission</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our Mission</p>
           <h2 id="mission-heading" style={{ color: "#0101FF", fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>Helping People. Changing Lives.</h2>
           <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 660 }}>
             CADC is a private, non-profit Community Action Agency. We work to reduce poverty, revitalize communities, and empower people across Southwest Oklahoma through direct services, advocacy, and partnerships.
@@ -857,7 +857,7 @@ export default function AboutPage() {
 
         {/* History */}
         <section aria-labelledby="history-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our History</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Our History</p>
           <h2 id="history-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 16 }}>Six Decades of Service</h2>
 
           <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.8, maxWidth: 700, marginBottom: 18 }}>
@@ -900,7 +900,7 @@ export default function AboutPage() {
                 {/* Right: content */}
                 <div style={{ paddingLeft: 16, paddingBottom: i < TIMELINE.length - 1 ? 24 : 0, paddingTop: 0 }}>
                   <p style={{ color: "#111827", fontWeight: 700, fontSize: 14, margin: "0 0 4px", lineHeight: 1.3 }}>{t.label}</p>
-                  <p style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.65, margin: 0, maxWidth: 520 }}>{t.detail}</p>
+                  <p style={{ color: "#374151", fontSize: 13, lineHeight: 1.65, margin: 0, maxWidth: 520 }}>{t.detail}</p>
                 </div>
               </div>
             ))}
@@ -909,7 +909,7 @@ export default function AboutPage() {
 
         {/* Service area */}
         <section aria-labelledby="service-area-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Where We Serve</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Where We Serve</p>
           <h2 id="service-area-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 16 }}>9 Counties Across Southwest Oklahoma</h2>
           <ul style={{ display: "flex", flexWrap: "wrap", gap: 8, listStyle: "none", padding: 0, margin: 0 }}>
             {COUNTIES.map(c => (
@@ -930,7 +930,7 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
-          <p style={{ color: "#6b7280", fontSize: 13, marginTop: 12 }}>
+          <p style={{ color: "#374151", fontSize: 13, marginTop: 12 }}>
             Some programs — including Red River Transportation and Advantage Home Delivered Meals — serve additional counties. Visit individual program pages for coverage details.
           </p>
         </section>
@@ -940,7 +940,7 @@ export default function AboutPage() {
 
         {/* Programs */}
         <section aria-labelledby="programs-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>What We Do</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>What We Do</p>
           <h2 id="programs-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Our Programs</h2>
           <ul style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12, listStyle: "none", padding: 0, margin: 0 }}>
             {PROGRAMS.map(p => (
@@ -960,19 +960,19 @@ export default function AboutPage() {
 
         {/* Staff */}
         <section aria-labelledby="staff-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Administrative Staff</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Administrative Staff</p>
           <h2 id="staff-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Our Team</h2>
           <ul style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14, listStyle: "none", padding: 0, margin: 0 }}>
             {STAFF.map(s => (
               <li key={s.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: "20px 22px" }}>
                 <p style={{ color: "#111827", fontWeight: 800, fontSize: 15, margin: "0 0 3px" }}>{s.name}</p>
-                <p style={{ color: "#CC0000", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.09em", margin: "0 0 10px" }}>{s.title}</p>
-                <p style={{ color: "#6b7280", fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{s.bio}</p>
+                <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.09em", margin: "0 0 10px" }}>{s.title}</p>
+                <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.65, margin: "0 0 8px" }}>{s.bio}</p>
                 {"phone" in s && (s as {phone?:string}).phone && (
-                  <a href={`tel:+1${(s as {phone:string}).phone.replace(/\D/g,"")}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 12, textDecoration: "none", marginRight: 12 }}>📞 {(s as {phone:string}).phone}</a>
+                  <a href={`tel:+1${(s as {phone:string}).phone.replace(/\D/g,"")}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 15, textDecoration: "none", marginRight: 12 }}>📞 {(s as {phone:string}).phone}</a>
                 )}
                 {"email" in s && (s as {email?:string}).email && (
-                  <a href={`mailto:${(s as {email:string}).email}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 12, textDecoration: "none" }}>✉️ {(s as {email:string}).email}</a>
+                  <a href={`mailto:${(s as {email:string}).email}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>✉️ {(s as {email:string}).email}</a>
                 )}
               </li>
             ))}
@@ -981,7 +981,7 @@ export default function AboutPage() {
 
         {/* Program Directors */}
         <section aria-labelledby="directors-heading">
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Program Leadership</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Program Leadership</p>
           <h2 id="directors-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Program Directors</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
             {[
@@ -995,7 +995,7 @@ export default function AboutPage() {
             ].map(d => (
               <div key={d.name} style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 18px" }}>
                 <p style={{ fontWeight: 800, fontSize: 14, color: "#111827", margin: "0 0 3px" }}>{d.name}</p>
-                <p style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 10px", lineHeight: 1.4 }}>{d.title}</p>
+                <p style={{ fontSize: 14, color: "#374151", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 10px", lineHeight: 1.4 }}>{d.title}</p>
                 <a href={`tel:+1${d.phone.replace(/\D/g,"")}`} style={{ display: "block", color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none", marginBottom: 4 }}>{d.phone}</a>
                 {d.email && <a href={`mailto:${d.email}`} style={{ display: "block", color: "#0101FF", fontSize: 14, textDecoration: "none" }}>{d.email}</a>}
               </div>
@@ -1005,7 +1005,7 @@ export default function AboutPage() {
 
         {/* Contact CTA */}
         <section aria-labelledby="contact-cta-heading" style={{ background: "#F0F0FF", borderRadius: 20, padding: "40px 36px", border: "1px solid rgba(1,1,255,0.15)" }}>
-          <p style={{ color: "#CC0000", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Get in touch</p>
+          <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 10 }}>Get in touch</p>
           <h2 id="contact-cta-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.8rem)", fontWeight: 800, marginBottom: 8 }}>We're here to help.</h2>
           <p style={{ color: "#374151", fontSize: 14, lineHeight: 1.7, marginBottom: 24, maxWidth: 480 }}>
             {contact.address.street} · {contact.address.city}, {contact.address.state} {contact.address.zip}
