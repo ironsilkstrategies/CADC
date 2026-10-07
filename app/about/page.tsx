@@ -34,17 +34,18 @@ const PROGRAMS = [
 ];
 
 const STAFF = [
+  // Listed by position: executive → agency directors → program directors → administrative staff
   { name: "Leslea Hixson", title: "Executive Director", bio: "Executive Director since January 2024. Previously served as CADC's Head Start/Early Head Start Director. Holds a bachelor's degree in Elementary Education and a master's in Education Administration, with 17 years in public education as a teacher and administrator." },
   { name: "Terry Collom", title: "Chief Financial Officer", bio: "CFO with 16 years at CADC. Bachelor's degree in Accounting from Cameron University and 27 years of experience in the accounting field, including 10 years in private manufacturing." },
+  { name: "Suzi Fletcher", title: "Human Resources Director & Payroll Manager", bio: "Joined CADC in August 2023. Bachelor's and master's degrees in Accounting from Oklahoma State University, with 28 years of experience across payroll, audit, and financial accounting." },
   { name: "Robin Harris", title: "Head Start & Early Head Start Director", bio: "Leads CADC's Head Start and Early Head Start program across 11 centers in Southwest Oklahoma.", phone: "580-726-3343", email: "rharris@cadcok.org" },
   { name: "Gilbert Nuncio", title: "Transit Director", bio: "13 years with CADC. Started as a Red River Transportation driver in 2014, promoted to Maintenance Supervisor in 2016, Route Supervisor in 2018, and Transit Director in 2021." },
   { name: "Robert Meador", title: "Weatherization & Housing Director", bio: "Joined CADC in September 1991. Has overseen weatherization of over a thousand homes and led numerous housing rehabilitation projects over a 35-year career in community action.", phone: "580-305-0853" },
   { name: "Laura Vardell", title: "Senior Nutrition Director", bio: "4 years with CADC, overseeing congregate meal programs across Southwest Oklahoma." },
   { name: "Scott Fraley", title: "Community Market Director", bio: "Brings 30+ years of leadership experience in retail, merchandising, and materials management. Born and raised in Frederick, deeply rooted in the community." },
   { name: "Kristie Jackson", title: "Advantage Director", bio: "Started at CADC as a Head Start teacher in September 2022. Long personal history with CADC — attended Head Start as a child, as did her children." },
-  { name: "Suzi Fletcher", title: "Human Resources Director & Payroll Manager", bio: "Joined CADC in August 2023. Bachelor's and master's degrees in Accounting from Oklahoma State University, with 28 years of experience across payroll, audit, and financial accounting." },
-  { name: "Tiffany Camero", title: "Executive Secretary", bio: "6 years with CADC. U.S. Navy veteran who served 4 years on active duty." },
   { name: "Marty Martin", title: "Purchasing Officer", bio: "3 years with CADC. 30 years of accounting experience in banking." },
+  { name: "Tiffany Camero", title: "Executive Secretary", bio: "6 years with CADC. U.S. Navy veteran who served 4 years on active duty." },
   { name: "Sarah Perez", title: "Bookkeeper", bio: "Joined CADC in January 2023. Working toward a Bachelor's in Accounting at NWOSU." },
 ];
 
@@ -1016,8 +1017,9 @@ export default function AboutPage() {
               { name: "Robin Harris", title: "Head Start / Early Head Start Director", phone: "580-726-3343", email: "rharris@cadcok.org" },
               { name: "Gilbert Nuncio", title: "Red River Transportation Director", phone: "580-335-2691", email: "redriver@pldi.net" },
               { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "" },
-              { name: "Kristie Jackson", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "kjackson@cadcok.org" },
+              { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-335-5588", email: "" },
               { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
+              { name: "Kristie Jackson", title: "Advantage Home Delivered Meals Director", phone: "580-699-8880", email: "kjackson@cadcok.org" },
               { name: "Tiffany Camero", title: "Executive Secretary", phone: "580-335-5588", email: "tcamero@cadcok.org" },
             ].map(d => (
               <div key={d.name} style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 18px" }}>

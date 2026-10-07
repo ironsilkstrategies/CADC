@@ -2007,11 +2007,24 @@ function MarketCommunities() {
 
 
 // Staff & Leadership — editable from /admin
+// Rank a job title so directories always read top-down by position.
+function titleRank(title: string): number {
+  const t = title.toLowerCase();
+  if (t.includes("executive director")) return 0;
+  if (t.includes("chief") || t.includes("cfo")) return 1;
+  if (t.includes("human resources") || t.includes("hr director")) return 2;
+  if (t.includes("director")) return 3;
+  if (t.includes("manager") || t.includes("coordinator") || t.includes("supervisor") || t.includes("officer")) return 4;
+  if (t.includes("secretary") || t.includes("assistant") || t.includes("bookkeeper")) return 5;
+  return 6;
+}
+
 function StaffList() {
   const { staff } = useCms();
+  const sorted = staff.map((p, i) => ({ p, i })).sort((a, b) => titleRank(a.p.title) - titleRank(b.p.title) || a.i - b.i).map(x => x.p);
   return (
     <div className="cadc-stack">
-      {staff.map(p => (
+      {sorted.map(p => (
         <div key={p.name + p.title} className="cadc-card-sm">
           <p className="cadc-card-title">{p.name}</p>
           <p>{p.title}</p>
@@ -3796,6 +3809,17 @@ const PROGRAMS: ProgramData[] = [
 
             <div className="cadc-stack">
 
+              {/* Robin Harris */}
+              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
+                <div>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Robin Harris</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start / Early Head Start Director</p>
+                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 4 }}>580-726-3343</a>
+                  <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block" }}>rharris@cadcok.org</a>
+                </div>
+              </div>
+
               {/* Johnna Mann */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <img
@@ -3830,21 +3854,13 @@ const PROGRAMS: ProgramData[] = [
                 </div>
               </div>
 
-              {/* Allison Zavala */}
+              {/* Frances Baker */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <img
-        loading="lazy"
-        decoding="async"
-                  src="/images/head-start/staff/staff-allison-zavala.jpg"
-                  alt="Allison Zavala — Administrative Assistant"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
-                />
+                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🍳</div>
                 <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Allison Zavala</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
-                  <a href="mailto:azavala@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 6 }}>azavala@cadcok.org</a>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As an Administrative Assistant, I am committed to providing reliable and effective administrative support that enables our team to successfully serve the needs of our community. I take pride in helping ensure that our daily operations run efficiently and that our team has the support necessary to accomplish its goals. I am passionate about community engagement and the role that strong connections play in creating thriving communities."</p>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Frances Baker</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Nutrition &amp; Supplies Supervisor</p>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>Oversees nutrition planning and meal supply coordination across all Head Start and Early Head Start centers.</p>
                 </div>
               </div>
 
@@ -3861,14 +3877,21 @@ const PROGRAMS: ProgramData[] = [
                 </div>
               </div>
 
-              {/* Robin Harris */}
+              {/* Allison Zavala */}
               <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
+                <img
+        loading="lazy"
+        decoding="async"
+                  src="/images/head-start/staff/staff-allison-zavala.jpg"
+                  alt="Allison Zavala — Administrative Assistant"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
+                />
                 <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Robin Harris</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start / Early Head Start Director</p>
-                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 4 }}>580-726-3343</a>
-                  <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block" }}>rharris@cadcok.org</a>
+                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Allison Zavala</p>
+                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
+                  <a href="mailto:azavala@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 6 }}>azavala@cadcok.org</a>
+                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As an Administrative Assistant, I am committed to providing reliable and effective administrative support that enables our team to successfully serve the needs of our community. I take pride in helping ensure that our daily operations run efficiently and that our team has the support necessary to accomplish its goals. I am passionate about community engagement and the role that strong connections play in creating thriving communities."</p>
                 </div>
               </div>
 
@@ -3888,16 +3911,6 @@ const PROGRAMS: ProgramData[] = [
                 <div>
                   <p className="cadc-card-title" style={{ marginBottom: 2 }}>Dori Lientz</p>
                   <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
-                </div>
-              </div>
-
-              {/* Frances Baker */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🍳</div>
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Frances Baker</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Nutrition &amp; Supplies Supervisor</p>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>Oversees nutrition planning and meal supply coordination across all Head Start and Early Head Start centers.</p>
                 </div>
               </div>
 
@@ -4499,7 +4512,22 @@ const PROGRAMS: ProgramData[] = [
         content: (
           <div className="cadc-light-content">
             <p>CADC is governed by a tripartite Board of Directors — public sector, private sector, and low-income community representatives — from each county we serve. Members serve 3-year terms. Source: FY '25 CSBG Board Membership Roster, August 18, 2025.</p>
-            <p style={{fontSize:13,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Chairman: Eddie Whitworth · Frederick, OK</p>
+            <div className="cadc-card" style={{marginTop:14}}>
+              <p className="cadc-label">Executive Committee</p>
+              {[
+                {role:"Chairman",name:"Eddie Whitworth",where:"Tillman County"},
+                {role:"Vice-Chairman",name:"Dave Johnson",where:"Cotton County"},
+                {role:"Secretary",name:"Bruce Mayfield",where:"Washita County"},
+                {role:"Member",name:"Tate Finnell",where:"Beckham County"},
+                {role:"Member",name:"Gary Jennings",where:"Kiowa County"},
+              ].map(o=>(
+                <div key={o.name} style={{display:"flex",justifyContent:"space-between",gap:10,padding:"7px 0",borderBottom:"1px solid #e5e7eb"}}>
+                  <span><strong style={{fontSize:15}}>{o.name}</strong> <span style={{fontSize:13,color:"#4B5563"}}>· {o.where}</span></span>
+                  <span style={{fontSize:13,fontWeight:700,color:"#CC0000",textTransform:"uppercase",letterSpacing:"0.06em",whiteSpace:"nowrap"}}>{o.role}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{fontSize:13,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Members by County</p>
             <div className="cadc-stack">
               {[
                 {county:"Beckham County",members:[
