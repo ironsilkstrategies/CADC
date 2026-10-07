@@ -21,6 +21,7 @@ import { DEFAULT_CONTENT, DEFAULT_SITE_TEXT, DEFAULT_PROGRAM_TAGLINES, fetchCont
 import { EditableText, AdminModeIndicator } from "@/components/InlineEditBar";
 import SpanishLayer from "@/components/SpanishLayer";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { headStartCenters } from "@/lib/locations";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -457,6 +458,20 @@ function downloadICS(content: string, filename: string) {
 
 // ─── Market Schedule Component ────────────────────────────────────────────────
 
+// Renders modals on document.body so position:fixed is relative to the viewport,
+// not a transformed/animated ancestor (which made popups open off-screen on phones).
+function ModalPortal({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+}
+
 function MarketSchedule({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -564,9 +579,10 @@ function MarketSchedule({ dark }: { dark: boolean }) {
 
 
       {selectedDate && selectedStops && selectedDayNum && (
+        <ModalPortal>
         <div
           onClick={() => setSelectedDate(null)}
-          style={{ position: "fixed", inset: 0, zIndex: 200, background: c.overlay, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+          style={{ position: "fixed", inset: 0, zIndex: 1000, background: c.overlay, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
         >
           <div
             onClick={e => e.stopPropagation()}
@@ -596,6 +612,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
             <p style={{ color: c.note, fontSize: 13, fontStyle: "italic", margin: "10px 0 0", textAlign: "center" }}>Tap outside to close</p>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   );
@@ -728,6 +745,43 @@ function MealCalendar({ dark }: { dark: boolean }) {
 
   return (
     <div style={{ position: "relative" }}>
+      <style>{`.meal-list{display:none}@media (max-width:700px){.meal-grid{display:none}.meal-list{display:block}}`}</style>
+
+      {/* Phone layout — readable week-by-week list */}
+      <div className="meal-list">
+        <div style={{ background: c.headerBg, borderRadius: 10, padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+          <span style={{ color: c.headerText, fontWeight: 800, fontSize: 16 }}>{month} {year}</span>
+          <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: 600 }}>Mon–Fri · tap for full menu</span>
+        </div>
+        {weeks.map((week, wi) => {
+          const days = week.map((d, di) => ({ d, di })).filter(x => x.d && meals[dateKey(x.d)]);
+          if (days.length === 0) return null;
+          return (
+            <div key={wi} style={{ border: `1px solid ${c.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 10, background: c.cellBg }}>
+              {days.map(({ d, di }, i) => {
+                const key = dateKey(d as number);
+                const meal = meals[key];
+                return (
+                  <button key={key} onClick={() => setSelectedDate(key)} style={{
+                    display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left",
+                    padding: "12px 14px", background: "none", border: "none", cursor: "pointer",
+                    borderTop: i === 0 ? "none" : `1px solid ${c.cellBorder}`,
+                  }}>
+                    <span style={{ flexShrink: 0, width: 48, textAlign: "center", background: c.cellHasMeal, borderRadius: 8, padding: "5px 0" }}>
+                      <span style={{ display: "block", fontSize: 11, fontWeight: 800, color: T.blue, letterSpacing: "0.06em" }}>{["SUN","MON","TUE","WED","THU","FRI","SAT"][di]}</span>
+                      <span style={{ display: "block", fontSize: 18, fontWeight: 800, color: c.dayNumMeal, lineHeight: 1.1 }}>{d}</span>
+                    </span>
+                    <span style={{ flex: 1, fontSize: 16, fontWeight: 700, color: c.headline, lineHeight: 1.35 }}>{meal.headline}</span>
+                    <span aria-hidden="true" style={{ color: T.blue, fontSize: 18, fontWeight: 700 }}>›</span>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="meal-grid">
       {/* Calendar header */}
       <div style={{ background: c.headerBg, borderRadius: "10px 10px 0 0", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ color: c.headerText, fontWeight: 800, fontSize: 13, letterSpacing: "0.05em" }}>
@@ -772,7 +826,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
                     <>
                       <span style={{ fontSize: 12, fontWeight: 800, color: hasMeal ? c.dayNumMeal : weekend ? c.weekendText : c.dayNum, lineHeight: 1 }}>{day}</span>
                       {meal && (
-                        <span style={{ fontSize: 13, fontWeight: 600, color: c.headline, lineHeight: 1.3, wordBreak: "break-word" }}>{meal.headline}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: c.headline, lineHeight: 1.3, overflowWrap: "normal", wordBreak: "normal", hyphens: "auto" }}>{meal.headline}</span>
                       )}
                     </>
                   )}
@@ -782,6 +836,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
           </div>
         ))}
       </div>
+      </div>
 
       {/* Note */}
       <p style={{ fontSize: 13, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
@@ -790,10 +845,11 @@ function MealCalendar({ dark }: { dark: boolean }) {
 
       {/* Day detail modal */}
       {selectedDate && selectedMeal && selectedDayNum && (
+        <ModalPortal>
         <div
           onClick={() => setSelectedDate(null)}
           style={{
-            position: "fixed", inset: 0, zIndex: 200,
+            position: "fixed", inset: 0, zIndex: 1000,
             background: c.overlay,
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: 24,
@@ -837,12 +893,23 @@ function MealCalendar({ dark }: { dark: boolean }) {
             <p style={{ color: c.note, fontSize: 13, fontStyle: "italic", margin: "12px 0 0", textAlign: "center" }}>Tap outside to close</p>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   );
 }
 
 // MealCalendarPanel detects desktop (dark) vs mobile (light) context
+// Senior Nutrition congregate sites — per Laura Vardell (Project Director), Aug 25 2026
+const SENIOR_CENTERS = [
+  {name:"Frederick",county:"Tillman County",addr:"100 E Grand, Frederick, OK 73542",phone:"580-335-7026",href:"tel:+15803357026"},
+  {name:"Ringling",county:"Jefferson County",addr:"200 D St., Ringling, OK 73456",phone:"580-662-2362",href:"tel:+15806622362"},
+  {name:"Cache",county:"Comanche County",addr:"416 West C Ave., Cache, OK 73527",phone:"580-429-3427",href:"tel:+15804293427"},
+  {name:"Temple",county:"Cotton County",addr:"201 S Commercial, Temple, OK 73568",phone:"580-342-6944",href:"tel:+15803426944"},
+  {name:"Walters",county:"Cotton County",addr:"500 E California, Walters, OK 73572",phone:"580-875-9044",href:"tel:+15808759044"},
+  {name:"Ryan",county:"Jefferson County",addr:"400 Taylor St. Apt #8, Ryan, OK 73565",phone:"580-757-2412",href:"tel:+15807572412"},
+];
+
 function MealCalendarPanel() {
   const cms = useCms(); const mn = newerSchedule(cms.seniorMenu, MENU_DATA);
   return (
@@ -859,6 +926,18 @@ function MealCalendarPanel() {
         📅 Save to Calendar (.ics)
       </button>
       <p style={{ fontSize: 13, color: "#4B5563", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
+      <div style={{ margin: "6px 0 12px" }}>
+        <p className="cadc-label" style={{ marginBottom: 8 }}>Where meals are served</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 8 }}>
+          {SENIOR_CENTERS.map(c => (
+            <div key={c.name} style={{ background: "white", border: "1px solid #d8dcf2", borderRadius: 10, padding: "10px 12px" }}>
+              <p style={{ fontSize: 15, fontWeight: 800, color: "#0101FF", margin: "0 0 2px" }}>{c.name}</p>
+              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`} target="_blank" rel="noopener noreferrer" style={{ display: "block", fontSize: 14, color: "#1f2937", margin: "0 0 4px" }}>📍 {c.addr}</a>
+              <a href={c.href} style={{ fontSize: 14, fontWeight: 700, color: "#0101FF", textDecoration: "none" }}>📞 {c.phone}</a>
+            </div>
+          ))}
+        </div>
+      </div>
       <div style={{ marginTop: 4, padding: "10px 14px", background: "#f0f0ff", borderRadius: 10 }}>
         <p style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#CC0000", margin: "0 0 6px" }}>About our menus</p>
         <p style={{ fontSize: 12, color: "#374151", margin: 0, lineHeight: 1.6 }}>Menus are planned by a registered dietitian and reviewed quarterly by Laura Vardell and our site managers.</p>
@@ -1856,6 +1935,7 @@ function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; 
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
   return (
+    <ModalPortal>
     <div onClick={onClose} role="dialog" aria-modal="true" aria-label={`${county} details`}
       style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(10,22,40,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 16, padding: 22, maxWidth: 420, width: "100%", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
@@ -1885,6 +1965,7 @@ function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; 
         </div>
       </div>
     </div>
+    </ModalPortal>
   );
 }
 
@@ -4160,6 +4241,17 @@ const PROGRAMS: ProgramData[] = [
         content: (
           <div className="cadc-light-content">
             <p>Hot, nutritious meals served in a welcoming environment at 6 community sites across Southwest Oklahoma. Seniors enjoy a meal with others, participate in activities, socialize, and build friendships.</p>
+            <p className="cadc-label" style={{marginTop:4}}>Our 6 senior centers</p>
+            <div className="cadc-stack">
+              {SENIOR_CENTERS.map(s=>(
+                <div key={s.name} className="cadc-card-sm">
+                  <p className="cadc-card-title">{s.name} Senior Center</p>
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.addr)}`} target="_blank" rel="noopener noreferrer" style={{display:"block",fontSize:15,color:"#1f2937",margin:"2px 0 2px",textDecoration:"underline",textDecorationColor:"#c7cbe8"}}>📍 {s.addr}</a>
+                  <p style={{fontSize:13,color:"#4B5563",margin:"0 0 6px"}}>{s.county}</p>
+                  <a href={s.href} className="cadc-link">📞 {s.phone}</a>
+                </div>
+              ))}
+            </div>
             <PhotoStrip dark={false} photos={[
               { src: PHOTOS.seniorNutrition.frederickDining, alt: "Frederick senior nutrition congregate dining room, serving line" },
               { src: PHOTOS.seniorNutrition.frederickWide, alt: "Full house at the Frederick senior nutrition center" },
@@ -4179,24 +4271,6 @@ const PROGRAMS: ProgramData[] = [
                   <p>$7.00 per meal</p>
                 </div>
               </div>
-            </div>
-            <p className="cadc-label" style={{marginTop:14}}>Our 6 congregate sites</p>
-            <div className="cadc-stack">
-              {[
-                {name:"Frederick",county:"Tillman County",addr:"100 E Grand, Frederick, OK 73542",phone:"580-335-7026",href:"tel:+15803357026"},
-                {name:"Ringling",county:"Jefferson County",addr:"200 D St., Ringling, OK 73456",phone:"580-662-2362",href:"tel:+15806622362"},
-                {name:"Cache",county:"Comanche County",addr:"416 West C Ave., Cache, OK 73527",phone:"580-429-3427",href:"tel:+15804293427"},
-                {name:"Temple",county:"Cotton County",addr:"201 S Commercial, Temple, OK 73568",phone:"580-342-6944",href:"tel:+15803426944"},
-                {name:"Walters",county:"Cotton County",addr:"500 E California, Walters, OK 73572",phone:"580-875-9044",href:"tel:+15808759044"},
-                {name:"Ryan",county:"Jefferson County",addr:"400 Taylor St. Apt #8, Ryan, OK 73565",phone:"580-757-2412",href:"tel:+15807572412"},
-              ].map(s=>(
-                <div key={s.name} className="cadc-card-sm">
-                  <p className="cadc-card-title">{s.name}</p>
-                  <p style={{fontSize:13,opacity:0.6,margin:"2px 0 4px"}}>{s.county}</p>
-                  <p>{s.addr}</p>
-                  <a href={s.href} className="cadc-link">{s.phone}</a>
-                </div>
-              ))}
             </div>
           </div>
         ),

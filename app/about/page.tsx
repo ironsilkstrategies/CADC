@@ -339,7 +339,8 @@ function LocationCard({ loc, onClose }: { loc: CADCLocation; onClose: () => void
             style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "white", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}
           >×</button>
           <p id={`loc-title-${loc.id}`} style={{ color: "white", fontWeight: 800, fontSize: 16, margin: 0, paddingRight: 40 }}>{loc.name}</p>
-          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 15, margin: "4px 0 0" }}>{loc.city} · {loc.county} County</p>
+          <p style={{ color: "rgba(255,255,255,0.9)", fontSize: 15, margin: "4px 0 0" }}>{loc.address}</p>
+          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, margin: "2px 0 0" }}>{loc.county} County</p>
         </div>
 
         {/* Body */}
@@ -766,7 +767,8 @@ function LocationMap() {
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: color, marginTop: 4, flexShrink: 0 }} aria-hidden="true" />
                 <div>
                   <p style={{ color: "#111827", fontWeight: 700, fontSize: 13, margin: "0 0 2px" }}>{loc.name}</p>
-                  <p style={{ color: "#374151", fontSize: 14, margin: "0 0 4px" }}>{loc.city} · {loc.county} County</p>
+                  <p style={{ color: "#374151", fontSize: 14, margin: "0 0 2px" }}>{loc.address}</p>
+                  <p style={{ color: "#4B5563", fontSize: 13, margin: "0 0 4px" }}>{loc.county} County</p>
                   <p style={{ color: "#0101FF", fontSize: 14, fontWeight: 700, margin: 0 }}>{loc.phone}</p>
                 </div>
               </button>
