@@ -130,8 +130,8 @@ export const complianceDocs: ComplianceDoc[] = [
     program: "transit",
   },
   {
-    label: "2024 Annual Report",
-    href: "/docs/annual-report-2024.pdf",
+    label: "2025 Annual Report",
+    href: "/documents/annual-report-2025.pdf",
     legacyHref:
       "https://www.cadcok.org/_files/ugd/f04cf2_5cfc2778d2fd422196f04c7a00c92b4c.pdf",
     program: "agency",
@@ -188,11 +188,11 @@ export const programDirectors = {
     email: "",
   },
   advantage: {
-    name: "Kristie",
+    name: "Kristie Jackson",
     title: "Advantage Home Delivered Meals — Lawton Office",
     phone: "580-699-8880",
     phoneHref: "tel:+15806998880",
-    email: "",
+    email: "kjackson@cadcok.org",
   },
   communityMarket: {
     name: "Scott Fraley",

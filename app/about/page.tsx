@@ -226,11 +226,11 @@ const LOCATIONS: CADCLocation[] = [
     name: "Head Start — Administrative Office",
     city: "Hobart",
     county: "Kiowa",
-    address: "Hobart, OK 73651",
+    address: "400 N. Randlett St., Hobart, OK 73651",
     phone: "580-726-3343",
     phoneHref: "tel:+15807263343",
     programs: ["Head Start & Early Head Start"],
-    mapsQuery: "CADC Head Start Hobart OK 73651",
+    mapsQuery: "400 N Randlett St, Hobart, OK 73651",
     hours: "Mon–Fri 8:00am–5:00pm",
   },
   {
@@ -472,17 +472,17 @@ const LOCATION_SVG: Record<string, { x: number; y: number }> = {
 // Head Start centers — 11 locations across SW Oklahoma
 const HEAD_START_CENTERS = [
   // Per Robin Harris email 9/1/2026 — 11 centers, 7 counties
-  { name: "Erick Head Start",       city: "Erick",       county: "Beckham",      x: 254, y: 206, phone: "580-726-3343", mapsQuery: "Erick OK 73645" },
-  { name: "Sayre Head Start",       city: "Sayre",       county: "Beckham",      x: 268, y: 196, phone: "580-726-3343", mapsQuery: "Sayre OK 73662" },
-  { name: "Temple Head Start",      city: "Temple",      county: "Cotton",       x: 368, y: 298, phone: "580-726-3343", mapsQuery: "Temple OK 73568" },
-  { name: "Ringling Head Start",    city: "Ringling",    county: "Jefferson",    x: 406, y: 326, phone: "580-726-3343", mapsQuery: "Ringling OK 73456" },
-  { name: "Hobart Head Start",      city: "Hobart",      county: "Kiowa",        x: 316, y: 248, phone: "580-726-3343", mapsQuery: "Hobart OK 73651" },
-  { name: "Hammon Head Start",      city: "Hammon",      county: "Roger Mills",  x: 262, y: 148, phone: "580-726-3343", mapsQuery: "Hammon OK 73650" },
-  { name: "Grandfield Head Start",  city: "Grandfield",  county: "Tillman",      x: 322, y: 308, phone: "580-726-3343", mapsQuery: "Grandfield OK 73546" },
-  { name: "Frederick Head Start",   city: "Frederick",   county: "Tillman",      x: 338, y: 284, phone: "580-726-3343", mapsQuery: "Frederick OK 73542" },
-  { name: "Burns Flat Head Start",  city: "Burns Flat",  county: "Washita",      x: 308, y: 192, phone: "580-726-3343", mapsQuery: "Burns Flat OK 73624" },
-  { name: "Cordell Head Start",     city: "Cordell",     county: "Washita",      x: 330, y: 186, phone: "580-726-3343", mapsQuery: "Cordell OK 73632" },
-  { name: "Sentinel Head Start",    city: "Sentinel",    county: "Washita",      x: 318, y: 202, phone: "580-726-3343", mapsQuery: "Sentinel OK 73664" },
+  { name: "Erick Head Start",       city: "Erick",       county: "Beckham",      x: 254, y: 206, address: "611 W. 3rd, Erick, OK 73645", phone: "580-526-3198", mapsQuery: "611 W. 3rd, Erick, OK 73645" },
+  { name: "Sayre Head Start",       city: "Sayre",       county: "Beckham",      x: 268, y: 196, address: "400 E. Hanna, Sayre, OK 73662", phone: "580-928-5417", mapsQuery: "400 E. Hanna, Sayre, OK 73662" },
+  { name: "Temple Head Start",      city: "Temple",      county: "Cotton",       x: 368, y: 298, address: "102 W. Texas, Temple, OK 73568", phone: "580-342-5022", mapsQuery: "102 W. Texas, Temple, OK 73568" },
+  { name: "Ringling Head Start",    city: "Ringling",    county: "Jefferson",    x: 406, y: 326, address: "Hwy 89 & Oak, Ringling, OK 73456", phone: "580-662-2987", mapsQuery: "Hwy 89 & Oak, Ringling, OK 73456" },
+  { name: "Hobart Head Start",      city: "Hobart",      county: "Kiowa",        x: 316, y: 248, address: "400 N. Randlett, Hobart, OK 73651", phone: "580-726-3648", mapsQuery: "400 N. Randlett, Hobart, OK 73651" },
+  { name: "Hammon Head Start",      city: "Hammon",      county: "Roger Mills",  x: 262, y: 148, address: "8th & Shockey, Hammon, OK 73650", phone: "580-473-9110", mapsQuery: "8th & Shockey, Hammon, OK 73650" },
+  { name: "Grandfield Head Start",  city: "Grandfield",  county: "Tillman",      x: 322, y: 308, address: "416 S. Main, Grandfield, OK 73546", phone: "580-479-3288", mapsQuery: "416 S. Main, Grandfield, OK 73546" },
+  { name: "Frederick Head Start",   city: "Frederick",   county: "Tillman",      x: 338, y: 284, address: "521 E. Gladstone, Frederick, OK 73542", phone: "580-335-5644", mapsQuery: "521 E. Gladstone, Frederick, OK 73542" },
+  { name: "Burns Flat Head Start",  city: "Burns Flat",  county: "Washita",      x: 308, y: 192, address: "100A Cimarron, Burns Flat, OK 73624", phone: "580-562-1776", mapsQuery: "100A Cimarron, Burns Flat, OK 73624" },
+  { name: "Cordell Head Start",     city: "Cordell",     county: "Washita",      x: 330, y: 186, address: "511 E. Kiowa, Cordell, OK 73632", phone: "580-832-2454", mapsQuery: "511 E. Kiowa, Cordell, OK 73632" },
+  { name: "Sentinel Head Start",    city: "Sentinel",    county: "Washita",      x: 318, y: 202, address: "114 S. 3rd St., Sentinel, OK 73664", phone: "580-393-4303", mapsQuery: "114 S. 3rd St., Sentinel, OK 73664" },
 ];
 
 // SVG Pin component — sleek minimal teardrop
@@ -537,7 +537,8 @@ function HSCard({ hs, onClose }: { hs: typeof HEAD_START_CENTERS[0]; onClose: ()
         <div style={{ background: "#D97706", padding: "20px 24px", position: "relative" }}>
           <button onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "white", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
           <p id={`hs-title-${hs.city}`} style={{ color: "white", fontWeight: 800, fontSize: 16, margin: 0 }}>🏫 {hs.name}</p>
-          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 15, margin: "4px 0 0" }}>{hs.city} · {hs.county} County</p>
+          <p style={{ color: "rgba(255,255,255,0.9)", fontSize: 15, margin: "4px 0 0" }}>{hs.address}</p>
+          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, margin: "2px 0 0" }}>{hs.county} County</p>
         </div>
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
@@ -774,6 +775,30 @@ function LocationMap() {
         </div>
       </div>
 
+      {(filter === "all" || filter === "head start") && (
+        <div style={{ marginTop: 24 }}>
+          <h3 style={{ color: "#0101FF", fontSize: 14, fontWeight: 800, marginBottom: 12 }}>Head Start Centers</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))", gap: 10 }}>
+            {HEAD_START_CENTERS.map(hs => (
+              <button
+                key={hs.name}
+                onClick={() => setSelectedHS(hs)}
+                aria-label={`View details for ${hs.name}`}
+                style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 16px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 12 }}
+              >
+                <div style={{ width: 10, height: 10, transform: "rotate(45deg)", background: "#D97706", marginTop: 5, flexShrink: 0 }} aria-hidden="true" />
+                <div>
+                  <p style={{ color: "#111827", fontWeight: 700, fontSize: 13, margin: "0 0 2px" }}>{hs.name}</p>
+                  <p style={{ color: "#374151", fontSize: 14, margin: "0 0 2px" }}>{hs.address}</p>
+                  <p style={{ color: "#4B5563", fontSize: 13, margin: "0 0 4px" }}>{hs.county} County</p>
+                  <p style={{ color: "#0101FF", fontSize: 14, fontWeight: 700, margin: 0 }}>{hs.phone}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Detail modals */}
       {selected && <LocationCard loc={selected} onClose={() => setSelected(null)} />}
       {selectedHS && <HSCard hs={selectedHS} onClose={() => setSelectedHS(null)} />}
@@ -784,7 +809,7 @@ function LocationMap() {
 // ─── Main About Page ──────────────────────────────────────────────────────────
 
 export default function AboutPage() {
-  const annualReport = complianceDocs.find((d: { label: string }) => d.label === "2024 Annual Report");
+  const annualReport = complianceDocs.find((d: { label: string }) => d.label === "2025 Annual Report");
 
   return (
     <CADCShell mainId="main-about-content">
@@ -804,8 +829,8 @@ export default function AboutPage() {
               📞 {contact.mainPhone}
             </a>
             {annualReport && (
-              <a href={(annualReport as { href: string }).href} target="_blank" rel="noopener noreferrer" aria-label="Download 2024 Annual Report (opens in new tab)" style={{ border: "1px solid #0101FF", color: "#0101FF", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
-                2024 Annual Report ↗
+              <a href={(annualReport as { href: string }).href} target="_blank" rel="noopener noreferrer" aria-label="Download 2025 Annual Report (opens in new tab)" style={{ border: "1px solid #0101FF", color: "#0101FF", padding: "12px 24px", borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
+                2025 Annual Report ↗
               </a>
             )}
           </div>
@@ -989,7 +1014,7 @@ export default function AboutPage() {
               { name: "Robin Harris", title: "Head Start / Early Head Start Director", phone: "580-726-3343", email: "rharris@cadcok.org" },
               { name: "Gilbert Nuncio", title: "Red River Transportation Director", phone: "580-335-2691", email: "redriver@pldi.net" },
               { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "" },
-              { name: "Kristie", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "" },
+              { name: "Kristie Jackson", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "kjackson@cadcok.org" },
               { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
               { name: "Tiffany Camero", title: "Executive Secretary", phone: "580-335-5588", email: "tcamero@cadcok.org" },
             ].map(d => (

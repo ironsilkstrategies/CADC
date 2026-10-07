@@ -21,6 +21,7 @@ import { DEFAULT_CONTENT, DEFAULT_SITE_TEXT, DEFAULT_PROGRAM_TAGLINES, fetchCont
 import { EditableText, AdminModeIndicator } from "@/components/InlineEditBar";
 import SpanishLayer from "@/components/SpanishLayer";
 import Link from "next/link";
+import { headStartCenters } from "@/lib/locations";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // ─── #8 Spanish / English translation map ────────────────────────────────────
@@ -1072,7 +1073,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
   const hubPulse = useRef(0);
 
   const RADIUS = isMobile ? 36 : 38;
-  const SIZE = isMobile ? "min(92vw,400px)" : "min(80vw,420px)";
+  const SIZE = isMobile ? "min(92vw,400px)" : "min(35vw, calc(100vh - 150px), 560px)";
   const NODE_SIZE = isMobile ? 54 : 78;
 
   // Initialize / sync node springs when items change
@@ -1319,7 +1320,7 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
       {/* Hub center */}
       <div style={{
         position:"absolute", left:"50%", top:"50%",
-        width: isMobile ? "clamp(96px,28vw,124px)" : "clamp(140px,30%,170px)",
+        width: isMobile ? "clamp(96px,28vw,124px)" : "clamp(110px,24%,150px)",
         aspectRatio:"1/1",
         transform:`translate(-50%,-50%) scale(${hubS})`,
         borderRadius:"50%",
@@ -1397,8 +1398,8 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
             )}
             {/* Node disc */}
             <div className="node-disc" style={{
-              width: isMobile ? "clamp(56px,15vw,72px)" : 84,
-              height: isMobile ? "clamp(56px,15vw,72px)" : 84,
+              width: isMobile ? "clamp(56px,15vw,72px)" : 76,
+              height: isMobile ? "clamp(56px,15vw,72px)" : 76,
               borderRadius:"50%",
               background: isActive ? "#E4E4FF" : "white",
               border:`${isActive?3:2}px solid ${T.blue}`,
@@ -1421,9 +1422,12 @@ function SpringOrbit({ stage, activeProgram, availablePrograms, glowNode, popNod
               fontWeight: isActive ? 800 : 700,
               textTransform:"uppercase", letterSpacing:"0.02em",
               textAlign:"center", lineHeight:1.2,
-              width: isMobile ? "clamp(80px,24vw,110px)" : 130,
+              maxWidth: isMobile ? "clamp(80px,24vw,110px)" : 120,
               whiteSpace: "normal",
               textShadow: "none",
+              background: "rgba(255,255,255,0.92)",
+              borderRadius: 6,
+              padding: "1px 5px",
             }}>
               {label}
             </span>
@@ -1460,16 +1464,16 @@ const PHOTOS = {
 
   // ── Community Market ──────────────────────────────────────────────────────
   communityMarket: {
-    trailerHero:         "/images/community-market-3.PNG",
-    frozenMeals:         "/images/community-market-2.PNG",
-    freshProduce:        "/images/community-market-3.PNG",
-    dairy:               "/images/community-market-4.PNG",
-    dryGoods:            "/images/community-market-5.PNG",
-    frozen:              "/images/community-market-6.PNG",
-    refrigeratedProduce: "/images/community-market-7.PNG",
-    household:           "/images/community-market-8.PNG",
-    pantry:              "/images/community-market-9.PNG",
-    refrigeratedExtra:   "/images/community-market-10.PNG",
+    trailerHero:         "/images/community-market-7.PNG",
+    frozenMeals:         "/images/community-market-3.PNG",
+    freshProduce:        "/images/community-market-7.PNG",
+    dairy:               "/images/community-market-5.PNG",
+    dryGoods:            "/images/community-market-9.PNG",
+    frozen:              "/images/community-market-2.PNG",
+    refrigeratedProduce: "/images/community-market-6.PNG",
+    household:           "/images/community-market-10.PNG",
+    pantry:              "/images/community-market-8.PNG",
+    refrigeratedExtra:   "/images/community-market-4.PNG",
   },
 
   // ── Head Start ────────────────────────────────────────────────────────────
@@ -1553,7 +1557,7 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
     },
     "community-market": {
       src: PHOTOS.communityMarket.trailerHero,
-      caption: "The CADC Community Market — bringing fresh food to communities across Southwest Oklahoma",
+      caption: "Fresh produce on board the CADC Community Market",
     },
     "head-start": {
       src: PHOTOS.headStart.classroomActivity,
@@ -1565,40 +1569,45 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
   if (!hero) return null;
 
   return (
-    <div style={{
-      position: "relative", width: "100%", height: "clamp(240px, 38vh, 380px)",
-      borderRadius: 14, overflow: "hidden", marginBottom: 20,
-      background: "#0a0d1f",
+    <figure style={{
+      margin: "0 0 20px", borderRadius: 14, overflow: "hidden",
+      border: `1px solid ${dark ? "rgba(1,1,255,0.25)" : "#d8dcf2"}`,
+      background: dark ? "#0d1030" : "#ffffff",
+      boxShadow: "0 4px 18px rgba(1,1,255,0.08)",
       animation: "fadeSlideIn 0.5s ease",
     }}>
-      <img
-        loading="lazy"
-        decoding="async"
-        src={hero.src}
-        alt={hero.caption}
-        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block", zIndex: 1 }}
-      />
-      <div aria-hidden="true" style={{ position: "absolute", inset: -20, backgroundImage: `url(${hero.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: "blur(18px) brightness(0.85)", zIndex: 0 }} />
-      {/* Caption bar */}
       <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0,
-        background: "linear-gradient(to top, rgba(0,0,20,0.65) 0%, transparent 100%)",
-        padding: "24px 14px 10px",
+        position: "relative", width: "100%", height: "clamp(240px, 40vh, 420px)",
+        background: dark ? "#0a0d1f" : "#eef0fb",
       }}>
-        <p style={{
-          color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: 600,
-          fontStyle: "italic", margin: 0, letterSpacing: "0.03em",
-          textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-        }}>{hero.caption}</p>
+        <img
+          loading="lazy"
+          decoding="async"
+          src={hero.src}
+          alt={hero.caption}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        />
       </div>
-    </div>
+      <figcaption style={{
+        padding: "10px 14px", fontSize: 14, fontWeight: 600, fontStyle: "italic",
+        color: dark ? "rgba(255,255,255,0.85)" : "#374151",
+        borderTop: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#e5e7f5"}`,
+      }}>{hero.caption}</figcaption>
+    </figure>
   );
 }
 
 // ─── Sub-Area Photo Carousel ──────────────────────────────────────────────────
 // Auto-cycles through program photos every 3.5s with crossfade.
 // Shown at top of sub-area content panels when the program has photos.
+
+const HS_CENTER_COUNTY: Record<string, string> = {
+  "hs-burns-flat": "Washita County", "hs-cordell": "Washita County", "hs-erick": "Beckham County",
+  "hs-frederick": "Tillman County", "hs-grandfield": "Tillman County", "hs-hammon": "Roger Mills County",
+  "hs-hobart": "Kiowa County", "hs-ringling": "Jefferson County", "hs-sayre": "Beckham County",
+  "hs-sentinel": "Washita County", "hs-temple": "Cotton County",
+};
 
 const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
   "head-start": [
@@ -1617,6 +1626,18 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/hero/hero-1.jpg",  alt: "Head Start Civil Rights training, CADC banner" },
     { src: "/images/hero/hero-8.jpg",  alt: "Head Start CPR and First Aid training" },
     { src: "/images/hero/hero-15.jpg", alt: "Head Start classroom visit with legislators" },
+    { src: "/images/hero/hero-16.jpg", alt: "Community visitors in a Head Start classroom" },
+    { src: "/images/head-start/ehs/ehs-infant-tummy-time.jpg", alt: "Early Head Start infant tummy time" },
+    { src: "/images/head-start/ehs/ehs-baby-tunnel-crawl.jpg", alt: "Early Head Start baby crawling through a tunnel" },
+    { src: "/images/head-start/ehs/ehs-toddler-outdoor-smile.jpg", alt: "Early Head Start toddler playing outside" },
+    { src: "/images/head-start/classroom/hs-kids-bug-observation.jpg", alt: "Children observing bugs — science exploration" },
+    { src: "/images/head-start/classroom/hs-kids-swings.jpg", alt: "Head Start children on the swings" },
+    { src: "/images/head-start/parenting/hs-fatherhood-dinner.jpg", alt: "Fatherhood engagement family dinner" },
+    { src: "/images/hero/hero-22.jpg", alt: "Easter Bunny visit with an Early Head Start infant" },
+    { src: "/images/hero/hero-9.jpg", alt: "Head Start families at a fall costume event" },
+    { src: "/images/head-start/community/hs-washita-back-to-school.jpg", alt: "Washita County back-to-school event" },
+    { src: "/images/hero/hero-7.jpg", alt: "CADC Head Start staff training" },
+    { src: "/images/hero/hero-23.jpg", alt: "Head Start staff professional development" },
   ],
   "senior-meals": [
     { src: "/images/senior-dining-1.JPG",  alt: "Seniors dining together at a CADC meal site" },
@@ -1630,17 +1651,23 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/senior-staff-1.JPG",   alt: "CADC senior nutrition staff" },
     { src: "/images/hero/hero-19.jpg", alt: "Senior Easter kitchen crew" },
     { src: "/images/hero/hero-20.jpg", alt: "Senior serving line, Easter decorations" },
+    { src: "/images/hero/hero-12.jpg", alt: "Seniors enjoying lunch together" },
+    { src: "/images/hero/hero-21.jpg", alt: "Senior nutrition kitchen staff in Easter spirit" },
   ],
   "advantage": [
     { src: "/images/hero/hero-2.jpg",  alt: "Advantage meal prep, freezer loading" },
     { src: "/images/hero/hero-24.jpg", alt: "Advantage freezer stocking" },
   ],
   "community-market": [
-    { src: "/images/community-market-3.PNG", alt: "Fresh produce at the CADC Community Market" },
-    { src: "/images/community-market-4.PNG", alt: "Dairy and refrigerated items" },
-    { src: "/images/community-market-6.PNG", alt: "Frozen foods section" },
-    { src: "/images/community-market-7.PNG", alt: "Refrigerated produce" },
-    { src: "/images/community-market-9.PNG", alt: "Pantry aisle" },
+    { src: "/images/community-market-7.PNG", alt: "Fresh produce — watermelons, apples and more" },
+    { src: "/images/community-market-6.PNG", alt: "Refrigerated fruits and vegetables" },
+    { src: "/images/community-market-4.PNG", alt: "Fresh and refrigerated groceries" },
+    { src: "/images/community-market-5.PNG", alt: "Dairy — milk, yogurt, eggs and butter" },
+    { src: "/images/community-market-2.PNG", alt: "Frozen foods" },
+    { src: "/images/community-market-3.PNG", alt: "Frozen meals and snacks" },
+    { src: "/images/community-market-9.PNG", alt: "Cereal and pantry staples" },
+    { src: "/images/community-market-8.PNG", alt: "Pantry aisle" },
+    { src: "/images/community-market-10.PNG", alt: "Household essentials" },
   ],
   "transit": [
     { src: "/images/hero/hero-14.jpg", alt: "Transit mechanics with diagnostic equipment" },
@@ -1671,55 +1698,45 @@ function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
   }, [current, photos?.length]);
 
   if (!photos || photos.length === 0) return null;
-  const idx = current;
 
   return (
-    <div style={{
-      width: "100%", height: "clamp(260px, 42vh, 420px)", borderRadius: 12, overflow: "hidden",
-      marginBottom: 16, position: "relative",
-      background: "#0a0d1f",
+    <figure style={{
+      margin: "0 0 16px", borderRadius: 12, overflow: "hidden",
+      border: "1px solid #d8dcf2", background: "#ffffff",
+      boxShadow: "0 4px 18px rgba(1,1,255,0.08)",
     }}>
-      <div aria-hidden="true" style={{ position: "absolute", inset: -20, backgroundImage: `url(${photos[current]?.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: "blur(18px) brightness(0.85)" }} />
-      {/* Bottom layer — current photo, shown whole */}
-      <img
-        loading="lazy"
-        decoding="async"
-        src={photos[current]?.src}
-        alt={photos[current]?.alt}
-        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block", opacity: 1 }}
-      />
-      {/* Top layer — next photo, fades in */}
-      <img
-        loading="lazy"
-        decoding="async"
-        key={next}
-        src={photos[next]?.src}
-        alt={photos[next]?.alt}
-        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "contain",
-          opacity: transitioning ? 1 : 0,
-          transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
-        }}
-      />
-      {photos.length > 1 && (
-        <div style={{
-          position: "absolute", bottom: 8, right: 10,
-          display: "flex", gap: 4,
-        }}>
-          {photos.map((_, i) => (
-            <div key={i} style={{
-              width: i === current ? 16 : 5, height: 5, borderRadius: 3,
-              background: i === idx ? "white" : "rgba(255,255,255,0.45)",
-              transition: "width 0.3s ease, background 0.3s ease",
-            }} />
-          ))}
-        </div>
-      )}
-    </div>
+      <div style={{ position: "relative", width: "100%", height: "clamp(280px, 46vh, 460px)", background: "#eef0fb" }}>
+        <img
+          loading="lazy"
+          decoding="async"
+          src={photos[current]?.src}
+          alt={photos[current]?.alt}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        />
+        <img
+          loading="lazy"
+          decoding="async"
+          key={next}
+          src={photos[next]?.src}
+          alt={photos[next]?.alt}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain",
+            opacity: transitioning ? 1 : 0,
+            transition: transitioning ? "opacity 0.7s ease-in-out" : "none",
+          }}
+        />
+      </div>
+      <figcaption style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "9px 14px", borderTop: "1px solid #e5e7f5" }}>
+        <span style={{ fontSize: 14, color: "#374151", fontWeight: 600 }}>{photos[transitioning ? next : current]?.alt}</span>
+        {photos.length > 1 && (
+          <span style={{ flexShrink: 0, fontSize: 13, fontWeight: 700, color: "#0101FF", fontVariantNumeric: "tabular-nums" }}>
+            {(transitioning ? next : current) + 1} / {photos.length}
+          </span>
+        )}
+      </figcaption>
+    </figure>
   );
 }
 
@@ -1736,18 +1753,14 @@ function PhotoStrip({ photos, dark }: {
 
   return (
     <div style={{
-      display: "flex", gap: 8,
-      overflowX: "auto",
+      display: "grid", gap: 8,
+      gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
       margin: "14px 0",
-      paddingBottom: 8,
-      // Hide scrollbar cross-browser
-      scrollbarWidth: "none",
     }}>
-      <style>{`.photo-strip::-webkit-scrollbar { display: none; }`}</style>
-      {visible.map((photo, i) => (
+      {visible.map((photo) => (
         <img
-        loading="lazy"
-        decoding="async"
+          loading="lazy"
+          decoding="async"
           key={photo.src}
           src={photo.src}
           alt={photo.alt}
@@ -1756,11 +1769,10 @@ function PhotoStrip({ photos, dark }: {
             setFailed(prev => new Set([...prev, idx]));
           }}
           style={{
-            flex: "0 0 auto",
-            width: 130, height: 100,
+            width: "100%", aspectRatio: "4 / 3",
             borderRadius: 10,
             objectFit: "cover",
-            objectPosition: "center 25%",
+            objectPosition: "center 30%",
             border: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#d0d4f0"}`,
             display: "block",
           }}
@@ -1807,7 +1819,7 @@ function PhotoGrid({ photos, dark }: {
               const originalIndex = photos.findIndex(p => p.src === photo.src);
               setFailed(prev => new Set([...prev, originalIndex]));
             }}
-            style={{ width: "100%", height: "auto", display: "block" }}
+            style={{ width: "100%", aspectRatio: i === 0 && hasSpan ? "16 / 10" : "1 / 1", objectFit: "cover", objectPosition: "center 35%", display: "block" }}
           />
         </div>
       ))}
@@ -3820,25 +3832,24 @@ const PROGRAMS: ProgramData[] = [
           <div className="cadc-light-content">
             <p>CADC Head Start operates <strong>11 centers</strong> across Southwest Oklahoma, serving children from birth through age 5.</p>
             <div className="cadc-stack">
-              {[
-                { city: "Erick",       county: "Beckham County",    phone: "580-726-3343" },
-                { city: "Sayre",       county: "Beckham County",    phone: "580-726-3343" },
-                { city: "Burns Flat",  county: "Washita County",    phone: "580-726-3343" },
-                { city: "Hammon",      county: "Roger Mills County", phone: "580-726-3343" },
-                { city: "Hobart",      county: "Kiowa County",      phone: "580-726-3343" },
-                { city: "Frederick",   county: "Tillman County",    phone: "580-726-3343" },
-                { city: "Temple",      county: "Cotton County",     phone: "580-726-3343" },
-                { city: "Grandfield",  county: "Tillman County",    phone: "580-726-3343" },
-                { city: "Ringling",    county: "Jefferson County",  phone: "580-726-3343" },
-                { city: "Cordell",     county: "Washita County",    phone: "580-726-3343" },
-                { city: "Sentinel",    county: "Washita County",    phone: "580-726-3343" },
-              ].map(c => (
-                <div key={c.city} className="cadc-card-sm">
-                  <p className="cadc-card-title">{c.city}</p>
-                  <p style={{ fontSize: 13, color: "#374151", margin: "2px 0 6px" }}>{c.county}</p>
-                  <a href={`tel:+15807263343`} className="cadc-link">{c.phone}</a>
-                </div>
-              ))}
+              {headStartCenters.map(c => {
+                const county = HS_CENTER_COUNTY[c.id];
+                const addr = `${c.street}, ${c.city}, ${c.state} ${c.zip}`;
+                return (
+                  <div key={c.id} className="cadc-card-sm">
+                    <p className="cadc-card-title">{c.name} Head Start</p>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`} target="_blank" rel="noopener noreferrer" style={{ display: "block", fontSize: 15, color: "#1f2937", margin: "2px 0 2px", textDecoration: "underline", textDecorationColor: "#c7cbe8" }}>📍 {addr}</a>
+                    {c.mailing && <p style={{ fontSize: 13, color: "#4B5563", margin: "0 0 2px" }}>Mailing: {c.mailing}, {c.city}, {c.state} {c.zip}</p>}
+                    {county && <p style={{ fontSize: 13, color: "#4B5563", margin: "0 0 6px" }}>{county}</p>}
+                    <a href={c.phoneHref} className="cadc-link">📞 {c.phone}</a>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="cadc-card" style={{ marginTop: 12 }}>
+              <p className="cadc-label">Head Start Administrative Office</p>
+              <p style={{ fontSize: 15, margin: "0 0 6px" }}>400 N. Randlett St., Hobart, OK 73651</p>
+              <a href="tel:+15807263343" className="cadc-link">📞 580-726-3343</a>
             </div>
             <div className="cadc-card" style={{ marginTop: 12 }}>
               <p className="cadc-label">Contact Head Start Director</p>
@@ -4233,10 +4244,10 @@ const PROGRAMS: ProgramData[] = [
             <p>The CADC Community Market is a mobile grocery store housed in a 42-foot customized trailer — bringing fresh, affordable, and nutritious food directly to communities across Southwest Oklahoma that have lost access to full-service grocery stores.</p>
             <p>The market is open to the general public regardless of ZIP code. No membership or eligibility required.</p>
             <PhotoStrip dark={false} photos={[
-              { src: PHOTOS.communityMarket.trailerHero, alt: "CADC Community Market 42-foot mobile grocery trailer" },
-              { src: PHOTOS.communityMarket.freshProduce, alt: "Fresh produce available at the CADC Community Market" },
-              { src: PHOTOS.communityMarket.refrigeratedProduce, alt: "Refrigerated produce section of the Community Market" },
-              { src: PHOTOS.communityMarket.refrigeratedExtra, alt: "Additional refrigerated produce at the Community Market" },
+              { src: PHOTOS.communityMarket.refrigeratedProduce, alt: "Refrigerated fruits and vegetables at the Community Market" },
+              { src: PHOTOS.communityMarket.refrigeratedExtra, alt: "Fresh and refrigerated groceries" },
+              { src: PHOTOS.communityMarket.dairy, alt: "Dairy — milk, yogurt, eggs and butter" },
+              { src: PHOTOS.communityMarket.dryGoods, alt: "Cereal and pantry staples" },
             ]} />
             <div className="cadc-card">
               <p className="cadc-label">Mission</p>
@@ -4287,7 +4298,6 @@ const PROGRAMS: ProgramData[] = [
           <div className="cadc-light-content">
             <p>The Community Market carries 400+ SKUs — from fresh produce to frozen meals to household essentials. We stock the brands and products you know and trust.</p>
             <PhotoGrid dark={false} photos={[
-              { src: PHOTOS.communityMarket.freshProduce, alt: "Fresh produce — watermelons, apples, sweet potatoes, onions" },
               { src: PHOTOS.communityMarket.refrigeratedProduce, alt: "Refrigerated produce — grapes, peppers, tomatoes, carrots" },
               { src: PHOTOS.communityMarket.frozen, alt: "Frozen foods — peaches, broccoli, ice cream bars" },
               { src: PHOTOS.communityMarket.frozenMeals, alt: "Frozen meals — burritos, fish sticks, chicken drumsticks" },

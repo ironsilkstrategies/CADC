@@ -179,11 +179,11 @@ export default function BoardPage() {
           <h2 id="annual-heading" className="font-serif text-2xl font-bold mb-4" style={{ color: "var(--cadc-blue)" }}>Annual Report</h2>
           <div className="rounded-xl border p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4" style={{ borderColor: "#e5e7eb" }}>
             <div className="flex-1">
-              <p className="font-semibold text-sm mb-1" style={{ color: "var(--cadc-blue)" }}>2024 Annual Report</p>
+              <p className="font-semibold text-sm mb-1" style={{ color: "var(--cadc-blue)" }}>2025 Annual Report</p>
               <p className="text-xs leading-relaxed" style={{ color: "#6b7280" }}>CADC's full annual report — program outcomes, financials, and community impact.</p>
             </div>
             <a
-              href="/docs/annual-report-2024.pdf"
+              href="/documents/annual-report-2025.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 flex-shrink-0"
