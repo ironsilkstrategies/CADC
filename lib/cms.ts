@@ -225,7 +225,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     { name: "Robert Meador",   title: "Director, Weatherization & Housing",          phone: "580-305-0853" },
     { name: "Laura Vardell",   title: "Director, Senior Nutrition",                  phone: "580-335-5588" },
     { name: "Scott Fraley",    title: "Director, Community Market",                  phone: "580-305-1964", email: "SFraley@cadcok.org" },
-    { name: "Kristie Jackson", title: "Director, Advantage Home Delivered Meals",    phone: "580-393-2216" },
+    { name: "Kristie Jackson", title: "Director, CSBG & Advantage",                 phone: "580-393-2216", email: "kjackson@cadcok.org" },
   ],
   documents: [
     { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },

@@ -55,7 +55,7 @@ const DIRECTORS = [
   { name: "Robert Meador", title: "Weatherization Director", phone: "580-305-0853", email: null },
   { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-335-5588", email: null },
   { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "SFraley@cadcok.org" },
-  { name: "Kristie Jackson", title: "Advantage Director", phone: "580-393-2216", email: "kjackson@cadcok.org" },
+  { name: "Kristie Jackson", title: "CSBG & Advantage Director", phone: "580-393-2216", email: "kjackson@cadcok.org" },
 ];
 
 // ─── Contact Page ─────────────────────────────────────────────────────────────

@@ -33,20 +33,21 @@ const PROGRAMS = [
   { name: "Community Market", slug: "community-market", icon: "🛒" },
 ];
 
-const STAFF = [
-  // Listed by position: executive → agency directors → program directors → administrative staff
-  { name: "Leslea Hixson", title: "Executive Director", bio: "Executive Director since January 2024. Previously served as CADC's Head Start/Early Head Start Director. Holds a bachelor's degree in Elementary Education and a master's in Education Administration, with 17 years in public education as a teacher and administrator." },
-  { name: "Terry Collom", title: "Chief Financial Officer", bio: "CFO with 16 years at CADC. Bachelor's degree in Accounting from Cameron University and 27 years of experience in the accounting field, including 10 years in private manufacturing." },
-  { name: "Suzi Fletcher", title: "Human Resources Director & Payroll Manager", bio: "Joined CADC in August 2023. Bachelor's and master's degrees in Accounting from Oklahoma State University, with 28 years of experience across payroll, audit, and financial accounting." },
-  { name: "Robin Harris", title: "Head Start & Early Head Start Director", bio: "Leads CADC's Head Start and Early Head Start program across 11 centers in Southwest Oklahoma.", phone: "580-726-3343", email: "rharris@cadcok.org" },
-  { name: "Gilbert Nuncio", title: "Transit Director", bio: "13 years with CADC. Started as a Red River Transportation driver in 2014, promoted to Maintenance Supervisor in 2016, Route Supervisor in 2018, and Transit Director in 2021." },
-  { name: "Robert Meador", title: "Weatherization & Housing Director", bio: "Joined CADC in September 1991. Has overseen weatherization of over a thousand homes and led numerous housing rehabilitation projects over a 35-year career in community action.", phone: "580-305-0853" },
-  { name: "Laura Vardell", title: "Senior Nutrition Director", bio: "4 years with CADC, overseeing congregate meal programs across Southwest Oklahoma." },
-  { name: "Scott Fraley", title: "Community Market Director", bio: "Brings 30+ years of leadership experience in retail, merchandising, and materials management. Born and raised in Frederick, deeply rooted in the community." },
-  { name: "Kristie Jackson", title: "Advantage Director", bio: "Started at CADC as a Head Start teacher in September 2022. Long personal history with CADC — attended Head Start as a child, as did her children." },
-  { name: "Marty Martin", title: "Purchasing Officer", bio: "3 years with CADC. 30 years of accounting experience in banking." },
-  { name: "Tiffany Camero", title: "Executive Secretary", bio: "6 years with CADC. U.S. Navy veteran who served 4 years on active duty." },
-  { name: "Sarah Perez", title: "Bookkeeper", bio: "Joined CADC in January 2023. Working toward a Bachelor's in Accounting at NWOSU." },
+const STAFF: { name: string; title: string; photo?: string; bio: string; phone?: string; email?: string }[] = [
+  // Listed by position. Bios and photos from the legacy cadcok.org/about-1 page (Oct 2026).
+  // Photos currently load from CADC's Wix media library — download into /public/images/staff before Wix is cancelled.
+  {"name": "Leslea Hixson", "title": "Executive Director", "photo": "https://static.wixstatic.com/media/f04cf2_dd33827399194b50a5a2ef9a47f7c771~mv2.jpg", "bio": "Leslea Hixson is the Executive Director starting January 2024 and has been with CADC for 2 years. She started with CADC as the Head Start/Early Head Start Director. She has a bachelor's degree in Elementary Education, master's in education administration, and has 17 years of working in public education as a teacher and administrator. Leslea is married to her husband Michael and has 4 children: Polly, Logan, Luke, and Maggie. She enjoys going to church, playing golf, crafting, spending time outdoors at the lake, and following her kids around for all their activities!"},
+  {"name": "Terry Collom", "title": "Chief Financial Officer", "photo": "https://static.wixstatic.com/media/f04cf2_d395d7fcbd154341816207c81c520d8b~mv2.jpg", "bio": "Terry Collom is the Chief Financial Officer for Community Action Development Corporation. He has been with the agency for 16 years. He has a bachelor's degree in Accounting from Cameron University, and has 27 years of experience working in the accounting field, including 10 years in the private manufacturing sector before coming to work for CADC. Terry is married to his wife Tracy, and has 2 daughters, Ariel and Aislee. He enjoys going to church, playing drums, lifting weights and working out, hunting, fishing, and attending his children's sporting events."},
+  {"name": "Suzi Fletcher", "title": "Human Resources Director & Payroll Manager", "photo": "https://static.wixstatic.com/media/f04cf2_609b57956b7c407cb4745fb20ac3c7ca~mv2.png", "bio": "Suzi Fletcher is the Human Resources Director/Payroll Manager for Community Action Development Corporation. She started with the agency in August 2023. She has a bachelor's and master's degree in accounting from Oklahoma State University. She has worked in various accounting fields over the past 28 years including public accounting and private sector manufacturing covering areas of payroll, audit, cost, and financial. She has served on various boards and participated in volunteer organizations. She has two children, Ethan and Emma. Her hobbies include reading, helping with her kids' projects, watching movies and trying new foods.", "email": "sfletcher@cadcok.org"},
+  {"name": "Robin Harris", "title": "Head Start & Early Head Start Director", "bio": "Leads CADC's Head Start and Early Head Start program across 11 centers in Southwest Oklahoma.", "phone": "580-726-3343", "email": "rharris@cadcok.org"},
+  {"name": "Gilbert Nuncio", "title": "Transit Director", "photo": "https://static.wixstatic.com/media/f04cf2_31dc196ac87348e081849131279d69a8~mv2.jpg", "bio": "Gilbert Nuncio has been with CADC for 13 years and has 8 years of experience in public transportation. Gilbert started with Red River Transportation as a driver in 2014 and was promoted to Maintenance Supervisor in 2016. In 2018, he was promoted to Route Supervisor and currently serves as Transit Director since 2021. Gilbert is married to his wife, Jenna, and has 3 kids, Crosby, Kimber and Kelton. Gilbert enjoys playing golf, fishing, being outdoors and maintaining his lawn."},
+  {"name": "Robert Meador", "title": "Weatherization & Housing Director", "photo": "https://static.wixstatic.com/media/f04cf2_6ce3585b5d2f408e847d445f29856f99~mv2.jpg", "bio": "Robert Meador serves as the Weatherization and Housing Director for the Community Action Development Corporation (CADC). He began his career with CADC in September 1991 as a coordinator for the Self Employment and Entrepreneurial Development System (SEEDS) program. In 1993, he assumed the role of Housing Director, and in 1996, he was named Weatherization Director. Over the course of his 35-year career in Community Action, Robert has made a lasting impact on low-income families and communities. His work has supported dozens of small business start-ups, contributed to the transformation of an aging hotel into a 29-unit apartment complex, and overseen numerous home rehabilitation and replacement projects. In addition, he has played a key role in the weatherization of well over a thousand homes, improving energy efficiency and living conditions for families in need. Robert holds a bachelor's degree in Business Administration, along with associate degrees in Accounting and Economics. He also maintains multiple state and national licenses and certifications in Community and Economic Development, Environmental Compliance, and Home Energy Performance. He and his wife, Holly, have been married for 38 years and have two adult daughters, Toloa and Victoria, as well as a young grandson, Easton. Outside of his professional responsibilities, Robert enjoys spending time with his grandson, as well as camping, fishing, and cooking.", "phone": "580-305-0853"},
+  {"name": "Laura Vardell", "title": "Senior Nutrition Director", "photo": "https://static.wixstatic.com/media/f04cf2_a4936f7a64ff4ac9bb8a9036d4c351ee~mv2.jpg", "bio": "Laura has been with the agency for 4 years. She has been married to Mike for 21 years and they have a son, Brandon. They love going to concerts and enjoy being with each other."},
+  {"name": "Scott Fraley", "title": "Community Market Director", "photo": "/images/staff/staff-scott-fraley.jpg", "bio": "Scott Fraley brings more than 30 years of leadership experience across retail, merchandising, materials management, and as a business owner. He got his start at the young age of 10 working at the Frederick Press and Ramona Theater, experiences that helped shape his strong work ethic and commitment to service. Known for his steady leadership style and operational expertise, Scott has built a career focused on driving performance, supporting teams, and delivering meaningful results. Born and raised in Frederick, Scott is deeply rooted in his community. He has been married to his wife, Kim, for 33 years, and together they have raised three daughters who have kept life full and active through the years with dance, piano, gymnastics, sports, and church activities. Outside of work, Scott enjoys creating and building steampunk-style industrial pipe lamps, combining craftsmanship with creativity. He is involved at First Baptist Church and engaged in community growth and activities.", "phone": "580-305-1964", "email": "sfraley@cadcok.org"},
+  {"name": "Kristie Jackson", "title": "CSBG & Advantage Director", "photo": "https://static.wixstatic.com/media/f04cf2_5c16c10138cd48339defadbea93c4148~mv2.jpg", "bio": "Kristie Jackson is the Advantage & CSBG Director for CADC. She started as a teacher at Head Start in September 2022 and then moved into her current position in January 2023. Kristie has a long history with CADC and Head Start. She attended Head Start as a child and both of her children did too. Kristie's dad, Ennis Jackson, served on the CADC Board of Directors for many years, and she followed in his footsteps and served on the board. Kristie has a bachelor's degree in business administration with a specialty in Human Resource Management and is currently seeking a master's degree from OU in Strategic Communication & Digital Strategy. She comes to the agency with many skills and ideas and hopes to utilize her knowledge to support the agency's mission and goals. Kristie is the mother of 2 boys Zayden and Canaan. In their spare time, they enjoy playing outside, dancing, and cooking.", "email": "kjackson@cadcok.org"},
+  {"name": "Marty Martin", "title": "Purchasing Officer", "photo": "https://static.wixstatic.com/media/f04cf2_d7f769beb12140bc957c184c9eaa859f~mv2.jpg", "bio": "Marty Martin is the Purchasing Officer at Community Action Development Corporation. He has been with the agency for 3 years. He has a bachelor's degree in Christian Counseling from Calvary Theological Seminary and he has an Associate in Computer Science from Cameron University. Marty has 30 years accounting experience in the banking industry prior to coming to work at CADC. Marty is married to his wife Sandi and has 2 Children, Nicholas & Morgan and 3 Grandchildren, Maylie, Max and Madison. Marty enjoys spending time with his family, traveling and attending church."},
+  {"name": "Tiffany Camero", "title": "Executive Secretary", "photo": "https://static.wixstatic.com/media/f04cf2_90c338be86174e018c6b81fa67e48e7d~mv2.jpg", "bio": "Tiffany Camero is the Executive Secretary for Community Action Development Corporation. She has been with us for 6 years. Tiffany is a veteran who is currently serving in the U.S. Navy Reserves. After serving 4 years in active duty, she attended Converse University and WOSC. She enjoys planning and hosting events, writing, painting, traveling, and making memories with her daughter.", "email": "tcamero@cadcok.org"},
+  {"name": "Sarah Perez", "title": "Bookkeeper", "photo": "https://static.wixstatic.com/media/f04cf2_b4fb999bac8d4020a31188ed905461bd~mv2.jpg", "bio": "Sarah Perez is the Bookkeeper for Community Action Development Corporation. She started in January 2023. She is currently working towards a Bachelor's Degree in Accounting with NWOSU and she has an Associate's Degree in Business Administration. Sarah is married to Andrew, and they have 4 kids, Abigail, Andrew Jr, Royce, and Ritchie. Sarah enjoys spending time with her family, cooking, and watching the kids play."},
 ];
 
 // ─── Location Map Data ────────────────────────────────────────────────────────
@@ -809,6 +810,39 @@ function LocationMap() {
   );
 }
 
+function StaffCard({ s }: { s: typeof STAFF[number] }) {
+  const [open, setOpen] = useState(false);
+  const [imgOk, setImgOk] = useState(true);
+  const long = s.bio.length > 260;
+  const initials = s.name.split(" ").map(w => w[0]).join("");
+  return (
+    <li style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div style={{ aspectRatio: "4 / 3", background: "#eef0fb", position: "relative" }}>
+        {s.photo && imgOk ? (
+          <img src={s.photo} alt={`${s.name}, ${s.title}`} loading="lazy" decoding="async" onError={() => setImgOk(false)}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 22%" }} />
+        ) : (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, fontWeight: 800, color: "#0101FF", opacity: 0.5 }} aria-hidden="true">{initials}</div>
+        )}
+      </div>
+      <div style={{ padding: "18px 20px 20px", display: "flex", flexDirection: "column", flex: 1 }}>
+        <p style={{ color: "#111827", fontWeight: 800, fontSize: 16, margin: "0 0 3px" }}>{s.name}</p>
+        <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.09em", margin: "0 0 10px" }}>{s.title}</p>
+        <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.65, margin: "0 0 8px", ...(long && !open ? { display: "-webkit-box", WebkitLineClamp: 5, WebkitBoxOrient: "vertical" as const, overflow: "hidden" } : {}) }}>{s.bio}</p>
+        {long && (
+          <button onClick={() => setOpen(o => !o)} aria-expanded={open} style={{ alignSelf: "flex-start", background: "none", border: "none", padding: 0, color: "#0101FF", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 8 }}>
+            {open ? "Show less ↑" : "Read full bio ↓"}
+          </button>
+        )}
+        <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
+          {s.phone && <a href={`tel:+1${s.phone.replace(/\D/g, "")}`} style={{ color: "#0101FF", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>📞 {s.phone}</a>}
+          {s.email && <a href={`mailto:${s.email}`} style={{ color: "#0101FF", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>✉️ {s.email}</a>}
+        </div>
+      </div>
+    </li>
+  );
+}
+
 // ─── Main About Page ──────────────────────────────────────────────────────────
 
 export default function AboutPage() {
@@ -991,19 +1025,7 @@ export default function AboutPage() {
           <p style={{ color: "#CC0000", fontSize: 14, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>Administrative Staff</p>
           <h2 id="staff-heading" style={{ color: "#0101FF", fontSize: "clamp(1.2rem,2.5vw,1.6rem)", fontWeight: 800, marginBottom: 20 }}>Our Team</h2>
           <ul style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14, listStyle: "none", padding: 0, margin: 0 }}>
-            {STAFF.map(s => (
-              <li key={s.name} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: "20px 22px" }}>
-                <p style={{ color: "#111827", fontWeight: 800, fontSize: 15, margin: "0 0 3px" }}>{s.name}</p>
-                <p style={{ color: "#CC0000", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.09em", margin: "0 0 10px" }}>{s.title}</p>
-                <p style={{ color: "#374151", fontSize: 15, lineHeight: 1.65, margin: "0 0 8px" }}>{s.bio}</p>
-                {"phone" in s && (s as {phone?:string}).phone && (
-                  <a href={`tel:+1${(s as {phone:string}).phone.replace(/\D/g,"")}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 15, textDecoration: "none", marginRight: 12 }}>📞 {(s as {phone:string}).phone}</a>
-                )}
-                {"email" in s && (s as {email?:string}).email && (
-                  <a href={`mailto:${(s as {email:string}).email}`} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#0101FF", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>✉️ {(s as {email:string}).email}</a>
-                )}
-              </li>
-            ))}
+            {STAFF.map(s => <StaffCard key={s.name} s={s} />)}
           </ul>
         </section>
 
@@ -1019,7 +1041,7 @@ export default function AboutPage() {
               { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "" },
               { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-335-5588", email: "" },
               { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
-              { name: "Kristie Jackson", title: "Advantage Home Delivered Meals Director", phone: "580-699-8880", email: "kjackson@cadcok.org" },
+              { name: "Kristie Jackson", title: "CSBG & Advantage Director", phone: "580-699-8880", email: "kjackson@cadcok.org" },
               { name: "Tiffany Camero", title: "Executive Secretary", phone: "580-335-5588", email: "tcamero@cadcok.org" },
             ].map(d => (
               <div key={d.name} style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 18px" }}>
