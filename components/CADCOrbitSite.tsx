@@ -312,32 +312,31 @@ function trackStat(type: "program" | "county" | "search" | "visit", key?: string
 // To update: change month, year, and meals object only. Keys are YYYY-MM-DD.
 
 const MENU_DATA = {
-  month: "September",
-  year: 2026,
+  month: "October", year: 2026,
   note: "8 oz milk served daily at all congregate sites",
   meals: {
-    "2026-09-01": { headline: "Mexican Casserole", full: ["Mexican Casserole", "Tex Mex Rice", "Ranch Beans", "Chips", "Brownie"] },
-    "2026-09-02": { headline: "Baked Rigatoni", full: ["Baked Rigatoni", "Corn", "Green Beans", "Garlic Bread", "Applesauce"] },
-    "2026-09-03": { headline: "Chicken Pasta", full: ["Chicken Pasta", "Pickled Beets", "Mandarin Oranges", "Crackers", "Cake w/ Icing"] },
-    "2026-09-04": { headline: "Chicken Fried Steak", full: ["Chicken Fried Steak", "Mashed Potatoes w/ Gravy", "Peas & Carrots", "Sliced Bread", "Fruit"] },
-    "2026-09-07": { headline: "Breakfast Casserole", full: ["Breakfast Casserole", "Hash Brown Patty", "Biscuit w/ Gravy", "Sliced Pears", "Cottage Cheese"] },
-    "2026-09-08": { headline: "Taco Spud", full: ["Taco Spud", "Baked Potato", "Mixed Veggies", "Dinner Roll", "Pudding Pan Pie"] },
-    "2026-09-09": { headline: "BBQ Pork", full: ["BBQ Pork on Bun", "Baked Beans", "Potato Salad", "No Bake Cookie"] },
-    "2026-09-10": { headline: "Brown Beans w/ Ham", full: ["Brown Beans w/ Ham", "Oven Fried Potatoes", "Zucchini/Tomatoes", "Cornbread", "Cobbler"] },
-    "2026-09-11": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Cali Mix", "Fruit", "Dinner Roll"] },
-    "2026-09-14": { headline: "Cajun Pork Chop", full: ["Cajun Pork Chop", "Potato Casserole", "Baked Beans", "Sliced Bread", "Mandarin Orange Salad"] },
-    "2026-09-15": { headline: "Chicken Teriyaki", full: ["Chicken Teriyaki", "Broccoli", "Carrots", "Rice Pilaf", "Pineapple", "Upside-Down Cake"] },
-    "2026-09-16": { headline: "Pimento Cheese", full: ["Pimento Cheese", "Vegetable Soup", "Crackers", "Pears w/ Cottage Cheese", "Cake w/ Frosting"] },
-    "2026-09-17": { headline: "Sliced Turkey", full: ["Sliced Turkey on Bun", "Tomato Soup", "Diced Peaches", "Peanut Butter Bar"] },
-    "2026-09-18": { headline: "Salisbury Steak", full: ["Salisbury Steak", "Mashed Potatoes w/ Gravy", "Green Beans", "Dinner Roll", "Butterscotch Fluff"] },
-    "2026-09-21": { headline: "Chicken Parmesan", full: ["Chicken Parmesan", "Spaghetti Noodles", "Carrots", "Broccoli", "Garlic Bread", "Pan Pie"] },
-    "2026-09-22": { headline: "Tuna Salad", full: ["Tuna Salad on Croissant", "Pickled Beets", "Diced Peaches", "Macaroni Salad", "Cookie Bar"] },
-    "2026-09-23": { headline: "Sausage Gravy", full: ["Sausage Gravy w/ Biscuit", "Zucchini/Tomatoes", "Fruit Salad"] },
-    "2026-09-24": { headline: "Fried Fish", full: ["Fried Fish", "Potato Wedges", "Cole Slaw", "Hush Puppies", "Poke Cake"] },
-    "2026-09-25": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Green Beans", "Dinner Roll", "Pear Crisp"] },
-    "2026-09-28": { headline: "Pulled Pork", full: ["Pulled Pork", "Baked Potato", "Mixed Vegetables", "Sliced Bread", "Cookies"] },
-    "2026-09-29": { headline: "Chicken Salad", full: ["Chicken Salad", "Cottage Cheese", "Pickled Beets", "Crackers", "Fruit Salad", "Simply Super Cake"] },
-    "2026-09-30": { headline: "Chicken & Noodles", full: ["Chicken & Noodles", "Carrots", "Peas", "Applesauce"] },
+    "2026-10-01": { headline: "Ham & Pinto Beans", full: ["Ham & Pinto Beans", "Zucchini/Tomatoes", "Spinach", "Cornbread", "Lemon Pie"] },
+    "2026-10-02": { headline: "Sloppy Joes on Bun", full: ["Sloppy Joes on Bun", "Potato Salad", "Baked Beans", "Banana Pudding"] },
+    "2026-10-05": { headline: "Ranch Chicken", full: ["Ranch Chicken", "Tossed Salad", "Mexican Corn", "Tortilla Chips", "Rocky Road Pudding"] },
+    "2026-10-06": { headline: "Fish on Bun", full: ["Fish on Bun", "Coleslaw", "Potato Wedges", "Cornbread", "Cake"] },
+    "2026-10-07": { headline: "Baked Chicken", full: ["Baked Chicken", "Sweet Potato Casserole", "Spinach", "Sliced Bread", "Jell-O w/ Fruit"] },
+    "2026-10-08": { headline: "Chef Salad", full: ["Chef Salad", "Diced Peaches", "Crackers", "Cinnamon Roll"] },
+    "2026-10-09": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes w/ Gravy", "Cooked Cabbage", "Roll", "Harvest Bar"] },
+    "2026-10-12": { headline: "Chicken Pot Pie", full: ["Chicken Pot Pie", "Harvard Beets", "Fruit Salad"] },
+    "2026-10-13": { headline: "Cheeseburger on Bun", full: ["Cheeseburger on Bun", "Pea Salad", "Baked Beans", "Frosted Brownie"] },
+    "2026-10-14": { headline: "Scalloped Chicken w/ Gravy", full: ["Scalloped Chicken w/ Gravy", "Sweet Potatoes", "Green Beans", "Dinner Roll"] },
+    "2026-10-15": { headline: "Hobo Beans", full: ["Hobo Beans", "Tomato Spoon Relish", "Spinach", "Cornbread", "Crisp"] },
+    "2026-10-16": { headline: "Smothered Pork Chop", full: ["Smothered Pork Chop", "Mashed Potatoes w/ Gravy", "California Mix", "Sliced Bread", "Bread Pudding"] },
+    "2026-10-19": { headline: "Chicken & Dumplings", full: ["Chicken & Dumplings", "Broccoli", "Carrots", "Dinner Roll", "Spice Cake"] },
+    "2026-10-20": { headline: "Loaded Baked Potato", full: ["Loaded Baked Potato", "Vegetable Soup", "Fruit", "Sliced Bread", "Mock Pecan Pie"] },
+    "2026-10-21": { headline: "Meatballs w/ Spaghetti", full: ["Meatballs w/ Spaghetti", "Corn", "Green Beans", "Garlic Bread", "Jell-O w/ Fruit"] },
+    "2026-10-22": { headline: "Creamy Tacos", full: ["Creamy Tacos", "Tossed Salad", "Peaches", "Tortilla Chips", "2 Cookies"] },
+    "2026-10-23": { headline: "Chicken Fried Steak", full: ["Chicken Fried Steak", "Mashed Potatoes w/ Gravy", "Black-Eyed Peas", "Dinner Roll", "Applesauce"] },
+    "2026-10-26": { headline: "Beef Stew", full: ["Beef Stew", "Harvard Beets", "Crackers", "Cake w/ Frosting"] },
+    "2026-10-27": { headline: "Chicken Tenders", full: ["Chicken Tenders", "Mashed Potatoes w/ Gravy", "Broccoli/Cauliflower", "Sliced Bread", "Butterscotch Pan Pie"] },
+    "2026-10-28": { headline: "Egg Omelet", full: ["Egg Omelet", "Hash Brown", "Tomato Spoon Relish", "Biscuit w/ Gravy", "Orange Jell-O"] },
+    "2026-10-29": { headline: "Brown Beans w/ Ham", full: ["Brown Beans w/ Ham", "Spinach", "Oven Potatoes", "Cornbread", "Crisp"] },
+    "2026-10-30": { headline: "Ribette", full: ["Ribette", "Scalloped Potatoes", "Green Beans", "Dinner Roll", "Cookie Bar"] },
   } as Record<string, { headline: string; full: string[] }>,
 };
 
@@ -346,34 +345,43 @@ const MENU_DATA = {
 // Each day can have multiple stops.
 
 const MARKET_SCHEDULE_DATA = {
-  month: "September",
-  year: 2026,
-  note: "Temporarily starting earlier due to extreme heat. Regular hours return in October.",
-  transportation: "Need a ride? Call or text 580-374-5518",
+  month: "October", year: 2026,
+  note: "Extended hours this month! Please help us share this schedule at churches, senior centers, and local businesses.",
+  transportation: "Need a ride to the market? Call or text 580-374-5518",
   stops: {
-    "2026-09-01": [{ time: "9:30–11:30", location: "Mt. View" }, { time: "1:30–3:30", location: "Corn" }],
-    "2026-09-02": [{ time: "9:30–11:30", location: "Burns Flat" }, { time: "1:00–3:30", location: "Sentinel" }],
-    "2026-09-03": [{ time: "9:00–12:00", location: "Grandfield" }, { time: "2:00–4:30", location: "Tipton" }],
-    "2026-09-04": [{ time: "10:30–12:00", location: "Ringling" }, { time: "2:00–3:30", location: "Ryan" }],
-    "2026-09-08": [{ time: "9:00–12:00", location: "Geronimo" }, { time: "1:30–4:00", location: "Chattanooga" }],
-    "2026-09-09": [{ time: "9:30–11:30", location: "Lawton — 509 Woodridge Dr." }, { time: "1:30–3:30", location: "Cache" }],
-    "2026-09-10": [{ time: "10:30–12:00", location: "Erick" }, { time: "2:00–3:30", location: "Lone Wolf" }],
-    "2026-09-11": [{ time: "10:30–12:00", location: "Hammon" }, { time: "1:30–3:00", location: "Canute" }],
-    "2026-09-14": [{ time: "9:00–11:00", location: "Randlett" }, { time: "1:00–3:30", location: "Temple" }],
-    "2026-09-15": [{ time: "9:30–11:30", location: "Mt. View" }, { time: "1:30–3:30", location: "Corn" }],
-    "2026-09-16": [{ time: "9:30–11:30", location: "Burns Flat" }, { time: "1:00–3:30", location: "Sentinel" }],
-    "2026-09-17": [{ time: "9:00–12:00", location: "Grandfield" }, { time: "2:00–4:30", location: "Tipton" }],
-    "2026-09-18": [{ time: "10:30–12:00", location: "Ringling" }, { time: "2:00–3:30", location: "Ryan" }],
-    "2026-09-21": [{ time: "9:30–11:30", location: "Sterling" }, { time: "1:00–3:00", location: "Fletcher" }],
-    "2026-09-22": [{ time: "9:00–12:00", location: "Geronimo" }, { time: "1:30–4:00", location: "Chattanooga" }],
-    "2026-09-23": [{ time: "9:30–11:30", location: "Lawton — Benjamin Davis HR" }, { time: "1:30–3:30", location: "Cache" }],
-    "2026-09-24": [{ time: "10:30–12:00", location: "Erick" }, { time: "2:00–3:30", location: "Lone Wolf" }],
-    "2026-09-25": [{ time: "10:30–12:00", location: "Hammon" }, { time: "1:30–3:00", location: "Canute" }],
-    "2026-09-28": [{ time: "9:30–11:00", location: "Valley Community S.C. — Lawton" }, { time: "1:00–3:30", location: "Temple" }],
-    "2026-09-29": [{ time: "9:30–11:30", location: "Mt. View" }, { time: "1:30–3:30", location: "Corn" }],
-    "2026-09-30": [{ time: "9:30–11:30", location: "Burns Flat" }, { time: "1:00–3:30", location: "Sentinel" }],
+    "2026-10-01": [{ time: "11:30 a.m.–2 p.m.", location: "Lawton — Pleasant Valley Community Senior Center, 1130 SW Monroe Ave." }, { time: "2:30–6 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }],
+    "2026-10-02": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
+    "2026-10-05": [{ time: "11 a.m.–6 p.m.", location: "Geronimo — 100 Main St. (Senior Citizen Center)" }],
+    "2026-10-06": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
+    "2026-10-07": [{ time: "11 a.m.–6 p.m.", location: "Cache — City Park, South 8th" }],
+    "2026-10-08": [{ time: "12–5 p.m.", location: "Erick — 103 W. 2nd St." }],
+    "2026-10-09": [{ time: "11 a.m.–2 p.m.", location: "Eldorado — 700 Block of W. A St." }, { time: "2:30–6 p.m.", location: "Olustee — 100 W. 4th" }],
+    "2026-10-12": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+    "2026-10-13": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
+    "2026-10-14": [{ time: "11:30 a.m.–2 p.m.", location: "Burns Flat — 228 Hwy 44" }, { time: "2:30–5:30 p.m.", location: "Sentinel — 210 East Main" }],
+    "2026-10-15": [{ time: "11:30 a.m.–2 p.m.", location: "Lawton — Pleasant Valley Community Senior Center, 1130 SW Monroe Ave." }, { time: "2:30–6 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }],
+    "2026-10-16": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
+    "2026-10-19": [{ time: "11 a.m.–6 p.m.", location: "Blair — 100 West Main (across from City Hall)" }],
+    "2026-10-20": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
+    "2026-10-21": [{ time: "11 a.m.–6 p.m.", location: "Cache — City Park, South 8th" }],
+    "2026-10-22": [{ time: "12–5 p.m.", location: "Erick — 103 W. 2nd St." }],
+    "2026-10-23": [{ time: "11 a.m.–2 p.m.", location: "Eldorado — 700 Block of W. A St." }, { time: "2:30–6 p.m.", location: "Olustee — 100 W. 4th" }],
+    "2026-10-26": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+    "2026-10-27": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
+    "2026-10-28": [{ time: "11:30 a.m.–2 p.m.", location: "Burns Flat — 228 Hwy 44" }, { time: "2:30–5:30 p.m.", location: "Sentinel — 210 East Main" }],
+    "2026-10-29": [{ time: "11:30 a.m.–2 p.m.", location: "Lawton — Valley Community Senior Living, 1130 SW Monroe Ave." }, { time: "2:30–6 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }],
+    "2026-10-30": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
   } as Record<string, { time: string; location: string }[]>,
 };
+
+// Pick the newer of the admin-saved schedule and the built-in one, so a stale saved
+// month never hides a newer built-in schedule (and a newer admin upload still wins).
+const MONTHS_ORDER = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function newerSchedule<T extends { month: string; year: number }>(saved: T | undefined | null, builtIn: T): T {
+  if (!saved) return builtIn;
+  const rank = (x: { month: string; year: number }) => x.year * 12 + MONTHS_ORDER.indexOf(x.month);
+  return rank(saved) >= rank(builtIn) ? saved : builtIn;
+}
 
 function generateMealICS(data: typeof MENU_DATA = MENU_DATA): string {
   const { month, year, meals } = data;
@@ -452,7 +460,7 @@ function MarketSchedule({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const cms = useCms();
-  const { month, year, note, stops } = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
+  const { month, year, note, stops } = newerSchedule(cms.marketSchedule, MARKET_SCHEDULE_DATA);
 
   const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
   const lastDay = new Date(year, firstDay.getMonth() + 1, 0);
@@ -553,9 +561,6 @@ function MarketSchedule({ dark }: { dark: boolean }) {
         ))}
       </div>
 
-      <p style={{ fontSize: 13, color: c.note, margin: "8px 0 0", fontStyle: "italic" }}>
-        <EditableText id="marketSchedule.note" section="marketSchedule" label="Market Schedule Note" fallback={note}>{note}</EditableText>
-      </p>
 
       {selectedDate && selectedStops && selectedDayNum && (
         <div
@@ -596,11 +601,19 @@ function MarketSchedule({ dark }: { dark: boolean }) {
 }
 
 function MarketSchedulePanel() {
-  const cms = useCms(); const md = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
+  const cms = useCms(); const md = newerSchedule(cms.marketSchedule, MARKET_SCHEDULE_DATA);
   return (
     <div className="cadc-light-content">
-      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
-        Tap any market day to see stop locations and times. Schedule updates monthly.
+      {md.note && (
+        <div style={{ background: "#FFF8E6", border: "2px solid #D97706", borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
+          <p style={{ fontWeight: 800, fontSize: 17, color: "#92400E", margin: "0 0 4px" }}>🕐 {md.month} {md.year} Schedule</p>
+          <p style={{ fontSize: 16, color: "#1F2937", margin: 0, lineHeight: 1.5 }}>
+            <EditableText id="marketSchedule.note" section="marketSchedule" label="Market Schedule Note" fallback={md.note}>{md.note}</EditableText>
+          </p>
+        </div>
+      )}
+      <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 12, color: "#1F2937" }}>
+        Tap any market day to see stop locations and times, or see the full list below.
       </p>
       <MarketSchedule dark={false} />
       <button
@@ -613,7 +626,39 @@ function MarketSchedulePanel() {
       <p style={{ fontSize: 13, color: "#4B5563", margin: "0 0 12px", fontStyle: "italic" }}>Works with Apple Calendar, Google Calendar, and Outlook</p>
       <div style={{ marginTop: 4, padding: "10px 14px", background: "#EEF0FF", borderRadius: 10 }}>
         <p style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: T.blue, margin: "0 0 6px" }}>Need a ride to the market?</p>
-        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700, fontSize: 13, textDecoration: "none" }} aria-label="Call or text for a ride at 580-374-5518">Call or text 580-374-5518</a>
+        <p style={{ fontSize: 16, color: "#1F2937", margin: "0 0 6px", lineHeight: 1.5 }}>Our support vehicle can bring you to the market if you don't have a reliable ride.</p>
+        <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 800, fontSize: 18, textDecoration: "none" }} aria-label="Call or text for a ride at 580-374-5518">📞 Call or text 580-374-5518</a>
+      </div>
+
+      {/* Full stop list — easy to read and print */}
+      <div style={{ marginTop: 18 }}>
+        <p style={{ fontSize: 14, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: T.maroon, margin: "0 0 10px" }}>All {md.month} Stops</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {Object.keys(md.stops).sort().map(date => {
+            const d = new Date(date + "T12:00:00");
+            return (
+              <div key={date} style={{ background: "white", border: "1.5px solid #E4E4FF", borderRadius: 12, padding: "12px 14px" }}>
+                <p style={{ fontWeight: 800, fontSize: 17, color: T.blue, margin: "0 0 6px" }}>
+                  {d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                </p>
+                {md.stops[date].map((st, i) => {
+                  const [town, place] = st.location.split(" — ");
+                  return (
+                    <div key={i} style={{ marginTop: i ? 8 : 0 }}>
+                      <p style={{ fontWeight: 800, fontSize: 16, color: "#111827", margin: 0 }}>{town} <span style={{ fontWeight: 700, color: "#0101FF" }}>· {st.time}</span></p>
+                      {place && (
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place + ", " + town + ", OK")}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, color: "#374151" }}>{place}</a>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ fontSize: 15, color: "#1F2937", marginTop: 14 }}>
+          Follow us on <a href="https://www.facebook.com/WeAreCADC/" target="_blank" rel="noopener noreferrer" style={{ color: "#0101FF", fontWeight: 700 }}>Facebook</a> for schedule updates. Questions? Call Scott Fraley, Community Market Director, at <a href="tel:+15803051964" style={{ color: "#0101FF", fontWeight: 700 }}>580-305-1964</a>.
+        </p>
       </div>
     </div>
   );
@@ -627,7 +672,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const cms = useCms();
-  const { month, year, note, meals } = cms.seniorMenu ?? MENU_DATA;
+  const { month, year, note, meals } = newerSchedule(cms.seniorMenu, MENU_DATA);
 
   // Build calendar grid — full weeks containing the month
   const firstDay = new Date(year, new Date(`${month} 1, ${year}`).getMonth(), 1);
@@ -798,7 +843,7 @@ function MealCalendar({ dark }: { dark: boolean }) {
 
 // MealCalendarPanel detects desktop (dark) vs mobile (light) context
 function MealCalendarPanel() {
-  const cms = useCms(); const mn = cms.seniorMenu ?? MENU_DATA;
+  const cms = useCms(); const mn = newerSchedule(cms.seniorMenu, MENU_DATA);
   return (
     <div className="cadc-light-content">
       <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12, color: "#374151" }}>
@@ -970,7 +1015,7 @@ function CanvasOverlay({ particles, shockwaves, width, height }: {
       ref={canvasRef}
       width={width}
       height={height}
-      style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:20, opacity: 0.35 }}
+      style={{ position:"absolute", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:20, opacity: 0.35 }}
     />
   );
 }
@@ -1904,7 +1949,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
     { label: "Check Eligibility", icon: "✅", areaId: "eligibility-weath", desc: "Income guidelines" },
   ],
   "senior-meals": [
-    { label: "View Menu", icon: "📋", areaId: "sn-menu", desc: "September meal calendar" },
+    { label: "View Menu", icon: "📋", areaId: "sn-menu", desc: "This month's meals" },
     { label: "Find a Site", icon: "📍", areaId: "congregate", desc: "6 dining locations" },
   ],
   "community-market": [
@@ -2722,11 +2767,11 @@ function CADCNow() {
   ].join("-");
 
   // Today's senior meal — keyed by ISO date string
-  const menu = cms.seniorMenu ?? MENU_DATA;
+  const menu = newerSchedule(cms.seniorMenu, MENU_DATA);
   const todayMeal = isWeekday ? (menu.meals?.[todayKey] ?? null) : null;
 
   // Market stops — all stops for today, or first stop of next upcoming date
-  const market = cms.marketSchedule ?? MARKET_SCHEDULE_DATA;
+  const market = newerSchedule(cms.marketSchedule, MARKET_SCHEDULE_DATA);
   const stops = market.stops ?? {};
   let marketStops: { location: string; time: string }[] | null = stops[todayKey] ?? null;
   let marketDateLabel = "Today";

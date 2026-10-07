@@ -990,7 +990,7 @@ export default function AboutPage() {
               { name: "Gilbert Nuncio", title: "Red River Transportation Director", phone: "580-335-2691", email: "redriver@pldi.net" },
               { name: "Robert Meador", title: "Weatherization & Housing Director", phone: "580-335-5588", email: "" },
               { name: "Kristie", title: "Advantage Home Delivered Meals", phone: "580-699-8880", email: "" },
-              { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "" },
+              { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
               { name: "Tiffany Camero", title: "Executive Secretary", phone: "580-335-5588", email: "tcamero@cadcok.org" },
             ].map(d => (
               <div key={d.name} style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 18px" }}>

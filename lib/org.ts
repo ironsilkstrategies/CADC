@@ -199,7 +199,7 @@ export const programDirectors = {
     title: "Community Market Director",
     phone: "580-305-1964",
     phoneHref: "tel:+15803051964",
-    email: "",
+    email: "sfraley@cadcok.org",
   },
   executive: {
     name: "Leslea Hixson",
