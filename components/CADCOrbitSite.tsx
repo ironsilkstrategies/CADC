@@ -1753,8 +1753,7 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/head-start/community/hs-girl-fire-truck-seat.jpg",    alt: "Girl in fire truck seat during community safety event" },
     { src: "/images/head-start/community/hs-community-event-outdoor.jpg", alt: "CADC Head Start outdoor community event" },
     { src: "/images/head-start/parenting/hs-muffins-with-mom-wide.jpg",  alt: "Muffins with Mom family engagement event" },
-    { src: "/images/hero/hero-1.jpg",  alt: "Head Start Civil Rights training, CADC banner" },
-    { src: "/images/hero/hero-8.jpg",  alt: "Head Start CPR and First Aid training" },
+    { src: "/images/hero/hero-8.jpg",  alt: "Kids painting pumpkins at a community event" },
     { src: "/images/hero/hero-15.jpg", alt: "Head Start classroom visit with legislators" },
     { src: "/images/hero/hero-16.jpg", alt: "Community visitors in a Head Start classroom" },
     { src: "/images/head-start/ehs/ehs-infant-tummy-time.jpg", alt: "Early Head Start infant tummy time" },
@@ -1766,8 +1765,15 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/hero/hero-22.jpg", alt: "Easter Bunny visit with an Early Head Start infant" },
     { src: "/images/hero/hero-9.jpg", alt: "Head Start families at a fall costume event" },
     { src: "/images/head-start/community/hs-washita-back-to-school.jpg", alt: "Washita County back-to-school event" },
-    { src: "/images/hero/hero-7.jpg", alt: "CADC Head Start staff training" },
-    { src: "/images/hero/hero-23.jpg", alt: "Head Start staff professional development" },
+  ],
+  // Head Start "Our Team" tab — staff group photos only (no classroom/kids photos)
+  "hs-team": [
+    { src: "/images/head-start/staff/hs-staff-training.jpg", alt: "CADC Head Start staff training" },
+    { src: "/images/hero/hero-23.jpg", alt: "Head Start staff meeting" },
+    { src: "/images/hero/hero-1.jpg", alt: "Head Start staff Civil Rights training" },
+    { src: "/images/hero/hero-4.jpg", alt: "Head Start staff professional development" },
+    { src: "/images/head-start/staff/hs-teachers-bear-ears.jpg", alt: "CADC Head Start teachers" },
+    { src: "/images/head-start/staff/staff-teacher-child-hug.jpg", alt: "Head Start teacher with a student" },
   ],
   "senior-meals": [
     { src: "/images/senior-dining-1.JPG",  alt: "Seniors dining together at a CADC meal site" },
@@ -3864,19 +3870,6 @@ const PROGRAMS: ProgramData[] = [
         content: (
           <div className="cadc-light-content">
             <p>The people behind CADC Head Start bring decades of experience and deep commitment to the families we serve.</p>
-
-            {/* Staff photo row — group shots */}
-            <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>
-              {[
-                { src: "/images/head-start/staff/hs-staff-training.jpg",       alt: "CADC Head Start staff training" },
-                { src: "/images/head-start/staff/hs-teachers-bear-ears.jpg",   alt: "CADC Head Start teachers wearing bear ears" },
-                { src: "/images/head-start/staff/staff-teacher-child-hug.jpg", alt: "Head Start teacher hugging child" },
-              ].map(p => (
-                <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ height: 220, width: "auto", borderRadius: 10, flexShrink: 0 }} />
-              ))}
-            </div>
 
             <div className="cadc-stack">
 
@@ -5990,7 +5983,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
-        {activeProgram && <SubAreaPhotoCarousel programSlug={activeProgram.slug} />}
+        {activeProgram && <SubAreaPhotoCarousel key={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} programSlug={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} />}
         <div className="cadc-light-content">
           {activeSubArea.content}
         </div>
@@ -6504,7 +6497,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               </h3>
             </div>
             <div style={{ padding: 20 }} className="cadc-light-content">
-              {activeProgram && <SubAreaPhotoCarousel programSlug={activeProgram.slug} />}
+              {activeProgram && <SubAreaPhotoCarousel key={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} programSlug={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} />}
               {activeSubArea.content}
             </div>
           </div>
