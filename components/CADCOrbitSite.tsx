@@ -1681,6 +1681,57 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
 // Auto-cycles through program photos every 3.5s with crossfade.
 // Shown at top of sub-area content panels when the program has photos.
 
+const HS_TEAM: { name: string; title: string; photo: string; phone?: string; email?: string; bio?: string }[] = [
+  {
+    "name": "Robin Harris",
+    "title": "Head Start / Early Head Start Director",
+    "photo": "/images/head-start/staff/staff-robin-harris.jpg",
+    "phone": "580-726-3343",
+    "email": "rharris@cadcok.org"
+  },
+  {
+    "name": "Johnna Mann",
+    "title": "Education Coordinator",
+    "photo": "/images/head-start/staff/staff-johnna-mann.jpg",
+    "email": "jmann@cadcok.org",
+    "bio": "I do this work because early childhood education is foundational. The experiences children have in their first years shape their confidence, their learning, and their future. As an Education Coordinator, I'm committed to ensuring our teachers feel supported, our classrooms are high-quality, and our families feel valued. Head Start changes lives."
+  },
+  {
+    "name": "Tarra Harrison",
+    "title": "PFCE Coordinator",
+    "photo": "/images/head-start/staff/staff-tarra-harrison.jpg",
+    "bio": "Every family has incredible potential, but not everyone has access to the support they need to reach it. As the PFCE Coordinator, I get to help parents and families recognize their own strengths, overcome barriers, and build lasting stability for their children's future. When we partner with families and give them the resources to achieve their goals, we aren't just supporting a child — we are lifting up the entire community."
+  },
+  {
+    "name": "Karen Segler",
+    "title": "ERSEA Coordinator",
+    "photo": "/images/head-start/staff/staff-karen-segler.jpg",
+    "email": "ksegler@cadcok.org",
+    "bio": "25+ years of service to CADC Head Start families across Southwest Oklahoma."
+  },
+  {
+    "name": "Frances Baker",
+    "title": "Nutrition & Supplies Supervisor",
+    "photo": "/images/head-start/staff/staff-frances-baker.jpg",
+    "email": "fbaker@cadcok.org",
+    "bio": "Coming from a single-parent household, I watched my mom work two jobs while attending college during my first few years of school. With her busy schedule, there wasn't always much time for cooking at home. However, I was fortunate to receive hot, nutritious meals through Head Start, which provided an important source of nourishment and support during my early childhood."
+  },
+  {
+    "name": "Christy Glisson",
+    "title": "Administrative Assistant — CADC Head Start Hobart",
+    "photo": "/images/head-start/staff/staff-christy-glisson.jpg",
+    "email": "cglisson@cadcok.org",
+    "bio": "I have been an administrative assistant with the CADC Head Start Office for 21 and a half years. I started out as an EHS parent and on policy council. That's when I learned about all the services and benefits that Head Start provides for children and their families. I wanted to be a part of that but on the administrative side. I love to see the children and hear about success stories with them and their families that might not have happened if they had not had encouragement, guidance and resources provided from our Head Start Program."
+  },
+  {
+    "name": "Allison Zavala",
+    "title": "Administrative Assistant — CADC Head Start Hobart",
+    "photo": "/images/head-start/staff/staff-allison-zavala.jpg",
+    "email": "azavala@cadcok.org",
+    "bio": "As an Administrative Assistant, I am committed to providing reliable and effective administrative support that enables our team to successfully serve the needs of our community. I take pride in helping ensure that our daily operations run efficiently and that our team has the support necessary to accomplish its goals. I am passionate about community engagement and the role that strong connections play in creating thriving communities."
+  }
+];
+
 const HS_CENTER_COUNTY: Record<string, string> = {
   "hs-burns-flat": "Washita County", "hs-cordell": "Washita County", "hs-erick": "Beckham County",
   "hs-frederick": "Tillman County", "hs-grandfield": "Tillman County", "hs-hammon": "Roger Mills County",
@@ -2021,6 +2072,7 @@ function titleRank(title: string): number {
 
 const STAFF_PHOTOS: Record<string, string> = {
   "Leslea Hixson": "/images/staff/staff-leslea-hixson.jpg",
+  "Robin Harris": "/images/head-start/staff/staff-robin-harris.jpg",
   "Terry Collom": "/images/staff/staff-terry-collom.jpg",
   "Suzi Fletcher": "/images/staff/staff-suzi-fletcher.jpg",
   "Gilbert Nuncio": "/images/staff/staff-gilbert-nuncio.jpg",
@@ -3828,110 +3880,20 @@ const PROGRAMS: ProgramData[] = [
 
             <div className="cadc-stack">
 
-              {/* Robin Harris */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Robin Harris</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start / Early Head Start Director</p>
-                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 4 }}>580-726-3343</a>
-                  <a href="mailto:rharris@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block" }}>rharris@cadcok.org</a>
+              {/* Ordered by position. Per Robin Harris Oct 9 2026: Dori Lientz resigned (removed); Nicole Burnett hired, add after onboarding. */}
+              {HS_TEAM.map(m => (
+                <div key={m.name} className="cadc-card-sm" style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                  <img loading="lazy" decoding="async" src={m.photo} alt={`${m.name} — ${m.title}`}
+                    style={{ width: 76, height: 76, objectFit: "cover", objectPosition: "center 22%", borderRadius: "50%", flexShrink: 0, border: "2px solid #DBEAFE" }} />
+                  <div style={{ minWidth: 0 }}>
+                    <p className="cadc-card-title" style={{ marginBottom: 2 }}>{m.name}</p>
+                    <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{m.title}</p>
+                    {m.phone && <a href={`tel:+1${m.phone.replace(/\D/g, "")}`} className="cadc-link" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>{m.phone}</a>}
+                    {m.email && <a href={`mailto:${m.email}`} className="cadc-link" style={{ fontSize: 14, display: "block", marginBottom: 6 }}>{m.email}</a>}
+                    {m.bio && <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, margin: 0 }}>{m.name === "Karen Segler" ? m.bio : `"${m.bio}"`}</p>}
+                  </div>
                 </div>
-              </div>
-
-              {/* Johnna Mann */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <img
-        loading="lazy"
-        decoding="async"
-                  src="/images/head-start/staff/staff-johnna-mann.jpg"
-                  alt="Johnna Mann — Education Coordinator"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
-                />
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Johnna Mann</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Education Coordinator</p>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"I do this work because early childhood education is foundational. The experiences children have in their first years shape their confidence, their learning, and their future. As an Education Coordinator, I'm committed to ensuring our teachers feel supported, our classrooms are high-quality, and our families feel valued. Head Start changes lives."</p>
-                </div>
-              </div>
-
-              {/* Tarra Harrison */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <img
-        loading="lazy"
-        decoding="async"
-                  src="/images/head-start/staff/staff-tarra-harrison.jpg"
-                  alt="Tarra Harrison — PFCE Coordinator"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
-                />
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Tarra Harrison</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>PFCE Coordinator</p>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"Every family has incredible potential, but not everyone has access to the support they need to reach it. As the PFCE Coordinator, I get to help parents and families recognize their own strengths, overcome barriers, and build lasting stability for their children's future. When we partner with families and give them the resources to achieve their goals, we aren't just supporting a child — we are lifting up the entire community."</p>
-                </div>
-              </div>
-
-              {/* Frances Baker */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🍳</div>
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Frances Baker</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Nutrition &amp; Supplies Supervisor</p>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>Oversees nutrition planning and meal supply coordination across all Head Start and Early Head Start centers.</p>
-                </div>
-              </div>
-
-              {/* Christy Glisson — flagged for better photo */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
-                  👩‍💼
-                </div>
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Christy Glisson</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
-                  <a href="tel:+15807263343" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 6 }}>580-726-3343</a>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"I have been an administrative assistant with the CADC Head Start Office for 21 and a half years. I started out as an EHS parent and on policy council. That's when I learned about all the services and benefits that Head Start provides for children and their families. I love to see the children and hear about success stories with them and their families that might not have happened if they had not had encouragement, guidance and resources provided from our Head Start Program."</p>
-                </div>
-              </div>
-
-              {/* Allison Zavala */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <img
-        loading="lazy"
-        decoding="async"
-                  src="/images/head-start/staff/staff-allison-zavala.jpg"
-                  alt="Allison Zavala — Administrative Assistant"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ width: 64, height: 64, objectFit: "cover", objectPosition: "center 15%", borderRadius: 50, flexShrink: 0, border: "2px solid #DBEAFE" }}
-                />
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Allison Zavala</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Administrative Assistant — CADC Head Start Hobart</p>
-                  <a href="mailto:azavala@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 6 }}>azavala@cadcok.org</a>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As an Administrative Assistant, I am committed to providing reliable and effective administrative support that enables our team to successfully serve the needs of our community. I take pride in helping ensure that our daily operations run efficiently and that our team has the support necessary to accomplish its goals. I am passionate about community engagement and the role that strong connections play in creating thriving communities."</p>
-                </div>
-              </div>
-
-              {/* Karen Segler */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍🏫</div>
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Karen Segler</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
-                  <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>25+ years of service to CADC Head Start families across Southwest Oklahoma.</p>
-                </div>
-              </div>
-
-              {/* Dori Lientz */}
-              <div className="cadc-card-sm" style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 50, flexShrink: 0, background: "#DBEAFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👩‍💼</div>
-                <div>
-                  <p className="cadc-card-title" style={{ marginBottom: 2 }}>Dori Lientz</p>
-                  <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Head Start Staff</p>
-                </div>
-              </div>
+              ))}
 
             </div>{/* end cadc-stack */}
 
