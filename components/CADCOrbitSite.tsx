@@ -1707,7 +1707,7 @@ const HS_TEAM: { name: string; title: string; photo: string; phone?: string; ema
     "title": "ERSEA Coordinator",
     "photo": "/images/head-start/staff/staff-karen-segler.jpg",
     "email": "ksegler@cadcok.org",
-    "bio": "25+ years of service to CADC Head Start families across Southwest Oklahoma."
+    "bio": "I fell in love with this program 28 years ago. I love that we are making meaningful, lasting differences in the lives of children and families by helping lay the foundation for their future success. Every day brings the reward of supporting our local community, empowering parents, and supporting families as they build bright futures for their children."
   },
   {
     "name": "Frances Baker",
@@ -3883,7 +3883,7 @@ const PROGRAMS: ProgramData[] = [
                     <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{m.title}</p>
                     {m.phone && <a href={`tel:+1${m.phone.replace(/\D/g, "")}`} className="cadc-link" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>{m.phone}</a>}
                     {m.email && <a href={`mailto:${m.email}`} className="cadc-link" style={{ fontSize: 14, display: "block", marginBottom: 6 }}>{m.email}</a>}
-                    {m.bio && <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, margin: 0 }}>{m.name === "Karen Segler" ? m.bio : `"${m.bio}"`}</p>}
+                    {m.bio && <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, margin: 0 }}>{`"${m.bio}"`}</p>}
                   </div>
                 </div>
               ))}
