@@ -5093,7 +5093,7 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
   return a;
 }
 
-function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
+function HeroPhotoField({ programSlug, dim = false }: { programSlug: string | null; dim?: boolean }) {
   const pool = programSlug && HERO_POOLS[programSlug] ? HERO_POOLS[programSlug] : HERO_POOLS["general"];
   const [idx, setIdx] = useState(0);
   useEffect(() => { setIdx(0); }, [programSlug]);
@@ -5108,8 +5108,9 @@ function HeroPhotoField({ programSlug }: { programSlug: string | null }) {
         <div key={photo} style={{
           position: "absolute", inset: 0,
           backgroundImage: `url(${photo})`, backgroundSize: "cover", backgroundPosition: "center",
-          opacity: i === idx ? 0.38 : 0,
-          transition: "opacity 1.4s ease-in-out",
+          opacity: i === idx ? (dim ? 0.18 : 0.38) : 0,
+          filter: dim ? "blur(3px)" : "none",
+          transition: "opacity 1.4s ease-in-out, filter 0.6s ease",
         }} />
       ))}
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.35) 100%)" }} />
@@ -5568,7 +5569,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
         {/* LEFT — Orbit / Map panel (sticky so the wheel is fully visible without scrolling) */}
         <div style={{ width: stage === "county" ? "100%" : stage === "content" ? "0%" : "38%", overflow: "hidden", transition: "width 0.35s ease", position: "sticky", top: 84, height: "calc(100vh - 84px)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-          <HeroPhotoField programSlug={activeProgram?.slug ?? null} />
+          <HeroPhotoField programSlug={activeProgram?.slug ?? null} dim={stage === "map"} />
           {stage === "county" && activeCountyName?.toLowerCase().includes("canadian") && (
             <a href="tel:+15803355588" style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 5, background: "#FFF8F0", border: "2px solid #D97706", borderRadius: 12, padding: "12px 18px", textDecoration: "none", color: "#92400E", fontWeight: 800, fontSize: 15, boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }}>
               ⚡ El Reno Emergency Utility Assistance — Call 580-335-5588
@@ -5597,7 +5598,7 @@ function DesktopLayout({ stage, activeCounty, activeCountyName, activeProgram, a
 
           {/* Map state */}
           {stage === "map" && (
-            <div style={{ width: "min(90%,800px)", animation: "fadeSlideIn 0.4s ease", background: "white", borderRadius: 16, border: `1px solid ${T.border}`, padding: 16 }}>
+            <div style={{ position: "relative", zIndex: 2, width: "min(90%,800px)", animation: "fadeSlideIn 0.4s ease", background: "#FFFFFF", borderRadius: 18, border: "1.5px solid #C7CBF0", padding: 18, boxShadow: "0 18px 50px rgba(10,13,60,0.22), 0 2px 8px rgba(10,13,60,0.10)" }}>
               <OklahomaCountyMap
                 selectedCounty={null}
                 onSelectCounty={tapCounty}
