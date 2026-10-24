@@ -1766,6 +1766,14 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/hero/hero-9.jpg", alt: "Head Start families at a fall costume event" },
     { src: "/images/head-start/community/hs-washita-back-to-school.jpg", alt: "Washita County back-to-school event" },
   ],
+  // Head Start "Early Head Start" tab — EHS photos only
+  "hs-ehs": [
+    { src: "/images/head-start/ehs/ehs-baby-tunnel-crawl.jpg", alt: "EHS infant crawling through a tunnel" },
+    { src: "/images/head-start/ehs/ehs-infant-tummy-time.jpg", alt: "EHS infant tummy time" },
+    { src: "/images/head-start/ehs/ehs-toddler-outdoor-smile.jpg", alt: "EHS toddler smiling outdoors" },
+    { src: "/images/head-start/ehs/ehs-toddler-playground-structure.jpg", alt: "EHS toddler on the playground" },
+    { src: "/images/hero/hero-22.jpg", alt: "Easter Bunny visit with an Early Head Start infant" },
+  ],
   // Head Start "Our Team" tab — staff group photos only (no classroom/kids photos)
   "hs-team": [
     { src: "/images/head-start/staff/hs-staff-training.jpg", alt: "CADC Head Start staff training" },
@@ -1812,6 +1820,9 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: "/images/hero/hero-17.jpg", alt: "Weatherization field crew in hi-vis vests" },
   ],
 };
+
+// Sub-areas that show their own slideshow instead of the program's general one
+const SUB_AREA_PHOTO_OVERRIDE: Record<string, string> = { "hs-team": "hs-team", "ehs": "hs-ehs" };
 
 function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
   const photos = SUB_AREA_PHOTOS[programSlug];
@@ -3676,19 +3687,6 @@ const PROGRAMS: ProgramData[] = [
         id: "ehs", label: "Early Head Start", shortLabel: "EHS", icon: "🤱",
         content: (
           <div className="cadc-light-content">
-            {/* EHS Photo Row */}
-            <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>
-              {[
-                { src: "/images/head-start/ehs/ehs-baby-tunnel-crawl.jpg",         alt: "EHS infant crawling through tunnel" },
-                { src: "/images/head-start/ehs/ehs-infant-tummy-time.jpg",          alt: "EHS infant tummy time activity" },
-                { src: "/images/head-start/ehs/ehs-toddler-outdoor-smile.jpg",      alt: "EHS toddler smiling outdoors" },
-                { src: "/images/head-start/ehs/ehs-toddler-playground-structure.jpg", alt: "EHS toddler on playground structure" },
-              ].map(p => (
-                <img loading="lazy" decoding="async" key={p.src} src={p.src} alt={p.alt}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{ height: 220, width: "auto", borderRadius: 10, flexShrink: 0 }} />
-              ))}
-            </div>
             <p>Early Head Start provides a comprehensive, age-appropriate program for infants, toddlers, and pregnant women from birth to age 3. Our approach supports the whole child — social-emotional, cognitive, physical, and language development are interconnected from the earliest stages of life.</p>
             <p>Families are valued as essential partners. Parents are encouraged to participate in daily routines, volunteer in classrooms, and stay engaged throughout the year.</p>
             <div className="cadc-card">
@@ -5984,7 +5982,7 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <h3 style={{ fontSize: "clamp(1.2rem,2vw,1.8rem)", fontWeight: 800, lineHeight: 1.2, marginBottom: 20, fontFamily: "'Space Grotesk', sans-serif", color: T.textPrimary }}>
           {activeSubArea.icon} {activeSubArea.label}
         </h3>
-        {activeProgram && <SubAreaPhotoCarousel key={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} programSlug={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} />}
+        {activeProgram && <SubAreaPhotoCarousel key={SUB_AREA_PHOTO_OVERRIDE[activeSubArea.id] ?? activeProgram.slug} programSlug={SUB_AREA_PHOTO_OVERRIDE[activeSubArea.id] ?? activeProgram.slug} />}
         <div className="cadc-light-content">
           {activeSubArea.content}
         </div>
@@ -6498,7 +6496,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
               </h3>
             </div>
             <div style={{ padding: 20 }} className="cadc-light-content">
-              {activeProgram && <SubAreaPhotoCarousel key={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} programSlug={activeSubArea.id === "hs-team" ? "hs-team" : activeProgram.slug} />}
+              {activeProgram && <SubAreaPhotoCarousel key={SUB_AREA_PHOTO_OVERRIDE[activeSubArea.id] ?? activeProgram.slug} programSlug={SUB_AREA_PHOTO_OVERRIDE[activeSubArea.id] ?? activeProgram.slug} />}
               {activeSubArea.content}
             </div>
           </div>
