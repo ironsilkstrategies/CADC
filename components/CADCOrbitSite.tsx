@@ -1644,37 +1644,14 @@ function ProgramHeroBanner({ slug, dark }: { slug: string; dark: boolean }) {
     },
   };
 
+  // Rotate through the program's photo set (same photos as its slideshow), leading with the hero shot
+  const set = SUB_AREA_PHOTOS[slug] ?? [];
   const hero = heroMap[slug];
-  if (!hero) return null;
-
-  return (
-    <figure style={{
-      margin: "0 0 20px", borderRadius: 14, overflow: "hidden",
-      border: `1px solid ${dark ? "rgba(1,1,255,0.25)" : "#d8dcf2"}`,
-      background: dark ? "#0d1030" : "#ffffff",
-      boxShadow: "0 4px 18px rgba(1,1,255,0.08)",
-      animation: "fadeSlideIn 0.5s ease",
-    }}>
-      <div style={{
-        position: "relative", width: "100%", height: "clamp(240px, 40vh, 420px)",
-        background: dark ? "#0a0d1f" : "#eef0fb",
-      }}>
-        <img
-          loading="lazy"
-          decoding="async"
-          src={hero.src}
-          alt={hero.caption}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-        />
-      </div>
-      <figcaption style={{
-        padding: "10px 14px", fontSize: 14, fontWeight: 600, fontStyle: "italic",
-        color: dark ? "rgba(255,255,255,0.85)" : "#374151",
-        borderTop: `1px solid ${dark ? "rgba(1,1,255,0.2)" : "#e5e7f5"}`,
-      }}>{hero.caption}</figcaption>
-    </figure>
-  );
+  const photos = hero
+    ? [{ src: hero.src, alt: hero.caption }, ...set.filter(p => p.src !== hero.src)]
+    : set;
+  if (photos.length === 0) return null;
+  return <PhotoRotator photos={photos} />;
 }
 
 // ─── Sub-Area Photo Carousel ──────────────────────────────────────────────────
@@ -1826,6 +1803,11 @@ const SUB_AREA_PHOTO_OVERRIDE: Record<string, string> = { "hs-team": "hs-team", 
 
 function SubAreaPhotoCarousel({ programSlug }: { programSlug: string }) {
   const photos = SUB_AREA_PHOTOS[programSlug];
+  if (!photos || photos.length === 0) return null;
+  return <PhotoRotator photos={photos} />;
+}
+
+function PhotoRotator({ photos }: { photos: { src: string; alt: string }[] }) {
   const [current, setCurrent] = useState(0);
   const [next, setNext] = useState(1);
   const [transitioning, setTransitioning] = useState(false);
@@ -3018,11 +3000,11 @@ function CADCNow() {
               textDecoration: "none", background: "transparent" }}>
             <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1.3 }}>{item.icon}</span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 2 }}>{item.label}</div>
-              <div style={{ color: item.color ? "white" : "white", fontSize: 14, fontWeight: 800, lineHeight: 1.3 }}>{item.value}</div>
-              {item.sub && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{item.sub}</div>}
+              <div style={{ fontSize: 13, color: "#FFFFFF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 2 }}>{item.label}</div>
+              <div style={{ color: "#FFFFFF", fontSize: 15, fontWeight: 800, lineHeight: 1.3 }}>{item.value}</div>
+              {item.sub && <div style={{ fontSize: 14, color: "#FFFFFF", marginTop: 2 }}>{item.sub}</div>}
             </div>
-            {item.href && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 16, flexShrink: 0, marginTop: 4 }}>›</span>}
+            {item.href && <span style={{ color: "#FFFFFF", fontSize: 18, flexShrink: 0, marginTop: 4 }}>›</span>}
           </a>
         ))}
       </div>
@@ -3052,7 +3034,7 @@ const CADC_LOCATIONS = [
   // Transit (3)
   { name: "Red River Transit — Frederick", city: "Frederick · 105 S. Main", lat: 34.3923, lng: -98.9912, phone: "580-335-2691", href: "tel:+15803352691", services: ["Transportation"] },
   { name: "Red River Transit — Sayre", city: "Sayre · 304 W. Main", lat: 35.2912, lng: -99.6401, phone: "580-928-2199", href: "tel:+15809282199", services: ["Transportation"] },
-  { name: "Red River Transit — Ryan", city: "Ryan · 400 Taylor St.", lat: 34.0187, lng: -97.9534, phone: "580-757-2412", href: "tel:+15807572412", services: ["Transportation"] },
+  { name: "Red River Transit — Ryan", city: "Ryan · 400 Taylor & Main", lat: 34.0187, lng: -97.9534, phone: "580-757-2235", href: "tel:+15807572235", services: ["Transportation"] },
   // Weatherization (1)
   { name: "Weatherization Office", city: "Frederick · 105 S. Main", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Weatherization","Housing"] },
   // Community Market (1)
@@ -4483,7 +4465,7 @@ const PROGRAMS: ProgramData[] = [
         id: "board-members", label: "Board of Directors", shortLabel: "Board", icon: "🏛️",
         content: (
           <div className="cadc-light-content">
-            <p>CADC is governed by a tripartite Board of Directors — public sector, private sector, and low-income community representatives — from each county we serve. Members serve 3-year terms. Source: FY '25 CSBG Board Membership Roster, August 18, 2025.</p>
+            <p>CADC is governed by a tripartite Board of Directors — public sector, private sector, and low-income community representatives — from each county we serve. Members serve 3-year terms. Source: CADC Board Membership Roster, 2026.</p>
             <div className="cadc-card" style={{marginTop:14}}>
               <p className="cadc-label">Executive Committee</p>
               {[
@@ -4502,40 +4484,39 @@ const PROGRAMS: ProgramData[] = [
             <p style={{fontSize:13,color:"#CC0000",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",margin:"14px 0 8px"}}>Board Members by County</p>
             <div className="cadc-stack">
               {[
+                // Board roster per CADC 2026 Board Membership Roster (updated by Tiffany Camero, Oct 12 2026)
                 {county:"Beckham County",members:[
                   {name:"Purcy Walker",sector:"Low Income",group:"Sayre Senior Citizens Group",term:"4/2025–4/2028"},
-                  {name:"Tate Finnell",sector:"Public",group:"Beckham County Commissioners (Exec. Committee)",term:"4/2023–4/2026"},
+                  {name:"Tate Finnell",sector:"Public",group:"Beckham County Commissioners (Member Exec. Committee)",term:"4/2026–4/2029"},
                   {name:"Jackie Anderson",sector:"Private",group:"Elk City Chamber of Commerce",term:"6/2025–6/2028"},
                 ]},
                 {county:"Cotton County",members:[
-                  {name:"Dave Johnson",sector:"Private",group:"Walters Chamber of Commerce (Vice-Chairman Exec. Committee)",term:"6/2023–6/2026"},
-                  {name:"Milton Honeycutt",sector:"Public",group:"Cotton County Commissioners",term:"1/2023–1/2026"},
-                  {name:"Paul Metcalfe",sector:"Low Income",group:"Walters Church of the Nazarene",term:"3/2023–3/2026"},
+                  {name:"Dave Johnson",sector:"Private",group:"Walters Chamber of Commerce (Vice-Chairman Exec. Committee)",term:"6/2026–6/2029"},
+                  {name:"Paul Metcalfe",sector:"Low Income",group:"Walters Church of the Nazarene",term:"3/2026–3/2029"},
                 ]},
                 {county:"Comanche County",members:[
                   {name:"Jo Peters",sector:"Private",group:"NAACP Chapter 6131",term:"9/2024–9/2027"},
                   {name:"Chandra Barnett",sector:"Low Income",group:"Cache Sr. Citizens Group",term:"11/2024–11/2027"},
                 ]},
                 {county:"Jefferson County",members:[
-                  {name:"Bryce Bohot",sector:"",group:"Jefferson County",term:""},
+                  {name:"Pat McGriff",sector:"Low Income",group:"Jefferson County District 1",term:"8/2026–8/2029"},
                 ]},
                 {county:"Kiowa County",members:[
-                  {name:"Gary Jennings",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"9/2022–9/2025"},
+                  {name:"Gary Jennings",sector:"Public",group:"Kiowa County Commissioners (Member Exec. Committee)",term:"11/2025–11/2028"},
                   {name:"Chris Block",sector:"Low Income",group:"",term:"11/2024–11/2027"},
                 ]},
                 {county:"Roger Mills County",members:[
-                  {name:"Monty Denny",sector:"Public",group:"Roger Mills County Commissioners / Cheyenne & Arapaho Tribes",term:"1/2023–1/2026"},
-                  {name:"Rector Candy",sector:"Private",group:"",term:"1/2024–1/2027"},
+                  {name:"Rector Candy",sector:"Private",group:"Cheyenne & Arapaho Tribes",term:"1/2024–1/2027"},
                 ]},
                 {county:"Tillman County",members:[
                   {name:"Roger Heap",sector:"Public",group:"Frederick Lions Club",term:"1/2024–1/2027"},
-                  {name:"Eddie Whitworth",sector:"Public",group:"Frederick Head Start Parents' Committee (Chairman)",term:"2/2024–2/2027"},
-                  {name:"Araceli Rodriguez",sector:"Private",group:"Frederick Chamber of Commerce",term:"5/2025–5/2028"},
+                  {name:"Eddie Whitworth",sector:"Low Income",group:"Frederick Head Start Parents' Committee (Chairman)",term:"2/2024–2/2027"},
+                  {name:"Araceli Rodriguez",sector:"Private",group:"Frederick Chamber of Commerce",term:"6/2025–6/2028"},
                 ]},
                 {county:"Washita County",members:[
-                  {name:"Bruce Mayfield",sector:"Private",group:"Town of Sentinel (Sec Exec Committee)",term:"7/2024–7/2027"},
+                  {name:"Bruce Mayfield",sector:"Private",group:"Town of Sentinel (Sec. Exec. Committee)",term:"7/2024–7/2027"},
                   {name:"Betty Mayfield",sector:"Low Income",group:"Head Start",term:"5/2025–5/2028"},
-                  {name:"Greg Chandler",sector:"Public",group:"Washita County Commissioners",term:"1/2023–1/2026"},
+                  {name:"Kristin Dowell",sector:"Public",group:"Washita County Commissioners",term:"1/2026–1/2029"},
                 ]},
               ].map(({county,members})=>(
                 <div key={county} className="cadc-card-sm">
@@ -4644,7 +4625,7 @@ const PROGRAMS: ProgramData[] = [
 
             <div className="cadc-card">
               <p className="cadc-label">Governance</p>
-              <p style={{fontSize:13,color:"#374151",margin:"0 0 10px",lineHeight:1.6}}>CADC is governed by a tripartite Board of Directors with 19 members representing public sector, private sector, and low-income community constituents across our 8-county board area.</p>
+              <p style={{fontSize:13,color:"#374151",margin:"0 0 10px",lineHeight:1.6}}>CADC is governed by a tripartite Board of Directors with 17 members representing public sector, private sector, and low-income community constituents across our 8-county board area.</p>
               <a href="/?program=board&area=board-members" className="cadc-btn" style={{marginBottom:8}}>View Board of Directors →</a>
               <a href="/?program=board&area=board-docs" className="cadc-btn" style={{background:"white",color:"#0101FF",border:"1.5px solid #0101FF"}}>Board Documents & Minutes →</a>
             </div>
