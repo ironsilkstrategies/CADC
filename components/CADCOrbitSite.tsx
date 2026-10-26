@@ -313,7 +313,7 @@ function trackStat(type: "program" | "county" | "search" | "visit", key?: string
 // ─── Senior Nutrition Menu Data ───────────────────────────────────────────────
 // To update: change month, year, and meals object only. Keys are YYYY-MM-DD.
 
-const MENU_DATA = {
+const OCTOBER_MENU_DATA = {
   month: "October", year: 2026,
   note: "8 oz milk served daily at all congregate sites",
   meals: {
@@ -341,6 +341,38 @@ const MENU_DATA = {
     "2026-10-30": { headline: "Ribette", full: ["Ribette", "Scalloped Potatoes", "Green Beans", "Dinner Roll", "Cookie Bar"] },
   } as Record<string, { headline: string; full: string[] }>,
 };
+
+// November 2026 menu — from CADC "11 November Menu 2026" (closed Nov 11 Veterans Day, Nov 26–27 Thanksgiving)
+const NOVEMBER_MENU_DATA: typeof OCTOBER_MENU_DATA = {
+  month: "November", year: 2026,
+  note: "8 oz milk served daily at all congregate sites · Closed Nov 11 (Veterans Day) and Nov 26–27 (Thanksgiving)",
+  meals: {
+    "2026-11-02": { headline: "Roasted Ham", full: ["Roasted Ham", "Sweet Potatoes", "Brussel Sprouts", "Cornbread", "Spiced Apples"] },
+    "2026-11-03": { headline: "Chicken Salad on Croissant (Curbside Pickup)", full: ["Chicken Salad on Croissant", "Broccoli Soup", "Pickled Beets", "Cookie"] },
+    "2026-11-04": { headline: "Fry Bread Stack w/ Taco Meat & Beans", full: ["Fry Bread Stack w/ Taco Meat & Beans", "Fiesta Corn/Chips", "Cherry Fruit Crisp"] },
+    "2026-11-05": { headline: "Roast Turkey w/ Gravy", full: ["Roast Turkey w/ Gravy", "Mashed Potatoes", "Peas & Carrots", "Dinner Roll", "Gingerbread"] },
+    "2026-11-06": { headline: "Southwest Stew", full: ["Southwest Stew", "Coleslaw", "Cornbread", "Jell-O w/ Fruit"] },
+    "2026-11-09": { headline: "Chili Dog on Bun", full: ["Chili Dog on Bun", "Tots & Cheese", "Coleslaw", "Cookies"] },
+    "2026-11-10": { headline: "Chicken Casserole", full: ["Chicken Casserole", "Refried Beans", "Stewed Tomatoes", "Bread", "Jell-O w/ Fruit"] },
+    "2026-11-12": { headline: "Beans w/ Ham", full: ["Beans w/ Ham", "Spinach", "Oven Browned Potatoes", "Cornbread", "Cobbler"] },
+    "2026-11-13": { headline: "Salisbury Steak w/ Gravy", full: ["Salisbury Steak w/ Gravy", "Mashed Potatoes", "Black-Eyed Peas", "Dinner Roll", "Sweet Potato Pie"] },
+    "2026-11-16": { headline: "King Ranch Chicken", full: ["King Ranch Chicken", "Tossed Salad", "Mexican Corn", "Taco Chips", "Pudding"] },
+    "2026-11-17": { headline: "Fried Fish", full: ["Fried Fish", "Coleslaw", "Potato Wedges", "Hush Puppies", "Cake"] },
+    "2026-11-18": { headline: "Baked Chicken", full: ["Baked Chicken", "Sweet Potato", "Spinach", "Dinner Roll", "Jell-O w/ Fruit"] },
+    "2026-11-19": { headline: "Chef Salad", full: ["Chef Salad", "Diced Peaches", "Crackers", "Cinnamon Roll"] },
+    "2026-11-20": { headline: "Meatloaf", full: ["Meatloaf", "Mashed Potatoes/Gravy", "Cooked Cabbage", "Bread", "Harvest Bar"] },
+    "2026-11-23": { headline: "Chicken Pot Pie", full: ["Chicken Pot Pie", "Harvard Beets", "Fruit Salad"] },
+    "2026-11-24": { headline: "Cheeseburger on Bun", full: ["Cheeseburger on Bun", "Pea Salad", "Baked Beans", "Frosted Brownie"] },
+    "2026-11-25": { headline: "Hobo Beans", full: ["Hobo Beans", "Tomato Spoon Relish", "Spinach", "Cornbread", "Crisp"] },
+    "2026-11-30": { headline: "Chicken & Dumplings", full: ["Chicken & Dumplings", "Broccoli", "Carrots", "Dinner Roll", "Cake"] },
+  },
+};
+
+// Built-in menu follows the calendar: the newest month that has started.
+const MENU_DATA = [OCTOBER_MENU_DATA, NOVEMBER_MENU_DATA].reduce((cur, m) => {
+  const start = new Date(m.year, ["January","February","March","April","May","June","July","August","September","October","November","December"].indexOf(m.month), 1);
+  return start <= new Date() ? m : cur;
+}, OCTOBER_MENU_DATA);
 
 // ─── Community Market Schedule Data ──────────────────────────────────────────
 // To update: change month, year, and stops object only. Keys are YYYY-MM-DD.
