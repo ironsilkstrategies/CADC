@@ -20,20 +20,22 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "CADC — Community Action Development Corporation",
   description:
-    "A Community Action Development Corporation serving 9 counties across Southwest Oklahoma — Head Start, Red River Transportation, Weatherization, Senior Nutrition, Tax Help, and more. Helping People. Changing Lives.",
+    "Community Action Development Corporation serves families across Southwest Oklahoma with Head Start, Red River Transportation, Weatherization, Senior Nutrition, Advantage meals and the Community Market. Helping People. Changing Lives.",
   metadataBase: new URL("https://cadcok.org"),
   openGraph: {
     title: "CADC — Community Action Development Corporation",
-    description: "Helping People. Changing Lives. A Community Action Development Corporation serving Southwest Oklahoma.",
+    description: "Helping People. Changing Lives. Head Start, Transit, Weatherization, Senior Meals and more across Southwest Oklahoma.",
     url: "https://cadcok.org",
-    siteName: "CADC",
+    siteName: "CADC — Community Action Development Corporation",
     locale: "en_US",
     type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "CADC — Helping People. Changing Lives. Services for families across Southwest Oklahoma" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "CADC — Community Action Development Corporation",
-    description: "Helping People. Changing Lives. A Community Action Development Corporation serving Southwest Oklahoma.",
+    description: "Helping People. Changing Lives. Head Start, Transit, Weatherization, Senior Meals and more across Southwest Oklahoma.",
+    images: ["/og-image.jpg"],
   },
 };
 
