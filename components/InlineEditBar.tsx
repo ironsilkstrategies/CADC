@@ -20,8 +20,23 @@ import type { ContentBlock } from "@/lib/cms";
 function useIsAdminViewer(): boolean {
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
-    const hasSession = typeof document !== "undefined" && document.cookie.includes("cadc_admin_view=1");
-    setIsAdmin(hasSession);
+    // Edit UI shows only when BOTH the viewer cookie and a saved admin key exist
+    // AND the server confirms that key is the current admin password.
+    // A stale cookie, a wrong/old password, or a regular visitor never sees edit mode.
+    if (typeof document === "undefined") return;
+    const hasCookie = document.cookie.includes("cadc_admin_view=1");
+    let key = "";
+    try { key = localStorage.getItem("cadc_admin_key") ?? ""; } catch { /* storage blocked */ }
+    if (!hasCookie || !key) { if (hasCookie) clearAdminViewerSession(); return; }
+    let cancelled = false;
+    fetch("/api/cms", { method: "HEAD", headers: { "x-admin-key": key } })
+      .then(r => {
+        if (cancelled) return;
+        if (r.status === 204) setIsAdmin(true);
+        else { clearAdminViewerSession(); try { localStorage.removeItem("cadc_admin_key"); } catch {} }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
   return isAdmin;
 }
@@ -29,10 +44,12 @@ function useIsAdminViewer(): boolean {
 // Call this from the admin login success handler to enable inline editing
 // site-wide without needing to pass adminKey through every page:
 export function markAdminViewerSession() {
-  document.cookie = "cadc_admin_view=1; path=/; max-age=86400"; // 24hr
+  // Session cookie: ends when the browser is closed (and capped at 2 hours).
+  document.cookie = "cadc_admin_view=1; path=/; max-age=7200; samesite=strict";
 }
 export function clearAdminViewerSession() {
   document.cookie = "cadc_admin_view=0; path=/; max-age=0";
+  try { localStorage.removeItem("cadc_admin_key"); } catch { /* storage blocked */ }
 }
 
 interface EditableProps {
