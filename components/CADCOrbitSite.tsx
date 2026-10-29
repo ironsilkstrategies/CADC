@@ -1696,7 +1696,8 @@ const HS_TEAM: { name: string; title: string; photo: string; phone?: string; ema
     "title": "Head Start / Early Head Start Director",
     "photo": "/images/head-start/staff/staff-robin-harris.jpg",
     "phone": "580-726-3343",
-    "email": "rharris@cadcok.org"
+    "email": "rharris@cadcok.org",
+    "bio": "Every child deserves to feel loved, valued, and believed in, no matter their circumstances. Families may not always have a lot, but sometimes the things that matter most don't cost anything—a smile, a hug, encouragement, someone who listens, and people who truly care. If we can give a child a safe place to grow and a family the support to keep moving forward, then we are making a difference that can last a lifetime."
   },
   {
     "name": "Johnna Mann",
