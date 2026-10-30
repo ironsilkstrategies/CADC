@@ -1709,6 +1709,7 @@ const HS_TEAM: { name: string; title: string; photo: string; phone?: string; ema
   {
     "name": "Tarra Harrison",
     "title": "PFCE Coordinator",
+    "email": "tharrison@cadcok.org",
     "photo": "/images/head-start/staff/staff-tarra-harrison.jpg",
     "bio": "Every family has incredible potential, but not everyone has access to the support they need to reach it. As the PFCE Coordinator, I get to help parents and families recognize their own strengths, overcome barriers, and build lasting stability for their children's future. When we partner with families and give them the resources to achieve their goals, we aren't just supporting a child — we are lifting up the entire community."
   },
