@@ -5849,6 +5849,12 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <h1 style={{ margin: "0 0 20px" }}>
           <img src="/images/cadc-logo.png" alt="Community Action Development Corporation" style={{ display: "block", width: "min(100%, 460px)", height: "auto" }} />
         </h1>
+        <div style={{ margin: "0 0 20px", maxWidth: 520 }}>
+          <div role="note" aria-label="Our mission" style={{ background: "#0101FF", color: "#FFFFFF", borderRadius: 14, padding: "14px 18px", borderLeft: "6px solid #CC0000", boxShadow: "0 6px 20px rgba(1,1,255,0.18)" }}>
+            <span style={{ display: "block", fontSize: 12, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#FFD0D0", marginBottom: 4 }}>Our Mission</span>
+            <span style={{ display: "block", fontSize: "clamp(1.15rem,2vw,1.45rem)", fontWeight: 800, lineHeight: 1.25 }}>Reducing poverty by empowering people.</span>
+          </div>
+        </div>
         <p style={{ color: "#374151", fontSize: 17, lineHeight: 1.7, marginBottom: 24 }}>
           Serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, senior nutrition, and more. Tap the CADC logo to find services in your county.
         </p>
@@ -6385,6 +6391,13 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
             </div>
             <span style={{ color: T.blue, fontSize: 13, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Tap to Explore Your County</span>
           </button>
+
+          <div style={{ marginTop: 24, width: "100%", maxWidth: 420, textAlign: "center" }}>
+            <div role="note" aria-label="Our mission" style={{ background: "#0101FF", color: "#FFFFFF", borderRadius: 14, padding: "14px 18px", borderBottom: "5px solid #CC0000", boxShadow: "0 6px 20px rgba(1,1,255,0.18)" }}>
+            <span style={{ display: "block", fontSize: 12, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#FFD0D0", marginBottom: 4 }}>Our Mission</span>
+            <span style={{ display: "block", fontSize: "clamp(1.15rem,2vw,1.45rem)", fontWeight: 800, lineHeight: 1.25 }}>Reducing poverty by empowering people.</span>
+          </div>
+          </div>
 
           {/* Program tiles — each one is a link */}
           <div style={{ marginTop: 28, width: "100%", maxWidth: 420, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
