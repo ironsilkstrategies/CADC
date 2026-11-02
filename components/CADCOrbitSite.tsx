@@ -1655,6 +1655,37 @@ const PHOTOS = {
   },
 } as const;
 
+// ─── Mission Banner ───────────────────────────────────────────────────────────
+// CADC mission statement (per Leslea Hixson, Nov 2026). Shown on the home page.
+function MissionBanner() {
+  return (
+    <div role="note" aria-label="Our mission" className="cadc-mission">
+      <style>{`
+        .cadc-mission{position:relative;overflow:hidden;border-radius:18px;padding:22px 24px 22px 26px;color:#fff;
+          background:linear-gradient(120deg,#0101FF 0%,#1a2bff 45%,#3b1fd1 75%,#CC0000 140%);
+          box-shadow:0 14px 40px rgba(1,1,255,0.28),inset 0 1px 0 rgba(255,255,255,0.25);text-align:left}
+        .cadc-mission:before{content:"“";position:absolute;right:14px;top:-34px;font-size:150px;line-height:1;
+          font-family:Georgia,serif;color:rgba(255,255,255,0.12);pointer-events:none}
+        .cadc-mission:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+          background:linear-gradient(100deg,transparent,rgba(255,255,255,0.22),transparent);
+          transform:skewX(-20deg);animation:cadcMissionShine 5.5s ease-in-out 1.2s infinite}
+        @keyframes cadcMissionShine{0%{left:-60%}35%,100%{left:130%}}
+        @media (prefers-reduced-motion:reduce){.cadc-mission:after{animation:none;display:none}}
+        .cadc-mission .lbl{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.22em;
+          text-transform:uppercase;color:#fff;background:#CC0000;padding:5px 12px;border-radius:999px;margin-bottom:12px;
+          box-shadow:0 4px 12px rgba(204,0,0,0.35)}
+        .cadc-mission .txt{display:block;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:900;line-height:1.12;letter-spacing:-0.01em;
+          font-family:'Space Grotesk',system-ui,sans-serif;position:relative;z-index:1}
+        .cadc-mission .txt em{font-style:normal;background:linear-gradient(transparent 62%,rgba(204,0,0,0.85) 62%);padding:0 2px}
+        .cadc-mission .sig{display:block;margin-top:10px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.88);position:relative;z-index:1}
+      `}</style>
+      <span className="lbl">❤ Our Mission</span>
+      <span className="txt">Reducing poverty by <em>empowering people.</em></span>
+      <span className="sig">Community Action Development Corporation · Helping People. Changing Lives.</span>
+    </div>
+  );
+}
+
 // ─── Program Hero Banner ──────────────────────────────────────────────────────
 // Displays at top of program content panel (Option B of photo strategy)
 // Photo strips with parallax-style overlay and program identity
@@ -5849,11 +5880,8 @@ function DesktopContentPanel({ stage, activeCountyName, activeProgram, activeSub
         <h1 style={{ margin: "0 0 20px" }}>
           <img src="/images/cadc-logo.png" alt="Community Action Development Corporation" style={{ display: "block", width: "min(100%, 460px)", height: "auto" }} />
         </h1>
-        <div style={{ margin: "0 0 20px", maxWidth: 520 }}>
-          <div role="note" aria-label="Our mission" style={{ background: "#0101FF", color: "#FFFFFF", borderRadius: 14, padding: "14px 18px", borderLeft: "6px solid #CC0000", boxShadow: "0 6px 20px rgba(1,1,255,0.18)" }}>
-            <span style={{ display: "block", fontSize: 12, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#FFD0D0", marginBottom: 4 }}>Our Mission</span>
-            <span style={{ display: "block", fontSize: "clamp(1.15rem,2vw,1.45rem)", fontWeight: 800, lineHeight: 1.25 }}>Reducing poverty by empowering people.</span>
-          </div>
+        <div style={{ margin: "0 0 22px", maxWidth: 560 }}>
+          <MissionBanner />
         </div>
         <p style={{ color: "#374151", fontSize: 17, lineHeight: 1.7, marginBottom: 24 }}>
           Serving 9 counties across Southwest Oklahoma — early childhood education, transportation, weatherization, senior nutrition, and more. Tap the CADC logo to find services in your county.
@@ -6393,10 +6421,7 @@ function MobileLayout({ stage, activeCounty, activeCountyName, activeProgram, ac
           </button>
 
           <div style={{ marginTop: 24, width: "100%", maxWidth: 420, textAlign: "center" }}>
-            <div role="note" aria-label="Our mission" style={{ background: "#0101FF", color: "#FFFFFF", borderRadius: 14, padding: "14px 18px", borderBottom: "5px solid #CC0000", boxShadow: "0 6px 20px rgba(1,1,255,0.18)" }}>
-            <span style={{ display: "block", fontSize: 12, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#FFD0D0", marginBottom: 4 }}>Our Mission</span>
-            <span style={{ display: "block", fontSize: "clamp(1.15rem,2vw,1.45rem)", fontWeight: 800, lineHeight: 1.25 }}>Reducing poverty by empowering people.</span>
-          </div>
+            <MissionBanner />
           </div>
 
           {/* Program tiles — each one is a link */}
