@@ -378,7 +378,7 @@ const MENU_DATA = [OCTOBER_MENU_DATA, NOVEMBER_MENU_DATA].reduce((cur, m) => {
 // To update: change month, year, and stops object only. Keys are YYYY-MM-DD.
 // Each day can have multiple stops.
 
-const MARKET_SCHEDULE_DATA = {
+const OCTOBER_MARKET_DATA = {
   month: "October", year: 2026,
   note: "Extended hours this month! Please help us share this schedule at churches, senior centers, and local businesses.",
   transportation: "Need a ride to the market? Call or text 580-374-5518",
@@ -407,6 +407,39 @@ const MARKET_SCHEDULE_DATA = {
     "2026-10-30": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
   } as Record<string, { time: string; location: string }[]>,
 };
+
+// November 2026 Community Market — from Scott Fraley's "November Community Market Schedule" (no market Nov 11, 26, 27)
+const NOVEMBER_MARKET_DATA: typeof OCTOBER_MARKET_DATA = {
+  month: "November", year: 2026,
+  note: "No market Nov 11 (Veterans Day) or Nov 26–27 (Thanksgiving). Please help us share this schedule at churches, senior centers, and local businesses.",
+  transportation: "Need a ride to the market? Call or text 580-374-5518",
+  stops: {
+    "2026-11-02": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+    "2026-11-03": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
+    "2026-11-04": [{ time: "11:30 a.m.–5:30 p.m.", location: "Sentinel — 210 East Main" }],
+    "2026-11-05": [{ time: "11:30 a.m.–1:30 p.m.", location: "Lawton — Valley Community Senior Living, 1130 SW Monroe Ave." }, { time: "3–6 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }],
+    "2026-11-06": [{ time: "11 a.m.–6 p.m.", location: "Olustee — 100 W. 4th" }],
+    "2026-11-09": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+    "2026-11-10": [{ time: "11 a.m.–6 p.m.", location: "Geronimo — 100 Main St. (Senior Citizen Center)" }],
+    "2026-11-12": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
+    "2026-11-13": [{ time: "11 a.m.–6 p.m.", location: "Duke" }],
+    "2026-11-16": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+    "2026-11-17": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
+    "2026-11-18": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
+    "2026-11-19": [{ time: "11:30 a.m.–1:30 p.m.", location: "Lawton — Valley Community Senior Living, 1130 SW Monroe Ave." }, { time: "3–6 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }],
+    "2026-11-20": [{ time: "11 a.m.–6 p.m.", location: "Olustee — 100 W. 4th" }],
+    "2026-11-23": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+    "2026-11-24": [{ time: "11 a.m.–6 p.m.", location: "Geronimo — 100 Main St. (Senior Citizen Center)" }],
+    "2026-11-25": [{ time: "11:30 a.m.–5:30 p.m.", location: "Sentinel — 210 East Main" }],
+    "2026-11-30": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
+  } as Record<string, { time: string; location: string }[]>,
+};
+
+// Built-in Market schedule follows the calendar: the newest month that has started.
+const MARKET_SCHEDULE_DATA = [OCTOBER_MARKET_DATA, NOVEMBER_MARKET_DATA].reduce((cur, m) => {
+  const start = new Date(m.year, ["January","February","March","April","May","June","July","August","September","October","November","December"].indexOf(m.month), 1);
+  return start <= new Date() ? m : cur;
+}, OCTOBER_MARKET_DATA);
 
 // Pick the newer of the admin-saved schedule and the built-in one, so a stale saved
 // month never hides a newer built-in schedule (and a newer admin upload still wins).
@@ -1747,6 +1780,7 @@ const HS_TEAM: { name: string; title: string; photo: string; phone?: string; ema
   {
     "name": "Nikki Burnett",
     "title": "Quality Assurance & Comprehensive Services Coordinator",
+    "email": "nburnett@cadcok.org",
     "photo": "/images/head-start/staff/staff-nikki-burnett.jpg",
     "bio": "I love working with families because I believe every child and family deserves to feel supported, valued, and given the opportunity to thrive. My passion has always been helping families, building meaningful relationships, and making a difference in the lives of others. Through Head Start, I get to continue that passion by helping children grow and giving families the support and encouragement they deserve."
   },
