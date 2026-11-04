@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
 };
 
-const VERSION = "v2.36";
+const VERSION = "v2.37";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

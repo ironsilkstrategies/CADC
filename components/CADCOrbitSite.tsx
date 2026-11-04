@@ -1745,6 +1745,12 @@ const HS_TEAM: { name: string; title: string; photo: string; phone?: string; ema
     "bio": "Every family has incredible potential, but not everyone has access to the support they need to reach it. As the PFCE Coordinator, I get to help parents and families recognize their own strengths, overcome barriers, and build lasting stability for their children's future. When we partner with families and give them the resources to achieve their goals, we aren't just supporting a child — we are lifting up the entire community."
   },
   {
+    "name": "Nikki Burnett",
+    "title": "Quality Assurance & Comprehensive Services Coordinator",
+    "photo": "/images/head-start/staff/staff-nikki-burnett.jpg",
+    "bio": "I love working with families because I believe every child and family deserves to feel supported, valued, and given the opportunity to thrive. My passion has always been helping families, building meaningful relationships, and making a difference in the lives of others. Through Head Start, I get to continue that passion by helping children grow and giving families the support and encouragement they deserve."
+  },
+  {
     "name": "Karen Segler",
     "title": "ERSEA Coordinator",
     "photo": "/images/head-start/staff/staff-karen-segler.jpg",
@@ -1858,9 +1864,8 @@ const SUB_AREA_PHOTOS: Record<string, { src: string; alt: string }[]> = {
   "transit": [
     { src: "/images/hero/hero-14.jpg", alt: "Transit mechanics with diagnostic equipment" },
   ],
-  "weatherization": [
-    { src: "/images/hero/hero-17.jpg", alt: "Weatherization field crew in hi-vis vests" },
-  ],
+  // Weatherization: no program photos yet (hero-17 is Head Start staff, removed per Kristie Jackson Nov 2026)
+  "weatherization": [],
 };
 
 // Sub-areas that show their own slideshow instead of the program's general one
@@ -2186,7 +2191,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
     { label: "View Fares", icon: "💲", areaId: "fares", desc: "See pricing" },
   ],
   "weatherization": [
-    { label: "Paper Application", icon: "📄", href: "/documents/weatherization-application.pdf", desc: "Print & mail or drop off" },
+    { label: "Apply Online", icon: "📝", href: "https://ok.mywaplink.org/", desc: "Oklahoma WAP application" },
     { label: "Check Eligibility", icon: "✅", areaId: "eligibility-weath", desc: "Income guidelines" },
   ],
   "senior-meals": [
@@ -3918,7 +3923,7 @@ const PROGRAMS: ProgramData[] = [
 
             <div className="cadc-stack">
 
-              {/* Ordered by position. Per Robin Harris Oct 9 2026: Dori Lientz resigned (removed); Nicole Burnett hired, add after onboarding. */}
+              {/* Ordered by position. Per Robin Harris Oct 9 2026: Dori Lientz resigned (removed); Nikki Burnett added Nov 2026. */}
               {HS_TEAM.map(m => (
                 <div key={m.name} className="cadc-card-sm" style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
                   <img loading="lazy" decoding="async" src={m.photo} alt={`${m.name} — ${m.title}`}
@@ -4121,11 +4126,11 @@ const PROGRAMS: ProgramData[] = [
         id: "apply-weath", label: "Apply", shortLabel: "Apply", icon: "📝",
         content: (
           <div className="cadc-light-content">
-            <p>Due to a recent change at the state level, online applications are temporarily unavailable. Applications must be submitted using our paper form. Call or stop by your nearest CADC office to request a form or have one mailed to you.</p>
-            <div className="cadc-card" style={{ background: "#FFF8F0", border: "1.5px solid #D97706" }}>
-              <p className="cadc-label" style={{ color: "#D97706" }}>⚠️ Online Applications Temporarily Unavailable</p>
-              <p style={{ fontSize: 13, marginBottom: 10 }}>Paper applications are now required. Download and print below, or call us to have one mailed to you.</p>
-              <a href="/documents/weatherization-application.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">📄 Download Paper Application →</a>
+            <p>Applications for the Weatherization Assistance Program are submitted online through the State of Oklahoma's WAP portal. This is currently the only way to apply.</p>
+            <div className="cadc-card" style={{ background: "#F0F0FF", border: "1.5px solid #0101FF" }}>
+              <p className="cadc-label">Apply Online</p>
+              <p style={{ fontSize: 15, marginBottom: 12 }}>Start your application on the Oklahoma Weatherization Assistance Program site.</p>
+              <a href="https://ok.mywaplink.org/" target="_blank" rel="noopener noreferrer" className="cadc-btn">📝 Apply at ok.mywaplink.org →</a>
             </div>
             <div className="cadc-card">
               <p className="cadc-label">Call to Apply</p>
@@ -4196,11 +4201,6 @@ const PROGRAMS: ProgramData[] = [
               <p className="cadc-label">Available Rental Properties</p>
               <p style={{ fontSize: 13, color: "#374151", fontStyle: "italic" }}>Current availability coming soon. Call to inquire about openings.</p>
               <a href="tel:+15803355588" className="cadc-btn" style={{ marginTop: 12 }}>📞 Call to Inquire — 580-335-5588</a>
-            </div>
-            <div className="cadc-card">
-              <p className="cadc-label">Rental Application</p>
-              <p style={{ fontSize: 13, marginBottom: 10 }}>Download and complete the rental application below. Return completed applications to the Frederick office.</p>
-              <a href="/documents/rental-application.pdf" target="_blank" rel="noopener noreferrer" className="cadc-btn">📄 Download Rental Application →</a>
             </div>
             <div className="cadc-card">
               <p className="cadc-label">CADC Main Office</p>
@@ -5114,7 +5114,6 @@ const HERO_POOLS: Record<string, string[]> = {
   "advantage":       [2,24].map(n=>`/images/hero/hero-${n}.jpg`),
   "community-market":["/images/community-market-3.PNG","/images/community-market-7.PNG","/images/community-market-4.PNG"],
   "transit":         [14].map(n=>`/images/hero/hero-${n}.jpg`),
-  "weatherization":  [17].map(n=>`/images/hero/hero-${n}.jpg`),
   "general":         [6,7,15,16,18,4].map(n=>`/images/hero/hero-${n}.jpg`),
 };
 
