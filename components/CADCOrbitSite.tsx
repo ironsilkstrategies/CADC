@@ -426,7 +426,7 @@ const NOVEMBER_MARKET_DATA: typeof OCTOBER_MARKET_DATA = {
     "2026-11-16": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
     "2026-11-17": [{ time: "11:30 a.m.–5:30 p.m.", location: "Mt. View — 106 OK-115" }],
     "2026-11-18": [{ time: "11:30 a.m.–5:30 p.m.", location: "Corn — Main & Oklahoma" }],
-    "2026-11-19": [{ time: "11:30 a.m.–1:30 p.m.", location: "Lawton — Valley Community Senior Living, 1130 SW Monroe Ave." }, { time: "3–6 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }],
+    "2026-11-19": [{ time: "11:30 a.m.–1:30 p.m.", location: "Lawton — Benjamin O. Davis Highrise, 620 SW E Ave." }, { time: "2:30–6 p.m.", location: "Indiahoma — 900 Show Place Blvd. (east of the Town Hall office)" }],
     "2026-11-20": [{ time: "11 a.m.–6 p.m.", location: "Olustee — 100 W. 4th" }],
     "2026-11-23": [{ time: "11 a.m.–6 p.m.", location: "Temple — 122 S. Commercial Ave." }],
     "2026-11-24": [{ time: "11 a.m.–6 p.m.", location: "Geronimo — 100 Main St. (Senior Citizen Center)" }],
