@@ -118,14 +118,14 @@ const OFFICES = [
     programs: ["Advantage Home Delivered Meals"],
   },
   {
-    name: "Advantage \u2014 Temple Office",
-    address: "102 W. Texas, Temple, OK 73568",
+    name: "CADC \u2014 Temple Office",
+    address: "202 S. Commercial, Temple, OK 73568",
     phone: "580-342-6967",
     phoneHref: "tel:+15803426967",
     hours: "Mon\u2013Fri 8:00am\u20135:00pm",
-    mapsUrl: "https://maps.google.com/?q=102+W.+Texas%2C+Temple%2C+OK+73568",
-    appleMapsUrl: "https://maps.apple.com/?q=102+W.+Texas%2C+Temple%2C+OK+73568",
-    programs: ["Advantage Home Delivered Meals"],
+    mapsUrl: "https://maps.google.com/?q=202+S.+Commercial%2C+Temple%2C+OK+73568",
+    appleMapsUrl: "https://maps.apple.com/?q=202+S.+Commercial%2C+Temple%2C+OK+73568",
+    programs: ["CADC Office", "Advantage Home Delivered Meals"],
   },
   {
     name: "Advantage \u2014 Lawton Office",
@@ -160,8 +160,8 @@ const OFFICES = [
   {
     name: "Community Market \u2014 Scheduling Office",
     address: "105 S. Main Street, Frederick, OK 73542",
-    phone: "580-305-1964",
-    phoneHref: "tel:+15803051964",
+    phone: "580-374-5518",
+    phoneHref: "tel:+15803745518",
     hours: "Call for market schedule",
     mapsUrl: "https://maps.google.com/?q=105+S.+Main+Street%2C+Frederick%2C+OK+73542",
     appleMapsUrl: "https://maps.apple.com/?q=105+S.+Main+Street%2C+Frederick%2C+OK+73542",
@@ -172,11 +172,11 @@ const OFFICES = [
 const DIRECTORS = [
   { name: "Leslea Hixson", title: "Executive Director", phone: "580-335-5588", email: "lhixson@cadcok.org" },
   { name: "Robin Harris", title: "Head Start & Early Head Start Director", phone: "580-726-3343", email: "rharris@cadcok.org" },
-  { name: "Gilbert Nuncio", title: "Red River Transit Director", phone: "580-335-2691", email: "redriver@pldi.net" },
+  { name: "Gilbert Nuncio", title: "Red River Transit Director", phone: "580-335-2691", email: "gnuncio@cadcok.org" },
   { name: "Robert Meador", title: "Weatherization Director", phone: "580-305-0853", email: null },
-  { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-335-5588", email: null },
-  { name: "Scott Fraley", title: "Community Market Director", phone: "580-305-1964", email: "sfraley@cadcok.org" },
-  { name: "Kristie Jackson", title: "CSBG & Advantage Director", phone: "580-393-2216", email: "kjackson@cadcok.org" },
+  { name: "Laura Vardell", title: "Senior Nutrition Director", phone: "580-342-6967", email: "lvardell@cadcok.org" },
+  { name: "Scott Fraley", title: "Community Market Director", phone: "580-374-5518", email: "sfraley@cadcok.org" },
+  { name: "Kristie Jackson", title: "CSBG & Advantage Director", phone: "580-699-8880", email: "kjackson@cadcok.org" },
 ];
 
 // ─── Contact Page ─────────────────────────────────────────────────────────────
@@ -278,7 +278,7 @@ export default function ContactPage() {
               { icon: "🍽️", title: "Senior Meal Sites", desc: "Congregate dining at 6 locations", href: "/?program=senior-meals" },
               { icon: "🚗", title: "Advantage Meals", desc: "Home-delivered meals for seniors", href: "tel:+15803932216" },
               { icon: "🏠", title: "Weatherization", desc: "Energy efficiency & housing assistance", href: "/?program=weatherization" },
-              { icon: "🛒", title: "Community Market", desc: "Mobile grocery — call Scott Fraley", href: "tel:+15803051964" },
+              { icon: "🛒", title: "Community Market", desc: "Mobile grocery — call Scott Fraley", href: "tel:+15803745518" },
             ].map(card => (
               <a
                 key={card.title}

@@ -740,7 +740,7 @@ function MarketSchedulePanel() {
           })}
         </div>
         <p style={{ fontSize: 15, color: "#1F2937", marginTop: 14 }}>
-          Follow us on <a href="https://www.facebook.com/WeAreCADC/" target="_blank" rel="noopener noreferrer" style={{ color: "#0101FF", fontWeight: 700 }}>Facebook</a> for schedule updates. Questions? Call Scott Fraley, Community Market Director, at <a href="tel:+15803051964" style={{ color: "#0101FF", fontWeight: 700 }}>580-305-1964</a>.
+          Follow us on <a href="https://www.facebook.com/WeAreCADC/" target="_blank" rel="noopener noreferrer" style={{ color: "#0101FF", fontWeight: 700 }}>Facebook</a> for schedule updates. Questions? Call Scott Fraley, Community Market Director, at <a href="tel:+15803745518" style={{ color: "#0101FF", fontWeight: 700 }}>580-374-5518</a>.
         </p>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function CountyDetailPopup({ county, slug, cities, onClose }: { county: string; 
           {programs.map(p => <a key={p.slug} href={`/?county=${slug}&program=${p.slug}`} style={{ background: T.blueLight, color: T.blue, padding: "6px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>{p.icon} {p.shortName}</a>)}
         </div>
         <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-          <a href="tel:+15803051964" style={{ flex: 1, textAlign: "center", background: T.maroon, color: "white", padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>📞 Call the Market</a>
+          <a href="tel:+15803745518" style={{ flex: 1, textAlign: "center", background: T.maroon, color: "white", padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>📞 Call the Market</a>
           <a href={`/?county=${slug}`} style={{ flex: 1, textAlign: "center", background: "white", border: `1px solid ${T.blue}`, color: T.blue, padding: "11px", borderRadius: 8, fontWeight: 800, fontSize: 13, textDecoration: "none" }}>See county →</a>
         </div>
       </div>
@@ -2234,7 +2234,7 @@ const PROGRAM_CTAS: Record<string, { label: string; icon: string; href?: string;
   ],
   "community-market": [
     { label: "See Schedule", icon: "📅", areaId: "market-schedule", desc: "Monthly stop schedule" },
-    { label: "Call Scott", icon: "📞", href: "tel:+15803051964", desc: "580-305-1964" },
+    { label: "Call Scott", icon: "📞", href: "tel:+15803745518", desc: "580-374-5518" },
   ],
   "tax-help": [
     { label: "What to Bring", icon: "📎", areaId: "vita-bring", desc: "Required documents" },
@@ -2313,18 +2313,20 @@ function TransitRideSection() {
         <p className="cadc-label">Schedule a ride</p>
         <a href="tel:+15803352691" className="cadc-btn">📞 (580) 335-2691</a>
         <p className="cadc-note">Spanish-speaking staff available. ADA equipped vehicles.</p>
-        <a href="mailto:redriver@pldi.net" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ redriver@pldi.net</a>
+        <a href="mailto:gnuncio@cadcok.org" className="cadc-link" style={{display:"block",marginTop:8}}>✉️ gnuncio@cadcok.org</a>
       </div>
       <p className="cadc-label" style={{ marginTop: 8 }}>Counties served — call your county's office</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
         {[
-          ["Beckham","580-928-2199"],["Caddo","580-335-2691"],["Canadian","580-335-2691"],["Comanche","580-335-2691"],
-          ["Cotton","580-335-2691"],["Custer","580-335-2691"],["Jefferson","580-757-2235"],["Kiowa","580-335-2691"],
-          ["Roger Mills","580-928-2199"],["Stephens","580-335-2691"],["Tillman","580-335-2691"],["Washita","580-335-2691"],
+          ["Beckham","580-928-2199"],["Caddo","580-928-2199"],["Canadian","580-928-2199"],["Comanche","580-335-2691"],
+          ["Cotton","580-757-2235"],["Custer","580-335-2691"],["Jefferson","580-757-2235"],["Kiowa","580-335-2691|580-928-2199"],
+          ["Roger Mills","580-928-2199"],["Stephens","580-757-2235"],["Tillman","580-335-2691"],["Washita","580-928-2199"],
         ].map(([county, phone]) => (
           <div key={county} className="cadc-card-sm" style={{ border: "1.5px solid #E4E4FF" }}>
             <p className="cadc-card-title">{county} County</p>
-            <a href={`tel:+1${phone.replace(/\D/g,"")}`} style={{ color: "#0101FF", fontWeight: 800, fontSize: 17, textDecoration: "none" }}>📞 {phone}</a>
+            {phone.split("|").map(ph => (
+              <a key={ph} href={`tel:+1${ph.replace(/\D/g,"")}`} style={{ display: "block", color: "#0101FF", fontWeight: 800, fontSize: 17, textDecoration: "none" }}>📞 {ph}</a>
+            ))}
           </div>
         ))}
       </div>
@@ -3131,7 +3133,7 @@ const CADC_LOCATIONS = [
   { name: "Senior Nutrition — Ryan", city: "Ryan · 400 Taylor St.", lat: 34.0187, lng: -97.9534, phone: "580-757-2412", href: "tel:+15807572412", services: ["Senior Nutrition"] },
   // Advantage (3)
   { name: "Advantage — Sentinel Office", city: "Sentinel · 122 S. 3rd", lat: 35.1612, lng: -99.1712, phone: "580-393-2216", href: "tel:+15803932216", services: ["Advantage Meals"] },
-  { name: "Advantage — Temple Office", city: "Temple · 102 W. Texas", lat: 34.2712, lng: -98.2412, phone: "580-342-6967", href: "tel:+15803426967", services: ["Advantage Meals"] },
+  { name: "CADC — Temple Office", city: "Temple · 202 S. Commercial", lat: 34.2712, lng: -98.2412, phone: "580-342-6967", href: "tel:+15803426967", services: ["Advantage Meals"] },
   { name: "Advantage — Lawton Office", city: "Lawton · 802 SW A Ave, Ste B", lat: 34.6086, lng: -98.3959, phone: "580-699-8880", href: "tel:+15806998880", services: ["Advantage Meals"] },
   // Head Start (1)
   { name: "Head Start — Administrative Office", city: "Hobart", lat: 35.0295, lng: -99.0929, phone: "580-726-3343", href: "tel:+15807263343", services: ["Head Start","Early Head Start"] },
@@ -3142,7 +3144,7 @@ const CADC_LOCATIONS = [
   // Weatherization (1)
   { name: "Weatherization Office", city: "Frederick · 105 S. Main", lat: 34.3923, lng: -98.9912, phone: "580-335-5588", href: "tel:+15803355588", services: ["Weatherization","Housing"] },
   // Community Market (1)
-  { name: "Community Market", city: "Mobile — call for stops", lat: 34.3923, lng: -98.9912, phone: "580-305-1964", href: "tel:+15803051964", services: ["Community Market"] },
+  { name: "Community Market", city: "Mobile — call for stops", lat: 34.3923, lng: -98.9912, phone: "580-374-5518", href: "tel:+15803745518", services: ["Community Market"] },
 ];
 
 function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -4424,7 +4426,7 @@ const PROGRAMS: ProgramData[] = [
               <div>
                 <p className="cadc-card-title" style={{ marginBottom: 2 }}>Scott Fraley</p>
                 <p style={{ fontSize: 13, color: "#374151", fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Community Market Director</p>
-                <a href="tel:+15803051964" className="cadc-link" style={{ fontSize: 13, display: "block" }}>580-305-1964</a>
+                <a href="tel:+15803745518" className="cadc-link" style={{ fontSize: 13, display: "block" }}>580-374-5518</a>
                 <a href="mailto:SFraley@cadcok.org" className="cadc-link" style={{ fontSize: 13, display: "block", marginBottom: 8 }}>SFraley@cadcok.org</a>
                 <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6, margin: 0 }}>"As Community Market Director, I do this work because I enjoy helping and serving others. Growing up in a small community, I watched local businesses and grocery stores dwindle, making access to fresh food more difficult — especially for those with limited transportation. The Mobile Market helps bridge that gap by bringing fresh, nutritious food directly to communities with limited resources. Being able to connect people with healthy food and needed resources gives me a true sense of purpose."</p>
               </div>
@@ -4869,7 +4871,7 @@ const PROGRAMS: ProgramData[] = [
             <div className="cadc-stack">
               {[
                 {n:"Sentinel — Emily Correll",addr:"122 S. 3rd Butler Building, Sentinel, OK 73664",p:"580-393-2216",href:"tel:+15803932216"},
-                {n:"Temple — Danya Brinson",addr:"102 West Texas, Temple, OK 73568",p:"580-342-6967",href:"tel:+15803426967"},
+                {n:"Temple — Danya Brinson",addr:"202 S. Commercial, Temple, OK 73568",p:"580-342-6967",href:"tel:+15803426967"},
                 {n:"Lawton — Kristie Jackson",addr:"802 SW A Ave, Suite B, Lawton, OK 73501",p:"580-699-8880",href:"tel:+15806998880"},
               ].map(o=>(
                 <div key={o.n} className="cadc-card-sm">

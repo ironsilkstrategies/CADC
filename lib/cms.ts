@@ -221,11 +221,11 @@ export const DEFAULT_CONTENT: SiteContent = {
   staff: [
     { name: "Leslea Hixson",   title: "Executive Director",                         phone: "580-335-5588" },
     { name: "Robin Harris",    title: "Director, Head Start & Early Head Start",     phone: "580-726-3343", email: "rharris@cadcok.org" },
-    { name: "Gilbert Nuncio",  title: "Director, Red River Transportation",          phone: "580-335-2691" },
+    { name: "Gilbert Nuncio",  title: "Director, Red River Transportation",          phone: "580-335-2691", email: "gnuncio@cadcok.org" },
     { name: "Robert Meador",   title: "Director, Weatherization & Housing",          phone: "580-305-0853" },
-    { name: "Laura Vardell",   title: "Director, Senior Nutrition",                  phone: "580-335-5588" },
-    { name: "Scott Fraley",    title: "Director, Community Market",                  phone: "580-305-1964", email: "SFraley@cadcok.org" },
-    { name: "Kristie Jackson", title: "Director, CSBG & Advantage",                 phone: "580-393-2216", email: "kjackson@cadcok.org" },
+    { name: "Laura Vardell",   title: "Director, Senior Nutrition",                  phone: "580-342-6967", email: "lvardell@cadcok.org" },
+    { name: "Scott Fraley",    title: "Director, Community Market",                  phone: "580-374-5518", email: "sfraley@cadcok.org" },
+    { name: "Kristie Jackson", title: "Director, CSBG & Advantage",                 phone: "580-699-8880", email: "kjackson@cadcok.org" },
   ],
   documents: [
     { label: "Annual Report 2025",                         href: "/documents/annual-report-2025.pdf" },

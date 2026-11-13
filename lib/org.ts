@@ -171,7 +171,7 @@ export const programDirectors = {
     title: "Red River Transportation Director",
     phone: "580-335-2691",
     phoneHref: "tel:+15803352691",
-    email: "redriver@pldi.net",
+    email: "gnuncio@cadcok.org",
   },
   weatherization: {
     name: "Robert Meador",
@@ -181,11 +181,11 @@ export const programDirectors = {
     email: "",
   },
   seniorNutrition: {
-    name: "Senior Nutrition Director",
+    name: "Laura Vardell",
     title: "Senior Nutrition Program",
-    phone: "580-335-5588",
-    phoneHref: "tel:+15803355588",
-    email: "",
+    phone: "580-342-6967",
+    phoneHref: "tel:+15803426967",
+    email: "lvardell@cadcok.org",
   },
   advantage: {
     name: "Kristie Jackson",
@@ -197,8 +197,8 @@ export const programDirectors = {
   communityMarket: {
     name: "Scott Fraley",
     title: "Community Market Director",
-    phone: "580-305-1964",
-    phoneHref: "tel:+15803051964",
+    phone: "580-374-5518",
+    phoneHref: "tel:+15803745518",
     email: "sfraley@cadcok.org",
   },
   executive: {
